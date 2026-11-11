@@ -260,10 +260,16 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
     try {
       // Raw values: the action parses them with the same schema. No prices are sent; the
       // displayed total is only compared so a price change is never charged silently.
-      failure = await placeOrderAction({
+      const result = await placeOrderAction({
         ...form.getValues(),
         expectedTotal: quote.totals.total,
       });
+      // VNPay: leave for the gateway (external page); the button stays locked meanwhile.
+      if (result?.ok) {
+        window.location.assign(result.gatewayUrl);
+        return;
+      }
+      failure = result;
     } catch {
       failure = { ok: false, error: 'unexpected', fieldErrors: [] };
     }
@@ -290,7 +296,7 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
           void form.handleSubmit(placeOrder, () => setAlert({ kind: 'fixErrors' }))(event)
         }
         aria-busy={placing}
-        className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-16"
+        className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-16"
       >
         <div className="flex flex-col gap-10">
           <CheckoutSection
