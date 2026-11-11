@@ -45,6 +45,101 @@
       "subject": "Email thử nghiệm từ Perfume Store",
       "heading": "Hệ thống email đã hoạt động",
       "body": "Email này được gửi từ hàng đợi công việc nền để kiểm tra cấu hình."
+    },
+    "layout": {
+      "tagline": "Nước hoa chính hãng, tuyển chọn tại Việt Nam.",
+      "automated": "Email này được gửi tự động, vui lòng không trả lời. Cần hỗ trợ? Hãy liên hệ chúng tôi qua website.",
+      "greeting": "Xin chào {name},"
+    },
+    "order": {
+      "viewOrder": "Xem đơn hàng",
+      "summary": {
+        "items": "Sản phẩm của bạn",
+        "quantity": "SL {quantity}",
+        "subtotal": "Tạm tính",
+        "discount": "Giảm giá",
+        "shipping": "Phí giao hàng",
+        "freeShipping": "Miễn phí",
+        "giftWrap": "Gói quà",
+        "total": "Tổng cộng",
+        "amountPaid": "Đã thanh toán",
+        "amountDue": "Còn lại",
+        "deliverTo": "Giao đến",
+        "paymentMethod": "Thanh toán"
+      },
+      "confirmation": {
+        "subject": "Đã nhận đơn hàng {code}",
+        "preview": "Cảm ơn bạn đã đặt đơn hàng {code}.",
+        "heading": "Cảm ơn bạn đã đặt hàng",
+        "intro": "Chúng tôi đã nhận được đơn hàng {code} bạn đặt ngày {date}.",
+        "instructions": {
+          "cod": "Chúng tôi sẽ gọi điện xác nhận đơn hàng trong vòng 24 giờ. Bạn thanh toán cho người giao hàng khi nhận hàng.",
+          "codDeposit": "Để xác nhận đơn hàng COD này, vui lòng đặt cọc {deposit} qua đường dẫn bên dưới. Phần còn lại thanh toán khi nhận hàng.",
+          "online": "Vui lòng hoàn tất thanh toán {amount} qua đường dẫn bên dưới. Sản phẩm chỉ được giữ cho bạn trong thời gian giới hạn.",
+          "bankTransfer": "Vui lòng chuyển khoản {amount} với nội dung là mã đơn hàng {code}. Chúng tôi xác nhận đơn hàng ngay khi nhận được tiền.",
+          "paid": "Chúng tôi đã nhận được thanh toán và đang chuẩn bị đơn hàng của bạn."
+        }
+      },
+      "paymentReceived": {
+        "subject": "Đã nhận thanh toán cho đơn hàng {code}",
+        "preview": "Chúng tôi đã nhận {amount}.",
+        "heading": "Đã nhận thanh toán",
+        "body": "Chúng tôi đã nhận {amount} cho đơn hàng {code}.",
+        "balance": "Số tiền còn lại {amount} sẽ thanh toán cho người giao hàng khi nhận hàng.",
+        "fullyPaid": "Đơn hàng của bạn đã được thanh toán đủ. Cảm ơn bạn."
+      },
+      "shipped": {
+        "subject": "Đơn hàng {code} đang được giao",
+        "preview": "Đơn hàng đã được giao cho đơn vị vận chuyển.",
+        "heading": "Đơn hàng đang trên đường đến bạn",
+        "body": "Đơn hàng {code} đã được giao cho {carrier}.",
+        "tracking": "Mã vận đơn: {code}",
+        "track": "Theo dõi đơn hàng",
+        "codBalance": "Vui lòng chuẩn bị {amount} để thanh toán cho người giao hàng."
+      },
+      "delivered": {
+        "subject": "Đơn hàng {code} đã được giao",
+        "preview": "Mong bạn yêu thích mùi hương mới.",
+        "heading": "Đơn hàng đã đến tay bạn",
+        "body": "Đơn hàng {code} đã được giao thành công. Mong bạn yêu thích mùi hương mới.",
+        "review": "Vài ngày tới, chúng tôi sẽ mời bạn đánh giá sản phẩm. Cảm nhận của bạn giúp những người yêu nước hoa khác lựa chọn dễ dàng hơn.",
+        "returns": "Có điều gì chưa ổn? Bạn có thể yêu cầu trả hàng trong vòng 7 ngày kể từ khi nhận hàng."
+      },
+      "cancelled": {
+        "subject": "Đơn hàng {code} đã được huỷ",
+        "preview": "Đơn hàng của bạn đã được huỷ.",
+        "heading": "Đơn hàng đã được huỷ",
+        "body": "Đơn hàng {code} đã được huỷ và các sản phẩm giữ cho bạn đã được trả lại kho.",
+        "refund": "Chúng tôi sẽ hoàn lại {amount} bạn đã thanh toán và gửi xác nhận khi hoàn tiền xong.",
+        "help": "Nếu bạn không yêu cầu huỷ đơn, vui lòng liên hệ chúng tôi."
+      },
+      "refunded": {
+        "subject": "Đã nhận hàng trả lại của đơn {code}",
+        "preview": "Yêu cầu hoàn tiền của bạn đang được xử lý.",
+        "heading": "Chúng tôi đã nhận hàng trả lại",
+        "body": "Chúng tôi đã nhận được sản phẩm trả lại của đơn hàng {code}.",
+        "refund": "Chúng tôi đang hoàn lại {amount} và sẽ gửi xác nhận khi hoàn tiền xong."
+      }
+    },
+    "auth": {
+      "verify": {
+        "subject": "Xác nhận email của bạn",
+        "preview": "Chỉ một bước để hoàn tất tạo tài khoản.",
+        "heading": "Xác nhận email của bạn",
+        "body": "Vui lòng xác nhận địa chỉ email để hoàn tất việc tạo tài khoản Perfume Store.",
+        "cta": "Xác nhận email",
+        "expiry": "Đường dẫn có hiệu lực trong 24 giờ.",
+        "ignore": "Nếu bạn không tạo tài khoản, hãy bỏ qua email này."
+      },
+      "reset": {
+        "subject": "Đặt lại mật khẩu",
+        "preview": "Chọn mật khẩu mới cho tài khoản của bạn.",
+        "heading": "Đặt lại mật khẩu",
+        "body": "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Perfume Store của bạn.",
+        "cta": "Đặt mật khẩu mới",
+        "expiry": "Đường dẫn có hiệu lực trong 30 phút và chỉ dùng được một lần.",
+        "ignore": "Nếu bạn không yêu cầu, hãy bỏ qua email này: mật khẩu của bạn vẫn giữ nguyên."
+      }
     }
   },
   "ui": {
@@ -1144,6 +1239,302 @@
         },
         "system": "Hệ thống"
       }
+    },
+    "alerts": {
+      "subject": "[Perfume Store] {title}",
+      "heading": "Thông báo nội bộ",
+      "openAdmin": "Mở trang quản trị",
+      "kinds": {
+        "new_order": "Đơn hàng mới",
+        "high_value_cod": "Đơn COD giá trị cao",
+        "suspicious_ipn": "IPN đáng ngờ",
+        "late_payment_refund": "Thanh toán sau khi huỷ cần hoàn tiền",
+        "low_stock": "Sắp hết hàng",
+        "job_failed": "Tác vụ nền thất bại"
+      },
+      "order": "Đơn {code}: {amount} · {method} · {province}",
+      "orderNoProvince": "Đơn {code}: {amount} · {method}",
+      "noDetails": "Không có thêm thông tin."
     }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Đăng nhập",
+      "metaTitle": "Đăng nhập",
+      "intro": "Chào mừng bạn trở lại. Đăng nhập để theo dõi đơn hàng và thanh toán nhanh hơn.",
+      "submit": "Đăng nhập",
+      "forgot": "Quên mật khẩu?",
+      "noAccount": "Lần đầu đến với Perfume Store?",
+      "createAccount": "Tạo tài khoản",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "notVerified": "Vui lòng xác nhận email trước. Chúng tôi vừa gửi lại đường dẫn xác nhận cho bạn.",
+      "locked": "Tài khoản này đã bị khoá. Vui lòng liên hệ chúng tôi để được hỗ trợ.",
+      "staffAccount": "Tài khoản nhân viên đăng nhập tại trang quản trị.",
+      "verified": "Email của bạn đã được xác nhận. Chào mừng bạn!",
+      "verifyFailed": "Đường dẫn xác nhận không hợp lệ hoặc đã hết hạn. Hãy đăng nhập để nhận đường dẫn mới."
+    },
+    "signUp": {
+      "title": "Tạo tài khoản",
+      "metaTitle": "Tạo tài khoản",
+      "intro": "Lưu địa chỉ, theo dõi đơn hàng và nhận email bằng ngôn ngữ bạn chọn.",
+      "submit": "Tạo tài khoản",
+      "haveAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "checkEmailTitle": "Hãy kiểm tra hộp thư",
+      "checkEmail": "Nếu {email} có thể dùng để tạo tài khoản, chúng tôi đã gửi đường dẫn xác nhận đến địa chỉ này. Mở đường dẫn để hoàn tất đăng ký.",
+      "terms": "Khi tạo tài khoản, bạn đồng ý với điều khoản sử dụng và chính sách bảo mật của chúng tôi."
+    },
+    "forgot": {
+      "title": "Quên mật khẩu?",
+      "metaTitle": "Quên mật khẩu",
+      "intro": "Nhập email của tài khoản, chúng tôi sẽ gửi đường dẫn để bạn đặt mật khẩu mới.",
+      "submit": "Gửi đường dẫn",
+      "sentTitle": "Hãy kiểm tra hộp thư",
+      "sent": "Nếu {email} có tài khoản, đường dẫn đặt lại mật khẩu đang được gửi đến. Đường dẫn có hiệu lực 30 phút và chỉ dùng được một lần.",
+      "back": "Quay lại đăng nhập"
+    },
+    "reset": {
+      "title": "Đặt mật khẩu mới",
+      "metaTitle": "Đặt lại mật khẩu",
+      "intro": "Mật khẩu mới cần có ít nhất 8 ký tự.",
+      "submit": "Lưu mật khẩu mới",
+      "done": "Mật khẩu đã được thay đổi. Vui lòng đăng nhập bằng mật khẩu mới.",
+      "invalidToken": "Đường dẫn đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Hãy yêu cầu đường dẫn mới.",
+      "requestNew": "Yêu cầu đường dẫn mới",
+      "signIn": "Đăng nhập"
+    },
+    "fields": {
+      "name": "Họ và tên",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Nhập lại mật khẩu mới",
+      "passwordHint": "Ít nhất 8 ký tự.",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu"
+    },
+    "google": "Tiếp tục với Google",
+    "or": "hoặc",
+    "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "tooManyRequests": "Bạn đã thử quá nhiều lần. Vui lòng đợi vài phút rồi thử lại."
+  },
+  "account": {
+    "metaTitle": "Tài khoản",
+    "title": "Tài khoản của tôi",
+    "greeting": "Xin chào, {name}",
+    "nav": {
+      "label": "Tài khoản",
+      "overview": "Tổng quan",
+      "orders": "Đơn hàng",
+      "addresses": "Địa chỉ",
+      "profile": "Hồ sơ",
+      "signOut": "Đăng xuất"
+    },
+    "overview": {
+      "intro": "Theo dõi đơn hàng, quản lý địa chỉ và chọn cách chúng tôi liên hệ với bạn.",
+      "recentOrders": "Đơn hàng gần đây",
+      "viewAll": "Xem tất cả đơn hàng",
+      "noOrders": "Bạn chưa có đơn hàng nào.",
+      "shop": "Khám phá nước hoa",
+      "defaultAddress": "Địa chỉ mặc định",
+      "noAddress": "Chưa có địa chỉ nào được lưu.",
+      "manageAddresses": "Quản lý địa chỉ",
+      "profile": "Hồ sơ",
+      "editProfile": "Chỉnh sửa hồ sơ",
+      "language": "Ngôn ngữ email: {language}",
+      "unverified": "Email của bạn chưa được xác nhận."
+    },
+    "orders": {
+      "title": "Đơn hàng của tôi",
+      "metaTitle": "Đơn hàng của tôi",
+      "empty": "Bạn chưa có đơn hàng nào.",
+      "code": "Mã đơn",
+      "date": "Ngày đặt",
+      "status": "Trạng thái",
+      "payment": "Thanh toán",
+      "total": "Tổng tiền",
+      "items": "{count} sản phẩm",
+      "view": "Xem đơn {code}",
+      "back": "Quay lại danh sách đơn hàng",
+      "detailTitle": "Đơn hàng {code}"
+    },
+    "addresses": {
+      "title": "Sổ địa chỉ",
+      "metaTitle": "Địa chỉ của tôi",
+      "intro": "Lưu tối đa {max} địa chỉ giao hàng. Địa chỉ mặc định được gợi ý khi thanh toán.",
+      "empty": "Bạn chưa lưu địa chỉ nào.",
+      "add": "Thêm địa chỉ",
+      "edit": "Sửa",
+      "editTitle": "Sửa địa chỉ",
+      "addTitle": "Địa chỉ mới",
+      "delete": "Xoá",
+      "deleteTitle": "Xoá địa chỉ này?",
+      "deleteDescription": "Thao tác này không thể hoàn tác.",
+      "confirmDelete": "Xoá địa chỉ",
+      "cancel": "Huỷ",
+      "setDefault": "Đặt làm mặc định",
+      "default": "Mặc định",
+      "save": "Lưu địa chỉ",
+      "saved": "Đã lưu địa chỉ.",
+      "deleted": "Đã xoá địa chỉ.",
+      "defaultSaved": "Đã cập nhật địa chỉ mặc định.",
+      "limitReached": "Bạn đã lưu đủ {max} địa chỉ. Hãy xoá bớt một địa chỉ để thêm địa chỉ mới.",
+      "fields": {
+        "fullName": "Tên người nhận",
+        "phone": "Số điện thoại",
+        "phoneHint": "10 chữ số, bắt đầu bằng 0.",
+        "province": "Tỉnh / thành phố",
+        "ward": "Phường / xã",
+        "street": "Địa chỉ cụ thể",
+        "streetHint": "Số nhà, tên đường, toà nhà.",
+        "isDefault": "Đặt làm địa chỉ mặc định",
+        "provincePlaceholder": "Chọn tỉnh / thành phố",
+        "wardPlaceholder": "Chọn phường / xã",
+        "wardFirst": "Hãy chọn tỉnh / thành phố trước",
+        "search": "Tìm kiếm…",
+        "noResults": "Không có kết quả phù hợp."
+      },
+      "wardsFailed": "Không tải được danh sách phường / xã. Vui lòng thử lại."
+    },
+    "profile": {
+      "title": "Hồ sơ",
+      "metaTitle": "Hồ sơ của tôi",
+      "intro": "Thông tin của bạn được dùng để giao hàng và gửi email về đơn hàng.",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu hồ sơ.",
+      "fields": {
+        "name": "Họ và tên",
+        "email": "Email",
+        "emailHint": "Liên hệ chúng tôi nếu bạn muốn đổi email của tài khoản.",
+        "phone": "Số điện thoại",
+        "phoneHint": "10 chữ số, bắt đầu bằng 0. Không bắt buộc.",
+        "birthday": "Ngày sinh",
+        "birthdayHint": "Không bắt buộc.",
+        "locale": "Ngôn ngữ email",
+        "localeHint": "Email về tài khoản được gửi bằng ngôn ngữ này.",
+        "marketing": "Gửi cho tôi tin tức và ưu đãi dành riêng qua email",
+        "marketingHint": "Bạn có thể huỷ đăng ký bất cứ lúc nào."
+      },
+      "languages": {
+        "vi": "Tiếng Việt",
+        "en": "English"
+      }
+    },
+    "errors": {
+      "required": "Vui lòng điền thông tin này.",
+      "tooLong": "Nội dung quá dài.",
+      "invalid": "Vui lòng kiểm tra lại giá trị này.",
+      "emailInvalid": "Vui lòng nhập email hợp lệ.",
+      "passwordTooShort": "Mật khẩu cần ít nhất 8 ký tự.",
+      "passwordTooLong": "Mật khẩu tối đa 128 ký tự.",
+      "passwordMismatch": "Hai mật khẩu chưa khớp nhau.",
+      "phoneInvalid": "Số điện thoại cần 10 chữ số, bắt đầu bằng 0.",
+      "birthdayInvalid": "Vui lòng nhập một ngày hợp lệ trong quá khứ.",
+      "wardInvalid": "Hãy chọn phường / xã thuộc tỉnh / thành phố đã chọn.",
+      "addressLimit": "Bạn có thể lưu tối đa 10 địa chỉ.",
+      "codeInvalid": "Mã đơn hàng có dạng PF-261111-7K3Q.",
+      "notFound": "Không tìm thấy nội dung này.",
+      "unauthorized": "Vui lòng đăng nhập lại.",
+      "notCancellable": "Đơn hàng này không thể huỷ được nữa.",
+      "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "validation": "Vui lòng sửa các mục được đánh dấu."
+    }
+  },
+  "customerOrder": {
+    "status": {
+      "pending": "Chờ thanh toán",
+      "awaiting_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "processing": "Đang chuẩn bị",
+      "shipped": "Đang giao",
+      "delivered": "Đã giao",
+      "completed": "Hoàn tất",
+      "cancelled": "Đã huỷ",
+      "delivery_failed": "Giao không thành công",
+      "return_requested": "Yêu cầu trả hàng",
+      "returned": "Đã trả hàng"
+    },
+    "paymentStatus": {
+      "unpaid": "Chưa thanh toán",
+      "partially_paid": "Đã thanh toán một phần",
+      "paid": "Đã thanh toán",
+      "partially_refunded": "Đã hoàn tiền một phần",
+      "refunded": "Đã hoàn tiền"
+    },
+    "paymentMethod": {
+      "cod": "Thanh toán khi nhận hàng (COD)",
+      "vnpay": "VNPay",
+      "payos": "Chuyển khoản VietQR",
+      "bank_transfer": "Chuyển khoản ngân hàng",
+      "momo": "MoMo",
+      "zalopay": "ZaloPay"
+    },
+    "carrier": {
+      "self": "Nhân viên cửa hàng",
+      "ghn": "Giao Hàng Nhanh",
+      "ghtk": "Giao Hàng Tiết Kiệm",
+      "viettel_post": "Viettel Post",
+      "other": "Đơn vị vận chuyển"
+    },
+    "shipmentStatus": {
+      "pending": "Đang chuẩn bị",
+      "in_transit": "Đang vận chuyển",
+      "delivered": "Đã giao",
+      "failed": "Giao không thành công",
+      "returned": "Đã hoàn về"
+    },
+    "view": {
+      "placedOn": "Đặt ngày {date}",
+      "status": "Trạng thái đơn hàng",
+      "timeline": "Lịch sử đơn hàng",
+      "items": "Sản phẩm",
+      "quantity": "SL {quantity}",
+      "summary": "Tóm tắt",
+      "subtotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "coupon": "Giảm giá ({code})",
+      "shipping": "Phí giao hàng",
+      "freeShipping": "Miễn phí",
+      "giftWrap": "Gói quà",
+      "total": "Tổng cộng",
+      "amountPaid": "Đã thanh toán",
+      "amountDue": "Còn lại",
+      "amountRefunded": "Đã hoàn tiền",
+      "deposit": "Tiền đặt cọc",
+      "payment": "Thanh toán",
+      "paymentMethod": "Phương thức",
+      "paymentStatus": "Trạng thái",
+      "shippingAddress": "Địa chỉ giao hàng",
+      "tracking": "Vận chuyển",
+      "trackingCode": "Mã vận đơn: {code}",
+      "trackParcel": "Theo dõi đơn",
+      "noTracking": "Thông tin vận chuyển sẽ hiển thị khi đơn hàng được giao cho đơn vị vận chuyển.",
+      "giftMessage": "Lời nhắn kèm quà",
+      "note": "Ghi chú của bạn"
+    },
+    "cancel": {
+      "button": "Huỷ đơn hàng",
+      "title": "Huỷ đơn hàng {code}?",
+      "description": "Sản phẩm đang giữ cho bạn sẽ được trả lại kho. Thao tác này không thể hoàn tác.",
+      "confirm": "Đồng ý huỷ đơn",
+      "keep": "Giữ đơn hàng",
+      "done": "Đơn hàng của bạn đã được huỷ."
+    }
+  },
+  "orderLookup": {
+    "title": "Tra cứu đơn hàng",
+    "metaTitle": "Tra cứu đơn hàng",
+    "intro": "Nhập mã đơn hàng và số điện thoại bạn đã dùng khi đặt hàng.",
+    "code": "Mã đơn hàng",
+    "codeHint": "Ví dụ PF-261111-7K3Q, có trong email xác nhận đơn hàng.",
+    "phone": "Số điện thoại",
+    "submit": "Tra cứu",
+    "notFound": "Không tìm thấy đơn hàng với thông tin này. Vui lòng kiểm tra lại mã đơn hàng và số điện thoại.",
+    "rateLimited": "Bạn đã thử quá nhiều lần. Vui lòng đợi vài phút rồi thử lại.",
+    "another": "Tra cứu đơn hàng khác",
+    "signInHint": "Đã có tài khoản?",
+    "signIn": "Đăng nhập để xem tất cả đơn hàng",
+    "resultTitle": "Đơn hàng {code}"
   }
 }

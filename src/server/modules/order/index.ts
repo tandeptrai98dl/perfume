@@ -23,3 +23,18 @@ export {
   type TransitionResult,
 } from './transition';
 export { generateOrderCode, ORDER_CODE_PATTERN } from './codes';
+
+// Customer (account & notifications stream): own-order reads scoped by user_id, guest lookup,
+// read model for emails, customer cancellation.
+export {
+  findOrderCodeForLookup,
+  getCustomerOrder,
+  getOrderViewByCode,
+  getOrderViewById,
+  listCustomerOrders,
+  normalizeOrderCode,
+  type CustomerOrderRow,
+  type OrderTimelineEntry,
+  type OrderView,
+} from './customer-queries';
+export { cancelCustomerOrder, CUSTOMER_CANCEL_REASON } from './customer-commands';

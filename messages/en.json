@@ -45,6 +45,101 @@
       "subject": "Test email from Perfume Store",
       "heading": "Email delivery is working",
       "body": "This email was sent from the background job queue to check the setup."
+    },
+    "layout": {
+      "tagline": "Authentic perfume, curated in Vietnam.",
+      "automated": "This email was sent automatically, please do not reply. Questions? Contact us through our website.",
+      "greeting": "Hello {name},"
+    },
+    "order": {
+      "viewOrder": "View your order",
+      "summary": {
+        "items": "Your items",
+        "quantity": "Qty {quantity}",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "shipping": "Shipping",
+        "freeShipping": "Free",
+        "giftWrap": "Gift wrap",
+        "total": "Total",
+        "amountPaid": "Paid",
+        "amountDue": "Remaining",
+        "deliverTo": "Delivering to",
+        "paymentMethod": "Payment"
+      },
+      "confirmation": {
+        "subject": "Order {code} received",
+        "preview": "Thank you for your order {code}.",
+        "heading": "Thank you for your order",
+        "intro": "We have received your order {code} placed on {date}.",
+        "instructions": {
+          "cod": "We will call you within 24 hours to confirm your order. You pay the courier on delivery.",
+          "codDeposit": "To confirm this cash-on-delivery order, please pay a deposit of {deposit} using the link below. The rest is paid on delivery.",
+          "online": "Please complete the payment of {amount} using the link below. Your items are reserved for a limited time.",
+          "bankTransfer": "Please transfer {amount} with the order code {code} as the transfer note. We confirm your order once the payment arrives.",
+          "paid": "Your payment has been received. We are preparing your order."
+        }
+      },
+      "paymentReceived": {
+        "subject": "Payment received for order {code}",
+        "preview": "We received {amount}.",
+        "heading": "Payment received",
+        "body": "We have received {amount} for order {code}.",
+        "balance": "The remaining {amount} is paid to the courier on delivery.",
+        "fullyPaid": "Your order is fully paid. Thank you."
+      },
+      "shipped": {
+        "subject": "Order {code} is on its way",
+        "preview": "Your parcel has been handed to the courier.",
+        "heading": "Your order is on its way",
+        "body": "Your order {code} has been handed to {carrier}.",
+        "tracking": "Tracking code: {code}",
+        "track": "Track your parcel",
+        "codBalance": "Please have {amount} ready for the courier."
+      },
+      "delivered": {
+        "subject": "Order {code} has been delivered",
+        "preview": "We hope you enjoy your new fragrance.",
+        "heading": "Your order has arrived",
+        "body": "Your order {code} has been delivered. We hope you enjoy your new fragrance.",
+        "review": "In a few days we will invite you to review your purchase. Your impressions help other perfume lovers choose.",
+        "returns": "Something not right? You can request a return within 7 days of delivery."
+      },
+      "cancelled": {
+        "subject": "Order {code} has been cancelled",
+        "preview": "Your order has been cancelled.",
+        "heading": "Your order has been cancelled",
+        "body": "Order {code} has been cancelled and the reserved items have been released.",
+        "refund": "We will refund the {amount} you paid. You will receive a confirmation once it is sent.",
+        "help": "If you did not ask for this, please contact us."
+      },
+      "refunded": {
+        "subject": "Return received for order {code}",
+        "preview": "Your refund is being processed.",
+        "heading": "Your return has been received",
+        "body": "We have received the items returned from order {code}.",
+        "refund": "We are refunding {amount}. You will receive a confirmation once it is sent."
+      }
+    },
+    "auth": {
+      "verify": {
+        "subject": "Confirm your email",
+        "preview": "One click to finish creating your account.",
+        "heading": "Confirm your email",
+        "body": "Please confirm your email address to finish creating your Perfume Store account.",
+        "cta": "Confirm my email",
+        "expiry": "This link is valid for 24 hours.",
+        "ignore": "If you did not create an account, you can ignore this email."
+      },
+      "reset": {
+        "subject": "Reset your password",
+        "preview": "Choose a new password for your account.",
+        "heading": "Reset your password",
+        "body": "We received a request to reset the password of your Perfume Store account.",
+        "cta": "Choose a new password",
+        "expiry": "This link is valid for 30 minutes and can be used once.",
+        "ignore": "If you did not ask for this, you can ignore this email: your password stays the same."
+      }
     }
   },
   "ui": {
@@ -333,5 +428,285 @@
       "hint": "Press Enter to see all results",
       "error": "Suggestions could not be loaded. Please try again."
     }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "metaTitle": "Sign in",
+      "intro": "Welcome back. Sign in to follow your orders and check out faster.",
+      "submit": "Sign in",
+      "forgot": "Forgot your password?",
+      "noAccount": "New to Perfume Store?",
+      "createAccount": "Create an account",
+      "invalidCredentials": "The email or password is incorrect.",
+      "notVerified": "Please confirm your email first. We have sent you a new confirmation link.",
+      "locked": "This account is locked. Please contact us for help.",
+      "staffAccount": "Staff accounts sign in through the admin area.",
+      "verified": "Your email is confirmed. Welcome!",
+      "verifyFailed": "This confirmation link is invalid or has expired. Sign in to receive a new one."
+    },
+    "signUp": {
+      "title": "Create an account",
+      "metaTitle": "Create an account",
+      "intro": "Save your addresses, follow your orders and receive emails in your language.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "checkEmailTitle": "Check your inbox",
+      "checkEmail": "If {email} can be used for a new account, we have sent a confirmation link to it. Open the link to finish signing up.",
+      "terms": "By creating an account you agree to our terms and privacy policy."
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "metaTitle": "Forgot password",
+      "intro": "Enter the email of your account and we will send you a link to choose a new password.",
+      "submit": "Send reset link",
+      "sentTitle": "Check your inbox",
+      "sent": "If an account exists for {email}, a reset link is on its way. It is valid for 30 minutes and can be used once.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "metaTitle": "Reset password",
+      "intro": "Your new password must have at least 8 characters.",
+      "submit": "Save new password",
+      "done": "Your password has been changed. Please sign in with your new password.",
+      "invalidToken": "This reset link is invalid or has expired. Request a new one.",
+      "requestNew": "Request a new link",
+      "signIn": "Sign in"
+    },
+    "fields": {
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "passwordHint": "At least 8 characters.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "google": "Continue with Google",
+    "or": "or",
+    "genericError": "Something went wrong. Please try again.",
+    "tooManyRequests": "Too many attempts. Please wait a few minutes and try again."
+  },
+  "account": {
+    "metaTitle": "My account",
+    "title": "My account",
+    "greeting": "Hello, {name}",
+    "nav": {
+      "label": "Account",
+      "overview": "Overview",
+      "orders": "Orders",
+      "addresses": "Addresses",
+      "profile": "Profile",
+      "signOut": "Sign out"
+    },
+    "overview": {
+      "intro": "Follow your orders, manage your addresses and choose how we contact you.",
+      "recentOrders": "Recent orders",
+      "viewAll": "View all orders",
+      "noOrders": "You have not placed an order yet.",
+      "shop": "Discover our perfumes",
+      "defaultAddress": "Default address",
+      "noAddress": "No saved address yet.",
+      "manageAddresses": "Manage addresses",
+      "profile": "Profile",
+      "editProfile": "Edit profile",
+      "language": "Email language: {language}",
+      "unverified": "Your email is not confirmed yet."
+    },
+    "orders": {
+      "title": "My orders",
+      "metaTitle": "My orders",
+      "empty": "You have no orders yet.",
+      "code": "Order",
+      "date": "Date",
+      "status": "Status",
+      "payment": "Payment",
+      "total": "Total",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "view": "View order {code}",
+      "back": "Back to my orders",
+      "detailTitle": "Order {code}"
+    },
+    "addresses": {
+      "title": "Addresses",
+      "metaTitle": "My addresses",
+      "intro": "Save up to {max} delivery addresses. The default address is suggested at checkout.",
+      "empty": "You have no saved addresses.",
+      "add": "Add address",
+      "edit": "Edit",
+      "editTitle": "Edit address",
+      "addTitle": "New address",
+      "delete": "Delete",
+      "deleteTitle": "Delete this address?",
+      "deleteDescription": "This cannot be undone.",
+      "confirmDelete": "Delete address",
+      "cancel": "Cancel",
+      "setDefault": "Set as default",
+      "default": "Default",
+      "save": "Save address",
+      "saved": "Address saved.",
+      "deleted": "Address deleted.",
+      "defaultSaved": "Default address updated.",
+      "limitReached": "You have reached the limit of {max} addresses. Delete one to add another.",
+      "fields": {
+        "fullName": "Recipient name",
+        "phone": "Phone number",
+        "phoneHint": "10 digits, starting with 0.",
+        "province": "Province / city",
+        "ward": "Ward / commune",
+        "street": "Street address",
+        "streetHint": "House number, street, building.",
+        "isDefault": "Use as my default address",
+        "provincePlaceholder": "Select a province",
+        "wardPlaceholder": "Select a ward",
+        "wardFirst": "Select a province first",
+        "search": "Search…",
+        "noResults": "No matching names."
+      },
+      "wardsFailed": "Could not load wards. Please try again."
+    },
+    "profile": {
+      "title": "Profile",
+      "metaTitle": "My profile",
+      "intro": "Your details are used for deliveries and order emails.",
+      "save": "Save changes",
+      "saved": "Profile saved.",
+      "fields": {
+        "name": "Full name",
+        "email": "Email",
+        "emailHint": "Contact us to change the email of your account.",
+        "phone": "Phone number",
+        "phoneHint": "10 digits, starting with 0. Optional.",
+        "birthday": "Birthday",
+        "birthdayHint": "Optional.",
+        "locale": "Email language",
+        "localeHint": "Account emails are sent in this language.",
+        "marketing": "Send me news and private offers by email",
+        "marketingHint": "You can unsubscribe at any time."
+      },
+      "languages": {
+        "vi": "Tiếng Việt",
+        "en": "English"
+      }
+    },
+    "errors": {
+      "required": "This field is required.",
+      "tooLong": "This is too long.",
+      "invalid": "Please check this value.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordTooShort": "Use at least 8 characters.",
+      "passwordTooLong": "Use at most 128 characters.",
+      "passwordMismatch": "The passwords do not match.",
+      "phoneInvalid": "Enter a Vietnamese mobile number: 10 digits starting with 0.",
+      "birthdayInvalid": "Enter a valid date in the past.",
+      "wardInvalid": "Choose a ward in the selected province.",
+      "addressLimit": "You can save up to 10 addresses.",
+      "codeInvalid": "Order codes look like PF-261111-7K3Q.",
+      "notFound": "We could not find this item.",
+      "unauthorized": "Please sign in again.",
+      "notCancellable": "This order can no longer be cancelled.",
+      "conflict": "The order changed in the meantime. Please reload the page.",
+      "unexpected": "Something went wrong. Please try again.",
+      "validation": "Please correct the highlighted fields."
+    }
+  },
+  "customerOrder": {
+    "status": {
+      "pending": "Awaiting payment",
+      "awaiting_confirmation": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "processing": "Preparing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "delivery_failed": "Delivery failed",
+      "return_requested": "Return requested",
+      "returned": "Returned"
+    },
+    "paymentStatus": {
+      "unpaid": "Unpaid",
+      "partially_paid": "Partially paid",
+      "paid": "Paid",
+      "partially_refunded": "Partially refunded",
+      "refunded": "Refunded"
+    },
+    "paymentMethod": {
+      "cod": "Cash on delivery",
+      "vnpay": "VNPay",
+      "payos": "VietQR bank transfer",
+      "bank_transfer": "Bank transfer",
+      "momo": "MoMo",
+      "zalopay": "ZaloPay"
+    },
+    "carrier": {
+      "self": "Our courier",
+      "ghn": "Giao Hàng Nhanh",
+      "ghtk": "Giao Hàng Tiết Kiệm",
+      "viettel_post": "Viettel Post",
+      "other": "Courier"
+    },
+    "shipmentStatus": {
+      "pending": "Preparing",
+      "in_transit": "In transit",
+      "delivered": "Delivered",
+      "failed": "Delivery failed",
+      "returned": "Returned"
+    },
+    "view": {
+      "placedOn": "Placed on {date}",
+      "status": "Order status",
+      "timeline": "Order history",
+      "items": "Items",
+      "quantity": "Qty {quantity}",
+      "summary": "Summary",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "coupon": "Discount ({code})",
+      "shipping": "Shipping",
+      "freeShipping": "Free",
+      "giftWrap": "Gift wrap",
+      "total": "Total",
+      "amountPaid": "Paid",
+      "amountDue": "Remaining",
+      "amountRefunded": "Refunded",
+      "deposit": "Deposit required",
+      "payment": "Payment",
+      "paymentMethod": "Method",
+      "paymentStatus": "Status",
+      "shippingAddress": "Delivery address",
+      "tracking": "Shipment",
+      "trackingCode": "Tracking code: {code}",
+      "trackParcel": "Track parcel",
+      "noTracking": "Tracking details appear here once your parcel is on its way.",
+      "giftMessage": "Gift message",
+      "note": "Your note"
+    },
+    "cancel": {
+      "button": "Cancel order",
+      "title": "Cancel order {code}?",
+      "description": "Your reserved items will be released. This cannot be undone.",
+      "confirm": "Yes, cancel order",
+      "keep": "Keep order",
+      "done": "Your order has been cancelled."
+    }
+  },
+  "orderLookup": {
+    "title": "Find your order",
+    "metaTitle": "Order lookup",
+    "intro": "Enter your order code and the phone number used at checkout.",
+    "code": "Order code",
+    "codeHint": "For example PF-261111-7K3Q, in your confirmation email.",
+    "phone": "Phone number",
+    "submit": "Find order",
+    "notFound": "We could not find an order with these details. Please check the order code and phone number.",
+    "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
+    "another": "Look up another order",
+    "signInHint": "Have an account?",
+    "signIn": "Sign in to see all your orders",
+    "resultTitle": "Order {code}"
   }
 }
