@@ -84,7 +84,7 @@ test.describe.serial('admin coupons and shipping', () => {
     await expectNoAxeViolations(page);
     await page.getByRole('button', { name: 'Tạo', exact: true }).click();
     // 150% is refused with a translated field error.
-    await expect(page.getByText('Phần trăm từ 1 đến 100.')).toBeVisible();
+    await expect(page.locator('main form').getByText('Phần trăm từ 1 đến 100.')).toBeVisible();
     await field(page, 'Giá trị').fill('15');
     await page.getByRole('button', { name: 'Tạo', exact: true }).click();
     await expect(toast(page, 'Đã tạo')).toBeVisible();

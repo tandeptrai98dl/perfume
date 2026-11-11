@@ -935,6 +935,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 
 - **Dashboard:** revenue today/7/30 days, orders by status (awaiting confirmation, to pack, in transit), average order value, top 10 products, low stock, reviews awaiting moderation, content missing English translations, e-invoices failed.
 - **Orders:** filter by status/payment method/date/province; search by code/phone/email; detail with timeline, payments, internal notes, e-invoice status; only valid transition buttons; carrier + tracking entry; packing slip (prices hidden for gifts) and delivery slip; cancel/refund with reason; bulk confirm/print.
+  Work queues: "awaiting confirmation" = `awaiting_confirmation`, "to pack" = `confirmed` + `processing`, "in transit" = `shipped`. Confirming a COD order is refused until `amount_paid >= deposit_required`; entering `shipped` creates the `shipments` row (carrier + tracking code, COD amount = balance due); `delivery_failed` sets `users.cod_risk_flag` and the phone's failed deliveries warn on later COD orders (derived from `order_events`, no extra table); an order holding money is cancelled only with `orders.cancelPaid` and the amount owed appears in the payments refund queue. Notes are `order_events` of type `note`; every action writes `audit_logs`.
 - **Manual orders** (`/admin/orders/new`): find customer by phone/email or create; pick variants; apply coupon; choose email language; payment = COD, manually confirmed bank transfer, or a payment link sent by email/Zalo.
 - **Order edits** before `shipped`: before/after diff and money difference shown before saving; blocked if someone else changed the order (optimistic lock).
 - **Products:** tabbed editor (Details, Variants & prices, Scent, Media, SEO, Compliance) with vi/en tabs; draft/published/archived; duplicate; slug change creates a 301 redirect; saving revalidates related pages (`revalidateTag`).
@@ -944,7 +945,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 - **Coupons:** percent / fixed / free shipping; conditions (minimum subtotal, brands, categories, usage limits, dates); usage statistics.
 - **Reviews:** approve/reject/reply; approval updates `rating_avg`.
 - **Content:** banners per placement with schedule, journal posts (Tiptap, linked products), static pages, header/footer menus, redirects — bilingual.
-- **Shipping:** zones (province groups) + weight-based rates, free-shipping threshold, delivery estimates.
+- **Shipping:** zones (province groups) + weight-based rates, free-shipping threshold, delivery estimates. Rates change checkout prices, so managing them needs `settings.manage` (Owner); a province in several zones uses the zone with the lowest priority number.
 - **Payments:** transactions by gateway, unmatched payments, refund queue (including IPNs received after cancellation), webhook log.
 - **COD reconciliation:** create a remittance per carrier, tick the orders paid, compare with the bank receipt; failed deliveries → restock + phone risk flag.
 - **Internal alerts:** new order, high-value COD, invalid IPN signature/amount, low stock, e-invoice failure → email + Telegram bot (D19); channels configured in settings.

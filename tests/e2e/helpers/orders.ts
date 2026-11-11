@@ -73,8 +73,8 @@ export async function createE2EOrder(input: E2EOrderInput): Promise<E2EOrder> {
         `insert into orders (id, code, email, phone, customer_name, locale, status, payment_method,
            subtotal, shipping_fee, total, deposit_required, hide_prices, gift_wrap, gift_message,
            confirmed_at)
-         values ($1, $2, $3, $4, $5, 'vi', $6, 'cod', $7, 30000, $8, $9, $10, $11, $12,
-           case when $6 = 'awaiting_confirmation' then null else now() end)`,
+         values ($1, $2, $3, $4, $5, 'vi', $6::order_status, 'cod', $7, 30000, $8, $9, $10, $11, $12,
+           case when $6::text = 'awaiting_confirmation' then null else now() end)`,
         [
           id,
           code,
