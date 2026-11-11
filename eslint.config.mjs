@@ -12,15 +12,19 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    // UI code never reaches into server code.
+    // UI code never reaches into server code (type-only imports are fine).
     files: ['src/components/**', 'src/hooks/**', 'src/stores/**', 'src/lib/**'],
     ignores: ['src/lib/env.ts'],
     rules: {
-      'no-restricted-imports': [
+      '@typescript-eslint/no-restricted-imports': [
         'error',
         {
           patterns: [
-            { group: ['@/server/*'], message: 'Client-side code must not import server code.' },
+            {
+              group: ['@/server/*'],
+              allowTypeImports: true,
+              message: 'Client-side code must not import server code.',
+            },
           ],
         },
       ],
