@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "siteName": "Perfume Store",
+    "defaultTitle": "Nước hoa chính hãng",
+    "defaultDescription": "Nước hoa chính hãng từ các thương hiệu niche và designer, giao hàng toàn quốc."
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "perfumes": "Nước hoa",
+    "brands": "Thương hiệu",
+    "journal": "Tạp chí",
+    "account": "Tài khoản",
+    "cart": "Giỏ hàng",
+    "search": "Tìm kiếm",
+    "skipToContent": "Bỏ qua đến nội dung chính"
+  },
+  "localeSwitcher": {
+    "label": "Ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "home": {
+    "eyebrow": "Nước hoa chính hãng",
+    "title": "Hương thơm dành riêng cho bạn",
+    "subtitle": "Tuyển chọn nước hoa niche và designer, cam kết chính hãng 100%."
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
+    "backHome": "Về trang chủ"
+  },
+  "admin": {
+    "title": "Quản trị"
+  }
+}

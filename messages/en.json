@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "siteName": "Perfume Store",
+    "defaultTitle": "Authentic perfumes",
+    "defaultDescription": "Authentic niche and designer perfumes, delivered across Vietnam."
+  },
+  "navigation": {
+    "home": "Home",
+    "perfumes": "Perfumes",
+    "brands": "Brands",
+    "journal": "Journal",
+    "account": "Account",
+    "cart": "Cart",
+    "search": "Search",
+    "skipToContent": "Skip to main content"
+  },
+  "localeSwitcher": {
+    "label": "Language",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "home": {
+    "eyebrow": "Authentic perfumes",
+    "title": "A scent that is yours alone",
+    "subtitle": "Curated niche and designer perfumes, 100% authentic."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to home"
+  }
+}
