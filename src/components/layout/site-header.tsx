@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
 
 import { SkipLink } from '@/components/ui/skip-link';
 import { Link } from '@/i18n/navigation';
@@ -52,7 +53,12 @@ export function SiteHeader() {
             {t('metadata.siteName')}
           </Link>
           <div className="flex items-center justify-end md:col-start-3 md:gap-1">
-            <LanguageSwitcher className="md:mr-2" />
+            {/* Dynamic routes ([slug]) only know the pathname at request time. */}
+            <Suspense
+              fallback={<span aria-hidden className="inline-block min-h-11 w-16 md:mr-2" />}
+            >
+              <LanguageSwitcher className="md:mr-2" />
+            </Suspense>
             {ACTIONS.map(({ href, key, icon: Icon }) => (
               <Link
                 key={key}
