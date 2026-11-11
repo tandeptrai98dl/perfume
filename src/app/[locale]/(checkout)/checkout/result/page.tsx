@@ -13,7 +13,6 @@ import { RetryPaymentPanel } from '@/components/checkout/result/retry-payment-pa
 import { resultView, type ResultState } from '@/components/checkout/result/state';
 import { VnpayPanel } from '@/components/checkout/result/vnpay-panel';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
@@ -136,15 +135,14 @@ async function ResultContent({
   const order = code ? await findOrderByCode(db, code) : null;
   if (!code || !order || !(await canViewOrder(order, token))) {
     return (
-      <EmptyState
-        title={<span className="text-h1">{t('notFound.title')}</span>}
-        description={t('notFound.description')}
-        action={
-          <Button asChild>
-            <Link href="/perfumes">{t('continueShopping')}</Link>
-          </Button>
-        }
-      />
+      <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
+        <XCircle aria-hidden className="text-gold-500 size-8" />
+        <h1 className="text-h1">{t('notFound.title')}</h1>
+        <p className="max-w-md text-taupe-600">{t('notFound.description')}</p>
+        <Button asChild>
+          <Link href="/perfumes">{t('continueShopping')}</Link>
+        </Button>
+      </div>
     );
   }
 
