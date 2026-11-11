@@ -38,7 +38,7 @@ export function OrderDetail({
         {actions && <div className="w-full sm:ml-auto sm:w-auto">{actions}</div>}
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div className="flex flex-col gap-10">
           <section aria-labelledby="order-items" className="flex flex-col gap-4">
             <h2 id="order-items" className="text-h3">
@@ -120,10 +120,12 @@ export function OrderDetail({
               <SummaryRow
                 label={t('view.paymentMethod')}
                 value={t(`paymentMethod.${order.paymentMethod}`)}
+                text
               />
               <SummaryRow
                 label={t('view.paymentStatus')}
                 value={t(`paymentStatus.${order.paymentStatus}`)}
+                text
               />
               {order.depositRequired > 0 && (
                 <SummaryRow label={t('view.deposit')} value={money(order.depositRequired)} />
@@ -208,19 +210,24 @@ export function OrderDetail({
   );
 }
 
+/** Label/value row; amounts never wrap, text values (method, status) may. */
 function SummaryRow({
   label,
   value,
   strong = false,
+  text = false,
 }: {
   label: string;
   value: string;
   strong?: boolean;
+  text?: boolean;
 }) {
   return (
     <div className={cn('flex items-baseline justify-between gap-4', strong && 'font-medium')}>
-      <dt className={cn(!strong && 'text-taupe-600')}>{label}</dt>
-      <dd className="whitespace-nowrap tabular-nums">{value}</dd>
+      <dt className={cn('shrink-0', !strong && 'text-taupe-600')}>{label}</dt>
+      <dd className={cn('text-right', text ? 'min-w-0' : 'whitespace-nowrap tabular-nums')}>
+        {value}
+      </dd>
     </div>
   );
 }

@@ -149,7 +149,7 @@ export function AddressForm({
             </FormItem>
           )}
         />
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="provinceCode"

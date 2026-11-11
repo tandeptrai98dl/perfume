@@ -72,7 +72,10 @@ export function AddressBook({
       {addresses.length === 0 ? (
         <EmptyState title={t('empty')} className="border-line-200 border" />
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2" data-testid="address-list">
+        <ul
+          className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2"
+          data-testid="address-list"
+        >
           {addresses.map((address) => (
             <li
               key={address.id}

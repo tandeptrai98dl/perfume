@@ -16,7 +16,7 @@ export function OrderHistory({ orders }: { orders: CustomerOrderRow[] }) {
         <li key={order.code}>
           <Link
             href={{ pathname: '/account/orders/[code]', params: { code: order.code } }}
-            className="hover:bg-sand-100 grid gap-2 px-2 py-4 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-6"
+            className="hover:bg-sand-100 grid gap-2 px-2 py-4 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-6"
           >
             <span className="flex flex-col gap-1">
               <span className="font-medium tracking-wide">{order.code}</span>

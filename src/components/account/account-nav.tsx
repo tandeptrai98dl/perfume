@@ -39,7 +39,7 @@ function AccountNavList({ pathname }: { pathname: string | null }) {
   }
 
   return (
-    <nav aria-label={t('label')} className="lg:sticky lg:top-6 lg:self-start">
+    <nav aria-label={t('label')} className="min-w-0 lg:sticky lg:top-6 lg:self-start">
       <ul className="border-line-200 -mx-4 flex gap-1 overflow-x-auto border-b px-4 lg:mx-0 lg:flex-col lg:border-b-0 lg:px-0">
         {ITEMS.map((item) => (
           <li key={item.key} className="shrink-0">

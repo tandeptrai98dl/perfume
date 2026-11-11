@@ -8,7 +8,7 @@ import { AccountNav, AccountNavFallback } from '@/components/account/account-nav
  */
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="container-content grid gap-8 py-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12 lg:py-16">
+    <div className="container-content grid grid-cols-[minmax(0,1fr)] gap-8 py-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12 lg:py-16">
       <Suspense fallback={<AccountNavFallback />}>
         <AccountNav />
       </Suspense>

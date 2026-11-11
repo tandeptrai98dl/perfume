@@ -75,7 +75,7 @@ async function Overview({ params }: { params: Props['params'] }) {
           )}
         </section>
 
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-2">
           <section
             aria-labelledby="default-address"
             className="bg-sand-100 flex flex-col gap-3 p-6"
@@ -106,7 +106,7 @@ async function Overview({ params }: { params: Props['params'] }) {
             <h2 id="profile-summary" className="text-h3">
               {t('overview.profile')}
             </h2>
-            <p className="break-words">{profile?.email ?? session.user.email}</p>
+            <p className="wrap-anywhere">{profile?.email ?? session.user.email}</p>
             <p className="text-taupe-600">
               {t('overview.language', {
                 language: t(`profile.languages.${profile?.locale ?? 'vi'}`),
