@@ -59,6 +59,15 @@ function LocaleLinks({
           <Link
             href={hrefFor(locale)}
             locale={locale}
+            // A locale switch changes the root layout (<html lang>): load a fresh document
+            // instead of a client transition through next-intl's /vi redirect, whose prefetch
+            // tree Next.js resolves wrongly (404 segment prefetches after the switch).
+            prefetch={false}
+            onClick={(event) => {
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+              event.preventDefault();
+              window.location.assign(event.currentTarget.href);
+            }}
             hrefLang={locale}
             lang={locale}
             aria-current={locale === current ? 'true' : undefined}
