@@ -35,7 +35,8 @@ export const giftOptionsSchema = z.object({
   giftMessage: z
     .string()
     .transform((value) => value.normalize('NFC').trim())
-    .pipe(z.string().max(GIFT_MESSAGE_MAX_LENGTH, 'tooLong'))
+    // Code points, like Postgres char_length (the CHECK on carts.gift_message).
+    .refine((value) => [...value].length <= GIFT_MESSAGE_MAX_LENGTH, 'tooLong')
     .nullable()
     .default(null),
   hidePrices: z.boolean(),

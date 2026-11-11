@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest';
 import en from '../../../../messages/en.json';
 import vi from '../../../../messages/vi.json';
 import { formats } from '@/i18n/formats';
+import { couponRejectionMessage } from '@/lib/cart-messages';
 
 import {
   capAddition,
   capUpdate,
   COUPON_REJECTIONS,
-  couponRejectionMessage,
   freeShippingProgress,
   lineCap,
   mergeCartItems,

@@ -31,7 +31,6 @@ export {
 } from './service';
 export {
   COUPON_REJECTIONS,
-  couponRejectionMessage,
   GIFT_MESSAGE_MAX_LENGTH,
   lineCap,
   type CartCouponRejection,

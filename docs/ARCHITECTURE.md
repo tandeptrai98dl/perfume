@@ -865,6 +865,7 @@ perfume-store/
 - Cart prices are always current; price or stock changes since adding are clearly flagged.
 - Mini-cart drawer opens after adding; progress bar "X ₫ away from free shipping".
 - Gift wrap (configurable fee), message card ≤ 200 characters, option to hide prices on the packing slip.
+- *Implementation (M2):* carts expire 30 days after their last change (sliding expiry, cookie refreshed with it); expired carts are ignored on read, no cron. The merge runs in Better Auth's `session.create.after` hook (reading `cart_token`) and again lazily in `src/server/cart-session.ts`; without a member cart the guest cart is adopted (token cleared), otherwise lines are merged into the member cart and the guest cart becomes `converted`. The guest's coupon and gift options win when set. Coupons are validated on apply (stored only when they apply) and re-validated on every read, showing the precise reason when they no longer apply; per-customer limits are checked for members in the cart and for guests at checkout. Re-adding a line from the product page refreshes its `price_when_added`.
 
 ### 10.4 Checkout (MVP)
 
