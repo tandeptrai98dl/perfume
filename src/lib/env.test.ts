@@ -24,12 +24,16 @@ describe('parseServerEnv', () => {
     expect(env.GOOGLE_CLIENT_ID).toBeUndefined();
   });
 
-  it('requires a real BETTER_AUTH_SECRET in production', () => {
+  it('requires real secrets in production', () => {
     expect(() => parseServerEnv({ NODE_ENV: 'production' })).toThrow(/BETTER_AUTH_SECRET/);
-    const secret = 'x'.repeat(32);
-    expect(
-      parseServerEnv({ NODE_ENV: 'production', BETTER_AUTH_SECRET: secret }).BETTER_AUTH_SECRET,
-    ).toBe(secret);
+    expect(() => parseServerEnv({ NODE_ENV: 'production' })).toThrow(/INTERNAL_API_SECRET/);
+    const env = parseServerEnv({
+      NODE_ENV: 'production',
+      BETTER_AUTH_SECRET: 'a'.repeat(32),
+      INTERNAL_API_SECRET: 'b'.repeat(32),
+    });
+    expect(env.BETTER_AUTH_SECRET).toBe('a'.repeat(32));
+    expect(env.INTERNAL_API_SECRET).toBe('b'.repeat(32));
   });
 
   it('requires the Google client id and secret together', () => {

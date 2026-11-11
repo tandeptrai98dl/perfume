@@ -296,7 +296,7 @@ stateDiagram-v2
 | Admin tables | TanStack Table | Server-side filtering, sorting, pagination | AG Grid |
 | Rich text | Tiptap | Product descriptions, journal; stored as JSON, rendered to sanitized HTML | Lexical |
 | Animation | Motion (framer-motion) | Restrained motion; respects `prefers-reduced-motion` | GSAP |
-| Background jobs | pg-boss + worker container | No extra infrastructure; retries, cron, delayed jobs. Worker built with tsup using the `react-server` condition to share `server/modules`; cache revalidation through an HMAC-signed internal endpoint; outbox inside Drizzle transactions validated by a spike in M0 | BullMQ + Redis, Inngest |
+| Background jobs | pg-boss + worker container | No extra infrastructure; retries, cron, delayed jobs. Worker bundled with tsup (default conditions, no `react-server`) to share `server/modules`; cache revalidation through an HMAC-signed internal endpoint; outbox inside Drizzle transactions via pg-boss `fromDrizzle` (ADR-0023) | BullMQ + Redis, Inngest |
 | Cache / rate limit | Next.js data cache; Postgres-backed rate limit + Cloudflare WAF in MVP; Redis (Valkey) when running multiple instances | Fewer moving parts in MVP | Upstash |
 | File storage | S3-compatible object storage in Vietnam + Cloudflare CDN | `next/image` for product images; S3 adapter keeps the provider swappable | Cloudinary |
 | Payments | VNPay (`vnpay` npm package), payOS (VietQR), COD | VNPay covers cards and bank QR; payOS confirms bank transfers automatically via webhook | MoMo, ZaloPay (Phase 2) |
@@ -810,8 +810,8 @@ perfume-store/
 │  │  │  ├─ storage/   s3.ts
 │  │  │  ├─ einvoice/  { types.ts, misa.ts | viettel.ts }   # D13
 │  │  │  └─ shipping/  (Phase 2: ghn.ts, ghtk.ts)
-│  │  ├─ auth/        { auth.ts, permissions.ts, guards.ts }
-│  │  ├─ jobs/        { queue.ts, handlers/*.ts }   # pg-boss
+│  │  ├─ auth/        { config.ts, server.ts, permissions.ts, admin-access.ts, guards.ts }
+│  │  ├─ jobs/        { definitions.ts, queue.ts, runner.ts, handlers/*.ts }   # pg-boss
 │  │  └─ lib/         { logger.ts, rate-limit.ts, errors.ts, audit.ts, ids.ts }
 │  ├─ actions/                         # thin Server Actions calling server/modules
 │  │  ├─ cart.ts, checkout.ts, account.ts, review.ts
@@ -819,8 +819,8 @@ perfume-store/
 │  ├─ lib/                             # shared client + server: format.ts, slug.ts, seo.ts, env.ts
 │  ├─ hooks/, stores/                  # Zustand for mini-cart UI only
 │  └─ proxy.ts                         # next-intl routing, redirects table, /admin pre-check
-├─ worker/index.ts                     # pg-boss worker entry; built with tsup
-│                                      # (--conditions=react-server) to share server/modules
+├─ worker/index.ts                     # pg-boss worker entry; bundled with tsup to share
+│                                      # server/modules (default conditions, ADR-0023)
 ├─ tests/{e2e, integration, fixtures}/
 ├─ public/
 ├─ docker/{Dockerfile, Dockerfile.worker, compose.yml, Caddyfile}
@@ -1073,7 +1073,7 @@ Payment contracts, legal work and content have lead times, so they run in parall
 4. Drizzle + first migrations: auth, catalogue + translations, inventory, settings; seed provinces/wards and bilingual demo data.
 5. Better Auth (email/password, Google for customers, TOTP + 2FA flag for staff); permission map per 11.1.
 6. Design tokens, fonts, primitives, header/footer with LanguageSwitcher, `/dev/ui` gallery.
-7. Technical spikes: worker sharing `server/modules` (tsup + `react-server`), pg-boss outbox inside a Drizzle transaction, internal revalidate endpoint.
+7. Technical spikes: worker sharing `server/modules` (tsup), pg-boss outbox inside a Drizzle transaction, internal revalidate endpoint — done, see ADR-0023.
 8. CI (lint, typecheck, unit tests, i18n check, build), automatic staging deploys, Sentry, JSON logs, health check.
 
 *Exit criteria:* staging serves `/` and `/en`; admin sign-in enforces 2FA; the worker sends a test email from an outbox job; CI green.

@@ -6,6 +6,7 @@ import { z } from 'zod';
  * Add variables in the task that introduces them, and mirror them in `.env.example`.
  */
 const DEV_AUTH_SECRET = 'dev-only-insecure-better-auth-secret-change-me';
+const DEV_INTERNAL_SECRET = 'dev-only-insecure-internal-api-secret-change-me';
 
 export const serverEnvSchema = z
   .object({
@@ -20,14 +21,32 @@ export const serverEnvSchema = z
     /** Google sign-in for customers only (staff cannot use OAuth). Both or neither. */
     GOOGLE_CLIENT_ID: z.string().min(1).optional(),
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    /** HMAC key shared by web and worker for /api/internal/* calls. */
+    INTERNAL_API_SECRET: z.string().min(32).default(DEV_INTERNAL_SECRET),
+    /** Base URL the worker uses to reach the web app (e.g. http://web:3000 in Docker). */
+    INTERNAL_APP_URL: z.url().optional(),
+    /** SMTP for transactional email; Mailpit from docker/compose.yml in development. */
+    SMTP_URL: z
+      .string()
+      .regex(/^smtps?:\/\//, 'must be an smtp:// or smtps:// URL')
+      .default('smtp://localhost:1025'),
+    EMAIL_FROM: z.string().min(3).default('Perfume Store <no-reply@localhost>'),
   })
   .superRefine((env, ctx) => {
-    if (env.NODE_ENV === 'production' && env.BETTER_AUTH_SECRET === DEV_AUTH_SECRET) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['BETTER_AUTH_SECRET'],
-        message: 'must be set to a random value in production',
-      });
+    if (env.NODE_ENV === 'production') {
+      const devDefaults = [
+        ['BETTER_AUTH_SECRET', env.BETTER_AUTH_SECRET === DEV_AUTH_SECRET],
+        ['INTERNAL_API_SECRET', env.INTERNAL_API_SECRET === DEV_INTERNAL_SECRET],
+      ] as const;
+      for (const [key, isDevDefault] of devDefaults) {
+        if (isDevDefault) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: 'must be set to a random value in production',
+          });
+        }
+      }
     }
     if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {
       ctx.addIssue({
