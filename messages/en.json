@@ -333,5 +333,157 @@
       "hint": "Press Enter to see all results",
       "error": "Suggestions could not be loaded. Please try again."
     }
+  },
+  "checkoutResult": {
+    "metaTitle": "Order result",
+    "orderCode": "Order number",
+    "placedAt": "Placed {date}",
+    "notFound": {
+      "title": "Order not found",
+      "description": "This link is invalid or has expired. Open the link in your order confirmation email, or sign in to see your orders."
+    },
+    "continueShopping": "Continue shopping",
+    "state": {
+      "paid": {
+        "title": "Payment received",
+        "description": "Thank you! We received {amount} and are preparing your order."
+      },
+      "depositPaid": {
+        "title": "Deposit received",
+        "description": "We received {amount}. You pay the remaining {balance} on delivery."
+      },
+      "codConfirm": {
+        "title": "Order placed",
+        "description": "We will call you or message you on Zalo within 24 hours to confirm your order. You pay on delivery."
+      },
+      "codDepositReceived": {
+        "title": "Deposit received",
+        "description": "We received {amount}. We will contact you to confirm the order; you pay the rest on delivery."
+      },
+      "awaitingPayment": {
+        "title": "Complete your payment",
+        "description": "Your items are held until {time}. Please pay {amount}."
+      },
+      "depositRequired": {
+        "title": "Pay your deposit",
+        "description": "High-value cash-on-delivery orders need a {amount} deposit before we confirm them. You pay the rest on delivery. Items are held until {time}."
+      },
+      "sessionExpired": {
+        "title": "Payment session expired",
+        "description": "Your items are still held until {time}. You can pay again, with another method if you like."
+      },
+      "windowClosed": {
+        "title": "Hold time is over",
+        "description": "This order was not paid in time and will be cancelled automatically. You are welcome to place a new order."
+      },
+      "cancelled": {
+        "title": "Order cancelled",
+        "description": "This order has been cancelled.",
+        "refund": "The {amount} you paid will be refunded. We will contact you."
+      },
+      "other": {
+        "title": "Order status",
+        "description": "Your order is {status}."
+      }
+    },
+    "orderStatus": {
+      "pending": "Awaiting payment",
+      "awaiting_confirmation": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "processing": "Being prepared",
+      "shipped": "On its way",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "delivery_failed": "Delivery failed",
+      "return_requested": "Return requested",
+      "returned": "Returned"
+    },
+    "paymentStatus": {
+      "unpaid": "Unpaid",
+      "partially_paid": "Deposit paid",
+      "paid": "Paid",
+      "partially_refunded": "Partly refunded",
+      "refunded": "Refunded"
+    },
+    "methods": {
+      "cod": "Cash on delivery (COD)",
+      "vnpay": "VNPay",
+      "payos": "VietQR bank transfer",
+      "bank_transfer": "Bank transfer",
+      "momo": "MoMo",
+      "zalopay": "ZaloPay"
+    },
+    "qr": {
+      "heading": "Scan the VietQR code to pay",
+      "instructions": "Open your banking app, scan the code and keep the amount and transfer note unchanged.",
+      "alt": "VietQR payment code for {amount}",
+      "amount": "Amount",
+      "note": "Transfer note",
+      "accountNumber": "Account number",
+      "accountName": "Account name",
+      "bin": "Bank code (BIN)",
+      "openCheckout": "Open the payOS payment page",
+      "sandbox": "Test environment: this QR code does not work with banking apps."
+    },
+    "countdown": {
+      "label": "Time left",
+      "expiresIn": "Code expires in {time}",
+      "expired": "Payment session expired"
+    },
+    "live": {
+      "waiting": "Waiting for payment confirmation…",
+      "paid": "Paid",
+      "checking": "Updating status…"
+    },
+    "vnpay": {
+      "heading": "Pay with VNPay",
+      "description": "You will be taken to the VNPay gateway to pay by domestic ATM card, international card or VNPay wallet. The result updates automatically.",
+      "pay": "Pay {amount} with VNPay",
+      "returned": "Back from VNPay. Waiting for VNPay to confirm…"
+    },
+    "retry": {
+      "heading": "Choose how to pay",
+      "method": "Payment method",
+      "submit": "Pay again",
+      "start": "Pay now",
+      "change": "Change payment method",
+      "providers": {
+        "vnpay": {
+          "title": "VNPay",
+          "description": "ATM card, international card, VNPay wallet"
+        },
+        "payos": {
+          "title": "VietQR bank transfer",
+          "description": "Scan the code with your banking app"
+        }
+      },
+      "errors": {
+        "reservationExpired": "The hold time for this order is over.",
+        "providerUnavailable": "This method is temporarily unavailable. Please choose another one.",
+        "gatewayError": "We could not reach the payment gateway. Please try again.",
+        "notPayable": "This order no longer needs a payment.",
+        "nothingDue": "Nothing is left to pay on this order.",
+        "notFound": "Order not found.",
+        "validation": "Invalid request.",
+        "unexpected": "Something went wrong. Please try again."
+      }
+    },
+    "summary": {
+      "heading": "Order summary",
+      "quantity": "Qty: {quantity}",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "shipping": "Shipping",
+      "giftWrap": "Gift wrap",
+      "total": "Total",
+      "deposit": "Deposit",
+      "paid": "Paid",
+      "due": "Balance",
+      "free": "Free",
+      "method": "Payment",
+      "paymentStatus": "Payment status",
+      "status": "Order status"
+    }
   }
 }

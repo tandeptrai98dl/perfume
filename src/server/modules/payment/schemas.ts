@@ -85,14 +85,6 @@ export const completeRefundSchema = z
   });
 export type CompleteRefundInput = z.output<typeof completeRefundSchema>;
 
-/** Storefront: start or retry an online payment for an order the visitor can access. */
-export const startPaymentSchema = z.object({
-  code: z.string().trim().min(1).max(40),
-  token: z.string().max(64).nullish(),
-  provider: onlineProviderSchema,
-});
-export type StartPaymentInput = z.output<typeof startPaymentSchema>;
-
 /** Admin lists. */
 export const PAYMENT_EVENT_FILTERS = ['all', 'invalid', 'unmatched'] as const;
 export const REFUND_FILTERS = ['open', 'completed', 'all'] as const;

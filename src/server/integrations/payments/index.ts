@@ -37,8 +37,8 @@ type GatewayEnv = Pick<
   | 'PAYOS_API_KEY'
   | 'PAYOS_CHECKSUM_KEY'
   | 'PAYOS_API_URL'
-  | 'PAYMENT_SIMULATOR'
->;
+> &
+  Partial<Pick<ServerEnv, 'PAYMENT_SIMULATOR'>>;
 
 function simulatorFor(env: GatewayEnv, hasKeys: boolean): boolean {
   if (env.PAYMENT_SIMULATOR === true) return true;
