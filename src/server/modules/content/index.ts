@@ -74,3 +74,11 @@ export type {
   RedirectInput,
   TopicInput,
 } from './schemas';
+export {
+  bannerInputSchema,
+  menuInputSchema,
+  pageInputSchema,
+  postInputSchema,
+  redirectInputSchema,
+  topicInputSchema,
+} from './schemas';
