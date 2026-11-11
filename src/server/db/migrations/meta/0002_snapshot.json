@@ -1,6 +1,6 @@
 {
-  "id": "04fda280-f99e-4a21-9999-c6257d821947",
-  "prevId": "9896f9df-ef9f-48f1-99b0-afede90e3a68",
+  "id": "7f90afeb-a4f0-4475-a7bf-3b9ffcb9a135",
+  "prevId": "e3b7b7d6-b455-48cd-88bb-3f0b4333e258",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -174,12 +174,6 @@
           "notNull": true,
           "default": false
         },
-        "impersonated_by": {
-          "name": "impersonated_by",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -268,6 +262,26 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "verified": {
+          "name": "verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "failed_verification_count": {
+          "name": "failed_verification_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "locked_until": {
+          "name": "locked_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -391,18 +405,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
-        },
-        "ban_reason": {
-          "name": "ban_reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ban_expires": {
-          "name": "ban_expires",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
         },
         "marketing_opt_in": {
           "name": "marketing_opt_in",
