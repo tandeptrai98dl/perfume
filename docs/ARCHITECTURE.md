@@ -210,7 +210,7 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 | `customer` + `auth` | Accounts, addresses, wishlist, consents, privacy requests | users, sessions, accounts, addresses, wishlists, consents, privacy_requests |
 | `review` | Reviews, review invitations, moderation | reviews, review_invitations |
 | `content` | Banners, journal posts, static pages, menus, redirects | posts, pages, banners, navigation_menus, redirects, *_translations |
-| `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs |
+| `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs (not created in M2: sends are recorded in `order_events`, see §10.5) |
 | `admin` | Permissions, audit, settings | audit_logs, settings |
 
 **Module communication rules:** module A calls only module B's public `index.ts`, never B's `repo.ts`. Side effects (emails, alerts, e-invoices, stats) go through the job queue using a **transactional outbox**: the job is enqueued in the same database transaction as the business change.
@@ -218,7 +218,7 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 ### 3.4 Order and payment flow
 
 1. Customer clicks "Place order" → Server Action `placeOrder` recomputes every price on the server (client prices are never trusted) and stores the session `locale` on the order.
-2. In one transaction: lock stock rows (`SELECT … FOR UPDATE`), create the order, create `stock_reservations` with `expires_at`, record the coupon redemption, enqueue outbox jobs. Online payment: `status = pending`, reservation 30 min. COD: `status = awaiting_confirmation`, reservation 24 h (D06).
+2. In one transaction: lock stock rows (`SELECT … FOR UPDATE`), create the order, create `stock_reservations` with `expires_at`, record the coupon redemption, enqueue outbox jobs. Online payment, and COD that needs a deposit (D16): `status = pending`, reservation 30 min. Other COD: `status = awaiting_confirmation`, reservation 24 h (D06). The cart row is locked first, so a repeated submit with the same checkout key returns the first order; checkouts using the same coupon are serialized (transaction-scoped advisory lock) so its per-customer limit holds under concurrency.
 3. **Online (VNPay / VietQR):** create a `payments` row expiring in 15 min → redirect or show the QR. If the session expires while the reservation is still valid, the customer can "Retry payment", creating a new payment (method may change).
 4. The gateway calls the IPN/webhook → verify signature + amount + idempotency → add to `amount_paid`. When fully paid: `payment_status = paid`, order moves to `confirmed`, reservations are committed to real stock deductions. The return URL only displays status; it never changes it. An IPN arriving after cancellation records the money, adds the order to the refund queue and alerts staff.
 5. **COD ≤ threshold:** staff confirm by phone/Zalo within 24 h → `confirmed`; otherwise a job cancels the order and releases stock. **COD > threshold (D16):** the customer pays a 20% deposit through steps 3–4 → `payment_status = partially_paid`, order `confirmed`; the carrier collects the balance.
@@ -257,6 +257,16 @@ stateDiagram-v2
 ```
 
 `payment_status`: `unpaid` → `partially_paid` → `paid` → `partially_refunded` | `refunded`. Gateway refunds call the provider API when supported; COD and bank-transfer refunds are manual and recorded in `refunds` with proof.
+
+**Payment rules as implemented (M2, `server/modules/payment`):**
+
+- `payment_status` is computed from money only: any refund → `partially_refunded`/`refunded` (all paid money returned); otherwise `unpaid` (nothing paid), `paid` (≥ total) or `partially_paid`.
+- Required online amount: the total for online/bank-transfer orders, `deposit_required` for COD above the threshold. Only a `pending` order is auto-confirmed by a payment; a COD order still `awaiting_confirmation` records its deposit and waits for staff.
+- One live session per order: a new session cancels older pending ones (an older one paid later still counts). `txn_ref` = 16 digits (`yyMMddHHmmss` + 4 random, Vietnam time) so it is also a valid payOS `orderCode`.
+- Retry extends the stock reservation to the new session's expiry, capped at `placed_at` + reservation window (30 min online / 24 h COD) + one session (15 min): stock is never held indefinitely.
+- Money that arrives for a cancelled/returned order, or beyond the total, is recorded and queued as a `requested` refund with a `late_payment_refund` alert. Invalid signature, unknown `txn_ref` or a different amount → `suspicious_ipn` alert, no state change. Customer bank details in payOS webhooks are masked before `payment_events` stores them.
+- payOS has no refund API: payOS refunds are completed manually (bank reference or proof image). VNPay refunds call the merchant API.
+- Without gateway keys outside production (or with `PAYMENT_SIMULATOR=true`, localhost only in production builds) both gateways run as a signed sandbox simulator for development and E2E.
 
 ### 3.6 Internationalization (D02, D11)
 
@@ -876,19 +886,21 @@ perfume-store/
 - **COD (D16):** orders ≤ 5,000,000 ₫ are placed directly; above that a 20% deposit via VietQR/VNPay is required (or the customer switches to full prepayment). COD orders wait for staff confirmation; unconfirmed after 24 h → auto-cancel and release stock (D06).
 - **VietQR (payOS):** QR + amount + transfer note containing the order code, 15-minute countdown (on expiry, "Retry payment" if stock is still reserved; method may change), switches to "Paid" when the webhook arrives (3s polling or SSE).
 - **VNPay:** redirect to the gateway, return to `/thanh-toan/ket-qua` (`/en/checkout/result`); status comes only from the IPN.
-- Duplicate protection: idempotency key per checkout session; the submit button locks while sending.
+- Duplicate protection: idempotency key per checkout session (`orders.checkout_key`, generated when the page renders); the submit button locks while sending. The client never sends prices; it sends the total it displayed, and a mismatch is refused ("price changed") instead of charging a different amount. Place-order rate limit: 5 web orders per minute per IP, counted on `orders.ip_address`.
+- Company VAT invoice: company name, tax code, invoice email and a structured company address (province → ward → street), stored as the `billing` row of `order_addresses` and as text in `orders.vat_invoice`.
 - *Acceptance:* Playwright E2E for all three methods (sandbox) in vi and en; two buyers racing for the last unit → exactly one order.
 
 ### 10.5 After purchase (MVP)
 
 - Emails (in the order's locale): order confirmation, payment received, shipped (tracking code + carrier link), delivered, cancelled/refunded.
-- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP).
+- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP). The phone may be the contact or the delivery phone; any mismatch gets one generic message. A successful lookup sets the signed per-order access cookie; email links open the same read-only page with `?t=<orderAccessToken>`. M2: the limiter is in-memory per web process (`server/lib/rate-limit.ts`); the `rate_limits` table replaces it when the app runs on more than one instance.
+- Emails are sent by the worker only (outbox jobs). Each customer email is recorded in the order timeline (`order_events.type = 'email_sent'`, `metadata.key` such as `order_confirmation`, `status:shipped`, `payment:<id>`) and skipped when a retried job finds it; staff alerts likewise (`staff_alert_sent`). Staff alerts go to `STAFF_ALERT_EMAIL` and the Telegram bot (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`); each channel is skipped when unset, and the text carries only order code, amount, payment method and province.
 - Customers can cancel before `processing`; return requests within 7 days of delivery per D17 (form + reason + photos).
 - Reviews after `delivered`, marked "Verified purchase", moderated. Guests receive a review invitation email with a one-time token link (30 days; one review per purchased item) (D08).
 
 ### 10.6 Account (MVP)
 
-- Sign up / sign in with email + password (email verification) or Google; password reset by email (30-minute single-use token).
+- Sign up / sign in with email + password (email verification) or Google; password reset by email (30-minute single-use token). Email/password accounts must confirm their address before the first sign-in (the link signs them in); sign-up therefore answers the same for new and existing emails (no account enumeration). Account emails use `users.locale`: the sign-up page's language, changeable in the profile.
 - After a guest order: one-step account creation; past orders with the same verified email are attached.
 - Preferred language (used for emails), order history, one-tap reorder, address book (max 10), wishlist, profile.
 - **Privacy centre:** view/withdraw consents, download personal data (JSON), request account deletion (personal data anonymized; orders retained for accounting).
@@ -936,6 +948,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 
 - **Dashboard:** revenue today/7/30 days, orders by status (awaiting confirmation, to pack, in transit), average order value, top 10 products, low stock, reviews awaiting moderation, content missing English translations, e-invoices failed.
 - **Orders:** filter by status/payment method/date/province; search by code/phone/email; detail with timeline, payments, internal notes, e-invoice status; only valid transition buttons; carrier + tracking entry; packing slip (prices hidden for gifts) and delivery slip; cancel/refund with reason; bulk confirm/print.
+  Work queues: "awaiting confirmation" = `awaiting_confirmation`, "to pack" = `confirmed` + `processing`, "in transit" = `shipped`. Confirming a COD order is refused until `amount_paid >= deposit_required`; entering `shipped` creates the `shipments` row (carrier + tracking code, COD amount = balance due); `delivery_failed` sets `users.cod_risk_flag` and the phone's failed deliveries warn on later COD orders (derived from `order_events`, no extra table); an order holding money is cancelled only with `orders.cancelPaid` and the amount owed appears in the payments refund queue. Notes are `order_events` of type `note`; every action writes `audit_logs`.
 - **Manual orders** (`/admin/orders/new`): find customer by phone/email or create; pick variants; apply coupon; choose email language; payment = COD, manually confirmed bank transfer, or a payment link sent by email/Zalo.
 - **Order edits** before `shipped`: before/after diff and money difference shown before saving; blocked if someone else changed the order (optimistic lock).
 - **Products:** tabbed editor (Details, Variants & prices, Scent, Media, SEO, Compliance) with vi/en tabs; draft/published/archived; duplicate; slug change creates a 301 redirect; saving revalidates related pages (`revalidateTag`).
@@ -945,7 +958,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 - **Coupons:** percent / fixed / free shipping; conditions (minimum subtotal, brands, categories, usage limits, dates); usage statistics.
 - **Reviews:** approve/reject/reply; approval updates `rating_avg`.
 - **Content:** banners per placement with schedule, journal posts (Tiptap, linked products), static pages, header/footer menus, redirects — bilingual.
-- **Shipping:** zones (province groups) + weight-based rates, free-shipping threshold, delivery estimates.
+- **Shipping:** zones (province groups) + weight-based rates, free-shipping threshold, delivery estimates. Rates change checkout prices, so managing them needs `settings.manage` (Owner); a province in several zones uses the zone with the lowest priority number.
 - **Payments:** transactions by gateway, unmatched payments, refund queue (including IPNs received after cancellation), webhook log.
 - **COD reconciliation:** create a remittance per carrier, tick the orders paid, compare with the bank receipt; failed deliveries → restock + phone risk flag.
 - **Internal alerts:** new order, high-value COD, invalid IPN signature/amount, low stock, e-invoice failure → email + Telegram bot (D19); channels configured in settings.

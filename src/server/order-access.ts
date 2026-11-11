@@ -1,10 +1,9 @@
 import 'server-only';
 
-import { createHmac, timingSafeEqual } from 'node:crypto';
-
 import { cookies } from 'next/headers';
 
 import { serverEnv } from '@/lib/env';
+import { computeOrderAccessToken, verifyOrderAccessTokenWith } from '@/server/lib/order-token';
 
 /**
  * Guest access to an order's result/payment page without an account (M2 foundation).
@@ -15,18 +14,13 @@ import { serverEnv } from '@/lib/env';
 const COOKIE_PREFIX = 'oa_';
 const MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
+/** The pure HMAC lives in `server/lib/order-token.ts` so the worker builds the same links. */
 export function orderAccessToken(code: string): string {
-  return createHmac('sha256', serverEnv().BETTER_AUTH_SECRET)
-    .update(`order-access:${code}`)
-    .digest('base64url')
-    .slice(0, 32);
+  return computeOrderAccessToken(serverEnv().BETTER_AUTH_SECRET, code);
 }
 
 export function verifyOrderAccessToken(code: string, token: string | null | undefined): boolean {
-  if (!token) return false;
-  const expected = Buffer.from(orderAccessToken(code));
-  const received = Buffer.from(token);
-  return expected.length === received.length && timingSafeEqual(expected, received);
+  return verifyOrderAccessTokenWith(serverEnv().BETTER_AUTH_SECRET, code, token);
 }
 
 export async function grantOrderAccess(code: string): Promise<void> {

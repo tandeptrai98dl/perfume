@@ -22,6 +22,21 @@ export const ADMIN_NAV: AdminNavSection[] = [
     labelKey: 'overview',
     items: [{ href: '/admin', labelKey: 'dashboard', permission: 'admin.access' }],
   },
+  // Admin orders stream (M2): orders, coupons, shipping.
+  {
+    labelKey: 'orders',
+    items: [{ href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' }],
+  },
+  {
+    labelKey: 'promotions',
+    items: [
+      { href: '/admin/promotions/coupons', labelKey: 'coupons', permission: 'coupons.manage' },
+    ],
+  },
+  {
+    labelKey: 'shipping',
+    items: [{ href: '/admin/shipping', labelKey: 'shippingRates', permission: 'settings.manage' }],
+  },
   // Stream B: catalogue, inventory.
   {
     labelKey: 'catalog',
@@ -52,6 +67,25 @@ export const ADMIN_NAV: AdminNavSection[] = [
     items: [
       { href: '/admin/inventory', labelKey: 'stock', permission: 'inventory.adjust' },
       { href: '/admin/inventory/movements', labelKey: 'movements', permission: 'inventory.adjust' },
+    ],
+  },
+  // M2 stream "payments": transactions, webhook log, refunds, bank transfers, COD.
+  {
+    labelKey: 'payments',
+    items: [
+      { href: '/admin/payments', labelKey: 'paymentTransactions', permission: 'payments.refund' },
+      { href: '/admin/payments/refunds', labelKey: 'refunds', permission: 'payments.refund' },
+      {
+        href: '/admin/payments/bank-transfers',
+        labelKey: 'bankTransfers',
+        permission: 'payments.confirmBankTransfer',
+      },
+      {
+        href: '/admin/payments/cod-remittances',
+        labelKey: 'codRemittances',
+        permission: 'payments.reconcileCod',
+      },
+      { href: '/admin/payments/events', labelKey: 'paymentEvents', permission: 'payments.refund' },
     ],
   },
   {

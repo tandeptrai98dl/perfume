@@ -3,10 +3,14 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError } from 'better-auth/api';
 import { twoFactor } from 'better-auth/plugins/two-factor';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 
 import type { ServerEnv } from '@/lib/env';
+import { parseVietnamesePhone } from '@/lib/phone';
+import { localizedPath } from '@/lib/seo/paths';
 import type { Database } from '@/server/db/client';
 import * as schema from '@/server/db/schema';
+import type { JobInput } from '@/server/jobs/definitions';
 import { newId } from '@/server/lib/ids';
 import { errorFields, logger } from '@/server/lib/logger';
 import { CART_COOKIE, mergeGuestCartFromCookieHeader } from '@/server/modules/cart';
@@ -36,9 +40,63 @@ export const AUTH_ERROR_CODES = {
 export type AuthEnv = Pick<
   ServerEnv,
   'APP_URL' | 'BETTER_AUTH_SECRET' | 'GOOGLE_CLIENT_ID' | 'GOOGLE_CLIENT_SECRET' | 'NODE_ENV'
->;
+> &
+  Partial<Pick<ServerEnv, 'AUTH_RATE_LIMIT'>>;
 
-export function createAuth(db: Database, env: AuthEnv) {
+/** Password reset links are single-use and expire after 30 minutes (§10.6). */
+export const RESET_PASSWORD_TTL_SECONDS = 30 * 60;
+/** Email verification links expire after 24 hours. */
+export const VERIFY_EMAIL_TTL_SECONDS = 24 * 60 * 60;
+
+export type AuthEmailJob = JobInput<'auth.email'>;
+
+/**
+ * Side effects injected by the caller. The web app enqueues the `auth.email` outbox job
+ * (the worker renders and sends it, never the request); tests capture the payloads.
+ */
+export type AuthDeps = {
+  enqueueAuthEmail?: (job: AuthEmailJob) => Promise<void>;
+};
+
+type Locale = 'vi' | 'en';
+
+function toLocale(value: unknown): Locale {
+  return value === 'en' ? 'en' : 'vi';
+}
+
+/**
+ * The reset link goes through Better Auth (`/api/auth/reset-password/:token`, which checks the
+ * token) and lands on the reset page in the user's language, whatever page asked for it.
+ */
+function resetLinkFor(url: string, locale: Locale): string {
+  const link = new URL(url);
+  link.searchParams.set('callbackURL', localizedPath(locale, '/reset-password'));
+  return link.toString();
+}
+
+export function createAuth(db: Database, env: AuthEnv, deps: AuthDeps = {}) {
+  async function sendAuthEmail(job: AuthEmailJob) {
+    if (!deps.enqueueAuthEmail) {
+      logger.warn('auth.email.not_configured', { kind: job.kind });
+      return;
+    }
+    try {
+      await deps.enqueueAuthEmail(job);
+    } catch (error) {
+      // Never reveal delivery problems to the client (no account enumeration); log only.
+      logger.error('auth.email.enqueue_failed', { kind: job.kind, ...errorFields(error) });
+    }
+  }
+
+  async function localeOf(user: { id: string; locale?: unknown }): Promise<Locale> {
+    if (user.locale === 'vi' || user.locale === 'en') return user.locale;
+    const row = await db.query.users.findFirst({
+      columns: { locale: true },
+      where: eq(schema.users.id, user.id),
+    });
+    return toLocale(row?.locale);
+  }
+
   const google =
     env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
       ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } }
@@ -70,9 +128,37 @@ export function createAuth(db: Database, env: AuthEnv) {
       enabled: true,
       minPasswordLength: 8,
       maxPasswordLength: 128,
+      // Verification required: sign-up then answers the same for new and existing e-mails
+      // (Better Auth's generic duplicate response), so it cannot be used to find accounts.
+      requireEmailVerification: true,
       autoSignIn: true,
-      // Password reset e-mails go through the worker outbox (M2); all sessions are revoked.
+      resetPasswordTokenExpiresIn: RESET_PASSWORD_TTL_SECONDS,
+      // Password reset e-mails go through the worker outbox; all sessions are revoked.
       revokeSessionsOnPasswordReset: true,
+      sendResetPassword: async ({ user, url }) => {
+        const locale = await localeOf(user);
+        await sendAuthEmail({
+          to: user.email,
+          locale,
+          kind: 'reset_password',
+          url: resetLinkFor(url, locale),
+        });
+      },
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      // Unverified sign-in attempts (correct password) get a fresh link.
+      sendOnSignIn: true,
+      autoSignInAfterVerification: true,
+      expiresIn: VERIFY_EMAIL_TTL_SECONDS,
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendAuthEmail({
+          to: user.email,
+          locale: await localeOf(user),
+          kind: 'verify_email',
+          url,
+        });
+      },
     },
     socialProviders: google,
     account: {
@@ -90,13 +176,30 @@ export function createAuth(db: Database, env: AuthEnv) {
     user: {
       additionalFields: {
         role: { type: 'string', required: false, input: false, defaultValue: 'customer' },
-        locale: { type: 'string', required: false, input: true, defaultValue: 'vi' },
-        phone: { type: 'string', required: false, input: true },
+        // Preferred language for account e-mails (§10.6); set from the sign-up page's locale.
+        locale: {
+          type: 'string',
+          required: false,
+          input: true,
+          defaultValue: 'vi',
+          validator: { input: z.enum(['vi', 'en']) },
+        },
+        phone: {
+          type: 'string',
+          required: false,
+          input: true,
+          validator: {
+            input: z
+              .string()
+              .refine((value) => parseVietnamesePhone(value) !== null)
+              .nullish(),
+          },
+        },
         banned: { type: 'boolean', required: false, input: false, defaultValue: false },
       },
     },
     rateLimit: {
-      enabled: env.NODE_ENV === 'production',
+      enabled: env.NODE_ENV === 'production' && env.AUTH_RATE_LIMIT !== 'off',
       window: 60,
       max: 100,
       customRules: {

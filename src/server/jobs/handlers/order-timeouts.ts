@@ -1,16 +1,27 @@
-import type { HandlerDeps } from '.';
+import {
+  cancelUnconfirmedCodOrders,
+  completeDeliveredOrders,
+  expireUnpaidOrders,
+} from '@/server/modules/payment';
 
-import { notImplemented } from './not-implemented';
+import type { HandlerDeps } from '.';
 
 /**
  * Cron jobs that move orders on time limits (ADR-0006): unpaid online orders, unconfirmed COD
- * orders, delivered → completed. Owner: M2 stream "payments".
+ * orders, delivered → completed. Owner: M2 stream "payments". Each run is idempotent and
+ * skips rows locked by concurrent work (see `server/modules/payment/timeouts.ts`).
  */
 export function createOrderTimeoutHandlers(deps: HandlerDeps) {
-  void deps;
+  const timeoutDeps = { db: deps.db, boss: deps.boss };
   return {
-    'orders.expire-unpaid': notImplemented('orders.expire-unpaid'),
-    'orders.cancel-unconfirmed-cod': notImplemented('orders.cancel-unconfirmed-cod'),
-    'orders.complete-delivered': notImplemented('orders.complete-delivered'),
+    'orders.expire-unpaid': async () => {
+      await expireUnpaidOrders(timeoutDeps);
+    },
+    'orders.cancel-unconfirmed-cod': async () => {
+      await cancelUnconfirmedCodOrders(timeoutDeps);
+    },
+    'orders.complete-delivered': async () => {
+      await completeDeliveredOrders(timeoutDeps);
+    },
   } as const;
 }

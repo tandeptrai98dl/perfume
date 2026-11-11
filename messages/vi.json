@@ -45,6 +45,101 @@
       "subject": "Email thử nghiệm từ Perfume Store",
       "heading": "Hệ thống email đã hoạt động",
       "body": "Email này được gửi từ hàng đợi công việc nền để kiểm tra cấu hình."
+    },
+    "layout": {
+      "tagline": "Nước hoa chính hãng, tuyển chọn tại Việt Nam.",
+      "automated": "Email này được gửi tự động, vui lòng không trả lời. Cần hỗ trợ? Hãy liên hệ chúng tôi qua website.",
+      "greeting": "Xin chào {name},"
+    },
+    "order": {
+      "viewOrder": "Xem đơn hàng",
+      "summary": {
+        "items": "Sản phẩm của bạn",
+        "quantity": "SL {quantity}",
+        "subtotal": "Tạm tính",
+        "discount": "Giảm giá",
+        "shipping": "Phí giao hàng",
+        "freeShipping": "Miễn phí",
+        "giftWrap": "Gói quà",
+        "total": "Tổng cộng",
+        "amountPaid": "Đã thanh toán",
+        "amountDue": "Còn lại",
+        "deliverTo": "Giao đến",
+        "paymentMethod": "Thanh toán"
+      },
+      "confirmation": {
+        "subject": "Đã nhận đơn hàng {code}",
+        "preview": "Cảm ơn bạn đã đặt đơn hàng {code}.",
+        "heading": "Cảm ơn bạn đã đặt hàng",
+        "intro": "Chúng tôi đã nhận được đơn hàng {code} bạn đặt ngày {date}.",
+        "instructions": {
+          "cod": "Chúng tôi sẽ gọi điện xác nhận đơn hàng trong vòng 24 giờ. Bạn thanh toán cho người giao hàng khi nhận hàng.",
+          "codDeposit": "Để xác nhận đơn hàng COD này, vui lòng đặt cọc {deposit} qua đường dẫn bên dưới. Phần còn lại thanh toán khi nhận hàng.",
+          "online": "Vui lòng hoàn tất thanh toán {amount} qua đường dẫn bên dưới. Sản phẩm chỉ được giữ cho bạn trong thời gian giới hạn.",
+          "bankTransfer": "Vui lòng chuyển khoản {amount} với nội dung là mã đơn hàng {code}. Chúng tôi xác nhận đơn hàng ngay khi nhận được tiền.",
+          "paid": "Chúng tôi đã nhận được thanh toán và đang chuẩn bị đơn hàng của bạn."
+        }
+      },
+      "paymentReceived": {
+        "subject": "Đã nhận thanh toán cho đơn hàng {code}",
+        "preview": "Chúng tôi đã nhận {amount}.",
+        "heading": "Đã nhận thanh toán",
+        "body": "Chúng tôi đã nhận {amount} cho đơn hàng {code}.",
+        "balance": "Số tiền còn lại {amount} sẽ thanh toán cho người giao hàng khi nhận hàng.",
+        "fullyPaid": "Đơn hàng của bạn đã được thanh toán đủ. Cảm ơn bạn."
+      },
+      "shipped": {
+        "subject": "Đơn hàng {code} đang được giao",
+        "preview": "Đơn hàng đã được giao cho đơn vị vận chuyển.",
+        "heading": "Đơn hàng đang trên đường đến bạn",
+        "body": "Đơn hàng {code} đã được giao cho {carrier}.",
+        "tracking": "Mã vận đơn: {code}",
+        "track": "Theo dõi đơn hàng",
+        "codBalance": "Vui lòng chuẩn bị {amount} để thanh toán cho người giao hàng."
+      },
+      "delivered": {
+        "subject": "Đơn hàng {code} đã được giao",
+        "preview": "Mong bạn yêu thích mùi hương mới.",
+        "heading": "Đơn hàng đã đến tay bạn",
+        "body": "Đơn hàng {code} đã được giao thành công. Mong bạn yêu thích mùi hương mới.",
+        "review": "Vài ngày tới, chúng tôi sẽ mời bạn đánh giá sản phẩm. Cảm nhận của bạn giúp những người yêu nước hoa khác lựa chọn dễ dàng hơn.",
+        "returns": "Có điều gì chưa ổn? Bạn có thể yêu cầu trả hàng trong vòng 7 ngày kể từ khi nhận hàng."
+      },
+      "cancelled": {
+        "subject": "Đơn hàng {code} đã được huỷ",
+        "preview": "Đơn hàng của bạn đã được huỷ.",
+        "heading": "Đơn hàng đã được huỷ",
+        "body": "Đơn hàng {code} đã được huỷ và các sản phẩm giữ cho bạn đã được trả lại kho.",
+        "refund": "Chúng tôi sẽ hoàn lại {amount} bạn đã thanh toán và gửi xác nhận khi hoàn tiền xong.",
+        "help": "Nếu bạn không yêu cầu huỷ đơn, vui lòng liên hệ chúng tôi."
+      },
+      "refunded": {
+        "subject": "Đã nhận hàng trả lại của đơn {code}",
+        "preview": "Yêu cầu hoàn tiền của bạn đang được xử lý.",
+        "heading": "Chúng tôi đã nhận hàng trả lại",
+        "body": "Chúng tôi đã nhận được sản phẩm trả lại của đơn hàng {code}.",
+        "refund": "Chúng tôi đang hoàn lại {amount} và sẽ gửi xác nhận khi hoàn tiền xong."
+      }
+    },
+    "auth": {
+      "verify": {
+        "subject": "Xác nhận email của bạn",
+        "preview": "Chỉ một bước để hoàn tất tạo tài khoản.",
+        "heading": "Xác nhận email của bạn",
+        "body": "Vui lòng xác nhận địa chỉ email để hoàn tất việc tạo tài khoản Perfume Store.",
+        "cta": "Xác nhận email",
+        "expiry": "Đường dẫn có hiệu lực trong 24 giờ.",
+        "ignore": "Nếu bạn không tạo tài khoản, hãy bỏ qua email này."
+      },
+      "reset": {
+        "subject": "Đặt lại mật khẩu",
+        "preview": "Chọn mật khẩu mới cho tài khoản của bạn.",
+        "heading": "Đặt lại mật khẩu",
+        "body": "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Perfume Store của bạn.",
+        "cta": "Đặt mật khẩu mới",
+        "expiry": "Đường dẫn có hiệu lực trong 30 phút và chỉ dùng được một lần.",
+        "ignore": "Nếu bạn không yêu cầu, hãy bỏ qua email này: mật khẩu của bạn vẫn giữ nguyên."
+      }
     }
   },
   "ui": {
@@ -333,6 +428,674 @@
       "error": "Không tải được gợi ý. Vui lòng thử lại."
     }
   },
+  "cart": {
+    "title": "Giỏ hàng",
+    "metaDescription": "Xem lại các sản phẩm trong giỏ hàng, mã ưu đãi và tuỳ chọn gói quà trước khi thanh toán.",
+    "headerLink": "{count, plural, =0 {Giỏ hàng, chưa có sản phẩm} other {Giỏ hàng, # sản phẩm}}",
+    "add": "Thêm vào giỏ",
+    "outOfStock": "Hết hàng",
+    "quantity": "Số lượng",
+    "added": "Đã thêm vào giỏ hàng",
+    "addedCapped": "Đã thêm vào giỏ — tối đa {max} sản phẩm cho mỗi lựa chọn",
+    "viewCart": "Xem giỏ hàng",
+    "checkout": "Thanh toán",
+    "continueShopping": "Tiếp tục mua sắm",
+    "errors": {
+      "validation": "Thông tin chưa hợp lệ. Vui lòng thử lại.",
+      "notFound": "Sản phẩm này không còn trong giỏ hàng. Trang đã được cập nhật.",
+      "unavailable": "Sản phẩm này hiện không thể đặt mua.",
+      "out_of_stock": "Sản phẩm này vừa hết hàng.",
+      "limit_reached": "Bạn đã có tối đa {max} sản phẩm này trong giỏ.",
+      "rate_limited": "Bạn đã thử quá nhiều mã. Vui lòng đợi một phút rồi thử lại.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại sau ít phút."
+    },
+    "mini": {
+      "title": "Giỏ hàng của bạn",
+      "count": "{count, plural, =0 {Chưa có sản phẩm} other {# sản phẩm}}",
+      "loading": "Đang tải giỏ hàng"
+    },
+    "empty": {
+      "title": "Giỏ hàng đang trống",
+      "description": "Hãy khám phá bộ sưu tập nước hoa chính hãng và chọn hương thơm dành cho bạn.",
+      "action": "Khám phá nước hoa"
+    },
+    "line": {
+      "remove": "Xoá",
+      "removeLabel": "Xoá {name} khỏi giỏ hàng",
+      "quantityFor": "Số lượng của {name}",
+      "unitPrice": "{price} mỗi sản phẩm",
+      "priceChanged": "Giá đã thay đổi từ {from} kể từ khi bạn thêm vào giỏ.",
+      "unavailable": "Sản phẩm này hiện không thể đặt mua. Vui lòng xoá khỏi giỏ hàng.",
+      "overStock": "{max, plural, other {Hiện chỉ có thể đặt tối đa # sản phẩm. Vui lòng giảm số lượng.}}",
+      "capped": "Số lượng đã được điều chỉnh về tối đa {max}."
+    },
+    "summary": {
+      "title": "Tóm tắt đơn hàng",
+      "subtotal": "Tạm tính",
+      "discount": "Ưu đãi ({code})",
+      "giftWrap": "Gói quà",
+      "shipping": "Phí vận chuyển",
+      "shippingAtCheckout": "Tính khi thanh toán",
+      "shippingFreeCoupon": "Miễn phí với mã {code}",
+      "total": "Tổng cộng",
+      "totalNote": "Chưa gồm phí vận chuyển.",
+      "checkoutBlocked": "Vui lòng điều chỉnh các sản phẩm được đánh dấu trước khi thanh toán."
+    },
+    "freeShipping": {
+      "label": "Tiến độ miễn phí vận chuyển",
+      "remaining": "Còn {amount} nữa để được miễn phí vận chuyển",
+      "unlocked": "Đơn hàng của bạn được miễn phí vận chuyển tiêu chuẩn"
+    },
+    "coupon": {
+      "label": "Mã ưu đãi",
+      "apply": "Áp dụng",
+      "remove": "Gỡ mã {code}",
+      "applied": "Đã áp dụng mã {code}",
+      "freeShipping": "Mã {code}: miễn phí vận chuyển khi thanh toán",
+      "notApplied": "Mã {code} chưa được áp dụng.",
+      "errors": {
+        "not_found": "Mã ưu đãi không tồn tại. Vui lòng kiểm tra lại chính tả.",
+        "inactive": "Mã ưu đãi này hiện không còn hiệu lực.",
+        "not_started": "Mã ưu đãi này chưa đến thời gian áp dụng.",
+        "expired": "Mã ưu đãi này đã hết hạn.",
+        "usage_limit": "Mã ưu đãi này đã hết lượt sử dụng.",
+        "per_customer_limit": "Bạn đã sử dụng mã ưu đãi này.",
+        "min_subtotal": "Mã áp dụng cho đơn từ {minSubtotal, number, vnd}. Thêm {missing, number, vnd} để sử dụng.",
+        "no_eligible_items": "Mã ưu đãi không áp dụng cho sản phẩm nào trong giỏ hàng.",
+        "empty_cart": "Hãy thêm sản phẩm vào giỏ trước khi nhập mã ưu đãi."
+      }
+    },
+    "gift": {
+      "title": "Quà tặng",
+      "wrap": "Gói quà cao cấp (+{fee})",
+      "message": "Lời nhắn trên thiệp",
+      "messageHint": "{count}/{max} ký tự",
+      "hidePrices": "Không in giá trên phiếu giao hàng",
+      "save": "Lưu tuỳ chọn quà tặng",
+      "saved": "Đã lưu tuỳ chọn quà tặng",
+      "tooLong": "Lời nhắn tối đa {max} ký tự."
+    },
+    "linesLabel": "Sản phẩm trong giỏ hàng"
+  },
+  "checkout": {
+    "metaTitle": "Thanh toán",
+    "title": "Thanh toán",
+    "secure": "Thanh toán an toàn",
+    "backToCart": "Quay lại giỏ hàng",
+    "steps": {
+      "contact": "Thông tin liên hệ",
+      "address": "Địa chỉ giao hàng",
+      "shipping": "Phương thức giao hàng",
+      "payment": "Thanh toán"
+    },
+    "contact": {
+      "email": "Email",
+      "emailHint": "Chúng tôi gửi xác nhận đơn hàng đến email này.",
+      "phone": "Số điện thoại di động",
+      "phoneHint": "10 chữ số, ví dụ 0912 345 678. Nhân viên giao hàng sẽ gọi số này.",
+      "signInPrompt": "Đã có tài khoản?",
+      "signIn": "Đăng nhập"
+    },
+    "address": {
+      "savedLegend": "Địa chỉ đã lưu",
+      "newAddress": "Dùng địa chỉ mới",
+      "fullName": "Họ và tên",
+      "province": "Tỉnh / thành phố",
+      "provincePlaceholder": "Chọn tỉnh hoặc thành phố",
+      "provinceSearch": "Tìm tỉnh, thành phố…",
+      "ward": "Phường / xã",
+      "wardPlaceholder": "Chọn phường hoặc xã",
+      "wardChooseProvince": "Vui lòng chọn tỉnh, thành phố trước",
+      "wardSearch": "Tìm phường, xã…",
+      "wardLoading": "Đang tải danh sách phường, xã…",
+      "street": "Địa chỉ cụ thể",
+      "streetHint": "Số nhà, tên đường, tòa nhà, tầng",
+      "noResults": "Không tìm thấy địa danh phù hợp.",
+      "note": "Ghi chú giao hàng (không bắt buộc)",
+      "noteHint": "Ví dụ: gọi trước khi giao, giao sau 18 giờ."
+    },
+    "shipping": {
+      "chooseProvince": "Chọn tỉnh, thành phố để xem phương thức giao hàng.",
+      "none": "Hiện chúng tôi chưa giao được đến địa chỉ này. Vui lòng liên hệ với chúng tôi.",
+      "eta": "{min}–{max} ngày",
+      "etaSame": "{days} ngày",
+      "free": "Miễn phí",
+      "freeOver": "Miễn phí cho đơn từ {amount}"
+    },
+    "payment": {
+      "methods": {
+        "cod": {
+          "title": "Thanh toán khi nhận hàng (COD)",
+          "description": "Trả tiền mặt cho nhân viên giao hàng khi nhận hàng. Chúng tôi sẽ gọi điện xác nhận đơn."
+        },
+        "payos": {
+          "title": "Chuyển khoản qua VietQR",
+          "description": "Quét mã QR bằng ứng dụng ngân hàng bất kỳ. Xác nhận tự động."
+        },
+        "vnpay": {
+          "title": "VNPay",
+          "description": "Thẻ ATM nội địa, thẻ quốc tế và ví VNPay QR."
+        }
+      },
+      "depositTitle": "Đơn COD này cần đặt cọc",
+      "depositBody": "Đơn thanh toán khi nhận hàng trên {threshold} cần đặt cọc {percent}% là {deposit}, thanh toán trực tuyến qua VietQR hoặc VNPay ngay sau khi đặt hàng. Nhân viên giao hàng thu phần còn lại {balance}.",
+      "depositAlternative": "Không muốn đặt cọc? Hãy chọn VietQR hoặc VNPay để thanh toán toàn bộ trước."
+    },
+    "vat": {
+      "toggle": "Tôi cần xuất hóa đơn VAT cho công ty",
+      "hint": "Hóa đơn điện tử được xuất khi đơn hàng giao thành công.",
+      "companyName": "Tên công ty",
+      "taxCode": "Mã số thuế",
+      "taxCodeHint": "10 chữ số, 10-3 chữ số cho chi nhánh, hoặc mã số thuế cá nhân 12 chữ số",
+      "email": "Email nhận hóa đơn",
+      "addressLegend": "Địa chỉ công ty"
+    },
+    "consents": {
+      "legend": "Điều khoản",
+      "terms": "Tôi đồng ý với <link>Điều khoản mua hàng</link>.",
+      "privacy": "Tôi đồng ý cho xử lý dữ liệu cá nhân theo <link>Chính sách bảo mật</link>.",
+      "marketing": "Gửi email cho tôi về sản phẩm mới và ưu đãi (không bắt buộc). Bạn có thể hủy đăng ký bất cứ lúc nào."
+    },
+    "review": {
+      "title": "Tóm tắt đơn hàng",
+      "items": "{count} sản phẩm",
+      "quantity": "SL {count}",
+      "subtotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "discountWithCode": "Giảm giá ({code})",
+      "shipping": "Phí giao hàng",
+      "shippingLater": "Tính sau khi có địa chỉ",
+      "shippingFree": "Miễn phí",
+      "giftWrap": "Gói quà",
+      "giftMessage": "Lời nhắn: “{message}”",
+      "hidePrices": "Ẩn giá trên phiếu giao hàng",
+      "total": "Tổng cộng",
+      "depositNow": "Tiền cọc thanh toán ngay",
+      "balanceOnDelivery": "Thu khi giao hàng",
+      "updating": "Đang cập nhật tổng tiền…",
+      "totalAnnouncement": "Tổng đơn hàng: {total}",
+      "editCart": "Sửa giỏ hàng"
+    },
+    "coupon": {
+      "label": "Mã giảm giá",
+      "apply": "Áp dụng",
+      "remove": "Bỏ mã {code}",
+      "applied": "Đã áp dụng mã {code}"
+    },
+    "placeOrder": "Đặt hàng",
+    "placeOrderPay": "Đặt hàng và thanh toán",
+    "placing": "Đang đặt hàng…",
+    "placeHint": "Giá được hệ thống xác nhận lại khi bạn đặt hàng.",
+    "alerts": {
+      "fixErrors": "Vui lòng kiểm tra các trường được đánh dấu.",
+      "cartChanged": "Giỏ hàng của bạn đã thay đổi. Vui lòng kiểm tra lại trước khi đặt hàng.",
+      "priceChanged": "Giá hoặc phí đã thay đổi kể từ khi trang được tải. Vui lòng kiểm tra tổng tiền mới và đặt hàng lại.",
+      "rateLimited": "Có quá nhiều đơn hàng từ kết nối này. Vui lòng đợi một phút rồi thử lại.",
+      "unexpected": "Chúng tôi chưa thể đặt đơn hàng của bạn. Vui lòng thử lại hoặc liên hệ với chúng tôi.",
+      "quoteFailed": "Chưa cập nhật được tổng tiền. Vui lòng thử lại."
+    },
+    "errors": {
+      "invalid": "Vui lòng kiểm tra lại trường này.",
+      "required": "Vui lòng nhập thông tin này.",
+      "tooShort": "Nội dung quá ngắn.",
+      "tooLong": "Nội dung quá dài.",
+      "emailInvalid": "Vui lòng nhập email hợp lệ.",
+      "phoneInvalid": "Vui lòng nhập số di động Việt Nam 10 chữ số, ví dụ 0912 345 678.",
+      "selectRequired": "Vui lòng chọn một mục.",
+      "taxCodeInvalid": "Vui lòng nhập mã số thuế hợp lệ.",
+      "consentRequired": "Vui lòng đồng ý để tiếp tục.",
+      "shippingRequired": "Vui lòng chọn phương thức giao hàng.",
+      "paymentRequired": "Vui lòng chọn phương thức thanh toán.",
+      "provinceUnknown": "Vui lòng chọn tỉnh, thành phố trong danh sách.",
+      "wardMismatch": "Phường, xã này không thuộc tỉnh, thành phố đã chọn.",
+      "shippingRateUnavailable": "Phương thức giao hàng này không còn áp dụng cho địa chỉ của bạn. Vui lòng chọn lại.",
+      "couponNotFound": "Mã này không tồn tại.",
+      "couponInactive": "Mã này không còn hiệu lực.",
+      "couponNotStarted": "Mã này chưa đến thời gian áp dụng.",
+      "couponExpired": "Mã này đã hết hạn.",
+      "couponUsageLimit": "Mã này đã hết lượt sử dụng.",
+      "couponPerCustomerLimit": "Bạn đã sử dụng mã này.",
+      "couponMinSubtotal": "Đơn hàng chưa đạt giá trị tối thiểu của mã.",
+      "couponNoEligibleItems": "Mã này không áp dụng cho sản phẩm trong giỏ hàng.",
+      "itemUnavailable": "{name} hiện không còn bán.",
+      "itemQuantityLimit": "{name}: số lượng vượt quá giới hạn mỗi đơn.",
+      "itemInsufficientStock": "{name}: không đủ hàng trong kho.",
+      "cartUnavailable": "Giỏ hàng trống hoặc đã được đặt hàng.",
+      "cartEmpty": "Giỏ hàng của bạn đang trống."
+    }
+  },
+  "checkoutResult": {
+    "metaTitle": "Kết quả đặt hàng",
+    "orderCode": "Mã đơn hàng",
+    "placedAt": "Đặt lúc {date}",
+    "notFound": {
+      "title": "Không tìm thấy đơn hàng",
+      "description": "Liên kết không hợp lệ hoặc đã hết hạn. Hãy mở liên kết trong email xác nhận đơn hàng hoặc đăng nhập để xem đơn của bạn."
+    },
+    "continueShopping": "Tiếp tục mua sắm",
+    "state": {
+      "paid": {
+        "title": "Thanh toán thành công",
+        "description": "Cảm ơn bạn! Chúng tôi đã nhận {amount} và đang chuẩn bị đơn hàng."
+      },
+      "depositPaid": {
+        "title": "Đã nhận tiền đặt cọc",
+        "description": "Đã nhận {amount}. Bạn thanh toán {balance} còn lại khi nhận hàng."
+      },
+      "codConfirm": {
+        "title": "Đặt hàng thành công",
+        "description": "Chúng tôi sẽ gọi điện hoặc nhắn Zalo để xác nhận đơn hàng trong vòng 24 giờ. Bạn thanh toán khi nhận hàng."
+      },
+      "codDepositReceived": {
+        "title": "Đã nhận tiền đặt cọc",
+        "description": "Đã nhận {amount}. Chúng tôi sẽ liên hệ để xác nhận đơn hàng; bạn thanh toán phần còn lại khi nhận hàng."
+      },
+      "awaitingPayment": {
+        "title": "Hoàn tất thanh toán",
+        "description": "Sản phẩm được giữ cho bạn đến {time}. Vui lòng thanh toán {amount}."
+      },
+      "depositRequired": {
+        "title": "Thanh toán tiền đặt cọc",
+        "description": "Đơn COD có giá trị cao cần đặt cọc {amount} trước khi xác nhận. Phần còn lại thanh toán khi nhận hàng. Sản phẩm được giữ đến {time}."
+      },
+      "sessionExpired": {
+        "title": "Phiên thanh toán đã hết hạn",
+        "description": "Sản phẩm vẫn được giữ cho bạn đến {time}. Bạn có thể thanh toán lại, kể cả bằng phương thức khác."
+      },
+      "windowClosed": {
+        "title": "Đã hết thời gian giữ hàng",
+        "description": "Đơn hàng chưa được thanh toán và sẽ được huỷ tự động. Bạn có thể đặt lại đơn mới."
+      },
+      "cancelled": {
+        "title": "Đơn hàng đã huỷ",
+        "description": "Đơn hàng này đã được huỷ.",
+        "refund": "Số tiền bạn đã thanh toán ({amount}) sẽ được hoàn lại. Chúng tôi sẽ liên hệ với bạn."
+      },
+      "other": {
+        "title": "Trạng thái đơn hàng",
+        "description": "Đơn hàng của bạn: {status}."
+      }
+    },
+    "orderStatus": {
+      "pending": "Chờ thanh toán",
+      "awaiting_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "processing": "Đang chuẩn bị hàng",
+      "shipped": "Đang giao",
+      "delivered": "Đã giao",
+      "completed": "Hoàn tất",
+      "cancelled": "Đã huỷ",
+      "delivery_failed": "Giao không thành công",
+      "return_requested": "Đang yêu cầu trả hàng",
+      "returned": "Đã trả hàng"
+    },
+    "paymentStatus": {
+      "unpaid": "Chưa thanh toán",
+      "partially_paid": "Đã đặt cọc",
+      "paid": "Đã thanh toán",
+      "partially_refunded": "Đã hoàn một phần",
+      "refunded": "Đã hoàn tiền"
+    },
+    "methods": {
+      "cod": "Thanh toán khi nhận hàng (COD)",
+      "vnpay": "VNPay",
+      "payos": "Chuyển khoản VietQR",
+      "bank_transfer": "Chuyển khoản ngân hàng",
+      "momo": "MoMo",
+      "zalopay": "ZaloPay"
+    },
+    "qr": {
+      "heading": "Quét mã VietQR để thanh toán",
+      "instructions": "Mở ứng dụng ngân hàng, quét mã và giữ nguyên số tiền và nội dung chuyển khoản.",
+      "alt": "Mã VietQR thanh toán {amount}",
+      "amount": "Số tiền",
+      "note": "Nội dung chuyển khoản",
+      "accountNumber": "Số tài khoản",
+      "accountName": "Chủ tài khoản",
+      "bin": "Mã ngân hàng (BIN)",
+      "openCheckout": "Mở trang thanh toán payOS",
+      "sandbox": "Môi trường thử nghiệm: mã QR này không dùng được với ứng dụng ngân hàng."
+    },
+    "countdown": {
+      "label": "Thời gian còn lại",
+      "expiresIn": "Mã hết hạn sau {time}",
+      "expired": "Phiên thanh toán đã hết hạn"
+    },
+    "live": {
+      "waiting": "Đang chờ xác nhận thanh toán…",
+      "paid": "Đã thanh toán",
+      "checking": "Đang cập nhật trạng thái…"
+    },
+    "vnpay": {
+      "heading": "Thanh toán qua VNPay",
+      "description": "Bạn sẽ được chuyển đến cổng VNPay để thanh toán bằng thẻ ATM, thẻ quốc tế hoặc ví VNPay. Kết quả được cập nhật tự động.",
+      "pay": "Thanh toán {amount} với VNPay",
+      "returned": "Đã quay lại từ VNPay. Đang chờ VNPay xác nhận…"
+    },
+    "retry": {
+      "heading": "Chọn cách thanh toán",
+      "method": "Phương thức thanh toán",
+      "submit": "Thanh toán lại",
+      "start": "Thanh toán",
+      "change": "Đổi phương thức thanh toán",
+      "providers": {
+        "vnpay": {
+          "title": "VNPay",
+          "description": "Thẻ ATM, thẻ quốc tế, ví VNPay"
+        },
+        "payos": {
+          "title": "Chuyển khoản VietQR",
+          "description": "Quét mã bằng ứng dụng ngân hàng"
+        }
+      },
+      "errors": {
+        "reservationExpired": "Đã hết thời gian giữ hàng cho đơn này.",
+        "providerUnavailable": "Phương thức này tạm thời không khả dụng. Vui lòng chọn cách khác.",
+        "gatewayError": "Không kết nối được cổng thanh toán. Vui lòng thử lại.",
+        "notPayable": "Đơn hàng này không còn cần thanh toán.",
+        "nothingDue": "Đơn hàng này không còn khoản nào cần thanh toán.",
+        "notFound": "Không tìm thấy đơn hàng.",
+        "validation": "Yêu cầu không hợp lệ.",
+        "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+      }
+    },
+    "summary": {
+      "heading": "Tóm tắt đơn hàng",
+      "quantity": "Số lượng: {quantity}",
+      "subtotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "shipping": "Phí vận chuyển",
+      "giftWrap": "Gói quà",
+      "total": "Tổng cộng",
+      "deposit": "Tiền đặt cọc",
+      "paid": "Đã thanh toán",
+      "due": "Còn lại",
+      "free": "Miễn phí",
+      "method": "Thanh toán",
+      "paymentStatus": "Tình trạng thanh toán",
+      "status": "Trạng thái đơn"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Đăng nhập",
+      "metaTitle": "Đăng nhập",
+      "intro": "Chào mừng bạn trở lại. Đăng nhập để theo dõi đơn hàng và thanh toán nhanh hơn.",
+      "submit": "Đăng nhập",
+      "forgot": "Quên mật khẩu?",
+      "noAccount": "Lần đầu đến với Perfume Store?",
+      "createAccount": "Tạo tài khoản",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "notVerified": "Vui lòng xác nhận email trước. Chúng tôi vừa gửi lại đường dẫn xác nhận cho bạn.",
+      "locked": "Tài khoản này đã bị khoá. Vui lòng liên hệ chúng tôi để được hỗ trợ.",
+      "staffAccount": "Tài khoản nhân viên đăng nhập tại <link>trang quản trị</link>.",
+      "verified": "Email của bạn đã được xác nhận. Chào mừng bạn!",
+      "verifyFailed": "Đường dẫn xác nhận không hợp lệ hoặc đã hết hạn. Hãy đăng nhập để nhận đường dẫn mới."
+    },
+    "signUp": {
+      "title": "Tạo tài khoản",
+      "metaTitle": "Tạo tài khoản",
+      "intro": "Lưu địa chỉ, theo dõi đơn hàng và nhận email bằng ngôn ngữ bạn chọn.",
+      "submit": "Tạo tài khoản",
+      "haveAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "checkEmailTitle": "Hãy kiểm tra hộp thư",
+      "checkEmail": "Nếu {email} có thể dùng để tạo tài khoản, chúng tôi đã gửi đường dẫn xác nhận đến địa chỉ này. Mở đường dẫn để hoàn tất đăng ký.",
+      "terms": "Khi tạo tài khoản, bạn đồng ý với điều khoản sử dụng và chính sách bảo mật của chúng tôi."
+    },
+    "forgot": {
+      "title": "Quên mật khẩu?",
+      "metaTitle": "Quên mật khẩu",
+      "intro": "Nhập email của tài khoản, chúng tôi sẽ gửi đường dẫn để bạn đặt mật khẩu mới.",
+      "submit": "Gửi đường dẫn",
+      "sentTitle": "Hãy kiểm tra hộp thư",
+      "sent": "Nếu {email} có tài khoản, đường dẫn đặt lại mật khẩu đang được gửi đến. Đường dẫn có hiệu lực 30 phút và chỉ dùng được một lần.",
+      "back": "Quay lại đăng nhập"
+    },
+    "reset": {
+      "title": "Đặt mật khẩu mới",
+      "metaTitle": "Đặt lại mật khẩu",
+      "intro": "Mật khẩu mới cần có ít nhất 8 ký tự.",
+      "submit": "Lưu mật khẩu mới",
+      "done": "Mật khẩu đã được thay đổi. Vui lòng đăng nhập bằng mật khẩu mới.",
+      "invalidToken": "Đường dẫn đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Hãy yêu cầu đường dẫn mới.",
+      "requestNew": "Yêu cầu đường dẫn mới",
+      "signIn": "Đăng nhập"
+    },
+    "fields": {
+      "name": "Họ và tên",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Nhập lại mật khẩu mới",
+      "passwordHint": "Ít nhất 8 ký tự.",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu"
+    },
+    "google": "Tiếp tục với Google",
+    "or": "hoặc",
+    "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "tooManyRequests": "Bạn đã thử quá nhiều lần. Vui lòng đợi vài phút rồi thử lại."
+  },
+  "account": {
+    "metaTitle": "Tài khoản",
+    "title": "Tài khoản của tôi",
+    "greeting": "Xin chào, {name}",
+    "nav": {
+      "label": "Tài khoản",
+      "overview": "Tổng quan",
+      "orders": "Đơn hàng",
+      "addresses": "Địa chỉ",
+      "profile": "Hồ sơ",
+      "signOut": "Đăng xuất"
+    },
+    "overview": {
+      "intro": "Theo dõi đơn hàng, quản lý địa chỉ và chọn cách chúng tôi liên hệ với bạn.",
+      "recentOrders": "Đơn hàng gần đây",
+      "viewAll": "Xem tất cả đơn hàng",
+      "noOrders": "Bạn chưa có đơn hàng nào.",
+      "shop": "Khám phá nước hoa",
+      "defaultAddress": "Địa chỉ mặc định",
+      "noAddress": "Chưa có địa chỉ nào được lưu.",
+      "manageAddresses": "Quản lý địa chỉ",
+      "profile": "Hồ sơ",
+      "editProfile": "Chỉnh sửa hồ sơ",
+      "language": "Ngôn ngữ email: {language}",
+      "unverified": "Email của bạn chưa được xác nhận."
+    },
+    "orders": {
+      "title": "Đơn hàng của tôi",
+      "metaTitle": "Đơn hàng của tôi",
+      "empty": "Bạn chưa có đơn hàng nào.",
+      "code": "Mã đơn",
+      "date": "Ngày đặt",
+      "status": "Trạng thái",
+      "payment": "Thanh toán",
+      "total": "Tổng tiền",
+      "items": "{count} sản phẩm",
+      "view": "Xem đơn {code}",
+      "back": "Quay lại danh sách đơn hàng",
+      "detailTitle": "Đơn hàng {code}"
+    },
+    "addresses": {
+      "title": "Sổ địa chỉ",
+      "metaTitle": "Địa chỉ của tôi",
+      "intro": "Lưu tối đa {max} địa chỉ giao hàng. Địa chỉ mặc định được gợi ý khi thanh toán.",
+      "empty": "Bạn chưa lưu địa chỉ nào.",
+      "add": "Thêm địa chỉ",
+      "edit": "Sửa",
+      "editTitle": "Sửa địa chỉ",
+      "addTitle": "Địa chỉ mới",
+      "delete": "Xoá",
+      "deleteTitle": "Xoá địa chỉ này?",
+      "deleteDescription": "Thao tác này không thể hoàn tác.",
+      "confirmDelete": "Xoá địa chỉ",
+      "cancel": "Huỷ",
+      "setDefault": "Đặt làm mặc định",
+      "default": "Mặc định",
+      "save": "Lưu địa chỉ",
+      "saved": "Đã lưu địa chỉ.",
+      "deleted": "Đã xoá địa chỉ.",
+      "defaultSaved": "Đã cập nhật địa chỉ mặc định.",
+      "limitReached": "Bạn đã lưu đủ {max} địa chỉ. Hãy xoá bớt một địa chỉ để thêm địa chỉ mới.",
+      "fields": {
+        "fullName": "Tên người nhận",
+        "phone": "Số điện thoại",
+        "phoneHint": "10 chữ số, bắt đầu bằng 0.",
+        "province": "Tỉnh / thành phố",
+        "ward": "Phường / xã",
+        "street": "Địa chỉ cụ thể",
+        "streetHint": "Số nhà, tên đường, toà nhà.",
+        "isDefault": "Đặt làm địa chỉ mặc định",
+        "provincePlaceholder": "Chọn tỉnh / thành phố",
+        "wardPlaceholder": "Chọn phường / xã",
+        "wardFirst": "Hãy chọn tỉnh / thành phố trước",
+        "search": "Tìm kiếm…",
+        "noResults": "Không có kết quả phù hợp."
+      },
+      "wardsFailed": "Không tải được danh sách phường / xã. Vui lòng thử lại."
+    },
+    "profile": {
+      "title": "Hồ sơ",
+      "metaTitle": "Hồ sơ của tôi",
+      "intro": "Thông tin của bạn được dùng để giao hàng và gửi email về đơn hàng.",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu hồ sơ.",
+      "fields": {
+        "name": "Họ và tên",
+        "email": "Email",
+        "emailHint": "Liên hệ chúng tôi nếu bạn muốn đổi email của tài khoản.",
+        "phone": "Số điện thoại",
+        "phoneHint": "10 chữ số, bắt đầu bằng 0. Không bắt buộc.",
+        "birthday": "Ngày sinh",
+        "birthdayHint": "Không bắt buộc.",
+        "locale": "Ngôn ngữ email",
+        "localeHint": "Email về tài khoản được gửi bằng ngôn ngữ này.",
+        "marketing": "Gửi cho tôi tin tức và ưu đãi dành riêng qua email",
+        "marketingHint": "Bạn có thể huỷ đăng ký bất cứ lúc nào."
+      },
+      "languages": {
+        "vi": "Tiếng Việt",
+        "en": "English"
+      }
+    },
+    "errors": {
+      "required": "Vui lòng điền thông tin này.",
+      "tooLong": "Nội dung quá dài.",
+      "invalid": "Vui lòng kiểm tra lại giá trị này.",
+      "emailInvalid": "Vui lòng nhập email hợp lệ.",
+      "passwordTooShort": "Mật khẩu cần ít nhất 8 ký tự.",
+      "passwordTooLong": "Mật khẩu tối đa 128 ký tự.",
+      "passwordMismatch": "Hai mật khẩu chưa khớp nhau.",
+      "phoneInvalid": "Số điện thoại cần 10 chữ số, bắt đầu bằng 0.",
+      "birthdayInvalid": "Vui lòng nhập một ngày hợp lệ trong quá khứ.",
+      "wardInvalid": "Hãy chọn phường / xã thuộc tỉnh / thành phố đã chọn.",
+      "addressLimit": "Bạn có thể lưu tối đa 10 địa chỉ.",
+      "codeInvalid": "Mã đơn hàng có dạng PF-261111-7K3Q.",
+      "notFound": "Không tìm thấy nội dung này.",
+      "unauthorized": "Vui lòng đăng nhập lại.",
+      "notCancellable": "Đơn hàng này không thể huỷ được nữa.",
+      "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "validation": "Vui lòng sửa các mục được đánh dấu."
+    }
+  },
+  "customerOrder": {
+    "status": {
+      "pending": "Chờ thanh toán",
+      "awaiting_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "processing": "Đang chuẩn bị",
+      "shipped": "Đang giao",
+      "delivered": "Đã giao",
+      "completed": "Hoàn tất",
+      "cancelled": "Đã huỷ",
+      "delivery_failed": "Giao không thành công",
+      "return_requested": "Yêu cầu trả hàng",
+      "returned": "Đã trả hàng"
+    },
+    "paymentStatus": {
+      "unpaid": "Chưa thanh toán",
+      "partially_paid": "Đã thanh toán một phần",
+      "paid": "Đã thanh toán",
+      "partially_refunded": "Đã hoàn tiền một phần",
+      "refunded": "Đã hoàn tiền"
+    },
+    "paymentMethod": {
+      "cod": "Thanh toán khi nhận hàng (COD)",
+      "vnpay": "VNPay",
+      "payos": "Chuyển khoản VietQR",
+      "bank_transfer": "Chuyển khoản ngân hàng",
+      "momo": "MoMo",
+      "zalopay": "ZaloPay"
+    },
+    "carrier": {
+      "self": "Nhân viên cửa hàng",
+      "ghn": "Giao Hàng Nhanh",
+      "ghtk": "Giao Hàng Tiết Kiệm",
+      "viettel_post": "Viettel Post",
+      "other": "Đơn vị vận chuyển"
+    },
+    "shipmentStatus": {
+      "pending": "Đang chuẩn bị",
+      "in_transit": "Đang vận chuyển",
+      "delivered": "Đã giao",
+      "failed": "Giao không thành công",
+      "returned": "Đã hoàn về"
+    },
+    "view": {
+      "placedOn": "Đặt ngày {date}",
+      "status": "Trạng thái đơn hàng",
+      "timeline": "Lịch sử đơn hàng",
+      "items": "Sản phẩm",
+      "quantity": "SL {quantity}",
+      "summary": "Tóm tắt",
+      "subtotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "coupon": "Giảm giá ({code})",
+      "shipping": "Phí giao hàng",
+      "freeShipping": "Miễn phí",
+      "giftWrap": "Gói quà",
+      "total": "Tổng cộng",
+      "amountPaid": "Đã thanh toán",
+      "amountDue": "Còn lại",
+      "amountRefunded": "Đã hoàn tiền",
+      "deposit": "Tiền đặt cọc",
+      "payment": "Thanh toán",
+      "paymentMethod": "Phương thức",
+      "paymentStatus": "Trạng thái",
+      "shippingAddress": "Địa chỉ giao hàng",
+      "tracking": "Vận chuyển",
+      "trackingCode": "Mã vận đơn: {code}",
+      "trackParcel": "Theo dõi đơn",
+      "noTracking": "Thông tin vận chuyển sẽ hiển thị khi đơn hàng được giao cho đơn vị vận chuyển.",
+      "giftMessage": "Lời nhắn kèm quà",
+      "note": "Ghi chú của bạn"
+    },
+    "cancel": {
+      "button": "Huỷ đơn hàng",
+      "title": "Huỷ đơn hàng {code}?",
+      "description": "Sản phẩm đang giữ cho bạn sẽ được trả lại kho. Thao tác này không thể hoàn tác.",
+      "confirm": "Đồng ý huỷ đơn",
+      "keep": "Giữ đơn hàng",
+      "done": "Đơn hàng của bạn đã được huỷ."
+    }
+  },
+  "orderLookup": {
+    "title": "Tra cứu đơn hàng",
+    "metaTitle": "Tra cứu đơn hàng",
+    "intro": "Nhập mã đơn hàng và số điện thoại bạn đã dùng khi đặt hàng.",
+    "code": "Mã đơn hàng",
+    "codeHint": "Ví dụ PF-261111-7K3Q, có trong email xác nhận đơn hàng.",
+    "phone": "Số điện thoại",
+    "submit": "Tra cứu",
+    "notFound": "Không tìm thấy đơn hàng với thông tin này. Vui lòng kiểm tra lại mã đơn hàng và số điện thoại.",
+    "rateLimited": "Bạn đã thử quá nhiều lần. Vui lòng đợi vài phút rồi thử lại.",
+    "another": "Tra cứu đơn hàng khác",
+    "signInHint": "Đã có tài khoản?",
+    "signIn": "Đăng nhập để xem tất cả đơn hàng",
+    "resultTitle": "Đơn hàng {code}"
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
@@ -359,13 +1122,34 @@
       "notes": "Nốt hương",
       "inventory": "Kho hàng",
       "stock": "Tồn kho",
-      "movements": "Lịch sử nhập xuất"
+      "movements": "Lịch sử nhập xuất",
+      "orders": "Đơn hàng",
+      "orderList": "Danh sách đơn",
+      "promotions": "Khuyến mãi",
+      "coupons": "Mã giảm giá",
+      "shipping": "Vận chuyển",
+      "shippingRates": "Khu vực & phí giao",
+      "payments": "Thanh toán",
+      "paymentTransactions": "Giao dịch",
+      "paymentEvents": "Nhật ký webhook",
+      "refunds": "Hoàn tiền",
+      "bankTransfers": "Xác nhận chuyển khoản",
+      "codRemittances": "Đối soát COD"
     },
     "dashboard": {
       "title": "Tổng quan",
       "welcome": "Xin chào {name}",
       "role": "Vai trò: {role}",
-      "placeholder": "Các số liệu bán hàng sẽ xuất hiện ở đây."
+      "queues": "Đơn cần xử lý",
+      "queueLink": "Xem {label}",
+      "byStatus": "Đơn theo trạng thái",
+      "lowStock": "Sắp hết hàng",
+      "revenue": "Doanh thu (đã trừ hoàn tiền)",
+      "today": "Hôm nay",
+      "last7Days": "7 ngày",
+      "last30Days": "30 ngày",
+      "orderCount": "{count, plural, other {# đơn}}",
+      "aov": "Giá trị đơn TB {amount}"
     },
     "roles": {
       "owner": "Chủ cửa hàng",
@@ -756,7 +1540,30 @@
       "emptyFile": "Tệp trống.",
       "fileTooLarge": "Ảnh vượt quá 10 MB.",
       "unsupportedType": "Chỉ chấp nhận ảnh JPEG, PNG, WebP hoặc AVIF.",
-      "corruptImage": "Không đọc được ảnh."
+      "corruptImage": "Không đọc được ảnh.",
+      "depositRequired": "Cần nhận đủ tiền cọc trước khi xác nhận đơn COD này.",
+      "cancelPaidForbidden": "Chỉ Quản lý hoặc Chủ shop được huỷ đơn đã nhận tiền.",
+      "notAwaitingCod": "Đơn không phải COD đang chờ xác nhận.",
+      "carrierRequired": "Chọn hãng vận chuyển.",
+      "trackingCodeInvalid": "Mã vận đơn gồm 4–40 ký tự: chữ, số hoặc . _ -",
+      "couponCodeInvalid": "Mã gồm 3–32 ký tự: chữ in hoa, số, - và _.",
+      "couponCodeTaken": "Mã này đã tồn tại.",
+      "couponUsed": "Mã đã được dùng nên không đổi được mã và loại giảm giá.",
+      "percentRange": "Phần trăm từ 1 đến 100.",
+      "provincesRequired": "Chọn ít nhất một tỉnh/thành.",
+      "maxWeightNotHigher": "Cân nặng tối đa phải lớn hơn cân nặng tối thiểu.",
+      "etaMaxBeforeMin": "Số ngày chậm nhất phải lớn hơn hoặc bằng số ngày nhanh nhất.",
+      "notPayable": "Đơn hàng không còn nhận thanh toán.",
+      "exceedsDue": "Số tiền vượt quá phần còn phải thu.",
+      "exceedsRefundable": "Số tiền vượt quá số có thể hoàn.",
+      "noGatewayPayment": "Đơn không có giao dịch qua cổng phù hợp để hoàn theo cách này.",
+      "proofRequired": "Nhập mã tham chiếu hoặc tải ảnh chứng từ.",
+      "refundClosed": "Yêu cầu hoàn tiền này đã được xử lý.",
+      "gatewayUnsupported": "Cổng này không hỗ trợ hoàn tiền tự động. Hãy hoàn thủ công.",
+      "notRemittable": "Đơn không phải COD đã giao.",
+      "alreadyRemitted": "Đơn đã có trong một phiên đối soát.",
+      "noOrders": "Chọn ít nhất một đơn.",
+      "orderNotFound": "Không tìm thấy đơn hàng."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -1143,95 +1950,703 @@
         },
         "system": "Hệ thống"
       }
-    }
-  },
-  "cart": {
-    "title": "Giỏ hàng",
-    "metaDescription": "Xem lại các sản phẩm trong giỏ hàng, mã ưu đãi và tuỳ chọn gói quà trước khi thanh toán.",
-    "headerLink": "{count, plural, =0 {Giỏ hàng, chưa có sản phẩm} other {Giỏ hàng, # sản phẩm}}",
-    "add": "Thêm vào giỏ",
-    "outOfStock": "Hết hàng",
-    "quantity": "Số lượng",
-    "added": "Đã thêm vào giỏ hàng",
-    "addedCapped": "Đã thêm vào giỏ — tối đa {max} sản phẩm cho mỗi lựa chọn",
-    "viewCart": "Xem giỏ hàng",
-    "checkout": "Thanh toán",
-    "continueShopping": "Tiếp tục mua sắm",
-    "errors": {
-      "validation": "Thông tin chưa hợp lệ. Vui lòng thử lại.",
-      "notFound": "Sản phẩm này không còn trong giỏ hàng. Trang đã được cập nhật.",
-      "unavailable": "Sản phẩm này hiện không thể đặt mua.",
-      "out_of_stock": "Sản phẩm này vừa hết hàng.",
-      "limit_reached": "Bạn đã có tối đa {max} sản phẩm này trong giỏ.",
-      "rate_limited": "Bạn đã thử quá nhiều mã. Vui lòng đợi một phút rồi thử lại.",
-      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại sau ít phút."
     },
-    "mini": {
-      "title": "Giỏ hàng của bạn",
-      "count": "{count, plural, =0 {Chưa có sản phẩm} other {# sản phẩm}}",
-      "loading": "Đang tải giỏ hàng"
-    },
-    "empty": {
-      "title": "Giỏ hàng đang trống",
-      "description": "Hãy khám phá bộ sưu tập nước hoa chính hãng và chọn hương thơm dành cho bạn.",
-      "action": "Khám phá nước hoa"
-    },
-    "line": {
-      "remove": "Xoá",
-      "removeLabel": "Xoá {name} khỏi giỏ hàng",
-      "quantityFor": "Số lượng của {name}",
-      "unitPrice": "{price} mỗi sản phẩm",
-      "priceChanged": "Giá đã thay đổi từ {from} kể từ khi bạn thêm vào giỏ.",
-      "unavailable": "Sản phẩm này hiện không thể đặt mua. Vui lòng xoá khỏi giỏ hàng.",
-      "overStock": "{max, plural, other {Hiện chỉ có thể đặt tối đa # sản phẩm. Vui lòng giảm số lượng.}}",
-      "capped": "Số lượng đã được điều chỉnh về tối đa {max}."
-    },
-    "summary": {
-      "title": "Tóm tắt đơn hàng",
-      "subtotal": "Tạm tính",
-      "discount": "Ưu đãi ({code})",
-      "giftWrap": "Gói quà",
-      "shipping": "Phí vận chuyển",
-      "shippingAtCheckout": "Tính khi thanh toán",
-      "shippingFreeCoupon": "Miễn phí với mã {code}",
-      "total": "Tổng cộng",
-      "totalNote": "Chưa gồm phí vận chuyển.",
-      "checkoutBlocked": "Vui lòng điều chỉnh các sản phẩm được đánh dấu trước khi thanh toán."
-    },
-    "freeShipping": {
-      "label": "Tiến độ miễn phí vận chuyển",
-      "remaining": "Còn {amount} nữa để được miễn phí vận chuyển",
-      "unlocked": "Đơn hàng của bạn được miễn phí vận chuyển tiêu chuẩn"
-    },
-    "coupon": {
-      "label": "Mã ưu đãi",
-      "apply": "Áp dụng",
-      "remove": "Gỡ mã {code}",
-      "applied": "Đã áp dụng mã {code}",
-      "freeShipping": "Mã {code}: miễn phí vận chuyển khi thanh toán",
-      "notApplied": "Mã {code} chưa được áp dụng.",
-      "errors": {
-        "not_found": "Mã ưu đãi không tồn tại. Vui lòng kiểm tra lại chính tả.",
-        "inactive": "Mã ưu đãi này hiện không còn hiệu lực.",
-        "not_started": "Mã ưu đãi này chưa đến thời gian áp dụng.",
-        "expired": "Mã ưu đãi này đã hết hạn.",
-        "usage_limit": "Mã ưu đãi này đã hết lượt sử dụng.",
-        "per_customer_limit": "Bạn đã sử dụng mã ưu đãi này.",
-        "min_subtotal": "Mã áp dụng cho đơn từ {minSubtotal, number, vnd}. Thêm {missing, number, vnd} để sử dụng.",
-        "no_eligible_items": "Mã ưu đãi không áp dụng cho sản phẩm nào trong giỏ hàng.",
-        "empty_cart": "Hãy thêm sản phẩm vào giỏ trước khi nhập mã ưu đãi."
+    "orders": {
+      "title": "Đơn hàng",
+      "description": "Xác nhận, đóng gói và giao đơn. Mọi thao tác đều được ghi nhật ký.",
+      "newManual": "Tạo đơn thủ công",
+      "newManualSoon": "Tạo đơn qua điện thoại/Zalo sẽ có trong bản cập nhật tới.",
+      "tabs": {
+        "label": "Hàng đợi xử lý",
+        "all": "Tất cả",
+        "awaiting": "Chờ xác nhận",
+        "toPack": "Cần đóng gói",
+        "inTransit": "Đang giao"
+      },
+      "search": "Tìm theo mã đơn, SĐT, email hoặc tên",
+      "filters": {
+        "status": "Trạng thái",
+        "paymentStatus": "Thanh toán",
+        "paymentMethod": "Phương thức",
+        "province": "Tỉnh/thành",
+        "all": "Tất cả",
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "clear": "Xoá bộ lọc"
+      },
+      "columns": {
+        "code": "Mã đơn",
+        "placedAt": "Ngày đặt",
+        "customer": "Khách hàng",
+        "province": "Tỉnh/thành",
+        "items": "SL",
+        "total": "Tổng tiền",
+        "status": "Trạng thái",
+        "payment": "Thanh toán"
+      },
+      "empty": "Không có đơn hàng phù hợp.",
+      "codRisk": "Rủi ro COD",
+      "bulk": {
+        "confirm": "Xác nhận đơn COD",
+        "confirmTitle": "Xác nhận {count, plural, other {# đơn}} đã chọn?",
+        "confirmDescription": "Chỉ đơn COD đang chờ xác nhận (đã đủ cọc nếu cần) được xác nhận; các đơn khác được bỏ qua.",
+        "confirmed": "Đã xác nhận {count, plural, other {# đơn}}",
+        "skipped": "Bỏ qua: {codes}",
+        "printPacking": "In phiếu đóng gói",
+        "printDelivery": "In phiếu giao hàng"
+      },
+      "status": {
+        "pending": "Chờ thanh toán",
+        "awaiting_confirmation": "Chờ xác nhận",
+        "confirmed": "Đã xác nhận",
+        "processing": "Đang đóng gói",
+        "shipped": "Đang giao",
+        "delivered": "Đã giao",
+        "completed": "Hoàn tất",
+        "cancelled": "Đã huỷ",
+        "delivery_failed": "Giao thất bại",
+        "return_requested": "Yêu cầu trả hàng",
+        "returned": "Đã hoàn hàng"
+      },
+      "paymentStatus": {
+        "unpaid": "Chưa thanh toán",
+        "partially_paid": "Thanh toán một phần",
+        "paid": "Đã thanh toán",
+        "partially_refunded": "Hoàn tiền một phần",
+        "refunded": "Đã hoàn tiền"
+      },
+      "paymentMethod": {
+        "cod": "COD",
+        "vnpay": "VNPay",
+        "payos": "VietQR",
+        "bank_transfer": "Chuyển khoản",
+        "momo": "MoMo",
+        "zalopay": "ZaloPay"
+      },
+      "carrier": {
+        "ghn": "GHN",
+        "ghtk": "GHTK",
+        "viettel_post": "Viettel Post",
+        "self": "Shop tự giao",
+        "other": "Hãng khác"
+      },
+      "shipmentStatus": {
+        "pending": "Chờ lấy hàng",
+        "in_transit": "Đang vận chuyển",
+        "delivered": "Đã giao",
+        "failed": "Giao thất bại",
+        "returned": "Đã hoàn về"
+      },
+      "actions": {
+        "title": "Xử lý đơn",
+        "confirmed": "Xác nhận đơn",
+        "processing": "Bắt đầu đóng gói",
+        "shipped": "Nhập mã vận đơn",
+        "delivered": "Đã giao thành công",
+        "delivery_failed": "Giao thất bại",
+        "returned": "Đã nhận hàng hoàn",
+        "return_requested": "Ghi nhận yêu cầu trả hàng",
+        "cancelled": "Huỷ đơn",
+        "done": "Đơn {code}: {status}",
+        "none": "Không còn thao tác nào cho trạng thái này.",
+        "cancelHint": "Chỉ Quản lý hoặc Chủ shop được huỷ đơn đã xác nhận hoặc đã nhận tiền.",
+        "dialogTitle": "{action}?",
+        "dialogDescription": "Đơn {code} sẽ chuyển sang “{status}”.",
+        "reason": "Ghi chú (không bắt buộc)",
+        "restock": "Hàng trong đơn sẽ được nhập lại kho.",
+        "riskFlag": "Khách hàng và số điện thoại sẽ bị đánh dấu rủi ro COD."
+      },
+      "ship": {
+        "title": "Giao cho hãng vận chuyển",
+        "description": "Tạo vận đơn trên cổng của hãng rồi nhập mã vận đơn tại đây.",
+        "carrier": "Hãng vận chuyển",
+        "trackingCode": "Mã vận đơn",
+        "feeActual": "Phí thực tế (₫)",
+        "submit": "Xác nhận đã gửi hàng",
+        "cod": "Hãng thu hộ {amount} khi giao.",
+        "noCod": "Không thu hộ: đơn đã thanh toán."
+      },
+      "cancel": {
+        "title": "Huỷ đơn {code}?",
+        "description": "Tồn kho được trả lại và khách nhận email thông báo. Không thể hoàn tác.",
+        "reason": "Lý do huỷ",
+        "reasonHint": "Bắt buộc, khách hàng không thấy nội dung này.",
+        "confirm": "Huỷ đơn",
+        "refund": "Khách đã thanh toán {amount}: khoản hoàn tiền sẽ nằm trong hàng đợi hoàn tiền."
+      },
+      "note": {
+        "label": "Thêm ghi chú nội bộ",
+        "hint": "Chỉ nhân viên thấy ghi chú này.",
+        "submit": "Lưu ghi chú",
+        "done": "Đã lưu ghi chú"
+      },
+      "detail": {
+        "placedAt": "Đặt lúc {date}",
+        "source": {
+          "web": "Website",
+          "admin": "Tạo thủ công"
+        },
+        "emailLocale": "Email gửi bằng: {locale}",
+        "locales": {
+          "vi": "Tiếng Việt",
+          "en": "Tiếng Anh"
+        },
+        "customer": "Khách hàng",
+        "masked": "Thông tin liên hệ được ẩn một phần theo quyền của bạn.",
+        "account": "Có tài khoản",
+        "guest": "Khách vãng lai",
+        "customerNote": "Ghi chú của khách",
+        "items": "Sản phẩm",
+        "itemColumns": {
+          "product": "Sản phẩm",
+          "sku": "SKU",
+          "unitPrice": "Đơn giá",
+          "quantity": "SL",
+          "discount": "Giảm",
+          "lineTotal": "Thành tiền"
+        },
+        "totals": "Tiền đơn hàng",
+        "subtotal": "Tạm tính",
+        "discount": "Giảm giá",
+        "coupon": "Mã {code}",
+        "shippingFee": "Phí vận chuyển",
+        "giftWrapFee": "Gói quà",
+        "total": "Tổng cộng",
+        "paid": "Đã thanh toán",
+        "refunded": "Đã hoàn",
+        "due": "Còn phải thu",
+        "deposit": "Tiền cọc yêu cầu",
+        "depositOutstanding": "Còn thiếu cọc",
+        "codToCollect": "Hãng thu hộ (COD)",
+        "refundOwed": "Cần hoàn cho khách",
+        "depositMissing": "Đơn COD giá trị cao: cần nhận đủ tiền cọc {amount} trước khi xác nhận.",
+        "refundOwedHint": "Đơn đã huỷ còn {amount} chưa hoàn. Khoản hoàn tiền được tạo trong hàng đợi hoàn tiền (mục Thanh toán).",
+        "shippingAddress": "Địa chỉ giao hàng",
+        "billingAddress": "Địa chỉ thanh toán",
+        "legacyDistrict": "(Quận/huyện cũ: {name})",
+        "noAddress": "Chưa có địa chỉ.",
+        "gift": "Quà tặng",
+        "giftWrap": "Gói quà",
+        "giftMessage": "Lời nhắn",
+        "hidePrices": "Ẩn giá trên phiếu đóng gói",
+        "vat": "Hoá đơn VAT",
+        "vatNone": "Khách không yêu cầu hoá đơn công ty.",
+        "vatCompany": "Tên công ty",
+        "vatTaxCode": "Mã số thuế",
+        "vatAddress": "Địa chỉ",
+        "vatEmail": "Email nhận hoá đơn",
+        "einvoice": "Hoá đơn điện tử: {ref}",
+        "payments": "Giao dịch thanh toán",
+        "paymentsEmpty": "Chưa có giao dịch.",
+        "paymentColumns": {
+          "provider": "Cổng",
+          "kind": "Loại",
+          "amount": "Số tiền",
+          "status": "Trạng thái",
+          "date": "Thời gian",
+          "reference": "Mã giao dịch"
+        },
+        "paymentKinds": {
+          "full": "Toàn bộ",
+          "deposit": "Tiền cọc",
+          "balance": "Phần còn lại",
+          "adjustment": "Điều chỉnh"
+        },
+        "paymentAttempt": {
+          "pending": "Đang chờ",
+          "succeeded": "Thành công",
+          "failed": "Thất bại",
+          "expired": "Hết hạn",
+          "cancelled": "Đã huỷ",
+          "refunded": "Đã hoàn"
+        },
+        "providers": {
+          "cod": "COD",
+          "vnpay": "VNPay",
+          "payos": "VietQR (payOS)",
+          "bank_manual": "Chuyển khoản",
+          "momo": "MoMo",
+          "zalopay": "ZaloPay"
+        },
+        "refunds": "Hoàn tiền",
+        "refundStatus": {
+          "requested": "Đã yêu cầu",
+          "processing": "Đang xử lý",
+          "completed": "Đã hoàn",
+          "failed": "Thất bại"
+        },
+        "shipments": "Vận đơn",
+        "shipmentsEmpty": "Chưa có vận đơn.",
+        "shipmentColumns": {
+          "carrier": "Hãng",
+          "trackingCode": "Mã vận đơn",
+          "status": "Trạng thái",
+          "cod": "Thu hộ",
+          "fee": "Phí thực tế",
+          "shippedAt": "Ngày gửi"
+        },
+        "timeline": "Lịch sử đơn hàng",
+        "timelineEmpty": "Chưa có sự kiện.",
+        "printPacking": "In phiếu đóng gói",
+        "printDelivery": "In phiếu giao hàng",
+        "risk": {
+          "title": "Cảnh báo rủi ro COD",
+          "account": "Tài khoản của khách đã bị đánh dấu sau một lần giao thất bại.",
+          "phone": "Số điện thoại này có {count, plural, other {# đơn}} giao thất bại trước đây.",
+          "advice": "Gọi xác nhận kỹ hoặc đề nghị khách chuyển khoản trước."
+        }
+      },
+      "timeline": {
+        "system": "Hệ thống",
+        "customer": "Khách hàng",
+        "staff": "Nhân viên",
+        "status_changed": "{from} → {to}",
+        "created": "Tạo đơn: {to}",
+        "note": "Ghi chú nội bộ",
+        "cod_risk_flagged": "Đánh dấu rủi ro COD",
+        "shipment": "Vận đơn {carrier} · {code}",
+        "other": "Sự kiện: {type}"
+      },
+      "print": {
+        "packing-slip": "Phiếu đóng gói",
+        "delivery-slip": "Phiếu giao hàng",
+        "print": "In",
+        "back": "Quay lại",
+        "orderCode": "Mã đơn",
+        "date": "Ngày đặt",
+        "shipTo": "Giao đến",
+        "recipient": "Người nhận",
+        "phone": "Điện thoại",
+        "product": "Sản phẩm",
+        "sku": "SKU",
+        "quantity": "SL",
+        "unitPrice": "Đơn giá",
+        "lineTotal": "Thành tiền",
+        "units": "Tổng số lượng: {count}",
+        "giftMessage": "Lời nhắn quà tặng",
+        "giftWrap": "Gói quà",
+        "pricesHidden": "Đơn quà tặng: phiếu không in giá.",
+        "customerNote": "Ghi chú của khách",
+        "codAmount": "Thu hộ (COD)",
+        "noCod": "Không thu tiền: đơn đã thanh toán",
+        "carrier": "Hãng vận chuyển",
+        "tracking": "Mã vận đơn",
+        "noShipment": "Chưa có vận đơn",
+        "packedBy": "Người đóng gói",
+        "checkedBy": "Người kiểm tra",
+        "receivedBy": "Người nhận ký",
+        "sender": "Người gửi",
+        "empty": "Không có đơn nào để in.",
+        "count": "{count, plural, other {# đơn}}",
+        "shopName": "Perfume Store"
       }
     },
-    "gift": {
-      "title": "Quà tặng",
-      "wrap": "Gói quà cao cấp (+{fee})",
-      "message": "Lời nhắn trên thiệp",
-      "messageHint": "{count}/{max} ký tự",
-      "hidePrices": "Không in giá trên phiếu giao hàng",
-      "save": "Lưu tuỳ chọn quà tặng",
-      "saved": "Đã lưu tuỳ chọn quà tặng",
-      "tooLong": "Lời nhắn tối đa {max} ký tự."
+    "coupons": {
+      "title": "Mã giảm giá",
+      "description": "Mã phần trăm, số tiền cố định hoặc miễn phí vận chuyển, kèm điều kiện và thống kê sử dụng.",
+      "new": "Tạo mã giảm giá",
+      "search": "Tìm theo mã hoặc ghi chú",
+      "empty": "Chưa có mã giảm giá.",
+      "columns": {
+        "code": "Mã",
+        "type": "Loại",
+        "value": "Giá trị",
+        "conditions": "Điều kiện",
+        "period": "Thời gian",
+        "usage": "Đã dùng",
+        "discount": "Tổng giảm",
+        "status": "Trạng thái"
+      },
+      "types": {
+        "percent": "Phần trăm",
+        "fixed": "Số tiền cố định",
+        "free_shipping": "Miễn phí vận chuyển"
+      },
+      "states": {
+        "active": "Đang chạy",
+        "scheduled": "Sắp chạy",
+        "expired": "Hết hạn/hết lượt",
+        "inactive": "Đã tắt"
+      },
+      "percentValue": "{value}%",
+      "maxDiscount": "tối đa {amount}",
+      "minSubtotal": "Đơn từ {amount}",
+      "scoped": "Giới hạn sản phẩm",
+      "noSale": "Trừ hàng giảm giá",
+      "noConditions": "Mọi đơn",
+      "usage": "{used} / {limit}",
+      "unlimited": "∞",
+      "always": "Không thời hạn",
+      "from": "Từ {date}",
+      "until": "Đến {date}",
+      "activate": "Bật",
+      "deactivate": "Tắt",
+      "activated": "Đã bật mã {code}",
+      "deactivated": "Đã tắt mã {code}",
+      "toggleFor": "Đang bật mã {code}",
+      "form": {
+        "general": "Thông tin mã",
+        "valueSection": "Giá trị giảm",
+        "conditions": "Điều kiện áp dụng",
+        "scope": "Phạm vi sản phẩm",
+        "limits": "Giới hạn sử dụng",
+        "code": "Mã giảm giá",
+        "codeHint": "Chữ in hoa, số, - và _ (3–32 ký tự). Khách nhập không phân biệt hoa thường.",
+        "type": "Loại giảm giá",
+        "value": "Giá trị",
+        "valuePercentHint": "Phần trăm giảm trên các sản phẩm áp dụng (1–100).",
+        "valueFixedHint": "Số tiền giảm (₫), không vượt quá giá trị sản phẩm áp dụng.",
+        "freeShippingHint": "Miễn toàn bộ phí vận chuyển khi đủ điều kiện.",
+        "maxDiscount": "Giảm tối đa (₫)",
+        "minSubtotal": "Giá trị đơn tối thiểu (₫)",
+        "startsAt": "Bắt đầu",
+        "endsAt": "Kết thúc",
+        "datesHint": "Giờ Việt Nam. Để trống nếu không giới hạn.",
+        "usageLimit": "Tổng số lượt dùng",
+        "perCustomerLimit": "Số lượt mỗi khách",
+        "perCustomerHint": "Đếm theo số điện thoại, email hoặc tài khoản.",
+        "limitHint": "Để trống nếu không giới hạn.",
+        "brands": "Thương hiệu",
+        "categories": "Danh mục",
+        "products": "Sản phẩm",
+        "scopeHint": "Không chọn gì để áp dụng cho mọi sản phẩm. Chọn nhiều nhóm: sản phẩm thuộc bất kỳ nhóm nào đều được giảm.",
+        "productSearch": "Tìm sản phẩm để thêm",
+        "addProduct": "Thêm {name}",
+        "removeProduct": "Bỏ {name}",
+        "noProducts": "Chưa chọn sản phẩm.",
+        "excludeSaleItems": "Không áp dụng cho sản phẩm đang giảm giá",
+        "isActive": "Đang bật",
+        "note": "Ghi chú nội bộ",
+        "usedLocked": "Mã đã được dùng {count, plural, other {# lần}}: không đổi được mã và loại giảm giá."
+      },
+      "stats": {
+        "title": "Thống kê sử dụng",
+        "redemptions": "Lượt dùng",
+        "discountTotal": "Tổng tiền giảm",
+        "uniqueCustomers": "Số khách",
+        "lastUsed": "Lần dùng gần nhất",
+        "never": "Chưa dùng",
+        "recent": "Đơn gần đây",
+        "order": "Đơn",
+        "amount": "Giảm",
+        "date": "Ngày"
+      }
     },
-    "linesLabel": "Sản phẩm trong giỏ hàng"
+    "shipping": {
+      "title": "Vận chuyển",
+      "description": "Khu vực theo tỉnh/thành và biểu phí theo cân nặng. Đơn đã đặt giữ nguyên phí cũ.",
+      "firstZoneWins": "Một tỉnh/thành thuộc nhiều khu vực sẽ dùng khu vực có thứ tự ưu tiên nhỏ nhất.",
+      "empty": "Chưa có khu vực vận chuyển: khách sẽ không đặt hàng được.",
+      "zone": {
+        "new": "Thêm khu vực",
+        "edit": "Sửa khu vực",
+        "editFor": "Sửa khu vực {name}",
+        "name": "Tên khu vực (nội bộ)",
+        "provinces": "Tỉnh/thành",
+        "provinceCount": "{count, plural, other {# tỉnh/thành}}",
+        "position": "Thứ tự ưu tiên",
+        "selectAll": "Chọn tất cả",
+        "clearAll": "Bỏ chọn",
+        "delete": "Xoá khu vực",
+        "deleteTitle": "Xoá khu vực {name}?",
+        "deleteDescription": "Mọi mức phí của khu vực này cũng bị xoá.",
+        "saved": "Đã lưu khu vực",
+        "deleted": "Đã xoá khu vực"
+      },
+      "rate": {
+        "title": "Biểu phí",
+        "new": "Thêm mức phí",
+        "newFor": "Thêm mức phí cho {zone}",
+        "edit": "Sửa",
+        "editFor": "Sửa mức phí {name}",
+        "nameVi": "Tên hiển thị (tiếng Việt)",
+        "nameEn": "Tên hiển thị (tiếng Anh)",
+        "minWeight": "Từ (gram)",
+        "maxWeight": "Đến (gram)",
+        "maxWeightHint": "Để trống nếu không giới hạn.",
+        "fee": "Phí (₫)",
+        "freeOver": "Miễn phí cho đơn từ (₫)",
+        "freeOverHint": "Để trống nếu không miễn phí.",
+        "etaMin": "Nhanh nhất (ngày)",
+        "etaMax": "Chậm nhất (ngày)",
+        "position": "Thứ tự hiển thị",
+        "isActive": "Đang áp dụng",
+        "weight": "{min}–{max} g",
+        "weightOpen": "Từ {min} g",
+        "eta": "{min}–{max} ngày",
+        "free": "Từ {amount}",
+        "noFree": "Không",
+        "empty": "Chưa có mức phí.",
+        "toggleFor": "Áp dụng mức phí {name}",
+        "delete": "Xoá",
+        "deleteFor": "Xoá mức phí {name}",
+        "deleteTitle": "Xoá mức phí {name}?",
+        "saved": "Đã lưu mức phí",
+        "deleted": "Đã xoá mức phí",
+        "activated": "Đã bật mức phí",
+        "deactivated": "Đã tắt mức phí",
+        "columns": {
+          "name": "Tên",
+          "weight": "Cân nặng",
+          "fee": "Phí",
+          "freeOver": "Miễn phí",
+          "eta": "Thời gian giao",
+          "active": "Áp dụng"
+        }
+      }
+    },
+    "payments": {
+      "title": "Giao dịch thanh toán",
+      "description": "Mọi lần thanh toán qua cổng, chuyển khoản và tiền thu hộ COD.",
+      "overview": {
+        "openRefunds": "{count, plural, other {# yêu cầu hoàn tiền đang chờ}}",
+        "suspicious": "{count, plural, other {# sự kiện webhook bất thường}}",
+        "awaitingTransfer": "{count, plural, other {# đơn chờ xác nhận chuyển khoản}}"
+      },
+      "search": "Tìm theo mã đơn, mã giao dịch",
+      "empty": "Chưa có giao dịch nào.",
+      "columns": {
+        "createdAt": "Thời gian",
+        "order": "Đơn hàng",
+        "provider": "Cổng",
+        "kind": "Loại",
+        "amount": "Số tiền",
+        "status": "Trạng thái",
+        "txnRef": "Mã giao dịch",
+        "providerTxnId": "Mã phía cổng",
+        "confirmedBy": "Xác nhận bởi"
+      },
+      "filter": {
+        "provider": "Cổng thanh toán",
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "providers": {
+        "vnpay": "VNPay",
+        "payos": "payOS (VietQR)",
+        "bank_manual": "Chuyển khoản (thủ công)",
+        "cod": "Thu hộ COD",
+        "momo": "MoMo",
+        "zalopay": "ZaloPay"
+      },
+      "kinds": {
+        "full": "Toàn bộ",
+        "deposit": "Đặt cọc",
+        "balance": "Phần còn lại",
+        "adjustment": "Điều chỉnh"
+      },
+      "attemptStatus": {
+        "pending": "Đang chờ",
+        "succeeded": "Thành công",
+        "failed": "Thất bại",
+        "expired": "Hết hạn",
+        "cancelled": "Đã huỷ",
+        "refunded": "Đã hoàn"
+      },
+      "paymentStatus": {
+        "unpaid": "Chưa thanh toán",
+        "partially_paid": "Đã đặt cọc",
+        "paid": "Đã thanh toán",
+        "partially_refunded": "Đã hoàn một phần",
+        "refunded": "Đã hoàn tiền"
+      },
+      "orderStatus": {
+        "pending": "Chờ thanh toán",
+        "awaiting_confirmation": "Chờ xác nhận",
+        "confirmed": "Đã xác nhận",
+        "processing": "Đang chuẩn bị hàng",
+        "shipped": "Đang giao",
+        "delivered": "Đã giao",
+        "completed": "Hoàn tất",
+        "cancelled": "Đã huỷ",
+        "delivery_failed": "Giao không thành công",
+        "return_requested": "Đang yêu cầu trả hàng",
+        "returned": "Đã trả hàng"
+      },
+      "events": {
+        "title": "Nhật ký webhook",
+        "description": "Mọi IPN/webhook nhận được, kể cả chữ ký sai hoặc không khớp đơn hàng. Gửi lại cùng sự kiện không tạo tác động mới.",
+        "empty": "Chưa có sự kiện nào.",
+        "filter": {
+          "label": "Lọc",
+          "all": "Tất cả",
+          "invalid": "Chữ ký không hợp lệ",
+          "unmatched": "Không khớp / bị từ chối"
+        },
+        "columns": {
+          "createdAt": "Nhận lúc",
+          "provider": "Cổng",
+          "eventType": "Loại sự kiện",
+          "signature": "Chữ ký",
+          "result": "Kết quả",
+          "order": "Đơn hàng",
+          "payload": "Dữ liệu"
+        },
+        "valid": "Hợp lệ",
+        "invalid": "Không hợp lệ",
+        "processed": "Đã xử lý",
+        "showPayload": "Xem dữ liệu",
+        "errors": {
+          "invalid_signature": "Chữ ký sai",
+          "unknown_txn_ref": "Không có giao dịch",
+          "amount_mismatch": "Sai số tiền",
+          "already_succeeded": "Giao dịch đã thanh toán trước đó"
+        },
+        "back": "Giao dịch"
+      },
+      "refunds": {
+        "title": "Hoàn tiền",
+        "description": "Hàng đợi hoàn tiền, gồm cả tiền nhận được sau khi đơn đã huỷ.",
+        "empty": "Không có yêu cầu hoàn tiền.",
+        "filter": {
+          "label": "Trạng thái",
+          "open": "Đang chờ",
+          "completed": "Đã hoàn tất",
+          "all": "Tất cả"
+        },
+        "columns": {
+          "createdAt": "Tạo lúc",
+          "order": "Đơn hàng",
+          "amount": "Số tiền",
+          "reason": "Lý do",
+          "method": "Hình thức",
+          "status": "Trạng thái",
+          "reference": "Tham chiếu"
+        },
+        "methods": {
+          "gateway": "Qua cổng thanh toán",
+          "bank_transfer": "Chuyển khoản",
+          "cash": "Tiền mặt"
+        },
+        "status": {
+          "requested": "Chờ hoàn",
+          "processing": "Đang xử lý",
+          "completed": "Đã hoàn",
+          "failed": "Thất bại"
+        },
+        "reasons": {
+          "late_payment_after_cancellation": "Nhận tiền sau khi đơn đã huỷ",
+          "overpayment": "Thanh toán thừa",
+          "order_cancelled": "Đơn đã huỷ"
+        },
+        "proof": "Ảnh chứng từ",
+        "complete": {
+          "open": "Hoàn tất",
+          "openFor": "Hoàn tất hoàn tiền đơn {code}",
+          "title": "Hoàn tất hoàn tiền",
+          "summary": "Hoàn {amount} cho đơn {code}.",
+          "mode": "Cách hoàn tiền",
+          "modeGateway": "Gọi API hoàn tiền của cổng ({provider})",
+          "modeManual": "Đã chuyển khoản / trả tiền mặt thủ công",
+          "providerRef": "Mã tham chiếu giao dịch hoàn",
+          "providerRefHint": "Bắt buộc nhập mã tham chiếu hoặc tải ảnh chứng từ.",
+          "proof": "Ảnh chứng từ (không bắt buộc nếu đã có mã)",
+          "submit": "Xác nhận đã hoàn tiền",
+          "done": "Đã hoàn tất hoàn tiền",
+          "failed": "Cổng thanh toán từ chối hoàn tiền ({error}). Có thể thử lại hoặc hoàn thủ công."
+        },
+        "request": {
+          "open": "Tạo yêu cầu hoàn tiền",
+          "title": "Tạo yêu cầu hoàn tiền",
+          "orderCode": "Mã đơn hàng",
+          "amount": "Số tiền hoàn (₫)",
+          "reason": "Lý do",
+          "method": "Hình thức",
+          "submit": "Tạo yêu cầu",
+          "done": "Đã thêm vào hàng đợi hoàn tiền"
+        }
+      },
+      "bankTransfers": {
+        "title": "Xác nhận chuyển khoản",
+        "description": "Đối chiếu sao kê ngân hàng rồi xác nhận số tiền đã nhận cho đơn hàng. Đơn chờ thanh toán sẽ tự chuyển sang Đã xác nhận khi đủ tiền.",
+        "search": "Tìm đơn theo mã",
+        "searchHint": "Danh sách mặc định là các đơn chọn chuyển khoản ngân hàng. Tìm theo mã để xác nhận cho đơn khác.",
+        "empty": "Không có đơn nào chờ chuyển khoản.",
+        "columns": {
+          "order": "Đơn hàng",
+          "placedAt": "Ngày đặt",
+          "method": "Phương thức",
+          "status": "Trạng thái",
+          "total": "Tổng",
+          "paid": "Đã nhận",
+          "due": "Còn lại"
+        },
+        "confirm": {
+          "open": "Xác nhận",
+          "openFor": "Xác nhận chuyển khoản cho đơn {code}",
+          "title": "Xác nhận đã nhận chuyển khoản",
+          "summary": "Đơn {code}: còn phải thu {due}.",
+          "amount": "Số tiền đã nhận (₫)",
+          "bankReference": "Mã giao dịch ngân hàng",
+          "note": "Ghi chú",
+          "submit": "Xác nhận đã nhận tiền",
+          "done": "Đã ghi nhận {amount} cho đơn {code}"
+        }
+      },
+      "cod": {
+        "title": "Đối soát COD",
+        "description": "Khi đơn vị vận chuyển chuyển tiền thu hộ, tạo phiên đối soát, đánh dấu các đơn có trong bảng kê và so với số tiền thực nhận.",
+        "listTitle": "Các phiên đối soát",
+        "empty": "Chưa có phiên đối soát nào.",
+        "columns": {
+          "receivedAt": "Ngày nhận",
+          "carrier": "Đơn vị",
+          "period": "Kỳ",
+          "orders": "Số đơn",
+          "ordersAmount": "Tiền thu hộ",
+          "fee": "Phí",
+          "total": "Thực nhận",
+          "reference": "Tham chiếu",
+          "createdBy": "Người tạo"
+        },
+        "carriers": {
+          "ghn": "GHN",
+          "ghtk": "GHTK",
+          "viettel_post": "Viettel Post",
+          "self": "Tự giao",
+          "other": "Khác"
+        },
+        "form": {
+          "title": "Tạo phiên đối soát",
+          "carrier": "Đơn vị vận chuyển",
+          "periodStart": "Từ ngày",
+          "periodEnd": "Đến ngày",
+          "receivedAt": "Ngày nhận tiền",
+          "bankReference": "Mã giao dịch ngân hàng",
+          "carrierFee": "Phí đối soát (₫)",
+          "totalAmount": "Số tiền thực nhận (₫)",
+          "orders": "Đơn hàng trong bảng kê",
+          "noCandidates": "Không có đơn COD đã giao nào chờ đối soát.",
+          "select": "Chọn đơn {code}",
+          "selectAll": "Chọn tất cả",
+          "orderAmount": "Tiền thu hộ đơn {code}",
+          "delivered": "Giao {date}",
+          "expected": "Tổng thu hộ trừ phí",
+          "received": "Thực nhận",
+          "difference": "Chênh lệch",
+          "matches": "Khớp với số tiền thực nhận",
+          "mismatch": "Lệch {amount} so với bảng kê",
+          "submit": "Lưu đối soát",
+          "done": "Đã đối soát {count} đơn",
+          "orderColumn": "Đơn hàng"
+        }
+      }
+    },
+    "alerts": {
+      "subject": "[Perfume Store] {title}",
+      "heading": "Thông báo nội bộ",
+      "openAdmin": "Mở trang quản trị",
+      "kinds": {
+        "new_order": "Đơn hàng mới",
+        "high_value_cod": "Đơn COD giá trị cao",
+        "suspicious_ipn": "IPN đáng ngờ",
+        "late_payment_refund": "Thanh toán sau khi huỷ cần hoàn tiền",
+        "low_stock": "Sắp hết hàng",
+        "job_failed": "Tác vụ nền thất bại"
+      },
+      "order": "Đơn {code}: {amount} · {method} · {province}",
+      "orderNoProvince": "Đơn {code}: {amount} · {method}",
+      "noDetails": "Không có thêm thông tin."
+    }
   }
 }

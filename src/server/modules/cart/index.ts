@@ -54,3 +54,6 @@ export type {
   CartOwner,
   CartView,
 } from './types';
+
+// ---------- Checkout stream (M2): conversion inside the placeOrder transaction ----------
+export { lockCart, markCartConverted } from './conversion';

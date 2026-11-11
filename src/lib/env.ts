@@ -52,6 +52,39 @@ export const serverEnvSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((value) => value === 'true'),
+
+    // ---------- M2 payments (ADR-0007: secrets only here, never in the DB or admin) ----------
+    /** VNPay merchant (terminal) code and HMAC-SHA512 hash secret. Both or neither. */
+    VNPAY_TMN_CODE: z.string().min(1).optional(),
+    VNPAY_HASH_SECRET: z.string().min(1).optional(),
+    VNPAY_PAYMENT_URL: z.url().default('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
+    /** VNPay merchant API (refunds, queries). */
+    VNPAY_API_URL: z.url().default('https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'),
+    /** payOS (VietQR) channel credentials. All three or none. */
+    PAYOS_CLIENT_ID: z.string().min(1).optional(),
+    PAYOS_API_KEY: z.string().min(1).optional(),
+    PAYOS_CHECKSUM_KEY: z.string().min(1).optional(),
+    PAYOS_API_URL: z.url().default('https://api-merchant.payos.vn'),
+    /**
+     * Sandbox simulator for VNPay and payOS (no network, signed with public dev keys). On by
+     * default outside production for gateways without keys; `true` forces it for every gateway
+     * (E2E). Refused in production unless APP_URL is localhost.
+     */
+    /**
+     * `off` disables Better Auth's per-IP rate limits for E2E runs against a production build
+     * (every test account signs in from one IP). Refused in production unless APP_URL is localhost.
+     */
+    AUTH_RATE_LIMIT: z.enum(['on', 'off']).default('on'),
+    PAYMENT_SIMULATOR: z
+      .enum(['true', 'false'])
+      .optional()
+      .transform((value) => (value === undefined ? undefined : value === 'true')),
+    // ---------- M2 account & notifications ----------
+    /** Internal alerts by email (new order, high-value COD, …, ADR-0019); skipped when unset. */
+    STAFF_ALERT_EMAIL: z.email().optional(),
+    /** Telegram bot for internal alerts (ADR-0019). Both or neither; skipped when unset. */
+    TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
+    TELEGRAM_CHAT_ID: z.string().min(1).optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -83,11 +116,53 @@ export const serverEnvSchema = z
         message: 'S3_BUCKET is required when MEDIA_STORAGE=s3',
       });
     }
+    if (Boolean(env.VNPAY_TMN_CODE) !== Boolean(env.VNPAY_HASH_SECRET)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['VNPAY_HASH_SECRET'],
+        message: 'VNPAY_TMN_CODE and VNPAY_HASH_SECRET must be set together',
+      });
+    }
+    const payos = [env.PAYOS_CLIENT_ID, env.PAYOS_API_KEY, env.PAYOS_CHECKSUM_KEY].filter(Boolean);
+    if (payos.length !== 0 && payos.length !== 3) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['PAYOS_CHECKSUM_KEY'],
+        message: 'PAYOS_CLIENT_ID, PAYOS_API_KEY and PAYOS_CHECKSUM_KEY must be set together',
+      });
+    }
+    if (env.NODE_ENV === 'production' && env.AUTH_RATE_LIMIT === 'off') {
+      const host = new URL(env.APP_URL).hostname;
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['AUTH_RATE_LIMIT'],
+          message: 'auth rate limits can only be turned off on localhost in production builds',
+        });
+      }
+    }
+    if (env.NODE_ENV === 'production' && env.PAYMENT_SIMULATOR) {
+      const host = new URL(env.APP_URL).hostname;
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['PAYMENT_SIMULATOR'],
+          message: 'the payment simulator is only allowed on localhost in production builds',
+        });
+      }
+    }
     if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {
       ctx.addIssue({
         code: 'custom',
         path: ['GOOGLE_CLIENT_SECRET'],
         message: 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set together',
+      });
+    }
+    if (Boolean(env.TELEGRAM_BOT_TOKEN) !== Boolean(env.TELEGRAM_CHAT_ID)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['TELEGRAM_CHAT_ID'],
+        message: 'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set together',
       });
     }
   });

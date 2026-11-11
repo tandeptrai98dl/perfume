@@ -46,3 +46,22 @@ describe('parseClientEnv', () => {
     expect(parseClientEnv({}).NEXT_PUBLIC_APP_NAME).toBe('Perfume Store');
   });
 });
+
+describe('AUTH_RATE_LIMIT', () => {
+  const prod = {
+    NODE_ENV: 'production',
+    BETTER_AUTH_SECRET: 'a'.repeat(32),
+    INTERNAL_API_SECRET: 'b'.repeat(32),
+  };
+
+  it('can only be turned off for localhost production builds (E2E)', () => {
+    expect(() =>
+      parseServerEnv({ ...prod, APP_URL: 'https://shop.example.vn', AUTH_RATE_LIMIT: 'off' }),
+    ).toThrow(/AUTH_RATE_LIMIT/);
+    expect(
+      parseServerEnv({ ...prod, APP_URL: 'http://localhost:3200', AUTH_RATE_LIMIT: 'off' })
+        .AUTH_RATE_LIMIT,
+    ).toBe('off');
+    expect(parseServerEnv(prod).AUTH_RATE_LIMIT).toBe('on');
+  });
+});
