@@ -23,7 +23,10 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       <Suspense fallback={null}>
         <CartCount />
       </Suspense>
-      <MiniCartSheet />
+      {/* Reads the pathname (closes after navigating), so it streams in on dynamic routes. */}
+      <Suspense fallback={null}>
+        <MiniCartSheet />
+      </Suspense>
     </NuqsAdapter>
   );
 }
