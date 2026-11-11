@@ -560,7 +560,8 @@ posts            author_id, cover_media_id, status, published_at, deleted_at
 post_translations        PK(post_id, locale), title, slug, excerpt, content jsonb,
                          seo_title, seo_description, is_published, UK(locale, slug)
 tags             (id only)
-tag_translations         PK(tag_id, locale), name, slug, UK(locale, slug)
+tag_translations         PK(tag_id, locale), name, slug, description, is_published,
+                         UK(locale, slug)                      // journal topics
 post_tags                PK(post_id, tag_id)
 post_products            PK(post_id, product_id), position
 pages            key UK (about, authenticity, terms, privacy, ...), status
@@ -569,9 +570,10 @@ page_translations        PK(page_id, locale), title, slug, content jsonb, seo_ti
 banners          placement enum(home_hero, home_promo, category_top, announcement),
                  starts_at?, ends_at?, position, is_active
 banner_translations      PK(banner_id, locale), title, subtitle, cta_label, cta_url,
-                         desktop_media_id, mobile_media_id
+                         desktop_media_id, mobile_media_id, is_published
 navigation_menus key, locale, items jsonb, UK(key, locale)
-redirects        from_path UK, to_path, status_code default 301   // slug changes
+redirects        from_path UK, to_path, status_code default 301 CHECK(301|302|307|308),
+                 hit_count, last_hit_at                // slug changes; chains collapsed on write
 
 // ===== SYSTEM =====
 notification_logs  channel enum(email, telegram, zalo), recipient, template, locale,
@@ -816,7 +818,8 @@ perfume-store/
 │  ├─ actions/                         # thin Server Actions calling server/modules
 │  │  ├─ cart.ts, checkout.ts, account.ts, review.ts
 │  │  └─ admin/*.ts
-│  ├─ lib/                             # shared client + server: format.ts, slug.ts, seo.ts, env.ts
+│  ├─ lib/                             # shared client + server: format.ts, slug.ts, seo/, rich-text/, env.ts
+│  ├─ data/                            # Next-only cached reads ('use cache' + cacheTag), e.g. content.ts
 │  ├─ hooks/, stores/                  # Zustand for mini-cart UI only
 │  └─ proxy.ts                         # next-intl routing, redirects table, /admin pre-check
 ├─ worker/index.ts                     # pg-boss worker entry; bundled with tsup to share
@@ -988,8 +991,9 @@ Advanced reports (revenue by brand/channel, repeat-customer cohorts, margins fro
 - Server-rendered HTML for all public pages; main content never depends on client JavaScript.
 - `generateMetadata` per route and locale: title ≤ 60 characters using `{Name} {Concentration} | {Brand} – {Shop}`, description ≤ 155 characters written per language, per-locale canonical, hreflang vi / en / x-default (= vi) via `alternates.languages`, Open Graph with dynamic OG image, `<html lang>` per locale.
 - **Canonical:** product pages canonicalize to the URL without `?v=`; paginated category pages self-canonicalize; multi-filter pages, search, cart, checkout, account and admin are `noindex`.
-- `sitemap.ts` split by type (products, brands, categories, scent families, journal) for both locales with real `lastModified`; each URL lists its alternates; only published translations are included. `robots.ts` blocks `/admin`, `/api`, cart, checkout, account and search in both locales.
-- `redirects` table handled in `proxy.ts`: slug changes keep rankings; discontinued products stay live with alternatives instead of returning 404.
+- Sitemap index `/sitemap.xml` with one child per type (`/sitemaps/<type>.xml`: static, pages, journal; products, brands, categories, scent families plug into `server/seo/sitemap-providers.ts`) for both locales with real `lastModified`; each URL lists its alternates and x-default; only published translations are included. `robots.ts` blocks `/admin`, `/api`, cart, checkout, account and search in both locales.
+- `redirects` table handled in `proxy.ts`: slug changes keep rankings; discontinued products stay live with alternatives instead of returning 404. The proxy keeps an in-memory route table (redirects + published content URLs) refreshed by a cheap version query every 5 s and invalidated by the `content:redirects` tag, so no request pays a database round-trip.
+- Content URLs without published content (e.g. an English page that is not published) get a real 404 status from the proxy: with Cache Components a page has already sent `200` before a streamed `notFound()`. The language switcher's "other locale, same slug" URLs are redirected (307) to the equivalent page, or to the closest listing when no translation exists (§10.7).
 - **JSON-LD:** `Organization` + `WebSite` (SearchAction) on the home page; `Product` + `Offer`/`AggregateOffer` (VND price, availability, `brand`, `sku`, `gtin` when a barcode exists) + `AggregateRating` (only with real reviews) on PDPs; `BreadcrumbList` on listings; `Article` for journal posts; `FAQPage` for FAQ.
 - Correct heading hierarchy (one `h1` per page), descriptive alt text per locale, meaningful image file names.
 - Internal links: PDP → brand, scent family, notes, related products; articles → products mentioned.
