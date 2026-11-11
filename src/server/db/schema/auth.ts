@@ -1,4 +1,14 @@
-import { boolean, date, index, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  date,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 import { citext, localeEnum, primaryId, timestamps } from './_shared';
 
@@ -31,9 +41,8 @@ export const users = pgTable(
     role: userRoleEnum().notNull().default('customer'),
     locale: localeEnum().notNull().default('vi'),
     twoFactorEnabled: boolean().notNull().default(false),
+    /** Locked accounts cannot sign in (enforced in the Better Auth session hook). */
     banned: boolean().notNull().default(false),
-    banReason: text(),
-    banExpires: timestamp({ withTimezone: true }),
     marketingOptIn: boolean().notNull().default(false),
     /** Set after a failed COD delivery (ADR-0016). */
     codRiskFlag: boolean().notNull().default(false),
@@ -57,7 +66,6 @@ export const sessions = pgTable(
     userAgent: text(),
     /** True only when the session completed a TOTP challenge; required for /admin. */
     twoFactorVerified: boolean().notNull().default(false),
-    impersonatedBy: uuid(),
     ...timestamps(),
   },
   (t) => [index().on(t.userId)],
@@ -107,6 +115,9 @@ export const twoFactors = pgTable(
     /** Encrypted by Better Auth before storage. */
     secret: text().notNull(),
     backupCodes: text().notNull(),
+    verified: boolean().notNull().default(true),
+    failedVerificationCount: integer().notNull().default(0),
+    lockedUntil: timestamp({ withTimezone: true }),
   },
   (t) => [index().on(t.userId)],
 );

@@ -24,12 +24,20 @@ pnpm db:seed                                  # admin units + fictional demo cat
 pnpm dev                                      # http://localhost:3000 (vi), /en (English)
 ```
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm lint` / `pnpm typecheck` / `pnpm format:check` | Static checks |
-| `pnpm test` | Unit tests (Vitest) |
-| `pnpm test:integration` | DB integration tests (Testcontainers, or `TEST_DATABASE_URL`) |
-| `pnpm i18n:check` | vi/en message key parity |
-| `pnpm db:generate` | Generate a migration from schema changes |
+Admin (`/admin`) needs a staff account. Create the first owner, then sign in at
+`/admin/login`; TOTP enrolment is mandatory on first sign-in:
+
+```bash
+STAFF_PASSWORD='choose-a-strong-password' pnpm auth:create-staff --email you@example.com --name "Owner" --role owner
+```
+
+| Command                                              | Purpose                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------------------------- |
+| `pnpm lint` / `pnpm typecheck` / `pnpm format:check` | Static checks                                                             |
+| `pnpm test`                                          | Unit tests (Vitest)                                                       |
+| `pnpm test:integration`                              | DB integration tests (Testcontainers, or `TEST_DATABASE_URL`)             |
+| `pnpm i18n:check`                                    | vi/en message key parity                                                  |
+| `pnpm db:generate`                                   | Generate a migration from schema changes                                  |
+| `pnpm auth:create-staff`                             | Create or promote a staff account (`owner`, `manager`, `staff`, `editor`) |
 
 Local services: Mailpit UI http://localhost:8025, MinIO console http://localhost:9001.

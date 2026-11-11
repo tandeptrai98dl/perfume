@@ -154,15 +154,13 @@ async function seedDemoCatalog(db: Database, locationId: string) {
   let productCount = 0;
   for (const b of demoCatalog.brands) {
     const brandId = newId();
-    await db
-      .insert(brands)
-      .values({
-        id: brandId,
-        name: b.name,
-        country: b.country,
-        status: 'active',
-        isFeatured: true,
-      });
+    await db.insert(brands).values({
+      id: brandId,
+      name: b.name,
+      country: b.country,
+      status: 'active',
+      isFeatured: true,
+    });
     await db.insert(brandTranslations).values([
       { brandId, locale: 'vi', slug: toSlug(b.name), isPublished: true },
       { brandId, locale: 'en', slug: toSlug(b.name), isPublished: true },
@@ -191,27 +189,23 @@ async function seedDemoCatalog(db: Database, locationId: string) {
         await db
           .insert(productCategories)
           .values(p.categories.map((key) => ({ productId, categoryId: categoryIds.get(key)! })));
-        await db
-          .insert(productFamilies)
-          .values(
-            p.families.map((key, i) => ({
+        await db.insert(productFamilies).values(
+          p.families.map((key, i) => ({
+            productId,
+            familyId: familyIds.get(key)!,
+            isPrimary: i === 0,
+          })),
+        );
+        await db.insert(productNotes).values(
+          (['top', 'middle', 'base'] as const).flatMap((layer) =>
+            p.notes[layer].map((key, position) => ({
               productId,
-              familyId: familyIds.get(key)!,
-              isPrimary: i === 0,
+              noteId: noteIds.get(key)!,
+              layer,
+              position,
             })),
-          );
-        await db
-          .insert(productNotes)
-          .values(
-            (['top', 'middle', 'base'] as const).flatMap((layer) =>
-              p.notes[layer].map((key, position) => ({
-                productId,
-                noteId: noteIds.get(key)!,
-                layer,
-                position,
-              })),
-            ),
-          );
+          ),
+        );
         const fullName = `${line.name} ${p.concentration.toUpperCase()}`;
         await db.insert(productTranslations).values([
           {

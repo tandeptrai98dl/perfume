@@ -36,7 +36,6 @@ CREATE TABLE "sessions" (
 	"ip_address" text,
 	"user_agent" text,
 	"two_factor_verified" boolean DEFAULT false NOT NULL,
-	"impersonated_by" uuid,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "sessions_token_unique" UNIQUE("token")
@@ -46,7 +45,10 @@ CREATE TABLE "two_factors" (
 	"id" uuid PRIMARY KEY NOT NULL,
 	"user_id" uuid NOT NULL,
 	"secret" text NOT NULL,
-	"backup_codes" text NOT NULL
+	"backup_codes" text NOT NULL,
+	"verified" boolean DEFAULT true NOT NULL,
+	"failed_verification_count" integer DEFAULT 0 NOT NULL,
+	"locked_until" timestamp with time zone
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
@@ -62,8 +64,6 @@ CREATE TABLE "users" (
 	"locale" "locale" DEFAULT 'vi' NOT NULL,
 	"two_factor_enabled" boolean DEFAULT false NOT NULL,
 	"banned" boolean DEFAULT false NOT NULL,
-	"ban_reason" text,
-	"ban_expires" timestamp with time zone,
 	"marketing_opt_in" boolean DEFAULT false NOT NULL,
 	"cod_risk_flag" boolean DEFAULT false NOT NULL,
 	"last_login_at" timestamp with time zone,

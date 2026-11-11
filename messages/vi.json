@@ -30,6 +30,62 @@
     "backHome": "Về trang chủ"
   },
   "admin": {
-    "title": "Quản trị"
+    "title": "Quản trị",
+    "metaTitle": "Quản trị — Perfume Store",
+    "nav": {
+      "dashboard": "Tổng quan",
+      "signOut": "Đăng xuất"
+    },
+    "dashboard": {
+      "title": "Tổng quan",
+      "welcome": "Xin chào {name}",
+      "role": "Vai trò: {role}",
+      "placeholder": "Các số liệu bán hàng sẽ xuất hiện ở đây."
+    },
+    "roles": {
+      "owner": "Chủ cửa hàng",
+      "manager": "Quản lý",
+      "staff": "Nhân viên",
+      "editor": "Biên tập viên"
+    },
+    "login": {
+      "title": "Đăng nhập quản trị",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "totpTitle": "Xác thực hai bước",
+      "totpHint": "Nhập mã 6 số trong ứng dụng xác thực.",
+      "totpCode": "Mã xác thực",
+      "useBackupCode": "Dùng mã dự phòng",
+      "useTotp": "Dùng ứng dụng xác thực",
+      "backupCode": "Mã dự phòng",
+      "verify": "Xác nhận",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "invalidCode": "Mã không đúng hoặc đã hết hạn.",
+      "notStaff": "Tài khoản này không có quyền truy cập trang quản trị.",
+      "locked": "Tài khoản đã bị khoá. Vui lòng liên hệ chủ cửa hàng.",
+      "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "twoFactor": {
+      "title": "Bật xác thực hai bước",
+      "intro": "Tài khoản quản trị bắt buộc dùng xác thực hai bước (TOTP).",
+      "passwordLabel": "Nhập lại mật khẩu để tiếp tục",
+      "start": "Tạo mã thiết lập",
+      "scanTitle": "Thêm vào ứng dụng xác thực",
+      "scanHint": "Mở Google Authenticator, 1Password hoặc ứng dụng tương tự, chọn thêm tài khoản bằng khoá thiết lập rồi nhập khoá dưới đây.",
+      "secretLabel": "Khoá thiết lập",
+      "uriLabel": "Liên kết otpauth",
+      "backupTitle": "Mã dự phòng",
+      "backupHint": "Lưu các mã này ở nơi an toàn. Mỗi mã chỉ dùng được một lần.",
+      "codeLabel": "Mã 6 số từ ứng dụng",
+      "confirm": "Xác nhận và bật",
+      "invalidPassword": "Mật khẩu không đúng.",
+      "invalidCode": "Mã không đúng. Vui lòng thử lại."
+    },
+    "forbidden": {
+      "title": "Không có quyền truy cập",
+      "description": "Vai trò của bạn không được phép xem trang này.",
+      "back": "Về trang tổng quan"
+    }
   }
 }

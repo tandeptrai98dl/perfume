@@ -17,6 +17,24 @@ describe('parseServerEnv', () => {
       expect((error as EnvValidationError).issues[0]).toMatch(/^APP_URL:/);
     }
   });
+
+  it('treats empty values as unset', () => {
+    const env = parseServerEnv({ BETTER_AUTH_SECRET: '', GOOGLE_CLIENT_ID: '' });
+    expect(env.BETTER_AUTH_SECRET.length).toBeGreaterThanOrEqual(32);
+    expect(env.GOOGLE_CLIENT_ID).toBeUndefined();
+  });
+
+  it('requires a real BETTER_AUTH_SECRET in production', () => {
+    expect(() => parseServerEnv({ NODE_ENV: 'production' })).toThrow(/BETTER_AUTH_SECRET/);
+    const secret = 'x'.repeat(32);
+    expect(
+      parseServerEnv({ NODE_ENV: 'production', BETTER_AUTH_SECRET: secret }).BETTER_AUTH_SECRET,
+    ).toBe(secret);
+  });
+
+  it('requires the Google client id and secret together', () => {
+    expect(() => parseServerEnv({ GOOGLE_CLIENT_ID: 'id' })).toThrow(/GOOGLE_CLIENT_SECRET/);
+  });
 });
 
 describe('parseClientEnv', () => {
