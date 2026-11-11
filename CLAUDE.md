@@ -50,7 +50,8 @@ pnpm db:generate    pnpm db:migrate     pnpm db:seed
 - Server Components by default; add `'use client'` only for interactivity.
 - Every Server Action and Route Handler starts with Zod validation and a permission
   check (`requirePermission`). `/admin` also requires a `two_factor_verified` session.
-- Money is `bigint` VND. Never use floats. Always recompute prices on the server.
+- Money is VND in whole đồng: Postgres `bigint`, TypeScript integer `number` (use `money()`
+  from the schema helpers). Never use floats. Always recompute prices on the server.
 - Order status changes only through `transitionOrder()`. Payment status changes only in
   the payment module (verified IPN/webhook, COD remittance, refund) (ADR-0005).
 - Webhooks: verify signature, match amount and `txn_ref`, enforce idempotency; return URLs

@@ -17,21 +17,32 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky",
-    "i18n:check": "node scripts/i18n-check.mjs"
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --env-file-if-exists=.env.local --import tsx src/server/db/migrate.ts",
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx src/server/db/seed/index.ts",
+    "db:studio": "drizzle-kit studio",
+    "test:integration": "vitest run --config vitest.integration.config.mts"
   },
   "dependencies": {
+    "drizzle-orm": "^0.45.4",
     "next": "16.4.6",
     "next-intl": "^4.15.0",
+    "pg": "^8.23.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "uuidv7": "^1.2.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
+    "@testcontainers/postgresql": "^12.2.1",
     "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "^1.0.0",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "husky": "^9.1.7",
@@ -39,6 +50,7 @@
     "prettier": "^3.10.0",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^5.1.0"
