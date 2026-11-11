@@ -12,7 +12,10 @@
     "account": "Tài khoản",
     "cart": "Giỏ hàng",
     "search": "Tìm kiếm",
-    "skipToContent": "Bỏ qua đến nội dung chính"
+    "skipToContent": "Bỏ qua đến nội dung chính",
+    "openMenu": "Mở menu",
+    "mobileNav": "Menu chính",
+    "searchShortcut": "Tìm kiếm (Ctrl K)"
   },
   "localeSwitcher": {
     "label": "Ngôn ngữ",
@@ -22,7 +25,15 @@
   "home": {
     "eyebrow": "Nước hoa chính hãng",
     "title": "Hương thơm dành riêng cho bạn",
-    "subtitle": "Tuyển chọn nước hoa niche và designer, cam kết chính hãng 100%."
+    "subtitle": "Tuyển chọn nước hoa niche và designer, cam kết chính hãng 100%.",
+    "cta": "Khám phá nước hoa",
+    "featuredEyebrow": "Tuyển chọn",
+    "featuredTitle": "Hương thơm nổi bật",
+    "viewAllProducts": "Xem tất cả nước hoa",
+    "brandsEyebrow": "Nhà hương",
+    "brandsTitle": "Thương hiệu",
+    "viewAllBrands": "Xem tất cả thương hiệu",
+    "featuredEmpty": "Bộ sưu tập đang được cập nhật."
   },
   "notFound": {
     "title": "Không tìm thấy trang",
@@ -76,6 +87,212 @@
     "tagline": "Nước hoa chính hãng, tuyển chọn tại Việt Nam.",
     "copyright": "© {siteName}. Bảo lưu mọi quyền.",
     "primaryNav": "Điều hướng chính"
+  },
+  "catalog": {
+    "gender": {
+      "male": "Nam",
+      "female": "Nữ",
+      "unisex": "Unisex"
+    },
+    "concentration": {
+      "edc": "Eau de Cologne",
+      "edt": "Eau de Toilette",
+      "edp": "Eau de Parfum",
+      "parfum": "Parfum",
+      "extrait": "Extrait de Parfum",
+      "other": "Nồng độ khác"
+    },
+    "concentrationShort": {
+      "edc": "EDC",
+      "edt": "EDT",
+      "edp": "EDP",
+      "parfum": "Parfum",
+      "extrait": "Extrait",
+      "other": "Khác"
+    },
+    "variantType": {
+      "full_size": "Chai tiêu chuẩn",
+      "travel": "Bản du lịch",
+      "tester": "Tester",
+      "gift_set": "Bộ quà tặng"
+    },
+    "variantLabel": {
+      "full_size": "{size} ml",
+      "travel": "Du lịch {size} ml",
+      "tester": "Tester {size} ml",
+      "gift_set": "Bộ quà tặng {size} ml"
+    },
+    "noteLayer": {
+      "top": "Hương đầu",
+      "middle": "Hương giữa",
+      "base": "Hương cuối"
+    },
+    "season": {
+      "spring": "Xuân",
+      "summer": "Hạ",
+      "autumn": "Thu",
+      "winter": "Đông"
+    },
+    "occasion": {
+      "day": "Ban ngày",
+      "night": "Buổi tối",
+      "office": "Công sở",
+      "date": "Hẹn hò",
+      "special": "Dịp đặc biệt",
+      "casual": "Thường ngày"
+    },
+    "noImage": "Chưa có hình ảnh"
+  },
+  "listing": {
+    "perfumesTitle": "Nước hoa chính hãng",
+    "perfumesIntro": "Toàn bộ nước hoa niche và designer chính hãng, được tuyển chọn và nhập khẩu chính ngạch.",
+    "perfumesDescription": "Mua nước hoa chính hãng: lọc theo thương hiệu, nhóm hương, nồng độ và mức giá. Giao hàng toàn quốc.",
+    "resultCount": "{count, plural, =0 {Không có sản phẩm} other {# sản phẩm}}",
+    "pageTitle": "{title} – Trang {page}",
+    "updating": "Đang cập nhật kết quả…",
+    "filters": {
+      "title": "Bộ lọc",
+      "open": "Bộ lọc",
+      "openWithCount": "Bộ lọc ({count})",
+      "clearAll": "Xoá tất cả",
+      "showResults": "{count, plural, =0 {Không có sản phẩm} other {Xem # sản phẩm}}",
+      "brand": "Thương hiệu",
+      "gender": "Giới tính",
+      "family": "Nhóm hương",
+      "note": "Nốt hương",
+      "concentration": "Nồng độ",
+      "type": "Loại",
+      "price": "Mức giá",
+      "anyPrice": "Mọi mức giá",
+      "inStock": "Chỉ hiện sản phẩm còn hàng",
+      "availability": "Tình trạng",
+      "optionCount": "{label} ({count})",
+      "active": "Bộ lọc đang chọn",
+      "remove": "Bỏ lọc: {label}",
+      "priceRange": {
+        "under2m": "Dưới 2 triệu",
+        "from2to4m": "2 – 4 triệu",
+        "from4to6m": "4 – 6 triệu",
+        "over6m": "Trên 6 triệu"
+      },
+      "priceChip": "Giá: {range}",
+      "inStockChip": "Còn hàng"
+    },
+    "sort": {
+      "label": "Sắp xếp",
+      "featured": "Nổi bật",
+      "newest": "Mới nhất",
+      "price_asc": "Giá: thấp đến cao",
+      "price_desc": "Giá: cao đến thấp",
+      "best_selling": "Bán chạy",
+      "relevance": "Phù hợp nhất"
+    },
+    "noResults": {
+      "title": "Không có sản phẩm phù hợp",
+      "description": "Thử bỏ bớt bộ lọc hoặc khám phá toàn bộ bộ sưu tập.",
+      "clearFilters": "Xoá bộ lọc",
+      "browseAll": "Xem tất cả nước hoa"
+    },
+    "brandsTitle": "Thương hiệu nước hoa",
+    "brandsIntro": "Các nhà hương niche và designer chúng tôi phân phối chính hãng, sắp xếp theo bảng chữ cái.",
+    "brandsDescription": "Danh sách thương hiệu nước hoa chính hãng từ A đến Z.",
+    "brandsIndex": "Chọn chữ cái",
+    "brandProductCount": "{count, plural, =0 {Chưa có sản phẩm} other {# sản phẩm}}",
+    "brandsEmpty": "Chưa có thương hiệu nào.",
+    "brandDescription": "Nước hoa {brand} chính hãng – xem toàn bộ sản phẩm, giá và tình trạng hàng.",
+    "brandTitle": "Nước hoa {brand}",
+    "collectionDescription": "Bộ sưu tập {name}: nước hoa chính hãng được tuyển chọn.",
+    "categoryDescription": "{name} chính hãng – lọc theo thương hiệu, nhóm hương và mức giá.",
+    "familyTitle": "Nước hoa {name}",
+    "familyDescription": "Khám phá nước hoa {name}: các mùi hương chính hãng cùng nhóm hương.",
+    "familyEyebrow": "Nhóm hương",
+    "collectionEyebrow": "Bộ sưu tập",
+    "categoryEyebrow": "Danh mục",
+    "brandEyebrow": "Thương hiệu"
+  },
+  "product": {
+    "viewBrand": "Xem tất cả nước hoa {brand}",
+    "size": "Dung tích",
+    "selectedSize": "Đã chọn: {label}",
+    "unavailableOption": "{label} – hết hàng",
+    "stock": {
+      "inStock": "Còn hàng",
+      "lowStock": "{count, plural, other {Chỉ còn # sản phẩm}}",
+      "outOfStock": "Hết hàng"
+    },
+    "noVariants": "Sản phẩm tạm thời chưa có sẵn.",
+    "purchaseSoon": "Đặt hàng trực tuyến sẽ sớm ra mắt. Liên hệ chúng tôi để được tư vấn và giữ hàng.",
+    "sku": "Mã sản phẩm: {sku}",
+    "productLine": "Nồng độ khác",
+    "productLineLabel": "Chọn nồng độ",
+    "pyramid": {
+      "title": "Tháp hương",
+      "empty": "Thông tin nốt hương đang được cập nhật."
+    },
+    "profile": {
+      "title": "Đặc điểm mùi hương",
+      "longevity": "Độ lưu hương",
+      "sillage": "Độ toả hương",
+      "scale": "{value}/5",
+      "seasons": "Mùa phù hợp",
+      "occasions": "Dịp sử dụng",
+      "families": "Nhóm hương",
+      "gender": "Dành cho",
+      "concentration": "Nồng độ",
+      "releaseYear": "Năm ra mắt",
+      "perfumer": "Nhà pha chế"
+    },
+    "description": "Mô tả",
+    "details": "Thông tin chi tiết",
+    "compliance": {
+      "title": "Thông tin sản phẩm theo quy định",
+      "countryOfOrigin": "Xuất xứ",
+      "responsibleImporter": "Tổ chức chịu trách nhiệm & nhập khẩu",
+      "cosmeticNotificationNo": "Số tiếp nhận phiếu công bố mỹ phẩm",
+      "ingredients": "Thành phần",
+      "warnings": "Cảnh báo",
+      "pending": "Đang cập nhật"
+    },
+    "authenticity": {
+      "title": "Cam kết chính hãng 100%",
+      "description": "Nhập khẩu chính ngạch, đầy đủ hoá đơn chứng từ. Hoàn tiền nếu không chính hãng."
+    },
+    "returns": "Đổi trả trong 7 ngày khi còn nguyên seal; lỗi từ nhà sản xuất được đổi mới hoặc hoàn tiền 100%.",
+    "brandStory": "Về {brand}",
+    "related": "Có thể bạn cũng thích",
+    "gallery": {
+      "label": "Hình ảnh sản phẩm",
+      "zoom": "Phóng to hình ảnh",
+      "zoomTitle": "{name} – hình {index}",
+      "thumbnail": "Hình {index} trên {total}"
+    },
+    "metaDescription": "{name} – {concentration} của {brand}. Nước hoa chính hãng, giao hàng toàn quốc.",
+    "breadcrumbPerfumes": "Nước hoa"
+  },
+  "search": {
+    "title": "Tìm kiếm",
+    "metaDescription": "Tìm nước hoa theo tên, thương hiệu hoặc nhóm hương.",
+    "label": "Tìm nước hoa",
+    "placeholder": "Tên nước hoa, thương hiệu, nhóm hương…",
+    "submit": "Tìm kiếm",
+    "resultsFor": "Kết quả cho “{query}”",
+    "fuzzyNotice": "Không có kết quả khớp chính xác – đây là các kết quả gần đúng.",
+    "prompt": "Nhập tên nước hoa, thương hiệu hoặc nhóm hương để bắt đầu.",
+    "noResults": {
+      "title": "Không tìm thấy kết quả cho “{query}”",
+      "description": "Kiểm tra chính tả, dùng ít từ hơn hoặc thử một nhóm hương như “gỗ”, “hoa”."
+    },
+    "dialog": {
+      "open": "Tìm kiếm",
+      "title": "Tìm kiếm sản phẩm",
+      "products": "Sản phẩm",
+      "brands": "Thương hiệu",
+      "seeAll": "Xem tất cả kết quả cho “{query}”",
+      "empty": "Không có gợi ý phù hợp.",
+      "loading": "Đang tìm…",
+      "hint": "Nhấn Enter để xem tất cả kết quả",
+      "error": "Không tải được gợi ý. Vui lòng thử lại."
+    }
   },
   "admin": {
     "title": "Quản trị",

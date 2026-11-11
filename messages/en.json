@@ -12,7 +12,10 @@
     "account": "Account",
     "cart": "Cart",
     "search": "Search",
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "openMenu": "Open menu",
+    "mobileNav": "Main menu",
+    "searchShortcut": "Search (Ctrl K)"
   },
   "localeSwitcher": {
     "label": "Language",
@@ -22,7 +25,15 @@
   "home": {
     "eyebrow": "Authentic perfumes",
     "title": "A scent that is yours alone",
-    "subtitle": "Curated niche and designer perfumes, 100% authentic."
+    "subtitle": "Curated niche and designer perfumes, 100% authentic.",
+    "cta": "Explore perfumes",
+    "featuredEyebrow": "Curated",
+    "featuredTitle": "Featured fragrances",
+    "viewAllProducts": "View all perfumes",
+    "brandsEyebrow": "Houses",
+    "brandsTitle": "Brands",
+    "viewAllBrands": "View all brands",
+    "featuredEmpty": "The collection is being updated."
   },
   "notFound": {
     "title": "Page not found",
@@ -76,5 +87,211 @@
     "tagline": "Authentic perfume, curated in Vietnam.",
     "copyright": "© {siteName}. All rights reserved.",
     "primaryNav": "Main navigation"
+  },
+  "catalog": {
+    "gender": {
+      "male": "Men",
+      "female": "Women",
+      "unisex": "Unisex"
+    },
+    "concentration": {
+      "edc": "Eau de Cologne",
+      "edt": "Eau de Toilette",
+      "edp": "Eau de Parfum",
+      "parfum": "Parfum",
+      "extrait": "Extrait de Parfum",
+      "other": "Other concentration"
+    },
+    "concentrationShort": {
+      "edc": "EDC",
+      "edt": "EDT",
+      "edp": "EDP",
+      "parfum": "Parfum",
+      "extrait": "Extrait",
+      "other": "Other"
+    },
+    "variantType": {
+      "full_size": "Full size",
+      "travel": "Travel size",
+      "tester": "Tester",
+      "gift_set": "Gift set"
+    },
+    "variantLabel": {
+      "full_size": "{size} ml",
+      "travel": "Travel {size} ml",
+      "tester": "Tester {size} ml",
+      "gift_set": "Gift set {size} ml"
+    },
+    "noteLayer": {
+      "top": "Top notes",
+      "middle": "Heart notes",
+      "base": "Base notes"
+    },
+    "season": {
+      "spring": "Spring",
+      "summer": "Summer",
+      "autumn": "Autumn",
+      "winter": "Winter"
+    },
+    "occasion": {
+      "day": "Daytime",
+      "night": "Evening",
+      "office": "Office",
+      "date": "Date night",
+      "special": "Special occasions",
+      "casual": "Casual"
+    },
+    "noImage": "Image coming soon"
+  },
+  "listing": {
+    "perfumesTitle": "Authentic perfumes",
+    "perfumesIntro": "Our full selection of authentic niche and designer perfumes, sourced through official import channels.",
+    "perfumesDescription": "Shop authentic perfumes by brand, scent family, concentration and price. Delivered across Vietnam.",
+    "resultCount": "{count, plural, =0 {No products} one {# product} other {# products}}",
+    "pageTitle": "{title} – Page {page}",
+    "updating": "Updating results…",
+    "filters": {
+      "title": "Filters",
+      "open": "Filters",
+      "openWithCount": "Filters ({count})",
+      "clearAll": "Clear all",
+      "showResults": "{count, plural, =0 {No products} one {Show # product} other {Show # products}}",
+      "brand": "Brand",
+      "gender": "Gender",
+      "family": "Scent family",
+      "note": "Note",
+      "concentration": "Concentration",
+      "type": "Type",
+      "price": "Price",
+      "anyPrice": "Any price",
+      "inStock": "In stock only",
+      "availability": "Availability",
+      "optionCount": "{label} ({count})",
+      "active": "Active filters",
+      "remove": "Remove filter: {label}",
+      "priceRange": {
+        "under2m": "Under ₫2M",
+        "from2to4m": "₫2M – ₫4M",
+        "from4to6m": "₫4M – ₫6M",
+        "over6m": "Over ₫6M"
+      },
+      "priceChip": "Price: {range}",
+      "inStockChip": "In stock"
+    },
+    "sort": {
+      "label": "Sort by",
+      "featured": "Featured",
+      "newest": "Newest",
+      "price_asc": "Price: low to high",
+      "price_desc": "Price: high to low",
+      "best_selling": "Best selling",
+      "relevance": "Most relevant"
+    },
+    "noResults": {
+      "title": "No matching products",
+      "description": "Try removing some filters or explore the full collection.",
+      "clearFilters": "Clear filters",
+      "browseAll": "View all perfumes"
+    },
+    "brandsTitle": "Perfume brands",
+    "brandsIntro": "The niche and designer houses we carry, all sourced officially, from A to Z.",
+    "brandsDescription": "Authentic perfume brands from A to Z.",
+    "brandsIndex": "Jump to letter",
+    "brandProductCount": "{count, plural, =0 {No products yet} one {# product} other {# products}}",
+    "brandsEmpty": "No brands yet.",
+    "brandDescription": "Authentic {brand} perfumes – browse every product, price and availability.",
+    "brandTitle": "{brand} perfumes",
+    "collectionDescription": "{name}: a curated collection of authentic perfumes.",
+    "categoryDescription": "Authentic {name} – filter by brand, scent family and price.",
+    "familyTitle": "{name} perfumes",
+    "familyDescription": "Discover {name} perfumes: authentic fragrances from this scent family.",
+    "familyEyebrow": "Scent family",
+    "collectionEyebrow": "Collection",
+    "categoryEyebrow": "Category",
+    "brandEyebrow": "Brand"
+  },
+  "product": {
+    "viewBrand": "View all {brand} perfumes",
+    "size": "Size",
+    "selectedSize": "Selected: {label}",
+    "unavailableOption": "{label} – out of stock",
+    "stock": {
+      "inStock": "In stock",
+      "lowStock": "{count, plural, one {Only # left} other {Only # left}}",
+      "outOfStock": "Out of stock"
+    },
+    "noVariants": "This product is currently unavailable.",
+    "purchaseSoon": "Online ordering opens soon. Contact us for advice or to reserve this item.",
+    "sku": "SKU: {sku}",
+    "productLine": "Other concentrations",
+    "productLineLabel": "Choose a concentration",
+    "pyramid": {
+      "title": "Fragrance pyramid",
+      "empty": "Note details are coming soon."
+    },
+    "profile": {
+      "title": "Scent profile",
+      "longevity": "Longevity",
+      "sillage": "Sillage",
+      "scale": "{value}/5",
+      "seasons": "Seasons",
+      "occasions": "Occasions",
+      "families": "Scent family",
+      "gender": "For",
+      "concentration": "Concentration",
+      "releaseYear": "Released",
+      "perfumer": "Perfumer"
+    },
+    "description": "Description",
+    "details": "Details",
+    "compliance": {
+      "title": "Product and regulatory information",
+      "countryOfOrigin": "Country of origin",
+      "responsibleImporter": "Responsible person and importer",
+      "cosmeticNotificationNo": "Cosmetic notification number",
+      "ingredients": "Ingredients",
+      "warnings": "Warnings",
+      "pending": "Being updated"
+    },
+    "authenticity": {
+      "title": "100% authentic, guaranteed",
+      "description": "Officially imported with full invoices. Money back if it is not authentic."
+    },
+    "returns": "Returns within 7 days with the seal intact; defective items are replaced or fully refunded.",
+    "brandStory": "About {brand}",
+    "related": "You may also like",
+    "gallery": {
+      "label": "Product images",
+      "zoom": "Zoom image",
+      "zoomTitle": "{name} – image {index}",
+      "thumbnail": "Image {index} of {total}"
+    },
+    "metaDescription": "{name} – {concentration} by {brand}. Authentic perfume, delivered across Vietnam.",
+    "breadcrumbPerfumes": "Perfumes"
+  },
+  "search": {
+    "title": "Search",
+    "metaDescription": "Search perfumes by name, brand or scent family.",
+    "label": "Search perfumes",
+    "placeholder": "Perfume, brand or scent family…",
+    "submit": "Search",
+    "resultsFor": "Results for “{query}”",
+    "fuzzyNotice": "No exact matches – showing the closest results.",
+    "prompt": "Type a perfume, brand or scent family to begin.",
+    "noResults": {
+      "title": "No results for “{query}”",
+      "description": "Check the spelling, use fewer words or try a scent family such as “woody” or “floral”."
+    },
+    "dialog": {
+      "open": "Search",
+      "title": "Search products",
+      "products": "Products",
+      "brands": "Brands",
+      "seeAll": "See all results for “{query}”",
+      "empty": "No suggestions found.",
+      "loading": "Searching…",
+      "hint": "Press Enter to see all results",
+      "error": "Suggestions could not be loaded. Please try again."
+    }
   }
 }
