@@ -39,6 +39,7 @@ export function PaymentTable(props: {
         cell: ({ row }) => (
           <Link
             href={orderHref(row.original.orderId) as Route}
+            prefetch={false}
             className="font-mono underline-offset-4 hover:underline"
           >
             {row.original.orderCode}

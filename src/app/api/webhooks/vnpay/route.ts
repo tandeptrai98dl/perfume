@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { connection, NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
 import { getDb } from '@/server/db/client';
@@ -32,6 +32,7 @@ const RESPONSES: Record<
 };
 
 export async function GET(request: NextRequest) {
+  await connection();
   const parsed = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams.entries()));
   if (!parsed.success) return NextResponse.json(VNPAY_IPN_RESPONSES.invalidSignature);
   const gateway = getPaymentGateways().vnpay;

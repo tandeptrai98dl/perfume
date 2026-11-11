@@ -55,7 +55,11 @@ export function VnpayPanel(props: {
       </h2>
       <p className="text-small text-taupe-600">{t('vnpay.description')}</p>
       {!paid && (
-        <Button asChild size="lg" className="w-full sm:w-fit">
+        <Button
+          asChild
+          size="lg"
+          className="h-auto w-full py-3 text-center whitespace-normal sm:w-fit"
+        >
           <a href={props.checkoutUrl}>
             {t('vnpay.pay', { amount: format.number(props.amount, 'vnd') })}
           </a>

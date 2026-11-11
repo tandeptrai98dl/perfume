@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto';
 
-import { NextResponse, type NextRequest } from 'next/server';
+import { connection, NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
 import { serverEnv } from '@/lib/env';
@@ -26,6 +26,7 @@ import { processGatewayNotification } from '@/server/modules/payment';
 const querySchema = z.record(z.string().max(64), z.string().max(2048));
 
 export async function GET(request: NextRequest) {
+  await connection();
   const gateway = getPaymentGateways().vnpay;
   if (gateway?.mode !== 'simulator') return new NextResponse(null, { status: 404 });
 

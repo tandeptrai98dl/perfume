@@ -44,6 +44,7 @@ export function RefundTable(props: {
           <span className="flex flex-col">
             <Link
               href={orderHref(row.original.orderId) as Route}
+              prefetch={false}
               className="font-mono underline-offset-4 hover:underline"
             >
               {row.original.orderCode}

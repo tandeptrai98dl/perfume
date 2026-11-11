@@ -92,8 +92,12 @@ export function RetryPaymentPanel({
           {t(`errors.${error}`)}
         </p>
       )}
-      <Button type="submit" loading={pending} className="w-full sm:w-fit">
-        {variant === 'start' ? t('start') : variant === 'retry' ? t('submit') : t('change')}
+      <Button
+        type="submit"
+        loading={pending}
+        className="h-auto w-full py-3 text-center whitespace-normal sm:w-fit"
+      >
+        {variant === 'retry' ? t('submit') : t('start')}
       </Button>
     </form>
   );
