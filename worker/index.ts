@@ -8,7 +8,8 @@ import { serverEnv } from '@/lib/env';
 import { sentryOptions } from '@/lib/observability/sentry-options';
 import { createEmailSender } from '@/server/integrations/email/send';
 import { createHandlers } from '@/server/jobs/handlers';
-import { createBoss, ensureQueues } from '@/server/jobs/queue';
+import { createBoss, ensureQueues, scheduleCronJobs } from '@/server/jobs/queue';
+import { createDb } from '@/server/db/client';
 import { registerWorkers } from '@/server/jobs/runner';
 import { errorFields, logger } from '@/server/lib/logger';
 
@@ -27,13 +28,18 @@ async function main() {
   boss.on('error', (error) => logger.error('pgboss.error', errorFields(error)));
 
   const email = createEmailSender({ smtpUrl: env.SMTP_URL, from: env.EMAIL_FROM });
+  const { db, pool } = createDb(env.DATABASE_URL);
 
   await boss.start();
   await ensureQueues(boss);
+  await scheduleCronJobs(boss);
   await registerWorkers(
     boss,
     createHandlers({
+      db,
+      boss,
       email,
+      appUrl: env.APP_URL,
       internalBaseUrl: env.INTERNAL_APP_URL ?? env.APP_URL,
       internalSecret: env.INTERNAL_API_SECRET,
     }),
@@ -48,6 +54,7 @@ async function main() {
     logger.info('worker.stopping', { signal });
     await boss.stop({ graceful: true, timeout: 30_000 });
     email.close();
+    await pool.end();
     await Sentry.flush(2_000);
     logger.info('worker.stopped');
     process.exit(0);

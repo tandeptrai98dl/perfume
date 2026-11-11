@@ -29,6 +29,7 @@ import {
 } from '../schema';
 
 import { demoCatalog } from './demo-catalog';
+import { seedDemoCoupons, seedShipping } from './commerce';
 import { seedDemoContent } from './demo-content';
 import adminUnitsData from './data/vn-admin-units.json';
 
@@ -259,7 +260,9 @@ export async function seed(connectionString: string, options: { demo: boolean })
     const content = options.demo
       ? await seedDemoContent(db)
       : { skipped: true, pages: 0, posts: 0 };
-    return { units, demo, content };
+    const shipping = await seedShipping(db);
+    const coupons = options.demo ? await seedDemoCoupons(db) : 0;
+    return { units, demo, content, shipping, coupons };
   } finally {
     await pool.end();
   }

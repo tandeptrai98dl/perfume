@@ -493,8 +493,8 @@ stock_movements  variant_id, location_id, delta int, reason enum(purchase, sale,
 
 // ===== CART =====
 carts            user_id?, token_hash UK, locale, status enum(active, converted, abandoned),
-                 coupon_code?, expires_at
-cart_items       cart_id FK, variant_id FK, quantity, UK(cart_id, variant_id)
+                 coupon_code?, gift_wrap, gift_message?, hide_prices, expires_at
+cart_items       cart_id FK, variant_id FK, quantity, price_when_added, UK(cart_id, variant_id)
 
 // ===== ORDERS =====
 orders           code UK,                     // "PF-261111-7K3Q", readable over the phone
@@ -504,20 +504,21 @@ orders           code UK,                     // "PF-261111-7K3Q", readable over
                    shipped, delivered, completed, cancelled, delivery_failed,
                    return_requested, returned),
                  payment_status enum(unpaid, partially_paid, paid, partially_refunded, refunded),
-                 payment_method enum(cod, vnpay, bank_transfer, momo, zalopay),
+                 payment_method enum(cod, vnpay, payos, bank_transfer, momo, zalopay),
                  subtotal, discount_total, shipping_fee, gift_wrap_fee, total,
                  deposit_required default 0, amount_paid default 0, amount_refunded default 0,
                  amount_due GENERATED AS (total - amount_paid) STORED,
                  coupon_code?, gift_wrap bool, gift_message?, hide_prices bool,
                  customer_note?, internal_note?, vat_invoice jsonb?,  // company name, tax code
                  einvoice_ref?, einvoice_issued_at?,                  // D13
-                 ip_address, user_agent, placed_at, confirmed_at?, delivered_at?,
+                 checkout_key UK?, shipping_rate_id?,                  // idempotency, chosen rate
+                 ip_address, user_agent, placed_at, confirmed_at?, shipped_at?, delivered_at?, completed_at?,
                  cancelled_at?, cancel_reason?, version int default 0 // optimistic lock
 order_items      order_id FK, product_id, variant_id, product_name, variant_label, sku,
                  image_url, unit_price, compare_at_price?, quantity,
                  discount_allocated, line_total
 order_addresses  PK(order_id, type), type enum(shipping, billing), full_name, phone,
-                 province_name, ward_name, legacy_district?, street
+                 province_code, province_name, ward_code, ward_name, legacy_district?, street
 order_events     order_id FK, type, from_status?, to_status?, message, diff jsonb?,
                  actor_type enum(system, customer, staff), actor_id?, metadata jsonb
 
@@ -525,7 +526,7 @@ order_events     order_id FK, type, from_status?, to_status?, message, diff json
 payments         order_id FK, provider enum(cod, vnpay, payos, bank_manual, momo, zalopay),
                  kind enum(full, deposit, balance, adjustment), amount,
                  status enum(pending, succeeded, failed, expired, cancelled, refunded),
-                 txn_ref UK, provider_txn_id?, bank_code?, expires_at, paid_at?,
+                 txn_ref UK, provider_txn_id?, bank_code?, checkout_url?, qr_code?, expires_at, paid_at?,
                  confirmed_by?,                   // staff id for bank_manual
                  raw jsonb                        // sanitized
 payment_events   provider, event_type, idempotency_key UK, payload jsonb,
