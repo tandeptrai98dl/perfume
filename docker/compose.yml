@@ -1,0 +1,61 @@
+# Local development services. Usage: docker compose -f docker/compose.yml up -d
+name: perfume
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: perfume
+      POSTGRES_PASSWORD: perfume
+      POSTGRES_DB: perfume
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U perfume -d perfume']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    # SMTP on 1025, web UI on http://localhost:8025
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+  minio:
+    # S3-compatible storage; console on http://localhost:9001 (minioadmin / minioadmin)
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio-setup:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb --ignore-existing local/perfume-media &&
+      mc anonymous set download local/perfume-media
+      "
+
+volumes:
+  postgres-data:
+  minio-data:

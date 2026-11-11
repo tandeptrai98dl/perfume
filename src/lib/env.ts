@@ -8,6 +8,10 @@ import { z } from 'zod';
 export const serverEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   APP_URL: z.url().default('http://localhost:3000'),
+  DATABASE_URL: z
+    .string()
+    .regex(/^postgres(ql)?:\/\//, 'must be a postgres:// connection string')
+    .default('postgres://perfume:perfume@localhost:5432/perfume'),
 });
 
 /** Client-exposed variables must be prefixed with NEXT_PUBLIC_. */
