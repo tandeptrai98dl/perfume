@@ -147,6 +147,18 @@ describe('order.placed', () => {
     expect(await eventsOf(order.id, 'staff_alert_sent')).toHaveLength(2);
   });
 
+  it('sends no customer e-mail for a manual order without e-mail, but still alerts staff', async () => {
+    const order = await insertOrder(db, {
+      email: '',
+      paymentMethod: 'cod',
+      status: 'awaiting_confirmation',
+      total: 1_000_000,
+    });
+    await handlers['order.placed']({ orderId: order.id });
+    expect(sent.map((m) => m.to)).toEqual(['alerts@shop.test']);
+    expect(await eventsOf(order.id, 'email_sent')).toEqual([]);
+  });
+
   it('retries after an SMTP failure without sending twice', async () => {
     const order = await insertOrder(db, { locale: 'vi', email: 'retry@example.com' });
     failNextEmail = 1;
