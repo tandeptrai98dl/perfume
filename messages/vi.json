@@ -119,6 +119,16 @@
         "heading": "Chúng tôi đã nhận hàng trả lại",
         "body": "Chúng tôi đã nhận được sản phẩm trả lại của đơn hàng {code}.",
         "refund": "Chúng tôi đang hoàn lại {amount} và sẽ gửi xác nhận khi hoàn tiền xong."
+      },
+      "updated": {
+        "subject": "Đơn hàng {code} đã được cập nhật",
+        "preview": "Đơn hàng của bạn vừa được cập nhật.",
+        "heading": "Đơn hàng đã được cập nhật",
+        "body": "Theo trao đổi với bạn, chúng tôi đã cập nhật đơn hàng {code}. Thông tin mới nhất ở bên dưới.",
+        "payDifference": "Tổng tiền mới cao hơn số bạn đã thanh toán. Vui lòng thanh toán thêm {amount} qua đường dẫn bên dưới.",
+        "pay": "Thanh toán phần chênh lệch",
+        "refund": "Bạn đã thanh toán nhiều hơn tổng tiền mới. Chúng tôi sẽ hoàn lại {amount} cho bạn.",
+        "help": "Nếu thay đổi này chưa đúng, vui lòng trả lời email này hoặc liên hệ với chúng tôi."
       }
     },
     "auth": {
@@ -714,6 +724,10 @@
       "other": {
         "title": "Trạng thái đơn hàng",
         "description": "Đơn hàng của bạn: {status}."
+      },
+      "balanceDue": {
+        "title": "Thanh toán phần chênh lệch",
+        "description": "Đơn hàng của bạn đã được cập nhật. Vui lòng thanh toán thêm {amount} để chúng tôi tiếp tục chuẩn bị đơn hàng."
       }
     },
     "orderStatus": {
@@ -1564,20 +1578,20 @@
       "alreadyRemitted": "Đơn đã có trong một phiên đối soát.",
       "noOrders": "Chọn ít nhất một đơn.",
       "orderNotFound": "Không tìm thấy đơn hàng.",
-      "phoneInvalid": "Số di động Việt Nam gồm 10 chữ số, ví dụ 0912 345 678.",
+      "phoneInvalid": "Số điện thoại di động Việt Nam không hợp lệ.",
       "emailInvalid": "Email chưa hợp lệ.",
-      "selectRequired": "Vui lòng chọn một mục.",
+      "selectRequired": "Vui lòng chọn.",
       "tooShort": "Quá ngắn.",
       "shippingRequired": "Chọn phương thức giao hàng.",
       "paymentRequired": "Chọn hình thức thanh toán.",
-      "itemsRequired": "Thêm ít nhất một sản phẩm.",
+      "itemsRequired": "Đơn cần ít nhất một sản phẩm.",
       "cartEmpty": "Thêm ít nhất một sản phẩm.",
-      "itemUnavailable": "Có sản phẩm không còn bán.",
-      "itemQuantityLimit": "Có sản phẩm vượt quá số lượng tối đa mỗi đơn.",
-      "itemInsufficientStock": "Có sản phẩm không đủ hàng trong kho.",
-      "provinceUnknown": "Chọn tỉnh, thành phố trong danh sách.",
-      "wardMismatch": "Phường, xã không thuộc tỉnh, thành phố đã chọn.",
-      "shippingRateUnavailable": "Phương thức giao hàng không còn áp dụng cho địa chỉ này. Chọn lại.",
+      "itemUnavailable": "Sản phẩm này không còn bán nên không tăng số lượng được.",
+      "itemQuantityLimit": "Vượt quá số lượng tối đa cho một dòng.",
+      "itemInsufficientStock": "Không đủ hàng có thể bán cho số lượng này.",
+      "provinceUnknown": "Tỉnh/thành không hợp lệ.",
+      "wardMismatch": "Phường/xã không thuộc tỉnh/thành đã chọn.",
+      "shippingRateUnavailable": "Không có phương thức giao hàng phù hợp cho địa chỉ này.",
       "couponNotFound": "Mã giảm giá không tồn tại.",
       "couponInactive": "Mã giảm giá không còn hiệu lực.",
       "couponNotStarted": "Mã giảm giá chưa đến thời gian áp dụng.",
@@ -1585,7 +1599,13 @@
       "couponUsageLimit": "Mã giảm giá đã hết lượt sử dụng.",
       "couponPerCustomerLimit": "Khách này đã dùng mã giảm giá này.",
       "couponMinSubtotal": "Đơn chưa đạt giá trị tối thiểu của mã.",
-      "couponNoEligibleItems": "Mã không áp dụng cho sản phẩm trong đơn."
+      "couponNoEligibleItems": "Mã không áp dụng cho sản phẩm trong đơn.",
+      "orderNotEditable": "Đơn đã giao cho vận chuyển hoặc đã kết thúc nên không sửa được.",
+      "overrideForbidden": "Chỉ Quản lý hoặc Chủ shop được ghi đè phí giao hàng.",
+      "depositNoLongerRequired": "Đơn COD đang chờ đặt cọc sẽ không còn cần cọc sau khi sửa. Hãy huỷ và tạo đơn thủ công mới.",
+      "editNoChange": "Chưa có thay đổi nào để lưu.",
+      "reservationExpired": "Thời gian giữ hàng của đơn đã hết nên không thêm sản phẩm được.",
+      "stockNotHeld": "Tồn kho của đơn không khớp. Tải lại trang."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -2227,7 +2247,12 @@
         "cod_risk_flagged": "Đánh dấu rủi ro COD",
         "shipment": "Vận đơn {carrier} · {code}",
         "other": "Sự kiện: {type}",
-        "created_by_staff": "Nhân viên tạo đơn thủ công"
+        "created_by_staff": "Nhân viên tạo đơn thủ công",
+        "edited": "Sửa đơn",
+        "editedTotal": "Tổng tiền {from} → {to}",
+        "editedItems": "{count} dòng sản phẩm thay đổi",
+        "editedAddress": "Đổi địa chỉ giao hàng",
+        "editedOverride": "Ghi đè phí giao hàng: {reason}"
       },
       "print": {
         "packing-slip": "Phiếu đóng gói",
@@ -2404,6 +2429,104 @@
           "view": "Xem đơn hàng",
           "another": "Tạo đơn khác"
         }
+      },
+      "edit": {
+        "open": "Sửa đơn",
+        "openHint": "Sửa địa chỉ, sản phẩm, số lượng trước khi giao cho vận chuyển.",
+        "title": "Sửa đơn {code}",
+        "description": "Thay đổi được tính lại trên máy chủ. Xem trước chênh lệch tiền trước khi lưu.",
+        "back": "Quay lại đơn hàng",
+        "notEditable": "Không thể sửa đơn ở trạng thái “{status}”. Chỉ sửa được trước khi giao cho vận chuyển.",
+        "items": "Sản phẩm",
+        "noItems": "Đơn cần ít nhất một sản phẩm.",
+        "columns": {
+          "product": "Sản phẩm",
+          "unitPrice": "Đơn giá",
+          "quantity": "Số lượng",
+          "lineTotal": "Thành tiền",
+          "actions": "Thao tác"
+        },
+        "available": "Còn {available} có thể bán",
+        "heldAndAvailable": "Đơn đang giữ {held} · còn {available} có thể bán thêm",
+        "newLine": "Dòng mới (giá hiện tại)",
+        "quantityFor": "Số lượng {name}",
+        "increase": "Tăng {name}",
+        "decrease": "Giảm {name}",
+        "remove": "Xoá {name}",
+        "picker": {
+          "label": "Thêm sản phẩm",
+          "placeholder": "Tên sản phẩm, thương hiệu hoặc SKU",
+          "hint": "Nhập ít nhất 2 ký tự. Chỉ hiện sản phẩm đang bán.",
+          "empty": "Không tìm thấy sản phẩm phù hợp.",
+          "results": "Kết quả tìm kiếm",
+          "add": "Thêm",
+          "addLabel": "Thêm {name}",
+          "soldOut": "Hết hàng"
+        },
+        "address": "Địa chỉ giao hàng",
+        "fullName": "Người nhận",
+        "phone": "Số điện thoại người nhận",
+        "province": "Tỉnh/Thành phố",
+        "provincePlaceholder": "Chọn tỉnh/thành",
+        "ward": "Phường/Xã",
+        "wardPlaceholder": "Chọn phường/xã",
+        "wardLoading": "Đang tải…",
+        "street": "Số nhà, tên đường",
+        "search": "Tìm…",
+        "noResults": "Không có kết quả.",
+        "shipping": "Phí giao hàng",
+        "overrideManagerOnly": "Phí giao hàng hiện tại: {amount}, tính lại theo bảng giá. Chỉ Quản lý hoặc Chủ shop được ghi đè.",
+        "overrideActive": "Phí giao hàng đang được Quản lý ghi đè: {amount}. Chỉ Quản lý hoặc Chủ shop được thay đổi.",
+        "overrideEnable": "Ghi đè phí giao hàng",
+        "overrideAmount": "Phí giao hàng (₫)",
+        "overrideReason": "Lý do ghi đè",
+        "overrideReasonHint": "Bắt buộc khi đặt, đổi hoặc bỏ ghi đè. Bỏ chọn ô trên để quay về bảng giá.",
+        "noteTitle": "Ghi chú",
+        "note": "Lý do sửa đơn (hiện trên lịch sử đơn)",
+        "noteHint": "Không bắt buộc. Khách hàng không thấy ghi chú này.",
+        "preview": {
+          "title": "Xem trước",
+          "hint": "Bấm “Tính lại” để xem tổng tiền mới và chênh lệch. Mọi thay đổi sau đó cần tính lại trước khi lưu.",
+          "run": "Tính lại",
+          "stale": "Đơn đã thay đổi sau lần tính trước. Bấm “Tính lại”.",
+          "noChange": "Chưa có thay đổi nào so với đơn hiện tại.",
+          "totals": "Tổng tiền trước và sau khi sửa",
+          "amount": "Khoản",
+          "before": "Hiện tại",
+          "after": "Sau khi sửa",
+          "rows": {
+            "subtotal": "Tạm tính",
+            "discountTotal": "Giảm giá",
+            "shippingFee": "Phí giao hàng",
+            "giftWrapFee": "Gói quà",
+            "total": "Tổng cộng",
+            "depositRequired": "Tiền cọc COD"
+          },
+          "lines": "Thay đổi sản phẩm",
+          "added": "Thêm {name} × {to}",
+          "removed": "Xoá {name}",
+          "changedQty": "{name}: {from} → {to}",
+          "address": "Địa chỉ thay đổi: {fields}",
+          "addressFields": {
+            "fullName": "người nhận",
+            "phone": "số điện thoại",
+            "provinceCode": "tỉnh/thành",
+            "provinceName": "tỉnh/thành",
+            "wardCode": "phường/xã",
+            "wardName": "phường/xã",
+            "street": "số nhà, đường"
+          },
+          "couponDropped": "Mã {code} không còn đủ điều kiện với đơn mới và sẽ bị bỏ.",
+          "override": "Phí giao hàng ghi đè: {amount}",
+          "refund": "Khách đã trả nhiều hơn tổng mới: {amount} sẽ vào hàng chờ hoàn tiền.",
+          "payDifference": "Khách cần trả thêm {amount}. Email kèm đường dẫn thanh toán phần chênh lệch sẽ được gửi.",
+          "dueOnline": "Khách cần thanh toán trực tuyến {amount}.",
+          "sameTotal": "Tổng tiền không đổi.",
+          "difference": "{direction, select, up {Tổng tiền tăng} other {Tổng tiền giảm}} {amount}."
+        },
+        "save": "Lưu thay đổi",
+        "saved": "Đã cập nhật đơn {code}",
+        "current": "Hiện tại: tổng {total}, đã thu {paid} ({status})."
       }
     },
     "coupons": {

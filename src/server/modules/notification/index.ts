@@ -7,6 +7,7 @@ export {
   handleOrderPlaced,
   sendAuthEmail,
   sendOrderConfirmation,
+  sendOrderEdited,
   sendOrderUpdate,
   sendPaymentReceived,
   sendStaffAlert,
@@ -19,5 +20,5 @@ export {
   type StaffAlert,
   type StaffAlertKind,
 } from './staff-alerts';
-export { carrierTrackingUrl, orderPageUrl } from './links';
+export { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';
 export { EMAIL_SENT_EVENT, STAFF_ALERT_EVENT } from './once';

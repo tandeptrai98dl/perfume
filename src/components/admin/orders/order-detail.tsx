@@ -1,4 +1,5 @@
-import { Printer, TriangleAlert } from 'lucide-react';
+import { PencilLine, Printer, TriangleAlert } from 'lucide-react';
+import Link from 'next/link';
 
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -72,9 +73,12 @@ function Address({ address }: { address: AdminOrderAddress | null }) {
 export function OrderDetailView({
   order,
   canCancelPaid,
+  canEdit = false,
 }: {
   order: AdminOrderDetail;
   canCancelPaid: boolean;
+  /** Edit before shipment (§3.4 step 8): permission + editable status, decided by the page. */
+  canEdit?: boolean;
 }) {
   const t = useTranslations('admin.orders');
   const format = useOrderFormat();
@@ -317,6 +321,17 @@ export function OrderDetailView({
             codToCollect={money.codToCollect}
             canCancelPaid={canCancelPaid}
           />
+          {canEdit && (
+            <div className="border-line-200 flex flex-col gap-2 border-t pt-4">
+              <Button asChild variant="secondary" className="w-fit">
+                <Link href={`/admin/orders/${order.id}/edit`}>
+                  <PencilLine aria-hidden />
+                  {t('edit.open')}
+                </Link>
+              </Button>
+              <p className="text-small text-taupe-600">{t('edit.openHint')}</p>
+            </div>
+          )}
           <div className="border-line-200 flex flex-wrap gap-2 border-t pt-4">
             <Button asChild variant="secondary" size="sm">
               <a

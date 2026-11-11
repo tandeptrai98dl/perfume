@@ -133,6 +133,7 @@ const ICONS: Record<ResultState, typeof CheckCircle2> = {
   codDepositReceived: CheckCircle2,
   awaitingPayment: Clock,
   depositRequired: Clock,
+  balanceDue: Clock,
   sessionExpired: AlertCircle,
   windowClosed: XCircle,
   cancelled: XCircle,
@@ -194,6 +195,8 @@ async function ResultContent({
       case 'awaitingPayment':
       case 'depositRequired':
         return t(`state.${state}.description`, { amount: vnd(result.onlineDue), time });
+      case 'balanceDue':
+        return t('state.balanceDue.description', { amount: vnd(result.onlineDue) });
       case 'sessionExpired':
         return t('state.sessionExpired.description', { time });
       case 'other':

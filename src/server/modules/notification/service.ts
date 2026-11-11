@@ -26,7 +26,9 @@ import { errorFields, logger } from '@/server/lib/logger';
 import { getOrderViewById, type OrderStatus, type OrderView } from '@/server/modules/order';
 import { getCommerceSettings } from '@/server/modules/settings';
 
-import { carrierTrackingUrl, orderPageUrl } from './links';
+import { nextSessionAmount } from '@/server/modules/payment';
+
+import { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';
 import { EMAIL_SENT_EVENT, sendOnce, STAFF_ALERT_EVENT } from './once';
 import { buildStaffAlert, type StaffAlertKind } from './staff-alerts';
 
@@ -142,7 +144,15 @@ export function emailForTransition(from: string, to: OrderStatus): OrderUpdateKi
 
 export async function sendOrderUpdate(
   deps: NotificationDeps,
-  input: { orderId: string; kind: OrderUpdateKind; key: string; paymentAmount?: number },
+  input: {
+    orderId: string;
+    kind: OrderUpdateKind;
+    key: string;
+    paymentAmount?: number;
+    /** `updated`: money still due online and the page to pay it. */
+    amountDueOnline?: number;
+    payUrl?: string | null;
+  },
 ) {
   const order = await loadMailableOrder(deps.db, input.orderId);
   if (!order) return false;
@@ -167,6 +177,8 @@ export async function sendOrderUpdate(
           order: toEmailData(order),
           orderUrl: orderPageUrl({ ...linkOptions(deps), locale, code: order.code }),
           paymentAmount: input.paymentAmount,
+          amountDueOnline: input.amountDueOnline,
+          payUrl: input.payUrl,
           shipment: latest
             ? {
                 carrier: latest.carrier,
@@ -187,6 +199,38 @@ export async function sendStatusChangeEmail(
   const kind = emailForTransition(input.from, input.to as OrderStatus);
   if (!kind) return false;
   return sendOrderUpdate(deps, { orderId: input.orderId, kind, key: `status:${input.to}` });
+}
+
+/** Orders whose customer can still pay online from the payment page. */
+const PAYABLE_AFTER_EDIT: readonly string[] = [
+  'pending',
+  'awaiting_confirmation',
+  'confirmed',
+  'processing',
+];
+
+/**
+ * Order edited by staff before shipment (`order.updated`, §3.4 step 8): one e-mail per edit
+ * (keyed by the order version the edit wrote) with the new lines and totals, and the link to
+ * pay the difference when the new total needs more money online.
+ */
+export async function sendOrderEdited(
+  deps: NotificationDeps,
+  input: { orderId: string; version: number },
+) {
+  const order = await loadOrder(deps.db, input.orderId);
+  if (!order) return false;
+  const amountDueOnline = PAYABLE_AFTER_EDIT.includes(order.status) ? nextSessionAmount(order) : 0;
+  return sendOrderUpdate(deps, {
+    orderId: input.orderId,
+    kind: 'updated',
+    key: `edited:${input.version}`,
+    amountDueOnline,
+    payUrl:
+      amountDueOnline > 0
+        ? orderPaymentUrl({ ...linkOptions(deps), locale: order.locale, code: order.code })
+        : null,
+  });
 }
 
 /**

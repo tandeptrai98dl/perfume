@@ -237,6 +237,36 @@ describe('order.status-changed', () => {
   });
 });
 
+describe('order.updated', () => {
+  it('sends one "order updated" e-mail per edit, with the pay link when money is due', async () => {
+    const order = await insertOrder(db, {
+      locale: 'en',
+      email: 'edited@example.com',
+      status: 'confirmed',
+      paymentMethod: 'payos',
+      total: 3_500_000,
+    });
+    await db.update(orders).set({ amountPaid: 3_000_000 }).where(eq(orders.id, order.id));
+
+    await handlers['order.updated']({ orderId: order.id, version: 3 });
+    await handlers['order.updated']({ orderId: order.id, version: 3 }); // retried job
+    expect(sent).toHaveLength(1);
+    expect(sent[0]!.subject).toBe(`Your order ${order.code} has been updated`);
+    expect(sent[0]!.text).toContain('₫500,000');
+    const token = computeOrderAccessToken(SECRET, order.code);
+    expect(sent[0]!.html).toContain(
+      `https://shop.test/en/checkout/result?code=${order.code}&amp;t=${token}`,
+    );
+
+    // Fully paid after a later edit: no pay link.
+    await db.update(orders).set({ amountPaid: 3_500_000 }).where(eq(orders.id, order.id));
+    await handlers['order.updated']({ orderId: order.id, version: 4 });
+    expect(sent).toHaveLength(2);
+    expect(sent[1]!.html).not.toContain('/checkout/result');
+    expect(await eventsOf(order.id, 'email_sent')).toHaveLength(2);
+  });
+});
+
 describe('payment.received', () => {
   it('sends one e-mail per payment with the amount and the balance', async () => {
     const order = await insertOrder(db, {

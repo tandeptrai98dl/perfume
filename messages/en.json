@@ -119,6 +119,16 @@
         "heading": "Your return has been received",
         "body": "We have received the items returned from order {code}.",
         "refund": "We are refunding {amount}. You will receive a confirmation once it is sent."
+      },
+      "updated": {
+        "subject": "Your order {code} has been updated",
+        "preview": "Your order has just been updated.",
+        "heading": "Your order has been updated",
+        "body": "As agreed with you, we have updated order {code}. The latest details are below.",
+        "payDifference": "The new total is higher than what you have paid. Please pay the remaining {amount} using the link below.",
+        "pay": "Pay the difference",
+        "refund": "You have paid more than the new total. We will refund {amount} to you.",
+        "help": "If this change is not right, reply to this email or contact us."
       }
     },
     "auth": {
@@ -714,6 +724,10 @@
       "other": {
         "title": "Order status",
         "description": "Your order is {status}."
+      },
+      "balanceDue": {
+        "title": "Pay the difference",
+        "description": "Your order has been updated. Please pay the remaining {amount} so we can keep preparing your order."
       }
     },
     "orderStatus": {

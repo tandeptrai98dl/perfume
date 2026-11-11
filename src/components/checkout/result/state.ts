@@ -8,6 +8,7 @@ export type ResultState =
   | 'codDepositReceived'
   | 'awaitingPayment'
   | 'depositRequired'
+  | 'balanceDue'
   | 'sessionExpired'
   | 'windowClosed'
   | 'cancelled'
@@ -28,6 +29,8 @@ type Input = Pick<
 > & { session: { provider: string; qrCode: string | null; checkoutUrl: string | null } | null };
 
 const AWAITING = ['pending', 'awaiting_confirmation'];
+/** Stock already deducted; money can still be due after an admin edit raised the total. */
+const BALANCE = ['confirmed', 'processing'];
 
 /** Pure decision table for the result page (unit-tested). */
 export function resultView(result: Input, now: Date): { state: ResultState; panel: ResultPanel } {
@@ -48,6 +51,17 @@ export function resultView(result: Input, now: Date): { state: ResultState; pane
     return result.attempts > 0
       ? { state: 'sessionExpired', panel: 'retry' }
       : { state: waiting, panel: 'start' };
+  }
+
+  if (BALANCE.includes(result.status) && result.onlineDue > 0) {
+    if (result.sessionUsable && result.session) {
+      if (result.session.provider === 'payos' && result.session.qrCode)
+        return { state: 'balanceDue', panel: 'qr' };
+      if (result.session.provider === 'vnpay' && result.session.checkoutUrl) {
+        return { state: 'balanceDue', panel: 'vnpay' };
+      }
+    }
+    return { state: 'balanceDue', panel: result.attempts > 0 ? 'retry' : 'start' };
   }
 
   if (result.status === 'awaiting_confirmation' && cod) {

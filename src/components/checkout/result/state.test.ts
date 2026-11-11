@@ -42,6 +42,30 @@ describe('checkout result view', () => {
     });
   });
 
+  it('asks for the difference after an admin edit raised a paid order (no stock hold)', () => {
+    const edited = {
+      ...base,
+      status: 'confirmed',
+      paymentStatus: 'partially_paid' as const,
+      amountPaid: 3_000_000,
+      onlineDue: 500_000,
+      reservedUntil: null,
+    };
+    expect(resultView(edited, now)).toEqual({ state: 'balanceDue', panel: 'qr' });
+    expect(resultView({ ...edited, sessionUsable: false, attempts: 0 }, now)).toEqual({
+      state: 'balanceDue',
+      panel: 'start',
+    });
+    expect(resultView({ ...edited, status: 'processing', sessionUsable: false }, now)).toEqual({
+      state: 'balanceDue',
+      panel: 'retry',
+    });
+    expect(resultView({ ...edited, onlineDue: 0, paymentStatus: 'paid' }, now)).toEqual({
+      state: 'paid',
+      panel: null,
+    });
+  });
+
   it('handles COD without deposit, deposit due, deposit paid', () => {
     const cod = { ...base, paymentMethod: 'cod', status: 'awaiting_confirmation' };
     expect(resultView({ ...cod, onlineDue: 0 }, now)).toEqual({ state: 'codConfirm', panel: null });
