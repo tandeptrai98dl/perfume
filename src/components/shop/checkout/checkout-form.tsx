@@ -296,7 +296,7 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
           void form.handleSubmit(placeOrder, () => setAlert({ kind: 'fixErrors' }))(event)
         }
         aria-busy={placing}
-        className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-16"
+        className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-16"
       >
         <div className="flex flex-col gap-10">
           <CheckoutSection
