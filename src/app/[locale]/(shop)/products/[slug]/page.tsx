@@ -5,6 +5,7 @@ import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { SetLocaleAlternates, type LocaleAlternates } from '@/components/layout/locale-alternates';
+import { AddToCart } from '@/components/shop/add-to-cart';
 import { AuthenticityBadge } from '@/components/shop/authenticity-badge';
 import { BrandStoryBlock } from '@/components/shop/brand-story-block';
 import { ComplianceInfo } from '@/components/shop/compliance-info';
@@ -23,7 +24,9 @@ import { getPathname, Link } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { mediaUrl } from '@/lib/media-url';
 import { getProduct, getRelated } from '@/server/catalog-cache';
+import { getDb } from '@/server/db/client';
 import { getVariantOffers, type ProductDetail, type VariantOffer } from '@/server/modules/catalog';
+import { getCommerceSettings } from '@/server/modules/settings';
 
 import {
   absoluteUrl,
@@ -171,13 +174,6 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
               <Suspense fallback={<OfferSkeleton />}>
                 <PurchasePanel product={product} locale={locale} />
               </Suspense>
-              {/* Reserved for AddToCartBar (cart arrives in M2); nothing is purchasable yet. */}
-              <div
-                className="bg-sand-100 text-small min-h-13 p-4 text-taupe-600"
-                data-slot="add-to-cart"
-              >
-                {t('product.purchaseSoon')}
-              </div>
               <AuthenticityBadge />
               <p className="text-small text-taupe-600">{t('product.returns')}</p>
             </div>
@@ -231,7 +227,10 @@ const AVAILABILITY: Record<VariantOffer['stockState'], string> = {
 /** Live price and stock (never cached, §14.1) plus Product JSON-LD built from the same data. */
 async function PurchasePanel({ product, locale }: { product: ProductDetail; locale: Locale }) {
   await connection();
-  const offers = await getVariantOffers(product.id);
+  const [offers, settings] = await Promise.all([
+    getVariantOffers(product.id),
+    getCommerceSettings(getDb()),
+  ]);
   const byId = new Map(offers.map((offer) => [offer.variantId, offer]));
   const variants = product.variants.flatMap((variant) => {
     const offer = byId.get(variant.id);
@@ -292,6 +291,12 @@ async function PurchasePanel({ product, locale }: { product: ProductDetail; loca
   return (
     <>
       <VariantSelector variants={variants} />
+      <div data-slot="add-to-cart">
+        <AddToCart
+          variants={variants.map((variant) => variant.offer)}
+          maxQuantityPerLine={settings.cart.maxQuantityPerLine}
+        />
+      </div>
       <JsonLd data={jsonLd} />
     </>
   );
@@ -306,6 +311,7 @@ function OfferSkeleton() {
         <Skeleton className="h-11 w-20" />
         <Skeleton className="h-11 w-20" />
       </div>
+      <Skeleton className="h-13 w-full" />
     </div>
   );
 }

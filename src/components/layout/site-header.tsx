@@ -1,7 +1,8 @@
-import type { LucideIcon } from 'lucide-react';
+import { ShoppingBag, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
+import { CartLink } from '@/components/shop/cart-link';
 import { SearchDialog } from '@/components/shop/search-dialog';
 import { SkipLink } from '@/components/ui/skip-link';
 import { Link } from '@/i18n/navigation';
@@ -29,7 +30,10 @@ const NAV: readonly NavItem[] = [
   { href: '/brands', key: 'brands' },
   { href: '/journal', key: 'journal' },
 ];
-const ACTIONS: readonly ActionItem[] = [];
+const ACTIONS: readonly ActionItem[] = [
+  // Cart (M2 cart stream): live count badge, see CartLink / CartCountSeed.
+  { href: '/cart', key: 'cart', icon: ShoppingBag },
+];
 const MOBILE_NAV: readonly MobileNavItem[] = [
   { href: '/perfumes', key: 'perfumes' },
   { href: '/brands', key: 'brands' },
@@ -72,16 +76,20 @@ export function SiteHeader() {
               <LanguageSwitcher className="md:mr-2" />
             </Suspense>
             <SearchDialog triggerClassName={iconLink} />
-            {ACTIONS.map(({ href, key, icon: Icon }) => (
-              <Link
-                key={key}
-                href={href}
-                className={key === 'account' ? `${iconLink} max-sm:hidden` : iconLink}
-                aria-label={t(`navigation.${key}`)}
-              >
-                <Icon aria-hidden />
-              </Link>
-            ))}
+            {ACTIONS.map(({ href, key, icon: Icon }) =>
+              key === 'cart' ? (
+                <CartLink key={key} className={iconLink} />
+              ) : (
+                <Link
+                  key={key}
+                  href={href}
+                  className={key === 'account' ? `${iconLink} max-sm:hidden` : iconLink}
+                  aria-label={t(`navigation.${key}`)}
+                >
+                  <Icon aria-hidden />
+                </Link>
+              ),
+            )}
           </div>
         </div>
       </header>

@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, gt, sql } from 'drizzle-orm';
 
 import type { Locale } from '@/i18n/routing';
 import type { Database } from '@/server/db/client';
@@ -16,6 +16,8 @@ type Executor = Pick<Database, 'select' | 'execute'>;
 
 export type CartRow = typeof carts.$inferSelect;
 
+export type VariantType = 'full_size' | 'decant' | 'travel' | 'tester' | 'gift_set';
+
 export type CartLine = {
   itemId: string;
   variantId: string;
@@ -24,6 +26,7 @@ export type CartLine = {
   categoryIds: string[];
   sku: string;
   sizeMl: number;
+  variantType: VariantType;
   productName: string;
   productSlug: string | null;
   brandName: string;
@@ -39,6 +42,10 @@ export type CartLine = {
   purchasable: boolean;
 };
 
+/**
+ * Active cart of a member (by user) or a guest (by cookie token). Carts expire 30 days after
+ * their last change (§10.3); expired carts are ignored here, so no cron is needed to hide them.
+ */
 export async function findActiveCart(
   db: Pick<Database, 'select'>,
   owner: { userId?: string | null; token?: string | null },
@@ -52,7 +59,7 @@ export async function findActiveCart(
   const [cart] = await db
     .select()
     .from(carts)
-    .where(and(condition, eq(carts.status, 'active')))
+    .where(and(condition, eq(carts.status, 'active'), gt(carts.expiresAt, sql`now()`)))
     .orderBy(sql`${carts.updatedAt} desc`)
     .limit(1);
   return cart ?? null;
@@ -66,6 +73,7 @@ type LineRow = {
   category_ids: string[] | null;
   sku: string;
   size_ml: number;
+  variant_type: VariantType;
   product_name: string;
   product_slug: string | null;
   brand_name: string;
@@ -88,7 +96,7 @@ export async function getCartLines(
   const result = await db.execute<LineRow>(sql`
     select ci.id as item_id, v.id as variant_id, p.id as product_id, b.id as brand_id,
       (select array_agg(pc.category_id) from product_categories pc where pc.product_id = p.id) as category_ids,
-      v.sku, v.size_ml,
+      v.sku, v.size_ml, v.variant_type,
       coalesce(pt_loc.name, pt_vi.name) as product_name,
       coalesce(pt_loc.slug, pt_vi.slug) as product_slug,
       b.name as brand_name,
@@ -119,6 +127,7 @@ export async function getCartLines(
     categoryIds: row.category_ids ?? [],
     sku: row.sku,
     sizeMl: row.size_ml,
+    variantType: row.variant_type,
     productName: row.product_name,
     productSlug: row.product_slug,
     brandName: row.brand_name,

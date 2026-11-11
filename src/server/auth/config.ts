@@ -8,6 +8,8 @@ import type { ServerEnv } from '@/lib/env';
 import type { Database } from '@/server/db/client';
 import * as schema from '@/server/db/schema';
 import { newId } from '@/server/lib/ids';
+import { errorFields, logger } from '@/server/lib/logger';
+import { CART_COOKIE, mergeGuestCartFromCookieHeader } from '@/server/modules/cart';
 
 import { isStaffRole } from './permissions';
 
@@ -141,11 +143,21 @@ export function createAuth(db: Database, env: AuthEnv) {
               },
             };
           },
-          after: async (session) => {
+          after: async (session, ctx) => {
             await db
               .update(schema.users)
               .set({ lastLoginAt: new Date() })
               .where(eq(schema.users.id, session.userId));
+            // Cart (§10.3): merge the guest cart of this browser into the member cart. A failure
+            // never blocks sign-in; src/server/cart-session.ts retries on the next request.
+            const cookieHeader =
+              ctx?.headers?.get('cookie') ?? ctx?.request?.headers.get('cookie') ?? null;
+            await mergeGuestCartFromCookieHeader(
+              db,
+              session.userId,
+              cookieHeader,
+              CART_COOKIE,
+            ).catch((error: unknown) => logger.warn('cart.merge.failed', errorFields(error)));
           },
         },
       },

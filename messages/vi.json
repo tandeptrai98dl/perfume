@@ -261,7 +261,6 @@
       "outOfStock": "Hết hàng"
     },
     "noVariants": "Sản phẩm tạm thời chưa có sẵn.",
-    "purchaseSoon": "Đặt hàng trực tuyến sẽ sớm ra mắt. Liên hệ chúng tôi để được tư vấn và giữ hàng.",
     "sku": "Mã sản phẩm: {sku}",
     "productLine": "Nồng độ khác",
     "productLineLabel": "Chọn nồng độ",
@@ -1145,5 +1144,94 @@
         "system": "Hệ thống"
       }
     }
+  },
+  "cart": {
+    "title": "Giỏ hàng",
+    "metaDescription": "Xem lại các sản phẩm trong giỏ hàng, mã ưu đãi và tuỳ chọn gói quà trước khi thanh toán.",
+    "headerLink": "{count, plural, =0 {Giỏ hàng, chưa có sản phẩm} other {Giỏ hàng, # sản phẩm}}",
+    "add": "Thêm vào giỏ",
+    "outOfStock": "Hết hàng",
+    "quantity": "Số lượng",
+    "added": "Đã thêm vào giỏ hàng",
+    "addedCapped": "Đã thêm vào giỏ — tối đa {max} sản phẩm cho mỗi lựa chọn",
+    "viewCart": "Xem giỏ hàng",
+    "checkout": "Thanh toán",
+    "continueShopping": "Tiếp tục mua sắm",
+    "errors": {
+      "validation": "Thông tin chưa hợp lệ. Vui lòng thử lại.",
+      "notFound": "Sản phẩm này không còn trong giỏ hàng. Trang đã được cập nhật.",
+      "unavailable": "Sản phẩm này hiện không thể đặt mua.",
+      "out_of_stock": "Sản phẩm này vừa hết hàng.",
+      "limit_reached": "Bạn đã có tối đa {max} sản phẩm này trong giỏ.",
+      "rate_limited": "Bạn đã thử quá nhiều mã. Vui lòng đợi một phút rồi thử lại.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại sau ít phút."
+    },
+    "mini": {
+      "title": "Giỏ hàng của bạn",
+      "count": "{count, plural, =0 {Chưa có sản phẩm} other {# sản phẩm}}",
+      "loading": "Đang tải giỏ hàng"
+    },
+    "empty": {
+      "title": "Giỏ hàng đang trống",
+      "description": "Hãy khám phá bộ sưu tập nước hoa chính hãng và chọn hương thơm dành cho bạn.",
+      "action": "Khám phá nước hoa"
+    },
+    "line": {
+      "remove": "Xoá",
+      "removeLabel": "Xoá {name} khỏi giỏ hàng",
+      "quantityFor": "Số lượng của {name}",
+      "unitPrice": "{price} mỗi sản phẩm",
+      "priceChanged": "Giá đã thay đổi từ {from} kể từ khi bạn thêm vào giỏ.",
+      "unavailable": "Sản phẩm này hiện không thể đặt mua. Vui lòng xoá khỏi giỏ hàng.",
+      "overStock": "{max, plural, other {Hiện chỉ có thể đặt tối đa # sản phẩm. Vui lòng giảm số lượng.}}",
+      "capped": "Số lượng đã được điều chỉnh về tối đa {max}."
+    },
+    "summary": {
+      "title": "Tóm tắt đơn hàng",
+      "subtotal": "Tạm tính",
+      "discount": "Ưu đãi ({code})",
+      "giftWrap": "Gói quà",
+      "shipping": "Phí vận chuyển",
+      "shippingAtCheckout": "Tính khi thanh toán",
+      "shippingFreeCoupon": "Miễn phí với mã {code}",
+      "total": "Tổng cộng",
+      "totalNote": "Chưa gồm phí vận chuyển.",
+      "checkoutBlocked": "Vui lòng điều chỉnh các sản phẩm được đánh dấu trước khi thanh toán."
+    },
+    "freeShipping": {
+      "label": "Tiến độ miễn phí vận chuyển",
+      "remaining": "Còn {amount} nữa để được miễn phí vận chuyển",
+      "unlocked": "Đơn hàng của bạn được miễn phí vận chuyển tiêu chuẩn"
+    },
+    "coupon": {
+      "label": "Mã ưu đãi",
+      "apply": "Áp dụng",
+      "remove": "Gỡ mã {code}",
+      "applied": "Đã áp dụng mã {code}",
+      "freeShipping": "Mã {code}: miễn phí vận chuyển khi thanh toán",
+      "notApplied": "Mã {code} chưa được áp dụng.",
+      "errors": {
+        "not_found": "Mã ưu đãi không tồn tại. Vui lòng kiểm tra lại chính tả.",
+        "inactive": "Mã ưu đãi này hiện không còn hiệu lực.",
+        "not_started": "Mã ưu đãi này chưa đến thời gian áp dụng.",
+        "expired": "Mã ưu đãi này đã hết hạn.",
+        "usage_limit": "Mã ưu đãi này đã hết lượt sử dụng.",
+        "per_customer_limit": "Bạn đã sử dụng mã ưu đãi này.",
+        "min_subtotal": "Mã áp dụng cho đơn từ {minSubtotal, number, vnd}. Thêm {missing, number, vnd} để sử dụng.",
+        "no_eligible_items": "Mã ưu đãi không áp dụng cho sản phẩm nào trong giỏ hàng.",
+        "empty_cart": "Hãy thêm sản phẩm vào giỏ trước khi nhập mã ưu đãi."
+      }
+    },
+    "gift": {
+      "title": "Quà tặng",
+      "wrap": "Gói quà cao cấp (+{fee})",
+      "message": "Lời nhắn trên thiệp",
+      "messageHint": "{count}/{max} ký tự",
+      "hidePrices": "Không in giá trên phiếu giao hàng",
+      "save": "Lưu tuỳ chọn quà tặng",
+      "saved": "Đã lưu tuỳ chọn quà tặng",
+      "tooLong": "Lời nhắn tối đa {max} ký tự."
+    },
+    "linesLabel": "Sản phẩm trong giỏ hàng"
   }
 }

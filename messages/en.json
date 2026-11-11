@@ -261,7 +261,6 @@
       "outOfStock": "Out of stock"
     },
     "noVariants": "This product is currently unavailable.",
-    "purchaseSoon": "Online ordering opens soon. Contact us for advice or to reserve this item.",
     "sku": "SKU: {sku}",
     "productLine": "Other concentrations",
     "productLineLabel": "Choose a concentration",
@@ -333,5 +332,94 @@
       "hint": "Press Enter to see all results",
       "error": "Suggestions could not be loaded. Please try again."
     }
+  },
+  "cart": {
+    "title": "Cart",
+    "metaDescription": "Review the items in your cart, promo code and gift options before checkout.",
+    "headerLink": "{count, plural, =0 {Cart, empty} one {Cart, # item} other {Cart, # items}}",
+    "add": "Add to cart",
+    "outOfStock": "Out of stock",
+    "quantity": "Quantity",
+    "added": "Added to cart",
+    "addedCapped": "Added to cart — limited to {max} per item",
+    "viewCart": "View cart",
+    "checkout": "Checkout",
+    "continueShopping": "Continue shopping",
+    "errors": {
+      "validation": "Something in the request was not valid. Please try again.",
+      "notFound": "This item is no longer in your cart. The page has been updated.",
+      "unavailable": "This item is currently unavailable.",
+      "out_of_stock": "This item has just sold out.",
+      "limit_reached": "You already have the maximum of {max} of this item in your cart.",
+      "rate_limited": "Too many attempts. Please wait a minute and try again.",
+      "unexpected": "Something went wrong. Please try again in a few minutes."
+    },
+    "mini": {
+      "title": "Your cart",
+      "count": "{count, plural, =0 {No items yet} one {# item} other {# items}}",
+      "loading": "Loading your cart"
+    },
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Explore our authentic fragrances and find a scent that is yours.",
+      "action": "Explore perfumes"
+    },
+    "line": {
+      "remove": "Remove",
+      "removeLabel": "Remove {name} from your cart",
+      "quantityFor": "Quantity of {name}",
+      "unitPrice": "{price} each",
+      "priceChanged": "The price has changed from {from} since you added this item.",
+      "unavailable": "This item is no longer available. Please remove it from your cart.",
+      "overStock": "{max, plural, one {Only # can be ordered right now. Please lower the quantity.} other {Only # can be ordered right now. Please lower the quantity.}}",
+      "capped": "The quantity was adjusted to the maximum of {max}."
+    },
+    "summary": {
+      "title": "Order summary",
+      "subtotal": "Subtotal",
+      "discount": "Discount ({code})",
+      "giftWrap": "Gift wrapping",
+      "shipping": "Shipping",
+      "shippingAtCheckout": "Calculated at checkout",
+      "shippingFreeCoupon": "Free with code {code}",
+      "total": "Total",
+      "totalNote": "Excludes shipping.",
+      "checkoutBlocked": "Please adjust the highlighted items before checking out."
+    },
+    "freeShipping": {
+      "label": "Free shipping progress",
+      "remaining": "{amount} away from free shipping",
+      "unlocked": "Your order qualifies for free standard shipping"
+    },
+    "coupon": {
+      "label": "Promo code",
+      "apply": "Apply",
+      "remove": "Remove code {code}",
+      "applied": "Code {code} applied",
+      "freeShipping": "Code {code}: free shipping at checkout",
+      "notApplied": "Code {code} is not applied.",
+      "errors": {
+        "not_found": "This promo code does not exist. Please check the spelling.",
+        "inactive": "This promo code is no longer active.",
+        "not_started": "This promo code is not valid yet.",
+        "expired": "This promo code has expired.",
+        "usage_limit": "This promo code has reached its usage limit.",
+        "per_customer_limit": "You have already used this promo code.",
+        "min_subtotal": "This code applies to orders from {minSubtotal, number, vnd}. Add {missing, number, vnd} more to use it.",
+        "no_eligible_items": "This promo code does not apply to any item in your cart.",
+        "empty_cart": "Add an item to your cart before entering a promo code."
+      }
+    },
+    "gift": {
+      "title": "Gift options",
+      "wrap": "Luxury gift wrapping (+{fee})",
+      "message": "Gift card message",
+      "messageHint": "{count}/{max} characters",
+      "hidePrices": "Hide prices on the packing slip",
+      "save": "Save gift options",
+      "saved": "Gift options saved",
+      "tooLong": "The message can be at most {max} characters."
+    },
+    "linesLabel": "Items in your cart"
   }
 }
