@@ -19,7 +19,7 @@ function raw(overrides: Partial<ManualOrderRawInput> = {}): ManualOrderRawInput 
     checkoutKey: 'manual-key-1234567890',
     customer: { fullName: 'Nguyễn Văn A', phone: '+84 912 345 678', email: '', locale: 'en' },
     items: [{ variantId: VARIANT, quantity: 2 }],
-    address: { provinceCode: '79', wardCode: '26734', street: '12 Lê Lợi' },
+    address: { provinceCode: '79', wardCode: '26743', street: '12 Lê Lợi' },
     shippingRateId: RATE,
     paymentOption: 'cod',
     ...overrides,

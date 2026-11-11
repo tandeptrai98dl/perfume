@@ -17,7 +17,7 @@ production build (desktop 1280 + 768, mobile 375, vi and en).
 | E2 | Two buyers for the last unit → one order | **Done** | `tests/integration/checkout/place-order.test.ts` "lets exactly one of two buyers racing for the last unit place an order"; `tests/integration/order/foundation.test.ts` "lets exactly one of two concurrent buyers reserve the last unit". |
 | E3 | Replayed IPN creates no duplicate | **Done** | `tests/integration/payment/payments.test.ts` "full payment → … a replay changes nothing", "two identical IPNs arriving at the same time are processed exactly once"; E2E `purchase-vietqr.spec.ts` replays the webhook and asserts one succeeded payment and one `payment.received` job; `purchase-vnpay.spec.ts` reloads the signed return URL and asserts no new event or job. |
 | E4 | IPN after cancellation lands in the refund queue | **Done** | `payments.test.ts` "IPN after cancellation records the money, queues a refund and alerts staff", "auto-cancelling a COD order whose deposit was paid queues a refund"; `tests/e2e/admin-payments.spec.ts` "refund queue: complete the refund of a payment received after cancellation". |
-| E5 | Staff complete a manual order end to end on staging | **Open** | Manual order creation is the wave-2 "manual orders" stream (the admin button is disabled on `main`); a staging environment does not exist yet (M3 §15 item 4). Re-check once both land. |
+| E5 | Staff complete a manual order end to end on staging | **Partial** | Manual orders are built: `/admin/orders/new` (`placeManualOrder` → `placeOrder(source='admin')`), `tests/integration/checkout/manual-order.test.ts`, `tests/e2e/admin-manual-order.spec.ts` (COD and payment link). Open: the staging run, since no staging environment exists yet (M3 §15 item 4). |
 
 ## Scope items (§15 M2)
 
@@ -27,7 +27,7 @@ production build (desktop 1280 + 768, mobile 375, vi and en).
 | S2 | Bilingual one-page checkout, 2-level addresses, zone rates, VAT details, consents | **Done** | `tests/e2e/checkout.spec.ts` (COD, online, deposit notice, validation, empty cart); `place-order.test.ts` (VAT invoice, consents, ward outside province, stale rate, stale total); purchase specs pick province → ward and standard / express delivery. |
 | S3 | `placeOrder` + time-limited reservations; state machines (§3.5); expiry and 24 h COD jobs | **Done** | `place-order.test.ts` (30 min / 24 h reservations, idempotent checkout key, rollback); `state-machine.test.ts`; `payments.test.ts` "expire-unpaid cancels orders whose reservations expired…", "cancel-unconfirmed-cod and complete-delivered respect their windows" (stock released through `transitionOrder`). Crons in `CRON_JOBS` (every minute / 5 min / hourly). |
 | S4 | Payments: COD (threshold + deposit), payOS VietQR, VNPay — sandboxes, IPN/webhooks, idempotency, retry | **Done** | `payments.test.ts` (sessions, reuse, retry with method change, reservation extension cap, wrong amount / bad signature, failed IPN), `payments.test.ts` in `integrations/payments` (signatures), `tests/e2e/checkout-result.spec.ts` (QR panel, forged return URL, expired session retry), purchase specs. |
-| S5 | Admin orders: list, detail, transitions, manual orders, edits, tracking, printing, cancel/refund, COD reconciliation; admin coupons, shipping, payments | **Partial** | Done: `tests/integration/order/admin.test.ts`, `tests/e2e/admin-orders.spec.ts` (queues, confirm → pack → ship < 2 min, slips, bulk confirm, deposit guard, manager-only cancel), `admin-payments.spec.ts`, `admin-coupons.spec.ts`, `admin-purchase.spec.ts`. Open: manual orders and order edits (wave-2 streams). |
+| S5 | Admin orders: list, detail, transitions, manual orders, edits, tracking, printing, cancel/refund, COD reconciliation; admin coupons, shipping, payments | **Done** | `tests/integration/order/admin.test.ts`, `tests/integration/order/edit.test.ts`, `tests/integration/checkout/manual-order.test.ts`, `tests/e2e/admin-orders.spec.ts`, `admin-payments.spec.ts`, `admin-coupons.spec.ts`, `admin-purchase.spec.ts`, `admin-manual-order.spec.ts`, `admin-order-edit.spec.ts`. |
 | S6 | vi/en emails by `orders.locale`; Telegram + email staff alerts; guest lookup; account pages | **Done** | `tests/integration/jobs/notifications.test.ts` (confirmation, status, payment e-mails once each, English orders, alerts without PII, retries); `tests/e2e/account.spec.ts` (sign-up, profile, addresses, orders, cancel, guest lookup, password reset); purchase specs assert `order.placed`, `payment.received`, `order.status-changed` are enqueued in the business transaction and look the order up by code + phone. |
 
 ## Required tests (§16.2) relevant to M2
@@ -36,12 +36,12 @@ production build (desktop 1280 + 768, mobile 375, vi and en).
 | --- | --- | --- |
 | Unit | Cart/order pricing, coupons, shipping fees, order and payment transition tables, VNPay/payOS signatures, permission map | **Done** (`pricing.test.ts`, `rules.test.ts`, `state-machine.test.ts`, `status.test.ts`, `payments.test.ts`, `permissions.test.ts`) |
 | Integration | Concurrent `placeOrder`, reservation expiry, replayed IPN, IPN after cancellation | **Done** (see E2–E4, S3) |
-| Integration | Order edit with optimistic locking | **Open** — wave-2 "order edits" stream (`transitionOrder` already refuses stale versions: `foundation.test.ts`) |
+| Integration | Order edit with optimistic locking | **Done** — `tests/integration/order/edit.test.ts` (version conflicts, reserved vs committed stock, payment deltas) |
 | Integration | E-invoice job retry | Not M2 (automatic e-invoicing is M3 item 2, D13) |
 | E2E | PDP → cart → checkout (COD, VietQR mock, VNPay sandbox) in vi and en | **Done** (E1) |
 | E2E | Language switch keeps the cart; sign-up/sign-in | **Done** (`cart.spec.ts`, `account.spec.ts`) |
 | E2E | Admin order processing | **Done** (`admin-orders.spec.ts`, `admin-purchase.spec.ts`) |
-| E2E | Admin manual order | **Open** — wave-2 "manual orders" stream |
+| E2E | Admin manual order | **Done** — `tests/e2e/admin-manual-order.spec.ts` |
 
 ## Definition of Done checks on the purchase flow
 
