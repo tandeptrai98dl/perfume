@@ -210,7 +210,7 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 | `customer` + `auth` | Accounts, addresses, wishlist, consents, privacy requests | users, sessions, accounts, addresses, wishlists, consents, privacy_requests |
 | `review` | Reviews, review invitations, moderation | reviews, review_invitations |
 | `content` | Banners, journal posts, static pages, menus, redirects | posts, pages, banners, navigation_menus, redirects, *_translations |
-| `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs |
+| `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs (not created in M2: sends are recorded in `order_events`, see §10.5) |
 | `admin` | Permissions, audit, settings | audit_logs, settings |
 
 **Module communication rules:** module A calls only module B's public `index.ts`, never B's `repo.ts`. Side effects (emails, alerts, e-invoices, stats) go through the job queue using a **transactional outbox**: the job is enqueued in the same database transaction as the business change.
@@ -881,13 +881,14 @@ perfume-store/
 ### 10.5 After purchase (MVP)
 
 - Emails (in the order's locale): order confirmation, payment received, shipped (tracking code + carrier link), delivered, cancelled/refunded.
-- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP).
+- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP). The phone may be the contact or the delivery phone; any mismatch gets one generic message. A successful lookup sets the signed per-order access cookie; email links open the same read-only page with `?t=<orderAccessToken>`. M2: the limiter is in-memory per web process (`server/lib/rate-limit.ts`); the `rate_limits` table replaces it when the app runs on more than one instance.
+- Emails are sent by the worker only (outbox jobs). Each customer email is recorded in the order timeline (`order_events.type = 'email_sent'`, `metadata.key` such as `order_confirmation`, `status:shipped`, `payment:<id>`) and skipped when a retried job finds it; staff alerts likewise (`staff_alert_sent`). Staff alerts go to `STAFF_ALERT_EMAIL` and the Telegram bot (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`); each channel is skipped when unset, and the text carries only order code, amount, payment method and province.
 - Customers can cancel before `processing`; return requests within 7 days of delivery per D17 (form + reason + photos).
 - Reviews after `delivered`, marked "Verified purchase", moderated. Guests receive a review invitation email with a one-time token link (30 days; one review per purchased item) (D08).
 
 ### 10.6 Account (MVP)
 
-- Sign up / sign in with email + password (email verification) or Google; password reset by email (30-minute single-use token).
+- Sign up / sign in with email + password (email verification) or Google; password reset by email (30-minute single-use token). Email/password accounts must confirm their address before the first sign-in (the link signs them in); sign-up therefore answers the same for new and existing emails (no account enumeration). Account emails use `users.locale`: the sign-up page's language, changeable in the profile.
 - After a guest order: one-step account creation; past orders with the same verified email are attached.
 - Preferred language (used for emails), order history, one-tap reorder, address book (max 10), wishlist, profile.
 - **Privacy centre:** view/withdraw consents, download personal data (JSON), request account deletion (personal data anonymized; orders retained for accounting).
