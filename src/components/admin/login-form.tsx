@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useId, useState, useTransition } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth/client';
 
 type Step = 'credentials' | 'totp' | 'backup';
@@ -71,7 +73,7 @@ export function LoginForm() {
   }
 
   const errorMessage = error ? (
-    <p role="alert" aria-live="assertive">
+    <p role="alert" aria-live="assertive" className="text-small text-danger">
       {t(error)}
     </p>
   ) : null;
@@ -79,44 +81,36 @@ export function LoginForm() {
   if (step === 'credentials') {
     return (
       <form action={submitCredentials} className="flex flex-col gap-4" noValidate>
-        <label htmlFor={`${id}-email`} className="flex flex-col gap-1">
+        <label htmlFor={`${id}-email`} className="text-small flex flex-col gap-2 font-medium">
           {t('email')}
-          <input
-            id={`${id}-email`}
-            name="email"
-            type="email"
-            autoComplete="username"
-            required
-            className="border p-2"
-          />
+          <Input id={`${id}-email`} name="email" type="email" autoComplete="username" required />
         </label>
-        <label htmlFor={`${id}-password`} className="flex flex-col gap-1">
+        <label htmlFor={`${id}-password`} className="text-small flex flex-col gap-2 font-medium">
           {t('password')}
-          <input
+          <Input
             id={`${id}-password`}
             name="password"
             type="password"
             autoComplete="current-password"
             required
             minLength={8}
-            className="border p-2"
           />
         </label>
         {errorMessage}
-        <button type="submit" disabled={pending} className="border p-2">
+        <Button type="submit" loading={pending}>
           {t('submit')}
-        </button>
+        </Button>
       </form>
     );
   }
 
   return (
     <form action={submitCode} className="flex flex-col gap-4" noValidate>
-      <h2 className="text-xl">{t('totpTitle')}</h2>
+      <h2 className="text-h3">{t('totpTitle')}</h2>
       {step === 'totp' && <p>{t('totpHint')}</p>}
-      <label htmlFor={`${id}-code`} className="flex flex-col gap-1">
+      <label htmlFor={`${id}-code`} className="text-small flex flex-col gap-2 font-medium">
         {step === 'backup' ? t('backupCode') : t('totpCode')}
-        <input
+        <Input
           id={`${id}-code`}
           name="code"
           type="text"
@@ -124,23 +118,22 @@ export function LoginForm() {
           autoComplete="one-time-code"
           required
           autoFocus
-          className="border p-2"
         />
       </label>
       {errorMessage}
-      <button type="submit" disabled={pending} className="border p-2">
+      <Button type="submit" loading={pending}>
         {t('verify')}
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
-        className="underline"
+        variant="link"
         onClick={() => {
           setError(null);
           setStep(step === 'backup' ? 'totp' : 'backup');
         }}
       >
         {step === 'backup' ? t('useTotp') : t('useBackupCode')}
-      </button>
+      </Button>
     </form>
   );
 }

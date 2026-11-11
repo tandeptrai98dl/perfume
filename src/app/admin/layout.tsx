@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 
 import messages from '../../../messages/vi.json';
 
+import '../fonts';
 import '../globals.css';
 
 /** Admin is Vietnamese-only in MVP, has no locale segment and is never indexed. */
@@ -18,10 +19,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function AdminRootLayout({ children }: LayoutProps<'/admin'>) {
   return (
     <html lang="vi">
-      <body>
+      <body data-surface="admin">
         <NextIntlClientProvider
           locale="vi"
-          messages={{ admin: messages.admin }}
+          messages={{ admin: messages.admin, ui: messages.ui }}
           timeZone="Asia/Ho_Chi_Minh"
         >
           {children}

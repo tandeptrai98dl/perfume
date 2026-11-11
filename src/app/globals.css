@@ -1,1 +1,214 @@
 @import 'tailwindcss';
+
+/*
+ * Design tokens (docs/ARCHITECTURE.md §7). Provisional until the brand identity is delivered:
+ * change token values here, never hard-code colours, font sizes or radii in components.
+ */
+@theme {
+  /* §7.1 Colour */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-ink-950: #0e0e0e;
+  --color-ink-700: #3a3632;
+  --color-taupe-600: #6b645c;
+  --color-taupe-300: #bdb4a7;
+  --color-line-200: #e4dccf;
+  --color-sand-100: #f1ebe1;
+  --color-ivory-50: #faf7f2;
+  --color-gold-500: #b89b5e;
+  --color-gold-700: #7a5c30;
+  --color-success: #2f6b4f;
+  --color-warning: #925c1b;
+  --color-danger: #a23b3b;
+  --color-info: #3c5a78;
+  --color-overlay: rgb(14 14 14 / 0.4);
+
+  /* §7.2 Typography (self-hosted via Fontsource, see src/app/fonts.ts) */
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.875rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.625rem;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.375rem;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1rem;
+  --text-eyebrow--letter-spacing: 0.16em;
+  --text-button: 0.8125rem;
+  --text-button--line-height: 1rem;
+  --text-button--letter-spacing: 0.14em;
+
+  /* §7.3 Layout, spacing, shape */
+  --radius-none: 0;
+  --radius-input: 2px;
+  --shadow-overlay: 0 24px 48px rgb(14 14 14 / 0.08);
+  --container-content: 1200px;
+  --container-wide: 1440px;
+  --spacing-section: 4.5rem;
+  --spacing-section-lg: 8rem;
+
+  /* §7.4 Motion */
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-hover: 200ms;
+  --duration-panel: 400ms;
+  --duration-reveal: 700ms;
+
+  --animate-fade-in: fade-in var(--duration-panel) var(--ease-luxe);
+  --animate-fade-out: fade-out var(--duration-hover) var(--ease-luxe);
+  --animate-sheet-in-right: sheet-in-right var(--duration-panel) var(--ease-luxe);
+  --animate-sheet-in-left: sheet-in-left var(--duration-panel) var(--ease-luxe);
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes sheet-in-right {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes sheet-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+/* Responsive display scale (desktop → mobile values from §7.2). */
+@utility text-display-xl {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.75rem;
+  line-height: 3.25rem;
+  @media (width >= 64rem) {
+    font-size: 4.5rem;
+    line-height: 5rem;
+  }
+}
+@utility text-display-lg {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  @media (width >= 64rem) {
+    font-size: 3.5rem;
+    line-height: 4rem;
+  }
+}
+@utility text-h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.875rem;
+  line-height: 2.375rem;
+  @media (width >= 64rem) {
+    font-size: 2.5rem;
+    line-height: 3rem;
+  }
+}
+@utility text-h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.625rem;
+  line-height: 2.125rem;
+  @media (width >= 64rem) {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+}
+@utility text-h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  @media (width >= 64rem) {
+    font-size: 1.375rem;
+    line-height: 1.875rem;
+  }
+}
+@utility eyebrow {
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+@utility container-content {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-content);
+  padding-inline: 1rem;
+  @media (width >= 48rem) {
+    padding-inline: 1.5rem;
+  }
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    border-color: var(--color-line-200);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background-color: var(--color-ivory-50);
+    color: var(--color-ink-950);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Stacked Vietnamese diacritics need room above display text (§7.2). */
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  ::selection {
+    background-color: var(--color-sand-100);
+    color: var(--color-ink-950);
+  }
+  /* §7.6: 2px gold-700 focus ring with 2px offset. */
+  :focus-visible {
+    outline: 2px solid var(--color-gold-700);
+    outline-offset: 2px;
+  }
+  [data-surface='admin'] {
+    background-color: var(--color-white);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

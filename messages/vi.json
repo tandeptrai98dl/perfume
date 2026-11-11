@@ -36,6 +36,47 @@
       "body": "Email này được gửi từ hàng đợi công việc nền để kiểm tra cấu hình."
     }
   },
+  "ui": {
+    "close": "Đóng",
+    "loading": "Đang tải",
+    "breadcrumb": "Đường dẫn",
+    "price": {
+      "from": "Từ {price}",
+      "salePrice": "Giá ưu đãi",
+      "originalPrice": "Giá gốc",
+      "percentOff": "-{percent}%"
+    },
+    "rating": {
+      "label": "Đánh giá {value} trên 5 sao",
+      "count": "{count, plural, other {# đánh giá}}",
+      "inputLegend": "Chọn số sao",
+      "star": "{count} sao"
+    },
+    "quantity": {
+      "label": "Số lượng",
+      "decrease": "Giảm số lượng",
+      "increase": "Tăng số lượng",
+      "value": "Số lượng",
+      "maxReached": "Đã đạt số lượng tối đa ({max})"
+    },
+    "combobox": {
+      "placeholder": "Chọn…",
+      "search": "Tìm kiếm…",
+      "empty": "Không tìm thấy kết quả."
+    },
+    "pagination": {
+      "label": "Phân trang",
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "page": "Trang {page}"
+    },
+    "menu": "Menu"
+  },
+  "footer": {
+    "tagline": "Nước hoa chính hãng, tuyển chọn tại Việt Nam.",
+    "copyright": "© {siteName}. Bảo lưu mọi quyền.",
+    "primaryNav": "Điều hướng chính"
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",

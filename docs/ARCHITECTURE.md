@@ -618,15 +618,15 @@ rate_limits      key PK, count, window_start            // MVP; Redis later
 | `gold-500` | #B89B5E | Rules, icons, decorative badges (never small text) | ~2.6:1 |
 | `gold-700` | #7A5C30 | Links, focus ring, emphasised text | ~5.8:1 |
 | `success` | #2F6B4F | In stock, payment succeeded | ≥ 4.5:1 |
-| `warning` | #A86B1F | Low stock | ≥ 4.5:1 |
+| `warning` | #925C1B | Low stock | ~5.2:1 (was #A86B1F, 4.1:1 — failed AA) |
 | `danger` | #A23B3B | Form errors, cancellations | ≥ 4.5:1 |
 | `info` | #3C5A78 | Neutral notices | ≥ 4.5:1 |
 
-Contrast ratios are estimates — verify with a WCAG checker when implementing tokens. Admin uses the same palette at higher density on a white (`#FFFFFF`) background.
+Contrast ratios verified when the tokens were implemented (M0); `taupe-300` and `gold-500` stay decorative only. Admin uses the same palette at higher density on a white (`#FFFFFF`) background.
 
 ### 7.2 Typography
 
-- **Display / headings:** Cormorant Garamond (serif, 400–500). **Body / UI:** Be Vietnam Pro (sans, 300–600). Both include Vietnamese subsets; load via `next/font/google` with `subsets: ['latin', 'vietnamese']`, `display: 'swap'`.
+- **Display / headings:** Cormorant Garamond (serif, 400–500). **Body / UI:** Be Vietnam Pro (sans, 300–600). Both include Vietnamese subsets; self-hosted from Fontsource packages (`src/app/fonts.ts`; latin, latin-ext and vietnamese subsets split by `unicode-range`, `font-display: swap`) so builds need no network access and no request goes to Google.
 - Check Vietnamese diacritics (ệ, ữ, ỹ, ặ) at every size; minimum line-height 1.5 for body and 1.15 for display so stacked diacritics never touch the line above.
 - Prices: sans + `tabular-nums`, formatted with `Intl.NumberFormat` for the active locale, currency VND.
 
@@ -674,7 +674,7 @@ WCAG 2.2 AA: 2px `gold-700` focus ring with 2px offset, touch targets ≥ 44×44
   --color-taupe-600: #6B645C; --color-taupe-300: #BDB4A7;
   --color-line-200: #E4DCCF; --color-sand-100: #F1EBE1; --color-ivory-50: #FAF7F2;
   --color-gold-500: #B89B5E; --color-gold-700: #7A5C30;
-  --color-success: #2F6B4F; --color-warning: #A86B1F;
+  --color-success: #2F6B4F; --color-warning: #925C1B;
   --color-danger: #A23B3B;  --color-info: #3C5A78;
   --font-display: var(--font-cormorant), Georgia, serif;
   --font-sans: var(--font-be-vietnam), system-ui, sans-serif;
