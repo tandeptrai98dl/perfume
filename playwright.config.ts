@@ -56,6 +56,8 @@ export default defineConfig({
           APP_URL: baseURL,
           // Payment gateways run as the signed sandbox simulator (no network, localhost only).
           PAYMENT_SIMULATOR: process.env.PAYMENT_SIMULATOR ?? 'true',
+          // Every test account signs in from one IP; the limits themselves are unit-tested.
+          AUTH_RATE_LIMIT: 'off',
         },
       },
 });

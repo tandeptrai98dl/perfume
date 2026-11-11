@@ -40,7 +40,8 @@ export const AUTH_ERROR_CODES = {
 export type AuthEnv = Pick<
   ServerEnv,
   'APP_URL' | 'BETTER_AUTH_SECRET' | 'GOOGLE_CLIENT_ID' | 'GOOGLE_CLIENT_SECRET' | 'NODE_ENV'
->;
+> &
+  Partial<Pick<ServerEnv, 'AUTH_RATE_LIMIT'>>;
 
 /** Password reset links are single-use and expire after 30 minutes (§10.6). */
 export const RESET_PASSWORD_TTL_SECONDS = 30 * 60;
@@ -198,7 +199,7 @@ export function createAuth(db: Database, env: AuthEnv, deps: AuthDeps = {}) {
       },
     },
     rateLimit: {
-      enabled: env.NODE_ENV === 'production',
+      enabled: env.NODE_ENV === 'production' && env.AUTH_RATE_LIMIT !== 'off',
       window: 60,
       max: 100,
       customRules: {

@@ -70,6 +70,11 @@ export const serverEnvSchema = z
      * default outside production for gateways without keys; `true` forces it for every gateway
      * (E2E). Refused in production unless APP_URL is localhost.
      */
+    /**
+     * `off` disables Better Auth's per-IP rate limits for E2E runs against a production build
+     * (every test account signs in from one IP). Refused in production unless APP_URL is localhost.
+     */
+    AUTH_RATE_LIMIT: z.enum(['on', 'off']).default('on'),
     PAYMENT_SIMULATOR: z
       .enum(['true', 'false'])
       .optional()
@@ -125,6 +130,16 @@ export const serverEnvSchema = z
         path: ['PAYOS_CHECKSUM_KEY'],
         message: 'PAYOS_CLIENT_ID, PAYOS_API_KEY and PAYOS_CHECKSUM_KEY must be set together',
       });
+    }
+    if (env.NODE_ENV === 'production' && env.AUTH_RATE_LIMIT === 'off') {
+      const host = new URL(env.APP_URL).hostname;
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['AUTH_RATE_LIMIT'],
+          message: 'auth rate limits can only be turned off on localhost in production builds',
+        });
+      }
     }
     if (env.NODE_ENV === 'production' && env.PAYMENT_SIMULATOR) {
       const host = new URL(env.APP_URL).hostname;

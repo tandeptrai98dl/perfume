@@ -101,7 +101,7 @@ test('editor manages content from the admin screens', async ({ page, request }) 
   await slugField.fill(`trang-moi-${run}`);
   await expect(slugField).toHaveValue(`trang-moi-${run}`);
   await page.getByRole('button', { name: 'Lưu' }).click();
-  await expect(page.getByText('Đã lưu')).toBeVisible();
+  await expect(page.getByText('Đã lưu').first()).toBeVisible();
   const moved = await request.get(`/chinh-sach/trang-thu-${run}`, { maxRedirects: 0 });
   expect(moved.status()).toBe(301);
   expect(moved.headers()['location']).toMatch(new RegExp(`/chinh-sach/trang-moi-${run}$`));
