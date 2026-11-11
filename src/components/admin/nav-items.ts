@@ -22,6 +22,21 @@ export const ADMIN_NAV: AdminNavSection[] = [
     labelKey: 'overview',
     items: [{ href: '/admin', labelKey: 'dashboard', permission: 'admin.access' }],
   },
+  // Admin orders stream (M2): orders, coupons, shipping.
+  {
+    labelKey: 'orders',
+    items: [{ href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' }],
+  },
+  {
+    labelKey: 'promotions',
+    items: [
+      { href: '/admin/promotions/coupons', labelKey: 'coupons', permission: 'coupons.manage' },
+    ],
+  },
+  {
+    labelKey: 'shipping',
+    items: [{ href: '/admin/shipping', labelKey: 'shippingRates', permission: 'settings.manage' }],
+  },
   // Stream B: catalogue, inventory.
   {
     labelKey: 'catalog',

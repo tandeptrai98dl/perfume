@@ -80,3 +80,37 @@ export async function getFreeShippingThreshold(db: Executor): Promise<number | n
     .where(eq(shippingRates.isActive, true));
   return row?.min == null ? null : Number(row.min);
 }
+
+// Admin (admin-orders stream): shipments, zone/rate management and admin reads.
+export {
+  createShipment,
+  deleteShippingRate,
+  deleteShippingZone,
+  saveShippingRate,
+  saveShippingZone,
+  setShippingRateActive,
+  SHIPPING_PERMISSION,
+  shippingTags,
+  updateLatestShipmentStatus,
+  type ShipmentStatus,
+} from './commands';
+export {
+  latestShipmentsForOrders,
+  listProvinceOptions,
+  listShipmentsForOrder,
+  listShippingZonesForAdmin,
+  type AdminShipment,
+  type AdminShippingRate,
+  type AdminShippingZone,
+  type ProvinceOption,
+} from './admin-queries';
+export {
+  shippingEntityIdSchema,
+  shippingRateActiveSchema,
+  shippingRateSchema,
+  shippingZoneSchema,
+  type ShippingEntityIdInput,
+  type ShippingRateActiveInput,
+  type ShippingRateInput,
+  type ShippingZoneInput,
+} from './admin-schemas';

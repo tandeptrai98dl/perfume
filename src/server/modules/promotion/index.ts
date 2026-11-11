@@ -102,3 +102,31 @@ export async function redeemCoupon(
     .where(eq(coupons.id, row.id));
   await tx.insert(couponRedemptions).values(input);
 }
+
+// ---------- Admin (admin-orders stream): coupon management ----------
+export { promotionTags, saveCoupon, setCouponActive } from './commands';
+export {
+  getCouponForEdit,
+  listCoupons,
+  type AdminCouponRow,
+  type CouponForEdit,
+  type CouponListQuery,
+  type CouponUsage,
+} from './admin-queries';
+export {
+  COUPON_CODE,
+  COUPON_SORTS,
+  COUPON_STATES,
+  COUPON_TYPES,
+  couponActiveSchema,
+  couponSchema,
+  couponScopeSchema,
+  couponState,
+  type CouponActiveInput,
+  type CouponInput,
+  type CouponScopeInput,
+  type CouponSort,
+  type CouponState,
+  type CouponTypeValue,
+} from './admin-schemas';
+// ---------- End admin ----------
