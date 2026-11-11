@@ -16,10 +16,12 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "i18n:check": "node scripts/i18n-check.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
+    "next-intl": "^4.15.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "zod": "^4.6.7"
