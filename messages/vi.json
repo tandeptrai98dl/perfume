@@ -773,7 +773,8 @@
       "gatewayUnsupported": "Cổng này không hỗ trợ hoàn tiền tự động. Hãy hoàn thủ công.",
       "notRemittable": "Đơn không phải COD đã giao.",
       "alreadyRemitted": "Đơn đã có trong một phiên đối soát.",
-      "noOrders": "Chọn ít nhất một đơn."
+      "noOrders": "Chọn ít nhất một đơn.",
+      "orderNotFound": "Không tìm thấy đơn hàng."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -1257,7 +1258,8 @@
           "unknown_txn_ref": "Không có giao dịch",
           "amount_mismatch": "Sai số tiền",
           "already_succeeded": "Giao dịch đã thanh toán trước đó"
-        }
+        },
+        "back": "Giao dịch"
       },
       "refunds": {
         "title": "Hoàn tiền",
@@ -1392,7 +1394,8 @@
           "matches": "Khớp với số tiền thực nhận",
           "mismatch": "Lệch {amount} so với bảng kê",
           "submit": "Lưu đối soát",
-          "done": "Đã đối soát {count} đơn"
+          "done": "Đã đối soát {count} đơn",
+          "orderColumn": "Đơn hàng"
         }
       }
     }
