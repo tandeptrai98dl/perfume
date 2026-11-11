@@ -22,7 +22,7 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
   const t = await getTranslations({ locale: 'vi', namespace: 'admin' });
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center justify-between gap-4 border-b p-4">
+      <header className="border-line-200 flex items-center justify-between gap-4 border-b p-4">
         <Link href="/admin" className="font-medium">
           {t('title')}
         </Link>

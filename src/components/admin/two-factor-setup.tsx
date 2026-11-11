@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useId, useState, useTransition } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth/client';
 
 type Enrolment = { secret: string; uri: string; backupCodes: string[] };
@@ -51,33 +53,36 @@ export function TwoFactorSetup() {
     });
   }
 
-  const errorMessage = error ? <p role="alert">{t(error)}</p> : null;
+  const errorMessage = error ? (
+    <p role="alert" className="text-small text-danger">
+      {t(error)}
+    </p>
+  ) : null;
 
   if (!enrolment) {
     return (
       <form action={start} className="flex flex-col gap-4">
-        <label htmlFor={`${id}-password`} className="flex flex-col gap-1">
+        <label htmlFor={`${id}-password`} className="text-small flex flex-col gap-2 font-medium">
           {t('passwordLabel')}
-          <input
+          <Input
             id={`${id}-password`}
             name="password"
             type="password"
             autoComplete="current-password"
             required
-            className="border p-2"
           />
         </label>
         {errorMessage}
-        <button type="submit" disabled={pending} className="border p-2">
+        <Button type="submit" loading={pending}>
           {t('start')}
-        </button>
+        </Button>
       </form>
     );
   }
 
   return (
     <form action={confirm} className="flex flex-col gap-4">
-      <h2 className="text-xl">{t('scanTitle')}</h2>
+      <h2 className="text-h3">{t('scanTitle')}</h2>
       <p>{t('scanHint')}</p>
       <dl className="flex flex-col gap-2">
         <dt>{t('secretLabel')}</dt>
@@ -89,29 +94,28 @@ export function TwoFactorSetup() {
           <code className="text-sm break-all select-all">{enrolment.uri}</code>
         </dd>
       </dl>
-      <h2 className="text-xl">{t('backupTitle')}</h2>
+      <h2 className="text-h3">{t('backupTitle')}</h2>
       <p>{t('backupHint')}</p>
       <ul className="grid grid-cols-2 gap-1 font-mono">
         {enrolment.backupCodes.map((code) => (
           <li key={code}>{code}</li>
         ))}
       </ul>
-      <label htmlFor={`${id}-code`} className="flex flex-col gap-1">
+      <label htmlFor={`${id}-code`} className="text-small flex flex-col gap-2 font-medium">
         {t('codeLabel')}
-        <input
+        <Input
           id={`${id}-code`}
           name="code"
           type="text"
           inputMode="numeric"
           autoComplete="one-time-code"
           required
-          className="border p-2"
         />
       </label>
       {errorMessage}
-      <button type="submit" disabled={pending} className="border p-2">
+      <Button type="submit" loading={pending}>
         {t('confirm')}
-      </button>
+      </Button>
     </form>
   );
 }

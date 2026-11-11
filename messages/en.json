@@ -35,5 +35,46 @@
       "heading": "Email delivery is working",
       "body": "This email was sent from the background job queue to check the setup."
     }
+  },
+  "ui": {
+    "close": "Close",
+    "loading": "Loading",
+    "breadcrumb": "Breadcrumb",
+    "price": {
+      "from": "From {price}",
+      "salePrice": "Sale price",
+      "originalPrice": "Original price",
+      "percentOff": "-{percent}%"
+    },
+    "rating": {
+      "label": "Rated {value} out of 5",
+      "count": "{count, plural, one {# review} other {# reviews}}",
+      "inputLegend": "Choose a rating",
+      "star": "{count, plural, one {# star} other {# stars}}"
+    },
+    "quantity": {
+      "label": "Quantity",
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "value": "Quantity",
+      "maxReached": "Maximum quantity reached ({max})"
+    },
+    "combobox": {
+      "placeholder": "Select…",
+      "search": "Search…",
+      "empty": "No results found."
+    },
+    "pagination": {
+      "label": "Pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {page}"
+    },
+    "menu": "Menu"
+  },
+  "footer": {
+    "tagline": "Authentic perfume, curated in Vietnam.",
+    "copyright": "© {siteName}. All rights reserved.",
+    "primaryNav": "Main navigation"
   }
 }

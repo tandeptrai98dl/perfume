@@ -3,8 +3,10 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
+import { Toaster } from '@/components/ui/toaster';
 import { routing } from '@/i18n/routing';
 
+import '../fonts';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -28,7 +30,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          {children}
+          <Toaster />
+        </NextIntlClientProvider>
       </body>
     </html>
   );
