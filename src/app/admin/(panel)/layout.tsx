@@ -1,9 +1,16 @@
-import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { SignOutButton } from '@/components/admin/sign-out-button';
+import { AdminShell } from '@/components/admin/admin-shell';
+import { ShellSkeleton } from '@/components/admin/page-skeleton';
 import { requireAdminPage } from '@/server/auth/guards';
+import { isStaffRole, permissionsFor } from '@/server/auth/permissions';
+
+/**
+ * Entering the panel (e.g. from /admin/login) always waits for the session check, so it is
+ * not validated as an instant navigation; navigations between admin pages still are, and each
+ * page streams its data behind its own Suspense boundary.
+ */
+export const instant = false;
 
 /**
  * Every page in this group requires a staff session that passed TOTP within the last 8 hours.
@@ -11,27 +18,25 @@ import { requireAdminPage } from '@/server/auth/guards';
  */
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense>
-      <AdminShell>{children}</AdminShell>
+    <Suspense fallback={<ShellSkeleton />}>
+      <Panel>{children}</Panel>
     </Suspense>
   );
 }
 
-async function AdminShell({ children }: { children: React.ReactNode }) {
-  await requireAdminPage();
-  const t = await getTranslations({ locale: 'vi', namespace: 'admin' });
+async function Panel({ children }: { children: React.ReactNode }) {
+  const { user } = await requireAdminPage();
+  const role = user.role ?? 'customer';
+  // requireAdminPage already redirected non-staff; this narrows the type.
+  if (!isStaffRole(role)) return null;
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="border-line-200 flex items-center justify-between gap-4 border-b p-4">
-        <Link href="/admin" className="font-medium">
-          {t('title')}
-        </Link>
-        <nav className="flex items-center gap-4">
-          <Link href="/admin">{t('nav.dashboard')}</Link>
-          <SignOutButton />
-        </nav>
-      </header>
-      <main className="flex-1 p-6">{children}</main>
-    </div>
+    <AdminShell
+      session={{
+        user: { id: user.id, name: user.name, role },
+        permissions: permissionsFor(role),
+      }}
+    >
+      {children}
+    </AdminShell>
   );
 }

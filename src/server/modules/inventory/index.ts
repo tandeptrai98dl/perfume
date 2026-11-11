@@ -1,4 +1,4 @@
-/** Public API of the inventory module (read side: storefront availability). */
+/** Public API of the inventory module: storefront availability and admin stock changes. */
 export {
   availableQuantitySql,
   DEFAULT_LOW_STOCK_THRESHOLD,
@@ -7,3 +7,36 @@ export {
   type StockState,
   type VariantAvailability,
 } from './queries';
+
+// Admin (write side)
+export {
+  adjustStock,
+  ensureInventoryItems,
+  getDefaultLocationId,
+  hasStockHistory,
+  setLowStockThreshold,
+  type StockAdjustResult,
+} from './commands';
+export {
+  listLowStock,
+  listMovements,
+  listStock,
+  getStockForVariants,
+  STOCK_SORTS,
+  type MovementRow,
+  type StockListQuery,
+  type StockRow,
+  type StockSort,
+} from './admin-queries';
+export {
+  ADJUSTMENT_MODES,
+  ADJUSTMENT_REASONS,
+  lowStockThresholdSchema,
+  MAX_STOCK_QUANTITY,
+  stockAdjustSchema,
+  type AdjustmentMode,
+  type AdjustmentReason,
+  type LowStockThresholdInput,
+  type StockAdjustInput,
+} from './admin-schemas';
+export { availableStock, computeAdjustment, isLowStock } from './adjustment';

@@ -1,15 +1,24 @@
 import { clientEnv } from './env';
 
+/** Local development fallback, served by `src/app/api/media/[...key]/route.ts`. */
+export const LOCAL_MEDIA_BASE_PATH = '/api/media';
+
 /**
- * Public URL of a stored media object. Joins `NEXT_PUBLIC_MEDIA_BASE_URL` and the storage key;
- * without a base URL it returns `fallback` (e.g. `media.url`), or null when there is none.
+ * Public URL of a stored media object. `NEXT_PUBLIC_MEDIA_BASE_URL` points at the bucket or
+ * CDN in production. Without it, an absolute `fallback` (e.g. `media.url` for externally hosted
+ * images) wins, otherwise development serves files from the local media store.
  */
 export function mediaUrl(
   storageKey: string,
   fallback: string | null = null,
   baseUrl: string | undefined = clientEnv.NEXT_PUBLIC_MEDIA_BASE_URL,
-): string | null {
-  if (!baseUrl) return fallback || null;
-  const key = storageKey.replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/');
-  return `${baseUrl.replace(/\/+$/, '')}/${key}`;
+): string {
+  if (!baseUrl && fallback) return fallback;
+  const base = (baseUrl ?? LOCAL_MEDIA_BASE_PATH).replace(/\/+$/, '');
+  const key = storageKey
+    .replace(/^\/+/, '')
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/');
+  return `${base}/${key}`;
 }

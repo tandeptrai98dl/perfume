@@ -52,10 +52,6 @@ async function signIn(page: Page) {
   await expect(page).toHaveURL(/\/admin$/);
 }
 
-test.beforeEach(({}, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'Admin is tested at desktop width');
-});
-
 test('editor manages content from the admin screens', async ({ page, request }) => {
   page.on('dialog', (dialog) => dialog.accept());
   await signIn(page);

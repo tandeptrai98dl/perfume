@@ -35,6 +35,23 @@ export const serverEnvSchema = z
     SENTRY_DSN: z.url().optional(),
     SENTRY_ENVIRONMENT: z.string().min(1).optional(),
     SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
+    /**
+     * Media storage (ARCHITECTURE.md §12 uploads). `s3` works with AWS, MinIO and Vietnamese
+     * S3-compatible providers; `local` writes to MEDIA_LOCAL_DIR and is served by
+     * /api/media (development and tests only). Defaults to `s3` when S3_BUCKET is set.
+     */
+    MEDIA_STORAGE: z.enum(['s3', 'local']).optional(),
+    MEDIA_LOCAL_DIR: z.string().min(1).default('.data/media'),
+    S3_ENDPOINT: z.url().optional(),
+    S3_REGION: z.string().min(1).default('us-east-1'),
+    S3_BUCKET: z.string().min(1).optional(),
+    S3_ACCESS_KEY_ID: z.string().min(1).optional(),
+    S3_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+    /** MinIO and most S3-compatible providers need path-style URLs. */
+    S3_FORCE_PATH_STYLE: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -52,6 +69,20 @@ export const serverEnvSchema = z
         }
       }
     }
+    if (env.S3_BUCKET && !(env.S3_ACCESS_KEY_ID && env.S3_SECRET_ACCESS_KEY)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['S3_ACCESS_KEY_ID'],
+        message: 'S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY are required when S3_BUCKET is set',
+      });
+    }
+    if (env.MEDIA_STORAGE === 's3' && !env.S3_BUCKET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['S3_BUCKET'],
+        message: 'S3_BUCKET is required when MEDIA_STORAGE=s3',
+      });
+    }
     if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {
       ctx.addIssue({
         code: 'custom',
@@ -65,7 +96,7 @@ export const serverEnvSchema = z
 export const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default('Perfume Store'),
   NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
-  /** Public base URL of media in object storage / CDN, e.g. https://cdn.example.vn/media. */
+  /** Public base URL of the media bucket/CDN, e.g. https://cdn.example.vn/media. */
   NEXT_PUBLIC_MEDIA_BASE_URL: z.url().optional(),
 });
 

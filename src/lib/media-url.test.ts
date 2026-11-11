@@ -12,10 +12,10 @@ describe('mediaUrl', () => {
     );
   });
 
-  it('falls back to the stored URL, or null', () => {
+  it('falls back to the stored URL, then to the local media route', () => {
     expect(mediaUrl('x.jpg', 'https://s3.example.vn/x.jpg', undefined)).toBe(
       'https://s3.example.vn/x.jpg',
     );
-    expect(mediaUrl('x.jpg', null, undefined)).toBeNull();
+    expect(mediaUrl('x.jpg', null, undefined)).toBe('/api/media/x.jpg');
   });
 });

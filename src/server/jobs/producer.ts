@@ -25,3 +25,6 @@ export function getProducer(): Promise<PgBoss> {
   });
   return producer;
 }
+
+/** Alias used by the catalogue admin actions (stream B). */
+export const getProducerBoss = getProducer;
