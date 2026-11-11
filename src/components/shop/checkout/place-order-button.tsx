@@ -9,9 +9,12 @@ import { Button } from '@/components/ui/button';
 export function PlaceOrderButton({
   placing,
   paysOnline,
+  waiting = false,
 }: {
   placing: boolean;
   paysOnline: boolean;
+  /** The total is being recomputed: wait for it so the buyer confirms the right amount. */
+  waiting?: boolean;
 }) {
   const t = useTranslations('checkout');
   return (
@@ -20,6 +23,7 @@ export function PlaceOrderButton({
         type="submit"
         size="lg"
         loading={placing}
+        disabled={waiting}
         className="w-full"
         data-testid="place-order"
       >

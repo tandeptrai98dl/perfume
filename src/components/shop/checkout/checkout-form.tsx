@@ -409,7 +409,7 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
               </div>
             )}
           </div>
-          <PlaceOrderButton placing={placing} paysOnline={paysOnline} />
+          <PlaceOrderButton placing={placing} paysOnline={paysOnline} waiting={quoting} />
         </aside>
       </form>
     </Form>

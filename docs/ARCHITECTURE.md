@@ -218,7 +218,7 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 ### 3.4 Order and payment flow
 
 1. Customer clicks "Place order" → Server Action `placeOrder` recomputes every price on the server (client prices are never trusted) and stores the session `locale` on the order.
-2. In one transaction: lock stock rows (`SELECT … FOR UPDATE`), create the order, create `stock_reservations` with `expires_at`, record the coupon redemption, enqueue outbox jobs. Online payment: `status = pending`, reservation 30 min. COD: `status = awaiting_confirmation`, reservation 24 h (D06).
+2. In one transaction: lock stock rows (`SELECT … FOR UPDATE`), create the order, create `stock_reservations` with `expires_at`, record the coupon redemption, enqueue outbox jobs. Online payment, and COD that needs a deposit (D16): `status = pending`, reservation 30 min. Other COD: `status = awaiting_confirmation`, reservation 24 h (D06). The cart row is locked first, so a repeated submit with the same checkout key returns the first order; checkouts using the same coupon are serialized (transaction-scoped advisory lock) so its per-customer limit holds under concurrency.
 3. **Online (VNPay / VietQR):** create a `payments` row expiring in 15 min → redirect or show the QR. If the session expires while the reservation is still valid, the customer can "Retry payment", creating a new payment (method may change).
 4. The gateway calls the IPN/webhook → verify signature + amount + idempotency → add to `amount_paid`. When fully paid: `payment_status = paid`, order moves to `confirmed`, reservations are committed to real stock deductions. The return URL only displays status; it never changes it. An IPN arriving after cancellation records the money, adds the order to the refund queue and alerts staff.
 5. **COD ≤ threshold:** staff confirm by phone/Zalo within 24 h → `confirmed`; otherwise a job cancels the order and releases stock. **COD > threshold (D16):** the customer pays a 20% deposit through steps 3–4 → `payment_status = partially_paid`, order `confirmed`; the carrier collects the balance.
@@ -875,7 +875,8 @@ perfume-store/
 - **COD (D16):** orders ≤ 5,000,000 ₫ are placed directly; above that a 20% deposit via VietQR/VNPay is required (or the customer switches to full prepayment). COD orders wait for staff confirmation; unconfirmed after 24 h → auto-cancel and release stock (D06).
 - **VietQR (payOS):** QR + amount + transfer note containing the order code, 15-minute countdown (on expiry, "Retry payment" if stock is still reserved; method may change), switches to "Paid" when the webhook arrives (3s polling or SSE).
 - **VNPay:** redirect to the gateway, return to `/thanh-toan/ket-qua` (`/en/checkout/result`); status comes only from the IPN.
-- Duplicate protection: idempotency key per checkout session; the submit button locks while sending.
+- Duplicate protection: idempotency key per checkout session (`orders.checkout_key`, generated when the page renders); the submit button locks while sending. The client never sends prices; it sends the total it displayed, and a mismatch is refused ("price changed") instead of charging a different amount. Place-order rate limit: 5 web orders per minute per IP, counted on `orders.ip_address`.
+- Company VAT invoice: company name, tax code, invoice email and a structured company address (province → ward → street), stored as the `billing` row of `order_addresses` and as text in `orders.vat_invoice`.
 - *Acceptance:* Playwright E2E for all three methods (sandbox) in vi and en; two buyers racing for the last unit → exactly one order.
 
 ### 10.5 After purchase (MVP)
