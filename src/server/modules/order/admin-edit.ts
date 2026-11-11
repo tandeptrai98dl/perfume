@@ -48,8 +48,10 @@ import {
   getShippingAddress,
   loadEditCatalog,
   ORDER_EDITED_EVENT,
+  searchEditVariants,
+  type EditVariantOption,
 } from './admin-edit-queries';
-import type { OrderEditInput } from './admin-edit-schemas';
+import type { EditVariantSearchInput, OrderEditInput } from './admin-edit-schemas';
 import { staffOrderActor } from './admin-view';
 import type { OrderStatus } from './state-machine';
 import { lockOrder, recordOrderEvent } from './transition';
@@ -506,6 +508,12 @@ export async function editOrder(
       metadata: {
         version: order.version + 1,
         stock: mode,
+        // Timeline summary (the admin timeline reads metadata only; the full diff is in `diff`).
+        summary: {
+          total: { from: plan.before.total, to: plan.after.total },
+          itemsChanged: plan.lineDiff.length,
+          addressChanged: plan.addressFields.length > 0,
+        },
         shippingFeeOverride: plan.shipping.override,
         ...(plan.shipping.override !== plan.overrideBefore && input.shippingFeeOverride
           ? { shippingFeeOverrideReason: input.shippingFeeOverride.reason }
@@ -585,4 +593,18 @@ export async function editOrder(
       tags,
     };
   });
+}
+
+/** Variant picker of the edit page: labels in the order's locale, never decants. */
+export async function searchOrderEditVariants(
+  ctx: CommandContext,
+  input: EditVariantSearchInput,
+): Promise<CommandResult<EditVariantOption[]>> {
+  assertCan(ctx.actor, 'orders.editBeforeShipping');
+  const [order] = await ctx.db
+    .select({ locale: orders.locale })
+    .from(orders)
+    .where(eq(orders.id, input.orderId));
+  if (!order) throw new DomainError('notFound');
+  return { data: await searchEditVariants(ctx.db, { q: input.q, locale: order.locale }), tags: [] };
 }

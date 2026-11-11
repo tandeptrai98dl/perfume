@@ -9,7 +9,7 @@ import { PageSkeleton } from '@/components/admin/page-skeleton';
 import { requireAdminPage } from '@/server/auth/guards';
 import { hasPermission } from '@/server/auth/permissions';
 import { getDb } from '@/server/db/client';
-import { getAdminOrderDetail } from '@/server/modules/order';
+import { canEditOrder, getAdminOrderDetail } from '@/server/modules/order';
 
 import { isUuid } from '../../_lib/params';
 
@@ -52,6 +52,7 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
         key={order.version}
         order={order}
         canCancelPaid={hasPermission(role, 'orders.cancelPaid')}
+        canEdit={hasPermission(role, 'orders.editBeforeShipping') && canEditOrder(order.status)}
       />
     </>
   );

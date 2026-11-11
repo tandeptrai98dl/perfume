@@ -124,6 +124,7 @@ export { cancelCustomerOrder, CUSTOMER_CANCEL_REASON } from './customer-commands
 export {
   editOrder,
   previewOrderEdit,
+  searchOrderEditVariants,
   type EditCouponOutcome,
   type EditPreviewLine,
   type OrderEditPreview,
