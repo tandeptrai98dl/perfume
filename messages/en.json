@@ -421,5 +421,152 @@
       "tooLong": "The message can be at most {max} characters."
     },
     "linesLabel": "Items in your cart"
+  },
+  "checkout": {
+    "metaTitle": "Checkout",
+    "title": "Checkout",
+    "secure": "Secure checkout",
+    "backToCart": "Back to cart",
+    "steps": {
+      "contact": "Contact",
+      "address": "Delivery address",
+      "shipping": "Delivery method",
+      "payment": "Payment"
+    },
+    "contact": {
+      "email": "Email",
+      "emailHint": "We send your order confirmation here.",
+      "phone": "Mobile number",
+      "phoneHint": "10 digits, e.g. 0912 345 678. The courier calls this number.",
+      "signInPrompt": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "address": {
+      "savedLegend": "Saved addresses",
+      "newAddress": "Use a new address",
+      "fullName": "Full name",
+      "province": "Province / city",
+      "provincePlaceholder": "Choose a province or city",
+      "provinceSearch": "Search provinces…",
+      "ward": "Ward / commune",
+      "wardPlaceholder": "Choose a ward or commune",
+      "wardChooseProvince": "Choose a province first",
+      "wardSearch": "Search wards…",
+      "wardLoading": "Loading wards…",
+      "street": "Street address",
+      "streetHint": "House number, street, building, floor",
+      "noResults": "No matching place.",
+      "note": "Delivery note (optional)",
+      "noteHint": "For example: call before delivery, deliver after 6 pm."
+    },
+    "shipping": {
+      "chooseProvince": "Choose your province to see delivery options.",
+      "none": "We cannot deliver to this address yet. Please contact us.",
+      "eta": "{min}–{max} days",
+      "etaSame": "{days, plural, one {# day} other {# days}}",
+      "free": "Free",
+      "freeOver": "Free on orders from {amount}"
+    },
+    "payment": {
+      "methods": {
+        "cod": {
+          "title": "Cash on delivery (COD)",
+          "description": "Pay the courier in cash when your parcel arrives. We call to confirm your order."
+        },
+        "payos": {
+          "title": "Bank transfer by VietQR",
+          "description": "Scan the QR code with any Vietnamese banking app. Confirmed automatically."
+        },
+        "vnpay": {
+          "title": "VNPay",
+          "description": "Domestic ATM cards, international cards and the VNPay QR wallet."
+        }
+      },
+      "depositTitle": "A deposit is required for this COD order",
+      "depositBody": "Cash-on-delivery orders above {threshold} need a {percent}% deposit of {deposit}, paid online by VietQR or VNPay right after you place the order. The courier collects the balance of {balance}.",
+      "depositAlternative": "Prefer not to pay a deposit? Choose VietQR or VNPay to prepay the full amount."
+    },
+    "vat": {
+      "toggle": "I need a VAT invoice for a company",
+      "hint": "An e-invoice is issued when the order is delivered.",
+      "companyName": "Company name",
+      "taxCode": "Tax code",
+      "taxCodeHint": "10 digits, 10-3 digits for a branch, or a 12-digit personal tax code",
+      "email": "Invoice email",
+      "addressLegend": "Company address"
+    },
+    "consents": {
+      "legend": "Agreements",
+      "terms": "I agree to the <link>Terms of sale</link>.",
+      "privacy": "I agree to the processing of my personal data under the <link>Privacy policy</link>.",
+      "marketing": "Email me about new arrivals and offers (optional). You can unsubscribe at any time."
+    },
+    "review": {
+      "title": "Order summary",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "quantity": "Qty {count}",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "discountWithCode": "Discount ({code})",
+      "shipping": "Delivery",
+      "shippingLater": "Calculated after the address",
+      "shippingFree": "Free",
+      "giftWrap": "Gift wrapping",
+      "giftMessage": "Gift message: “{message}”",
+      "hidePrices": "Prices hidden on the packing slip",
+      "total": "Total",
+      "depositNow": "Deposit to pay now",
+      "balanceOnDelivery": "Balance on delivery",
+      "updating": "Updating the total…",
+      "totalAnnouncement": "Order total: {total}",
+      "editCart": "Edit cart"
+    },
+    "coupon": {
+      "label": "Discount code",
+      "apply": "Apply",
+      "remove": "Remove code {code}",
+      "applied": "Code {code} applied"
+    },
+    "placeOrder": "Place order",
+    "placeOrderPay": "Place order and pay",
+    "placing": "Placing your order…",
+    "placeHint": "Prices are confirmed by our server when you place the order.",
+    "alerts": {
+      "fixErrors": "Please check the highlighted fields.",
+      "cartChanged": "Your cart has changed. Please review it before placing the order.",
+      "priceChanged": "A price or fee has changed since the page loaded. Please check the new total and place the order again.",
+      "rateLimited": "Too many orders from this connection. Please wait a minute and try again.",
+      "unexpected": "We could not place your order. Please try again or contact us.",
+      "quoteFailed": "We could not update the total. Please try again."
+    },
+    "errors": {
+      "invalid": "Please check this field.",
+      "required": "This field is required.",
+      "tooShort": "This is too short.",
+      "tooLong": "This is too long.",
+      "emailInvalid": "Enter a valid email address.",
+      "phoneInvalid": "Enter a 10-digit Vietnamese mobile number, e.g. 0912 345 678.",
+      "selectRequired": "Please choose one.",
+      "taxCodeInvalid": "Enter a valid tax code.",
+      "consentRequired": "Please accept to continue.",
+      "shippingRequired": "Choose a delivery method.",
+      "paymentRequired": "Choose a payment method.",
+      "provinceUnknown": "Choose a province from the list.",
+      "wardMismatch": "This ward does not belong to the chosen province.",
+      "shippingRateUnavailable": "This delivery method is no longer available for your address. Please choose again.",
+      "couponNotFound": "This code does not exist.",
+      "couponInactive": "This code is no longer active.",
+      "couponNotStarted": "This code is not valid yet.",
+      "couponExpired": "This code has expired.",
+      "couponUsageLimit": "This code has been fully used.",
+      "couponPerCustomerLimit": "You have already used this code.",
+      "couponMinSubtotal": "Your order does not reach this code's minimum amount.",
+      "couponNoEligibleItems": "This code does not apply to the items in your cart.",
+      "itemUnavailable": "{name} is no longer available.",
+      "itemQuantityLimit": "{name}: the quantity is above the limit per order.",
+      "itemInsufficientStock": "{name}: not enough stock left.",
+      "cartUnavailable": "Your cart is empty or has already been ordered.",
+      "cartEmpty": "Your cart is empty."
+    }
   }
 }
