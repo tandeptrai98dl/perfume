@@ -505,7 +505,7 @@ export async function getAdminOrderDetail(
       metadata: (event.metadata as Record<string, unknown> | null) ?? null,
     })),
     codRisk,
-    nextStatuses: staffNextStatuses(status, role),
+    nextStatuses: staffNextStatuses(status, role, order.amountPaid),
   };
 }
 

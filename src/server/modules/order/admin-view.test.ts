@@ -34,6 +34,12 @@ describe('staff → state machine actor', () => {
     expect(staffNextStatuses('pending', 'staff')).toEqual(['cancelled']);
     expect(staffNextStatuses('completed', 'owner')).toEqual([]);
     expect(staffNextStatuses('awaiting_confirmation', 'editor')).toEqual([]);
+    // A deposit already paid: only Manager/Owner may cancel.
+    expect(staffNextStatuses('awaiting_confirmation', 'staff', 500_000)).toEqual(['confirmed']);
+    expect(staffNextStatuses('awaiting_confirmation', 'owner', 500_000)).toEqual([
+      'confirmed',
+      'cancelled',
+    ]);
   });
 });
 

@@ -18,10 +18,20 @@ export function staffOrderActor(actor: Actor): OrderActor {
   };
 }
 
-/** Valid transition buttons for this staff member (§11.2 "only valid transition buttons"). */
-export function staffNextStatuses(status: OrderStatus, role: string): OrderStatus[] {
+/**
+ * Valid transition buttons for this staff member (§11.2 "only valid transition buttons").
+ * An order that already holds money can be cancelled only with `orders.cancelPaid`.
+ */
+export function staffNextStatuses(
+  status: OrderStatus,
+  role: string,
+  amountPaid = 0,
+): OrderStatus[] {
   if (!hasPermission(role, 'orders.process')) return [];
-  return nextStatuses(status, hasPermission(role, 'orders.cancelPaid') ? 'manager' : 'staff');
+  const manager = hasPermission(role, 'orders.cancelPaid');
+  return nextStatuses(status, manager ? 'manager' : 'staff').filter(
+    (to) => to !== 'cancelled' || manager || amountPaid <= 0,
+  );
 }
 
 /** RBAC §11.1: contact details need `customers.view` or `customers.viewContactInOrder`. */
