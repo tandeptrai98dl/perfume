@@ -1,7 +1,6 @@
 import { inArray, sql } from 'drizzle-orm';
 
 import type { Locale } from '@/i18n/routing';
-import type { CheckoutPaymentMethod } from '@/lib/checkout/form-schema';
 import type { Database } from '@/server/db/client';
 import { productVariants } from '@/server/db/schema';
 import type { FieldIssue } from '@/server/lib/command-context';
@@ -11,8 +10,9 @@ import { getCommerceSettings, type CommerceSettings } from '@/server/modules/set
 import { quoteShipping, type ShippingQuote } from '@/server/modules/shipping';
 
 import { variantLabel, type SnapshotVariantType } from './labels';
+import { getVariantLines, type LineRequest } from './manual-lines';
 import { priceCart, type CouponRejection, type PricingCoupon, type PricingResult } from './pricing';
-import { checkCartLines } from './rules';
+import { checkCartLines, type OrderPaymentMethod } from './rules';
 
 /*
  * Loads everything a checkout price depends on and prices it with `priceCart` — the same code
@@ -50,11 +50,14 @@ export function couponIssueCode(reason: CouponRejectionReason | CouponRejection)
 }
 
 export type EvaluateInput = {
-  cart: Pick<CartRow, 'id' | 'giftWrap'>;
+  /** Web checkout: the lines (and gift wrap) come from the cart. */
+  cart?: Pick<CartRow, 'id' | 'giftWrap'>;
+  /** Manual (staff) orders: the variants picked on the form, without a cart (§3.4 step 7). */
+  items?: readonly LineRequest[];
   locale: Locale;
   provinceCode?: string | null;
   shippingRateId?: string | null;
-  paymentMethod?: CheckoutPaymentMethod | null;
+  paymentMethod?: OrderPaymentMethod | null;
   couponCode?: string | null;
   customer?: { phone?: string; email?: string; userId?: string | null };
   /**
@@ -117,9 +120,14 @@ export async function evaluateCheckout(
   input: EvaluateInput,
 ): Promise<CheckoutEvaluation> {
   const [cartLines, settings] = await Promise.all([
-    getCartLines(db, { cartId: input.cart.id, locale: input.locale }),
+    input.items
+      ? getVariantLines(db, { items: input.items, locale: input.locale })
+      : input.cart
+        ? getCartLines(db, { cartId: input.cart.id, locale: input.locale })
+        : Promise.resolve([]),
     getCommerceSettings(db),
   ]);
+  const giftWrap = input.cart?.giftWrap ?? false;
   const lines = await withVariantLabels(db, cartLines, input.locale);
   const lineIssues = checkCartLines(lines, settings.cart.maxQuantityPerLine);
   const weightG = lines.reduce((sum, line) => sum + line.weightG * line.quantity, 0);
@@ -146,7 +154,7 @@ export async function evaluateCheckout(
       lines,
       coupon: withCoupon,
       shippingRate: rate ? { fee: rate.fee, freeOverSubtotal: rate.freeOverSubtotal } : null,
-      giftWrap: { enabled: input.cart.giftWrap, fee: settings.giftWrapFee },
+      giftWrap: { enabled: giftWrap, fee: settings.giftWrapFee },
       cod: {
         maxOrderWithoutDeposit: settings.cod.maxOrderWithoutDeposit,
         depositPercent: settings.cod.depositPercent,

@@ -32,6 +32,8 @@ export {
   countRecentOrdersByIp,
   findOrderByCheckoutKey,
   placeOrder,
+  placeOrderInTx,
+  type ManualPlaceOrderInput,
   type PlacedOrder,
   type PlaceOrderDeps,
   type PlaceOrderInput,
@@ -43,5 +45,40 @@ export {
   isOnlineMethod,
   reservationExpiry,
   type InitialOrderStatus,
+  type OrderPaymentMethod,
 } from './rules';
 export { variantLabel } from './labels';
+
+// ---------- Manual orders (wave 2): staff-created orders, same placeOrder rules ----------
+export {
+  getVariantLines,
+  mergeLineRequests,
+  searchOrderableVariants,
+  type LineRequest,
+  type OrderableVariant,
+} from './manual-lines';
+export {
+  placeManualOrder,
+  quoteManualOrder,
+  type ManualOrderQuote,
+  type ManualOrderResult,
+  type ManualQuoteLine,
+} from './manual-order';
+export {
+  customerLookupSchema,
+  MANUAL_ORDER_LIMITS,
+  MANUAL_PAYMENT_OPTIONS,
+  manualFollowUp,
+  manualOrderSchema,
+  manualPaymentMethod,
+  manualQuoteSchema,
+  mergeManualContact,
+  PAYMENT_LINK_PROVIDERS,
+  variantSearchSchema,
+  type ManualFollowUp,
+  type ManualOrderInput,
+  type ManualOrderRawInput,
+  type ManualPaymentOption,
+  type ManualQuoteInput,
+  type PaymentLinkProvider,
+} from './manual-order-schemas';
