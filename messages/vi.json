@@ -1269,7 +1269,7 @@
       "invalidCredentials": "Email hoặc mật khẩu không đúng.",
       "notVerified": "Vui lòng xác nhận email trước. Chúng tôi vừa gửi lại đường dẫn xác nhận cho bạn.",
       "locked": "Tài khoản này đã bị khoá. Vui lòng liên hệ chúng tôi để được hỗ trợ.",
-      "staffAccount": "Tài khoản nhân viên đăng nhập tại trang quản trị.",
+      "staffAccount": "Tài khoản nhân viên đăng nhập tại <link>trang quản trị</link>.",
       "verified": "Email của bạn đã được xác nhận. Chào mừng bạn!",
       "verifyFailed": "Đường dẫn xác nhận không hợp lệ hoặc đã hết hạn. Hãy đăng nhập để nhận đường dẫn mới."
     },

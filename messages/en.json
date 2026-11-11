@@ -441,7 +441,7 @@
       "invalidCredentials": "The email or password is incorrect.",
       "notVerified": "Please confirm your email first. We have sent you a new confirmation link.",
       "locked": "This account is locked. Please contact us for help.",
-      "staffAccount": "Staff accounts sign in through the admin area.",
+      "staffAccount": "Staff accounts sign in through the <link>admin area</link>.",
       "verified": "Your email is confirmed. Welcome!",
       "verifyFailed": "This confirmation link is invalid or has expired. Sign in to receive a new one."
     },
