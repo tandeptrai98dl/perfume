@@ -111,7 +111,7 @@ export async function createTestOrder(options: TestOrderOptions): Promise<TestOr
     await db.query(
       `insert into order_addresses (order_id, type, full_name, phone, province_code, province_name,
          ward_code, ward_name, street)
-       values ($1, 'shipping', 'Khách E2E', '0912345678', '79', 'TP. Hồ Chí Minh', '26734',
+       values ($1, 'shipping', 'Khách E2E', '0912345678', '79', 'TP. Hồ Chí Minh', '26743',
          'Phường Bến Nghé', '1 Lê Lợi')`,
       [id],
     );

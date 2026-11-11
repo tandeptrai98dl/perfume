@@ -12,6 +12,7 @@ export const ORDER_UPDATE_KINDS = [
   'delivered',
   'cancelled',
   'refunded',
+  'updated',
 ] as const;
 export type OrderUpdateKind = (typeof ORDER_UPDATE_KINDS)[number];
 
@@ -29,6 +30,9 @@ export type OrderUpdateProps = {
   /** Amount of the payment that triggered `paymentReceived`. */
   paymentAmount?: number;
   shipment?: ShipmentEmailData | null;
+  /** `updated`: amount still to pay online after the edit, and where to pay it. */
+  amountDueOnline?: number;
+  payUrl?: string | null;
 };
 
 export function orderUpdateSubject(locale: EmailLocale, kind: OrderUpdateKind, code: string) {
@@ -42,6 +46,8 @@ export function OrderUpdateEmail({
   orderUrl,
   paymentAmount,
   shipment,
+  amountDueOnline = 0,
+  payUrl = null,
 }: OrderUpdateProps) {
   const t = emailTranslator(locale);
   const f = emailFormatter(locale);
@@ -126,6 +132,29 @@ export function OrderUpdateEmail({
         </>
       );
       break;
+    case 'updated':
+      body = (
+        <>
+          <Text style={textStyle}>{t('email.order.updated.body', { code })}</Text>
+          {amountDueOnline > 0 && (
+            <Text style={textStyle}>
+              {t('email.order.updated.payDifference', { amount: f.money(amountDueOnline) })}
+            </Text>
+          )}
+          {amountDueOnline > 0 && payUrl && (
+            <EmailButton href={payUrl}>{t('email.order.updated.pay')}</EmailButton>
+          )}
+          {order.amountPaid - order.amountRefunded > order.total && (
+            <Text style={textStyle}>
+              {t('email.order.updated.refund', {
+                amount: f.money(order.amountPaid - order.amountRefunded - order.total),
+              })}
+            </Text>
+          )}
+          <Text style={mutedTextStyle}>{t('email.order.updated.help')}</Text>
+        </>
+      );
+      break;
   }
 
   return (
@@ -142,13 +171,13 @@ export function OrderUpdateEmail({
       <Text style={textStyle}>{t('email.layout.greeting', { name: order.customerName })}</Text>
       {body}
       <EmailButton href={orderUrl}>{t('email.order.viewOrder')}</EmailButton>
-      {(kind === 'shipped' || kind === 'cancelled') && (
+      {(kind === 'shipped' || kind === 'cancelled' || kind === 'updated') && (
         <>
           <OrderItems order={order} t={t} f={f} />
           <OrderTotals order={order} t={t} f={f} />
         </>
       )}
-      {kind === 'shipped' && <DeliveryAddress order={order} t={t} />}
+      {(kind === 'shipped' || kind === 'updated') && <DeliveryAddress order={order} t={t} />}
     </EmailLayout>
   );
 }

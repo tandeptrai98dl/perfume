@@ -8,7 +8,7 @@ const valid: CheckoutFormInput = {
   email: ' Khach@Example.com ',
   phone: '+84 912 345 678',
   fullName: 'Nguyễn Văn A',
-  address: { provinceCode: '79', wardCode: '26734', street: '12 Lê Lợi' },
+  address: { provinceCode: '79', wardCode: '26743', street: '12 Lê Lợi' },
   shippingRateId: '019a0000-0000-7000-8000-000000000001',
   paymentMethod: 'cod',
   couponCode: '',
@@ -92,14 +92,14 @@ describe('checkoutFormSchema', () => {
         companyName: 'Công ty TNHH ABC',
         taxCode: '0312345678-001',
         email: 'Ketoan@ABC.vn',
-        address: { provinceCode: '79', wardCode: '26734', street: '1 Nguyễn Huệ' },
+        address: { provinceCode: '79', wardCode: '26743', street: '1 Nguyễn Huệ' },
       },
     });
     expect(parsed.vatInvoice).toEqual({
       companyName: 'Công ty TNHH ABC',
       taxCode: '0312345678-001',
       email: 'ketoan@abc.vn',
-      address: { provinceCode: '79', wardCode: '26734', street: '1 Nguyễn Huệ' },
+      address: { provinceCode: '79', wardCode: '26743', street: '1 Nguyễn Huệ' },
     });
   });
 
@@ -109,7 +109,7 @@ describe('checkoutFormSchema', () => {
       companyName: 'ABC',
       taxCode,
       email: 'a@b.vn',
-      address: { provinceCode: '79', wardCode: '26734', street: '1 Nguyễn Huệ' },
+      address: { provinceCode: '79', wardCode: '26743', street: '1 Nguyễn Huệ' },
     };
     expect(issues({ ...valid, vatInvoice })).toEqual([]);
   });

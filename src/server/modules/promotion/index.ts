@@ -103,6 +103,9 @@ export async function redeemCoupon(
   await tx.insert(couponRedemptions).values(input);
 }
 
+// Coupons of existing orders (order-edits stream, wave 2).
+export { getCouponTerms, syncOrderRedemption } from './redemptions';
+
 // ---------- Admin (admin-orders stream): coupon management ----------
 export { promotionTags, saveCoupon, setCouponActive } from './commands';
 export {

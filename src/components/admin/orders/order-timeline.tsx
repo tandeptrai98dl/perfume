@@ -38,6 +38,10 @@ export function OrderTimeline({ events }: { events: AdminOrderEvent[] }) {
         return t('timeline.note');
       case 'cod_risk_flagged':
         return t('timeline.cod_risk_flagged');
+      case 'created_by_staff':
+        return t('timeline.created_by_staff');
+      case 'edited':
+        return t('timeline.edited');
       default:
         return t('timeline.other', { type: event.type });
     }
@@ -64,6 +68,7 @@ export function OrderTimeline({ events }: { events: AdminOrderEvent[] }) {
                 })}
               </p>
             )}
+            {event.type === 'edited' && <EditSummary metadata={event.metadata} />}
             {event.message && <p className="text-small whitespace-pre-line">{event.message}</p>}
             <p className="text-small text-taupe-600">
               <time dateTime={new Date(event.createdAt).toISOString()}>
@@ -77,4 +82,31 @@ export function OrderTimeline({ events }: { events: AdminOrderEvent[] }) {
       })}
     </ol>
   );
+}
+
+type EditSummaryData = {
+  total?: { from: number; to: number };
+  itemsChanged?: number;
+  addressChanged?: boolean;
+};
+
+/** One line per kind of change of an `edited` event (amounts, lines, address). */
+function EditSummary({ metadata }: { metadata: Record<string, unknown> | null }) {
+  const t = useTranslations('admin.orders.timeline');
+  const format = useOrderFormat();
+  const summary = (metadata?.summary ?? null) as EditSummaryData | null;
+  if (!summary) return null;
+  const parts: string[] = [];
+  if (summary.total && summary.total.from !== summary.total.to) {
+    parts.push(
+      t('editedTotal', { from: format.vnd(summary.total.from), to: format.vnd(summary.total.to) }),
+    );
+  }
+  if (summary.itemsChanged) parts.push(t('editedItems', { count: summary.itemsChanged }));
+  if (summary.addressChanged) parts.push(t('editedAddress'));
+  if (typeof metadata?.shippingFeeOverrideReason === 'string') {
+    parts.push(t('editedOverride', { reason: metadata.shippingFeeOverrideReason }));
+  }
+  if (parts.length === 0) return null;
+  return <p className="text-small">{parts.join(' · ')}</p>;
 }

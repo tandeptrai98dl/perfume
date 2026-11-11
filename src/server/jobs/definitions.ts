@@ -38,6 +38,15 @@ export const JOBS = {
     schema: z.object({ orderId: z.uuid(), from: z.string(), to: z.string() }),
     queue: retryPolicy,
   },
+  /**
+   * Staff edited the order before shipment (§3.4 step 8): customer "order updated" email with
+   * the new items/totals and, when money is due, the link to pay the difference. `version` is
+   * the order version written by the edit (one e-mail per edit).
+   */
+  'order.updated': {
+    schema: z.object({ orderId: z.uuid(), version: z.number().int().nonnegative() }),
+    queue: retryPolicy,
+  },
   /** A payment succeeded (full, deposit, balance): customer "payment received" email. */
   'payment.received': {
     schema: z.object({ orderId: z.uuid(), paymentId: z.uuid() }),

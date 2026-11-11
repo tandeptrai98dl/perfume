@@ -9,9 +9,20 @@ export {
   completeRefund,
   confirmBankTransfer,
   createCodRemittance,
+  recordManualBankTransfer,
   requestRefund,
+  type ManualTransferResult,
 } from './commands';
 export { queueRefundForCancelledOrder } from './ledger';
+// Order edits before shipment (order-edits stream, wave 2).
+export {
+  editPaymentEffect,
+  settleOrderAfterEdit,
+  type EditPaymentEffect,
+  type EditPaymentInput,
+  type SettledEdit,
+} from './adjustments';
+export { openRefundTotal } from './ledger';
 export {
   cancelUnconfirmedCodOrders,
   completeDeliveredOrders,

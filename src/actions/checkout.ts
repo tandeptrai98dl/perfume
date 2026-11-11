@@ -26,7 +26,9 @@ import {
   type PlacedOrder,
 } from '@/server/modules/checkout';
 import { listWards, type AdminUnit } from '@/server/modules/customer';
+import { createPaymentSession } from '@/server/modules/payment';
 import { grantOrderAccess } from '@/server/order-access';
+import { checkoutResultUrl, paymentDeps } from '@/server/payment-access';
 
 /*
  * Checkout Server Actions (§10.4). The storefront is public, so there is no permission check:
@@ -39,6 +41,9 @@ export type CheckoutActionError =
   DomainErrorCode | 'validation' | 'cartUnavailable' | 'rateLimited' | 'unexpected';
 
 export type CheckoutFailure = { ok: false; error: CheckoutActionError; fieldErrors: FieldIssue[] };
+
+/** VNPay orders go straight to the gateway (§10.4); the client navigates there. */
+export type PlaceOrderRedirect = { ok: true; gatewayUrl: string };
 
 /** Place order 5/min/IP (§12). */
 const PLACE_ORDER_LIMIT_PER_MINUTE = 5;
@@ -57,10 +62,37 @@ function resultPath(order: Pick<PlacedOrder, 'code'>, locale: Locale): string {
 }
 
 /**
- * Places the order and redirects to the localized result page (`/thanh-toan/ket-qua?code=…`,
- * `/en/checkout/result?code=…`), which shows the COD confirmation or the payment step.
+ * VNPay (§10.4 "redirect to the gateway"): opens the first payment session right away so the
+ * buyer lands on VNPay, not on an intermediate page. Null on any failure: the result page then
+ * shows the VNPay button / retry panel, which opens a session itself.
  */
-export async function placeOrderAction(raw: unknown): Promise<CheckoutFailure> {
+async function vnpayGatewayUrl(
+  order: Pick<PlacedOrder, 'orderId' | 'code' | 'locale' | 'paymentMethod' | 'status'>,
+  ip: string | null,
+): Promise<string | null> {
+  if (order.paymentMethod !== 'vnpay' || order.status !== 'pending') return null;
+  try {
+    const session = await createPaymentSession(await paymentDeps(), {
+      orderId: order.orderId,
+      provider: 'vnpay',
+      ipAddress: ip,
+      returnUrl: checkoutResultUrl(order.locale, order.code),
+    });
+    return session.checkoutUrl;
+  } catch (error) {
+    logger.warn('checkout.vnpay_session_failed', errorFields(error));
+    return null;
+  }
+}
+
+/**
+ * Places the order and redirects to the localized result page (`/thanh-toan/ket-qua?code=…`,
+ * `/en/checkout/result?code=…`), which shows the COD confirmation or the payment step. VNPay
+ * orders instead return the gateway URL (an external page: the client navigates there).
+ */
+export async function placeOrderAction(
+  raw: unknown,
+): Promise<CheckoutFailure | PlaceOrderRedirect> {
   const parsed = checkoutFormSchema.safeParse(raw);
   if (!parsed.success) {
     return { ok: false, error: 'validation', fieldErrors: zodIssues(parsed.error) };
@@ -70,12 +102,14 @@ export async function placeOrderAction(raw: unknown): Promise<CheckoutFailure> {
 
   // A repeated submit (double click, retry after a network error) returns the first order.
   const existing = await findOrderByCheckoutKey(db, form.checkoutKey);
+  const context = await requestContext();
   if (existing) {
     await grantOrderAccess(existing.code);
+    const gatewayUrl = await vnpayGatewayUrl(existing, context.ip);
+    if (gatewayUrl) return { ok: true, gatewayUrl };
     redirect(resultPath(existing, existing.locale));
   }
 
-  const context = await requestContext();
   if (context.ip && (await countRecentOrdersByIp(db, context.ip)) >= PLACE_ORDER_LIMIT_PER_MINUTE) {
     return { ok: false, error: 'rateLimited', fieldErrors: [] };
   }
@@ -120,6 +154,8 @@ export async function placeOrderAction(raw: unknown): Promise<CheckoutFailure> {
     });
   }
   await grantOrderAccess(order.code);
+  const gatewayUrl = await vnpayGatewayUrl(order, context.ip);
+  if (gatewayUrl) return { ok: true, gatewayUrl };
   redirect(resultPath(order, order.locale));
 }
 

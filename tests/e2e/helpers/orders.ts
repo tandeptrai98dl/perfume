@@ -65,7 +65,9 @@ export async function createE2EOrder(input: E2EOrderInput): Promise<E2EOrder> {
     const id = uuidv7();
     const code = orderCode();
     const price = Number(line.price);
-    const phone = input.phone ?? `09${String(randomInt(10_000_000, 99_999_999))}`;
+    const phone =
+      input.phone ??
+      `09${[1, 3, 4, 6, 7, 8][randomInt(0, 6)]}${String(randomInt(0, 10_000_000)).padStart(7, '0')}`;
     const status = input.status ?? 'awaiting_confirmation';
     await db.query('begin');
     try {
@@ -99,7 +101,7 @@ export async function createE2EOrder(input: E2EOrderInput): Promise<E2EOrder> {
       await db.query(
         `insert into order_addresses (order_id, type, full_name, phone, province_code, province_name,
            ward_code, ward_name, street)
-         values ($1, 'shipping', $2, $3, '79', 'Thành phố Hồ Chí Minh', '26734', 'Phường Bến Thành',
+         values ($1, 'shipping', $2, $3, '79', 'Thành phố Hồ Chí Minh', '26743', 'Phường Bến Thành',
            '12 Lê Lợi')`,
         [id, input.customerName, phone],
       );

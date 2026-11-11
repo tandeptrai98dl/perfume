@@ -78,6 +78,13 @@ async function clientIp(): Promise<string | null> {
   return forwarded && isIP(forwarded) ? forwarded : null;
 }
 
+/**
+ * Session creations in flight in this process, per order. Next.js can render this page twice
+ * for one request (e.g. the place-order redirect); both renders must share one session instead
+ * of the second cancelling the first while its gateway call is still running.
+ */
+const firstSessions = new Map<string, Promise<boolean>>();
+
 /** The first visit after placing an online order opens its first payment session. */
 async function ensureFirstSession(
   result: CheckoutResult,
@@ -87,6 +94,20 @@ async function ensureFirstSession(
 ): Promise<boolean> {
   const view = resultView(result, now);
   if (view.panel !== 'start' || providers.length === 0) return false;
+  const pending = firstSessions.get(result.orderId);
+  if (pending) return pending;
+  const created = openFirstSession(result, providers, locale).finally(() =>
+    firstSessions.delete(result.orderId),
+  );
+  firstSessions.set(result.orderId, created);
+  return created;
+}
+
+async function openFirstSession(
+  result: CheckoutResult,
+  providers: OnlineProvider[],
+  locale: Locale,
+): Promise<boolean> {
   const preferred = providers.find((p) => p === result.paymentMethod) ?? providers[0]!;
   try {
     await createPaymentSession(await paymentDeps(), {
@@ -112,6 +133,7 @@ const ICONS: Record<ResultState, typeof CheckCircle2> = {
   codDepositReceived: CheckCircle2,
   awaitingPayment: Clock,
   depositRequired: Clock,
+  balanceDue: Clock,
   sessionExpired: AlertCircle,
   windowClosed: XCircle,
   cancelled: XCircle,
@@ -173,6 +195,8 @@ async function ResultContent({
       case 'awaitingPayment':
       case 'depositRequired':
         return t(`state.${state}.description`, { amount: vnd(result.onlineDue), time });
+      case 'balanceDue':
+        return t('state.balanceDue.description', { amount: vnd(result.onlineDue) });
       case 'sessionExpired':
         return t('state.sessionExpired.description', { time });
       case 'other':

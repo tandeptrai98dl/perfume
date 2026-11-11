@@ -50,3 +50,11 @@ export {
   restockOrder,
   type ReservationLine,
 } from './reservations';
+
+// Order edits before shipment (wave 2, order-edits stream).
+export {
+  activeReservationExpiry,
+  adjustOrderStock,
+  type AdjustOrderStockInput,
+  type OrderStockChange,
+} from './order-adjustments';
