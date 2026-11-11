@@ -480,31 +480,32 @@ async function runListing(
  */
 export async function getProductListing(
   input: ListingQueryInput,
-  db: Executor = getDb(),
+  dbOverride?: Executor,
 ): Promise<ListingResult> {
   const query = listingQuerySchema.parse(input);
-  return runListing(db, query, query.scope, true);
+  return runListing(dbOverride ?? getDb(), query, query.scope, true);
 }
 
 /** Featured products for the home page (featured first, then newest). */
 export async function getFeaturedProducts(
   locale: CatalogLocale,
   limit = 8,
-  db: Executor = getDb(),
+  dbOverride?: Executor,
 ): Promise<ProductSummary[]> {
   const query = listingQuerySchema.parse({ locale, pageSize: Math.min(limit, 24) });
-  return (await runListing(db, query, query.scope, false)).items;
+  return (await runListing(dbOverride ?? getDb(), query, query.scope, false)).items;
 }
 
 /** Up to `limit` visible products in the given order (unknown or hidden ids are skipped). */
 export async function getProductSummariesByIds(
   locale: CatalogLocale,
   ids: readonly string[],
-  db: Executor = getDb(),
+  dbOverride?: Executor,
 ): Promise<ProductSummary[]> {
   if (ids.length === 0) return [];
   const query = listingQuerySchema.parse({ locale, pageSize: Math.min(ids.length, 60) });
-  return (await runListing(db, query, { kind: 'ids', ids: [...ids] }, false)).items;
+  return (await runListing(dbOverride ?? getDb(), query, { kind: 'ids', ids: [...ids] }, false))
+    .items;
 }
 
 /** Same brand or shared scent family first; excludes the product itself. */
@@ -512,8 +513,9 @@ export async function getRelatedProducts(
   locale: CatalogLocale,
   productId: string,
   limit = 4,
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<ProductSummary[]> {
+  const db = dbOverride ?? getDb();
   const result = await db.execute<{ id: string }>(sql`
     select p.id
     from products p
@@ -545,13 +547,14 @@ export async function getRelatedProducts(
 /** 6 products + 3 brands for the search dialog (§10.1). */
 export async function getSearchSuggestions(
   input: { locale: CatalogLocale; q: string },
-  db: Executor = getDb(),
+  dbOverride?: Executor,
 ): Promise<SearchSuggestions> {
   const { locale, q } = suggestionsQuerySchema.parse(input);
   const normalized = normalizeSearchQuery(q);
   if (normalized.terms.length === 0 && normalized.genders.length === 0) {
     return { products: [], brands: [] };
   }
+  const db = dbOverride ?? getDb();
 
   const listingQuery = listingQuerySchema.parse({ locale, q, sort: 'relevance', pageSize: 6 });
   const brandMatch =
@@ -609,11 +612,12 @@ async function visibleLocaleSlugs(
 /** Product page data by slug in one locale; null when missing or not visible there. */
 export async function getProductDetail(
   input: { locale: CatalogLocale; slug: string },
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<ProductDetail | null> {
   const parsed = productSlugQuerySchema.safeParse(input);
   if (!parsed.success) return null;
   const { locale, slug } = parsed.data;
+  const db = dbOverride ?? getDb();
 
   const core = await db.execute<Record<string, unknown>>(sql`
     select p.id, p.gender::text as gender, p.concentration::text as concentration,
@@ -818,8 +822,9 @@ export async function getProductDetail(
  */
 export async function getVariantOffers(
   productId: string,
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<VariantOffer[]> {
+  const db = dbOverride ?? getDb();
   const variants = await db
     .select({
       id: productVariants.id,
@@ -858,8 +863,9 @@ export async function getVariantOffers(
 /** Brands A–Z visible in a locale, with their number of visible products. */
 export async function getBrandList(
   locale: CatalogLocale,
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<BrandListItem[]> {
+  const db = dbOverride ?? getDb();
   const result = await db.execute<Record<string, unknown>>(sql`
     select b.id, b.name, bt.slug, b.country, b.is_featured,
       (
@@ -897,11 +903,12 @@ export async function getBrandList(
 
 export async function getBrandBySlug(
   input: { locale: CatalogLocale; slug: string },
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<BrandPage | null> {
   const parsed = productSlugQuerySchema.safeParse(input);
   if (!parsed.success) return null;
   const { locale, slug } = parsed.data;
+  const db = dbOverride ?? getDb();
 
   const [row] = await db
     .select({
@@ -960,9 +967,9 @@ export async function getBrandBySlug(
 export async function getFeaturedBrands(
   locale: CatalogLocale,
   limit = 12,
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<BrandListItem[]> {
-  const all = await getBrandList(locale, db);
+  const all = await getBrandList(locale, dbOverride);
   return all.filter((brand) => brand.isFeatured && brand.productCount > 0).slice(0, limit);
 }
 
@@ -970,11 +977,12 @@ export async function getFeaturedBrands(
 
 export async function getCategoryBySlug(
   input: { locale: CatalogLocale; slug: string },
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<TaxonomyPage | null> {
   const parsed = productSlugQuerySchema.safeParse(input);
   if (!parsed.success) return null;
   const { locale, slug } = parsed.data;
+  const db = dbOverride ?? getDb();
   const [row] = await db
     .select({
       id: categories.id,
@@ -1011,11 +1019,12 @@ export async function getCategoryBySlug(
 
 export async function getCollectionBySlug(
   input: { locale: CatalogLocale; slug: string },
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<TaxonomyPage | null> {
   const parsed = productSlugQuerySchema.safeParse(input);
   if (!parsed.success) return null;
   const { locale, slug } = parsed.data;
+  const db = dbOverride ?? getDb();
   const activeWindow = sql`(${collections.startsAt} is null or ${collections.startsAt} <= now())
     and (${collections.endsAt} is null or ${collections.endsAt} > now())`;
   const [row] = await db
@@ -1059,11 +1068,12 @@ export async function getCollectionBySlug(
 /** Scent families have no `is_published`: a translation row in the locale makes it visible. */
 export async function getFamilyBySlug(
   input: { locale: CatalogLocale; slug: string },
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<TaxonomyPage | null> {
   const parsed = productSlugQuerySchema.safeParse(input);
   if (!parsed.success) return null;
   const { locale, slug } = parsed.data;
+  const db = dbOverride ?? getDb();
   const [row] = await db
     .select({
       id: fragranceFamilies.id,

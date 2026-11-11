@@ -47,10 +47,11 @@ export function availableQuantitySql(variantId: AnyPgColumn | SQL): SQL<number> 
 /** Live availability per variant. Variants without an inventory row are out of stock. */
 export async function getVariantAvailability(
   variantIds: readonly string[],
-  db: Database = getDb(),
+  dbOverride?: Database,
 ): Promise<Map<string, VariantAvailability>> {
   const result = new Map<string, VariantAvailability>();
   if (variantIds.length === 0) return result;
+  const db = dbOverride ?? getDb();
 
   const rows = await db
     .select({
