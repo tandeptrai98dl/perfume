@@ -18,14 +18,30 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // Animations off (globals.css honours prefers-reduced-motion): no mid-transition
+    // screenshots or axe colour-contrast readings on fading toasts and sheets.
+    contextOptions: { reducedMotion: 'reduce' },
     ...(channel ? { channel } : {}),
   },
   projects: [
+    // Storefront specs run first on both viewports; admin specs (≥1024 px UI) create catalogue
+    // data, so they run afterwards and clean up, keeping storefront counts on the seed exact.
     {
       name: 'desktop',
+      testIgnore: /admin-.*\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
     },
-    { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 375, height: 812 } } },
+    {
+      name: 'mobile',
+      testIgnore: /admin-.*\.spec\.ts/,
+      use: { ...devices['Pixel 7'], viewport: { width: 375, height: 812 } },
+    },
+    {
+      name: 'admin',
+      testMatch: /admin-.*\.spec\.ts/,
+      dependencies: ['desktop', 'mobile'],
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
+    },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined

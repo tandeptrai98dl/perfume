@@ -17,6 +17,7 @@ import {
 import { alias } from 'drizzle-orm/pg-core';
 
 import type { RichTextDoc } from '@/lib/rich-text';
+import { localeFallbacks, type LocalizedSlugs } from '@/lib/seo/locale-fallbacks';
 import type { Database } from '@/server/db/client';
 import {
   bannerTranslations,
@@ -45,7 +46,6 @@ import { menuItemsSchema } from './schemas';
 import {
   INFO_PAGE_KEYS,
   isInfoPageKey,
-  LOCALES,
   type Alternates,
   type BannerPlacement,
   type BannerView,
@@ -616,32 +616,7 @@ export async function loadRouteTableVersion(db: DbExecutor): Promise<string> {
   return result.rows[0]?.version ?? '0';
 }
 
-type LocalizedEntity = {
-  slugs: Partial<Record<Locale, { slug: string; published: boolean }>>;
-};
-
-function localeFallbacks(
-  entities: LocalizedEntity[],
-  path: (slug: string, locale: Locale) => string,
-  listing: (locale: Locale) => string,
-): { path: string; toPath: string }[] {
-  const out: { path: string; toPath: string }[] = [];
-  for (const entity of entities) {
-    for (const source of LOCALES) {
-      const from = entity.slugs[source];
-      if (!from?.published) continue;
-      for (const target of LOCALES) {
-        if (target === source) continue;
-        const wrong = path(from.slug, target);
-        const to = entity.slugs[target];
-        const real = to ? path(to.slug, target) : null;
-        if (wrong === real && to?.published) continue;
-        out.push({ path: wrong, toPath: to?.published ? real! : listing(target) });
-      }
-    }
-  }
-  return out;
-}
+type LocalizedEntity = { slugs: LocalizedSlugs };
 
 function collect<T extends { id: string; locale: Locale; slug: string; published: boolean }>(
   rows: T[],

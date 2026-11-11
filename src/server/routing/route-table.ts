@@ -1,4 +1,9 @@
 import { getDb } from '@/server/db/client';
+import {
+  catalogRouteData,
+  loadCatalogRouteEntities,
+  loadCatalogRouteVersion,
+} from '@/server/modules/catalog';
 import { errorFields, logger } from '@/server/lib/logger';
 import {
   createRouteTableCache,
@@ -9,17 +14,39 @@ import {
 } from '@/server/modules/content';
 
 /**
- * Process-wide route table for `src/proxy.ts` (redirects + content URL existence) and the
- * redirect hit counter, flushed in batches so a redirect never costs a write per request.
+ * Process-wide route table for `src/proxy.ts` (redirects + which content and catalogue URLs
+ * exist) and the redirect hit counter, flushed in batches so a redirect never costs a write
+ * per request. Catalogue saves are picked up by the version check (at most every 5 s).
  */
+
+async function loadVersion(): Promise<string> {
+  const db = getDb();
+  const [content, catalog] = await Promise.all([
+    loadRouteTableVersion(db),
+    loadCatalogRouteVersion(db),
+  ]);
+  return `${content}|${catalog}`;
+}
 
 const cache = createRouteTableCache({
   load: async () => {
     const db = getDb();
-    const [version, data] = await Promise.all([loadRouteTableVersion(db), loadRouteTableData(db)]);
-    return { version, data };
+    const [version, data, catalogEntities] = await Promise.all([
+      loadVersion(),
+      loadRouteTableData(db),
+      loadCatalogRouteEntities(db),
+    ]);
+    const catalog = catalogRouteData(catalogEntities);
+    return {
+      version,
+      data: {
+        redirects: data.redirects,
+        contentPaths: [...data.contentPaths, ...catalog.contentPaths],
+        localeFallbacks: [...data.localeFallbacks, ...catalog.localeFallbacks],
+      },
+    };
   },
-  loadVersion: () => loadRouteTableVersion(getDb()),
+  loadVersion,
   onError: (error) => logger.warn('routeTable.load.failed', errorFields(error)),
 });
 

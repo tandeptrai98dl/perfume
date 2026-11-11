@@ -52,10 +52,6 @@ async function signIn(page: Page) {
   await expect(page).toHaveURL(/\/admin$/);
 }
 
-test.beforeEach(({}, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'Admin is tested at desktop width');
-});
-
 test('editor manages content from the admin screens', async ({ page, request }) => {
   page.on('dialog', (dialog) => dialog.accept());
   await signIn(page);
@@ -93,10 +89,14 @@ test('editor manages content from the admin screens', async ({ page, request }) 
 
   // Changing a published slug inserts a 301 automatically.
   await page.goto(editUrl);
-  await page
+  // Wait for hydration: typing into server-rendered inputs before React attaches is lost.
+  await page.waitForLoadState('networkidle');
+  const slugField = page
     .getByRole('tabpanel', { name: 'Tiếng Việt' })
-    .getByLabel('Đường dẫn (slug)')
-    .fill(`trang-moi-${run}`);
+    .getByLabel('Đường dẫn (slug)');
+  await expect(slugField).toHaveValue(`trang-thu-${run}`);
+  await slugField.fill(`trang-moi-${run}`);
+  await expect(slugField).toHaveValue(`trang-moi-${run}`);
   await page.getByRole('button', { name: 'Lưu' }).click();
   await expect(page.getByText('Đã lưu')).toBeVisible();
   const moved = await request.get(`/chinh-sach/trang-thu-${run}`, { maxRedirects: 0 });

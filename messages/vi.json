@@ -12,7 +12,10 @@
     "account": "Tài khoản",
     "cart": "Giỏ hàng",
     "search": "Tìm kiếm",
-    "skipToContent": "Bỏ qua đến nội dung chính"
+    "skipToContent": "Bỏ qua đến nội dung chính",
+    "openMenu": "Mở menu",
+    "mobileNav": "Menu chính",
+    "searchShortcut": "Tìm kiếm (Ctrl K)"
   },
   "localeSwitcher": {
     "label": "Ngôn ngữ",
@@ -22,7 +25,15 @@
   "home": {
     "eyebrow": "Nước hoa chính hãng",
     "title": "Hương thơm dành riêng cho bạn",
-    "subtitle": "Tuyển chọn nước hoa niche và designer, cam kết chính hãng 100%."
+    "subtitle": "Tuyển chọn nước hoa niche và designer, cam kết chính hãng 100%.",
+    "cta": "Khám phá nước hoa",
+    "featuredEyebrow": "Tuyển chọn",
+    "featuredTitle": "Hương thơm nổi bật",
+    "viewAllProducts": "Xem tất cả nước hoa",
+    "brandsEyebrow": "Nhà hương",
+    "brandsTitle": "Thương hiệu",
+    "viewAllBrands": "Xem tất cả thương hiệu",
+    "featuredEmpty": "Bộ sưu tập đang được cập nhật."
   },
   "notFound": {
     "title": "Không tìm thấy trang",
@@ -117,6 +128,212 @@
     "region": "Thông báo",
     "dismiss": "Ẩn thông báo"
   },
+  "catalog": {
+    "gender": {
+      "male": "Nam",
+      "female": "Nữ",
+      "unisex": "Unisex"
+    },
+    "concentration": {
+      "edc": "Eau de Cologne",
+      "edt": "Eau de Toilette",
+      "edp": "Eau de Parfum",
+      "parfum": "Parfum",
+      "extrait": "Extrait de Parfum",
+      "other": "Nồng độ khác"
+    },
+    "concentrationShort": {
+      "edc": "EDC",
+      "edt": "EDT",
+      "edp": "EDP",
+      "parfum": "Parfum",
+      "extrait": "Extrait",
+      "other": "Khác"
+    },
+    "variantType": {
+      "full_size": "Chai tiêu chuẩn",
+      "travel": "Bản du lịch",
+      "tester": "Tester",
+      "gift_set": "Bộ quà tặng"
+    },
+    "variantLabel": {
+      "full_size": "{size} ml",
+      "travel": "Du lịch {size} ml",
+      "tester": "Tester {size} ml",
+      "gift_set": "Bộ quà tặng {size} ml"
+    },
+    "noteLayer": {
+      "top": "Hương đầu",
+      "middle": "Hương giữa",
+      "base": "Hương cuối"
+    },
+    "season": {
+      "spring": "Xuân",
+      "summer": "Hạ",
+      "autumn": "Thu",
+      "winter": "Đông"
+    },
+    "occasion": {
+      "day": "Ban ngày",
+      "night": "Buổi tối",
+      "office": "Công sở",
+      "date": "Hẹn hò",
+      "special": "Dịp đặc biệt",
+      "casual": "Thường ngày"
+    },
+    "noImage": "Chưa có hình ảnh"
+  },
+  "listing": {
+    "perfumesTitle": "Nước hoa chính hãng",
+    "perfumesIntro": "Toàn bộ nước hoa niche và designer chính hãng, được tuyển chọn và nhập khẩu chính ngạch.",
+    "perfumesDescription": "Mua nước hoa chính hãng: lọc theo thương hiệu, nhóm hương, nồng độ và mức giá. Giao hàng toàn quốc.",
+    "resultCount": "{count, plural, =0 {Không có sản phẩm} other {# sản phẩm}}",
+    "pageTitle": "{title} – Trang {page}",
+    "updating": "Đang cập nhật kết quả…",
+    "filters": {
+      "title": "Bộ lọc",
+      "open": "Bộ lọc",
+      "openWithCount": "Bộ lọc ({count})",
+      "clearAll": "Xoá tất cả",
+      "showResults": "{count, plural, =0 {Không có sản phẩm} other {Xem # sản phẩm}}",
+      "brand": "Thương hiệu",
+      "gender": "Giới tính",
+      "family": "Nhóm hương",
+      "note": "Nốt hương",
+      "concentration": "Nồng độ",
+      "type": "Loại",
+      "price": "Mức giá",
+      "anyPrice": "Mọi mức giá",
+      "inStock": "Chỉ hiện sản phẩm còn hàng",
+      "availability": "Tình trạng",
+      "optionCount": "{label} ({count})",
+      "active": "Bộ lọc đang chọn",
+      "remove": "Bỏ lọc: {label}",
+      "priceRange": {
+        "under2m": "Dưới 2 triệu",
+        "from2to4m": "2 – 4 triệu",
+        "from4to6m": "4 – 6 triệu",
+        "over6m": "Trên 6 triệu"
+      },
+      "priceChip": "Giá: {range}",
+      "inStockChip": "Còn hàng"
+    },
+    "sort": {
+      "label": "Sắp xếp",
+      "featured": "Nổi bật",
+      "newest": "Mới nhất",
+      "price_asc": "Giá: thấp đến cao",
+      "price_desc": "Giá: cao đến thấp",
+      "best_selling": "Bán chạy",
+      "relevance": "Phù hợp nhất"
+    },
+    "noResults": {
+      "title": "Không có sản phẩm phù hợp",
+      "description": "Thử bỏ bớt bộ lọc hoặc khám phá toàn bộ bộ sưu tập.",
+      "clearFilters": "Xoá bộ lọc",
+      "browseAll": "Xem tất cả nước hoa"
+    },
+    "brandsTitle": "Thương hiệu nước hoa",
+    "brandsIntro": "Các nhà hương niche và designer chúng tôi phân phối chính hãng, sắp xếp theo bảng chữ cái.",
+    "brandsDescription": "Danh sách thương hiệu nước hoa chính hãng từ A đến Z.",
+    "brandsIndex": "Chọn chữ cái",
+    "brandProductCount": "{count, plural, =0 {Chưa có sản phẩm} other {# sản phẩm}}",
+    "brandsEmpty": "Chưa có thương hiệu nào.",
+    "brandDescription": "Nước hoa {brand} chính hãng – xem toàn bộ sản phẩm, giá và tình trạng hàng.",
+    "brandTitle": "Nước hoa {brand}",
+    "collectionDescription": "Bộ sưu tập {name}: nước hoa chính hãng được tuyển chọn.",
+    "categoryDescription": "{name} chính hãng – lọc theo thương hiệu, nhóm hương và mức giá.",
+    "familyTitle": "Nước hoa {name}",
+    "familyDescription": "Khám phá nước hoa {name}: các mùi hương chính hãng cùng nhóm hương.",
+    "familyEyebrow": "Nhóm hương",
+    "collectionEyebrow": "Bộ sưu tập",
+    "categoryEyebrow": "Danh mục",
+    "brandEyebrow": "Thương hiệu"
+  },
+  "product": {
+    "viewBrand": "Xem tất cả nước hoa {brand}",
+    "size": "Dung tích",
+    "selectedSize": "Đã chọn: {label}",
+    "unavailableOption": "{label} – hết hàng",
+    "stock": {
+      "inStock": "Còn hàng",
+      "lowStock": "{count, plural, other {Chỉ còn # sản phẩm}}",
+      "outOfStock": "Hết hàng"
+    },
+    "noVariants": "Sản phẩm tạm thời chưa có sẵn.",
+    "purchaseSoon": "Đặt hàng trực tuyến sẽ sớm ra mắt. Liên hệ chúng tôi để được tư vấn và giữ hàng.",
+    "sku": "Mã sản phẩm: {sku}",
+    "productLine": "Nồng độ khác",
+    "productLineLabel": "Chọn nồng độ",
+    "pyramid": {
+      "title": "Tháp hương",
+      "empty": "Thông tin nốt hương đang được cập nhật."
+    },
+    "profile": {
+      "title": "Đặc điểm mùi hương",
+      "longevity": "Độ lưu hương",
+      "sillage": "Độ toả hương",
+      "scale": "{value}/5",
+      "seasons": "Mùa phù hợp",
+      "occasions": "Dịp sử dụng",
+      "families": "Nhóm hương",
+      "gender": "Dành cho",
+      "concentration": "Nồng độ",
+      "releaseYear": "Năm ra mắt",
+      "perfumer": "Nhà pha chế"
+    },
+    "description": "Mô tả",
+    "details": "Thông tin chi tiết",
+    "compliance": {
+      "title": "Thông tin sản phẩm theo quy định",
+      "countryOfOrigin": "Xuất xứ",
+      "responsibleImporter": "Tổ chức chịu trách nhiệm & nhập khẩu",
+      "cosmeticNotificationNo": "Số tiếp nhận phiếu công bố mỹ phẩm",
+      "ingredients": "Thành phần",
+      "warnings": "Cảnh báo",
+      "pending": "Đang cập nhật"
+    },
+    "authenticity": {
+      "title": "Cam kết chính hãng 100%",
+      "description": "Nhập khẩu chính ngạch, đầy đủ hoá đơn chứng từ. Hoàn tiền nếu không chính hãng."
+    },
+    "returns": "Đổi trả trong 7 ngày khi còn nguyên seal; lỗi từ nhà sản xuất được đổi mới hoặc hoàn tiền 100%.",
+    "brandStory": "Về {brand}",
+    "related": "Có thể bạn cũng thích",
+    "gallery": {
+      "label": "Hình ảnh sản phẩm",
+      "zoom": "Phóng to hình ảnh",
+      "zoomTitle": "{name} – hình {index}",
+      "thumbnail": "Hình {index} trên {total}"
+    },
+    "metaDescription": "{name} – {concentration} của {brand}. Nước hoa chính hãng, giao hàng toàn quốc.",
+    "breadcrumbPerfumes": "Nước hoa"
+  },
+  "search": {
+    "title": "Tìm kiếm",
+    "metaDescription": "Tìm nước hoa theo tên, thương hiệu hoặc nhóm hương.",
+    "label": "Tìm nước hoa",
+    "placeholder": "Tên nước hoa, thương hiệu, nhóm hương…",
+    "submit": "Tìm kiếm",
+    "resultsFor": "Kết quả cho “{query}”",
+    "fuzzyNotice": "Không có kết quả khớp chính xác – đây là các kết quả gần đúng.",
+    "prompt": "Nhập tên nước hoa, thương hiệu hoặc nhóm hương để bắt đầu.",
+    "noResults": {
+      "title": "Không tìm thấy kết quả cho “{query}”",
+      "description": "Kiểm tra chính tả, dùng ít từ hơn hoặc thử một nhóm hương như “gỗ”, “hoa”."
+    },
+    "dialog": {
+      "open": "Tìm kiếm",
+      "title": "Tìm kiếm sản phẩm",
+      "products": "Sản phẩm",
+      "brands": "Thương hiệu",
+      "seeAll": "Xem tất cả kết quả cho “{query}”",
+      "empty": "Không có gợi ý phù hợp.",
+      "loading": "Đang tìm…",
+      "hint": "Nhấn Enter để xem tất cả kết quả",
+      "error": "Không tải được gợi ý. Vui lòng thử lại."
+    }
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
@@ -130,7 +347,20 @@
       "posts": "Bài viết",
       "topics": "Chủ đề",
       "navigation": "Menu điều hướng",
-      "redirects": "Chuyển hướng"
+      "redirects": "Chuyển hướng",
+      "label": "Điều hướng quản trị",
+      "open": "Mở menu quản trị",
+      "catalog": "Danh mục hàng",
+      "products": "Sản phẩm",
+      "brands": "Thương hiệu",
+      "productLines": "Dòng sản phẩm",
+      "categories": "Danh mục",
+      "collections": "Bộ sưu tập",
+      "families": "Nhóm hương",
+      "notes": "Nốt hương",
+      "inventory": "Kho hàng",
+      "stock": "Tồn kho",
+      "movements": "Lịch sử nhập xuất"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -398,6 +628,521 @@
         "forbidden": "Bạn không có quyền thực hiện thao tác này.",
         "validation": "Vui lòng kiểm tra lại các trường được đánh dấu.",
         "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+      }
+    },
+    "skipToContent": "Bỏ qua đến nội dung chính",
+    "status": {
+      "draft": "Nháp",
+      "active": "Đang bán",
+      "archived": "Lưu trữ",
+      "published": "Đã xuất bản",
+      "missing": "Chưa có",
+      "inactive": "Ngừng bán",
+      "low": "Sắp hết",
+      "out": "Hết hàng",
+      "visible": "Hiển thị",
+      "hidden": "Ẩn"
+    },
+    "table": {
+      "loading": "Đang tải…",
+      "count": "{total, plural, other {# kết quả}}",
+      "bulkActions": "Thao tác hàng loạt",
+      "selected": "Đã chọn {count}",
+      "clearSelection": "Bỏ chọn",
+      "selectAll": "Chọn tất cả dòng trên trang",
+      "selectRow": "Chọn dòng",
+      "range": "{from}–{to} trên {total}",
+      "pageSize": "Số dòng",
+      "pagination": "Phân trang",
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "page": "Trang {page}/{totalPages}",
+      "actions": "Thao tác"
+    },
+    "confirm": {
+      "typeToConfirm": "Nhập “{text}” để xác nhận",
+      "cancel": "Huỷ"
+    },
+    "translation": {
+      "locale": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "status": {
+        "missing": "Chưa có",
+        "draft": "Chưa xuất bản",
+        "published": "Đã xuất bản"
+      },
+      "tabsLabel": "Ngôn ngữ nội dung",
+      "addEnglish": "Thêm bản tiếng Anh",
+      "removeEnglish": "Xoá bản tiếng Anh",
+      "englishMissing": "Chưa có bản tiếng Anh. Trang tiếng Anh sẽ không hiển thị mục này.",
+      "englishHint": "Bản tiếng Anh do biên tập viên tiếng Anh viết hoặc duyệt, chỉ hiển thị khi được xuất bản (không dùng bản dịch máy).",
+      "isPublished": "Xuất bản bản {locale}",
+      "viRequired": "Bản tiếng Việt là bắt buộc."
+    },
+    "slug": {
+      "label": "Đường dẫn (slug)",
+      "hint": "Tự tạo từ tên: chữ thường không dấu, số và dấu gạch ngang.",
+      "regenerate": "Tạo lại từ tên",
+      "publishedWarning": "Đổi đường dẫn của trang đã xuất bản sẽ tạo chuyển hướng 301 từ địa chỉ cũ."
+    },
+    "seo": {
+      "title": "SEO",
+      "seoTitle": "Tiêu đề SEO",
+      "seoDescription": "Mô tả SEO",
+      "counter": "{count}/{max} ký tự",
+      "tooLong": "Dài hơn khuyến nghị: Google có thể cắt bớt.",
+      "preview": "Xem trước kết quả tìm kiếm Google",
+      "fallbackHint": "Để trống để dùng tên và mô tả mặc định."
+    },
+    "form": {
+      "save": "Lưu",
+      "create": "Tạo",
+      "cancel": "Huỷ",
+      "saved": "Đã lưu thay đổi",
+      "created": "Đã tạo",
+      "deleted": "Đã xoá",
+      "delete": "Xoá",
+      "edit": "Sửa",
+      "new": "Thêm mới",
+      "back": "Quay lại",
+      "none": "Không có",
+      "optional": "(không bắt buộc)",
+      "fixErrors": "Vui lòng kiểm tra các trường được đánh dấu.",
+      "unsaved": "Có thay đổi chưa lưu",
+      "yes": "Có",
+      "no": "Không",
+      "choose": "Chọn…",
+      "image": "Ảnh",
+      "removeImage": "Bỏ ảnh",
+      "upload": "Tải ảnh lên"
+    },
+    "errors": {
+      "validation": "Dữ liệu chưa hợp lệ. Vui lòng kiểm tra lại.",
+      "unauthorized": "Phiên đăng nhập đã hết hạn hoặc bạn không có quyền.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "notFound": "Không tìm thấy.",
+      "conflict": "Dữ liệu vừa được người khác thay đổi. Tải lại trang để xem bản mới nhất.",
+      "slugTaken": "Đường dẫn này đã được dùng.",
+      "skuTaken": "Mã SKU đã tồn tại.",
+      "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+      "forbiddenField": "Bạn không có quyền sửa giá hoặc thêm biến thể.",
+      "invalid": "Giá trị không hợp lệ.",
+      "inUse": "Không thể xoá vì mục này đang được sử dụng.",
+      "insufficientStock": "Không đủ tồn kho cho điều chỉnh này.",
+      "storageNotConfigured": "Chưa cấu hình nơi lưu trữ ảnh.",
+      "required": "Bắt buộc nhập.",
+      "tooLong": "Quá dài.",
+      "tooSmall": "Giá trị quá nhỏ.",
+      "tooLarge": "Giá trị quá lớn.",
+      "integer": "Phải là số nguyên.",
+      "slugInvalid": "Chỉ dùng chữ thường không dấu, số và dấu gạch ngang.",
+      "skuInvalid": "SKU chỉ gồm chữ in hoa, số và các ký tự . _ -",
+      "barcodeInvalid": "Mã vạch gồm 8–14 chữ số.",
+      "compareAtNotHigher": "Giá gốc phải cao hơn giá bán.",
+      "duplicate": "Bị trùng.",
+      "oneDefaultVariant": "Chọn đúng một biến thể mặc định.",
+      "onePrimaryFamily": "Chọn đúng một nhóm hương chính.",
+      "variantsMissing": "Không thể xoá biến thể đã lưu; hãy chuyển sang ngừng bán.",
+      "activeNeedsVariant": "Sản phẩm đang bán cần ít nhất một biến thể đang bán.",
+      "activeNeedsVietnamese": "Cần xuất bản bản tiếng Việt trước.",
+      "tooDeep": "Danh mục chỉ có tối đa 2 cấp.",
+      "lineBrandMismatch": "Dòng sản phẩm không thuộc thương hiệu đã chọn.",
+      "lineHasProducts": "Không thể đổi thương hiệu của dòng đang có sản phẩm.",
+      "endBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu.",
+      "noChange": "Số lượng không thay đổi.",
+      "wrongDirection": "Số lượng không khớp với lý do (nhập hàng/trả hàng phải tăng, hư hỏng phải giảm).",
+      "reasonRequired": "Chọn lý do điều chỉnh.",
+      "emptyFile": "Tệp trống.",
+      "fileTooLarge": "Ảnh vượt quá 10 MB.",
+      "unsupportedType": "Chỉ chấp nhận ảnh JPEG, PNG, WebP hoặc AVIF.",
+      "corruptImage": "Không đọc được ảnh."
+    },
+    "brands": {
+      "title": "Thương hiệu",
+      "description": "Tên thương hiệu không dịch; đường dẫn, câu chuyện và SEO theo từng ngôn ngữ.",
+      "new": "Thêm thương hiệu",
+      "createTitle": "Thêm thương hiệu",
+      "search": "Tìm theo tên",
+      "empty": "Chưa có thương hiệu nào.",
+      "columns": {
+        "name": "Tên",
+        "country": "Quốc gia",
+        "status": "Trạng thái",
+        "translations": "Bản dịch",
+        "products": "Sản phẩm",
+        "updated": "Cập nhật"
+      },
+      "fields": {
+        "name": "Tên thương hiệu",
+        "nameHint": "Tên thương hiệu giữ nguyên ở mọi ngôn ngữ.",
+        "country": "Quốc gia (mã ISO 2 chữ, ví dụ FR)",
+        "featured": "Thương hiệu nổi bật",
+        "status": "Trạng thái",
+        "story": "Câu chuyện thương hiệu",
+        "logo": "Logo"
+      },
+      "deleteTitle": "Xoá thương hiệu “{name}”?",
+      "deleteDescription": "Thương hiệu bị ẩn khỏi cửa hàng. Chỉ xoá được khi không còn sản phẩm.",
+      "allStatuses": "Mọi trạng thái"
+    },
+    "productLines": {
+      "title": "Dòng sản phẩm",
+      "description": "Nhóm các nồng độ (EDT, EDP, Parfum) của cùng một mùi hương.",
+      "new": "Thêm dòng sản phẩm",
+      "editTitle": "Sửa dòng sản phẩm",
+      "search": "Tìm theo tên hoặc thương hiệu",
+      "empty": "Chưa có dòng sản phẩm nào.",
+      "columns": {
+        "name": "Tên dòng",
+        "brand": "Thương hiệu",
+        "products": "Sản phẩm"
+      },
+      "fields": {
+        "name": "Tên dòng",
+        "brand": "Thương hiệu"
+      },
+      "deleteTitle": "Xoá dòng “{name}”?",
+      "deleteDescription": "Các sản phẩm thuộc dòng này sẽ không còn được nhóm với nhau."
+    },
+    "categories": {
+      "title": "Danh mục",
+      "description": "Cây danh mục 2 cấp, dùng cho điều hướng và bộ lọc.",
+      "new": "Thêm danh mục",
+      "createTitle": "Thêm danh mục",
+      "search": "Tìm theo tên",
+      "empty": "Chưa có danh mục nào.",
+      "columns": {
+        "name": "Tên",
+        "slug": "Đường dẫn",
+        "translations": "Bản dịch",
+        "products": "Sản phẩm",
+        "order": "Thứ tự"
+      },
+      "fields": {
+        "name": "Tên danh mục",
+        "parent": "Danh mục cha",
+        "noParent": "Không có (danh mục gốc)",
+        "sortOrder": "Thứ tự hiển thị",
+        "description": "Mô tả",
+        "parentLocked": "Danh mục đang có danh mục con nên phải là danh mục gốc."
+      },
+      "deleteTitle": "Xoá danh mục “{name}”?",
+      "deleteDescription": "Danh mục bị ẩn khỏi cửa hàng. Cần xoá các danh mục con trước."
+    },
+    "collections": {
+      "title": "Bộ sưu tập",
+      "description": "Tuyển chọn sản phẩm theo thứ tự thủ công.",
+      "new": "Thêm bộ sưu tập",
+      "createTitle": "Thêm bộ sưu tập",
+      "search": "Tìm theo tên",
+      "empty": "Chưa có bộ sưu tập nào.",
+      "columns": {
+        "name": "Tên",
+        "status": "Hiển thị",
+        "schedule": "Thời gian",
+        "translations": "Bản dịch",
+        "products": "Sản phẩm"
+      },
+      "fields": {
+        "name": "Tên bộ sưu tập",
+        "description": "Mô tả",
+        "isActive": "Đang hiển thị",
+        "startsAt": "Bắt đầu",
+        "endsAt": "Kết thúc",
+        "hero": "Ảnh bìa"
+      },
+      "products": {
+        "title": "Sản phẩm trong bộ sưu tập",
+        "hint": "Kéo thả hoặc dùng nút lên/xuống để sắp xếp, rồi lưu thứ tự.",
+        "add": "Thêm sản phẩm",
+        "search": "Tìm sản phẩm để thêm",
+        "noResults": "Không tìm thấy sản phẩm.",
+        "empty": "Chưa có sản phẩm nào.",
+        "save": "Lưu thứ tự",
+        "saved": "Đã lưu danh sách sản phẩm",
+        "moveUp": "Đưa {name} lên",
+        "moveDown": "Đưa {name} xuống",
+        "remove": "Bỏ {name} khỏi bộ sưu tập",
+        "moved": "{name}: vị trí {position}",
+        "saveFirst": "Lưu bộ sưu tập trước khi thêm sản phẩm."
+      },
+      "always": "Luôn hiển thị",
+      "deleteTitle": "Xoá bộ sưu tập “{name}”?",
+      "deleteDescription": "Bộ sưu tập và thứ tự sản phẩm sẽ bị xoá vĩnh viễn."
+    },
+    "taxonomy": {
+      "family": {
+        "title": "Nhóm hương",
+        "description": "Nhóm hương (gỗ, hoa, cam chanh…) có trang riêng trên cửa hàng.",
+        "new": "Thêm nhóm hương",
+        "createTitle": "Thêm nhóm hương",
+        "empty": "Chưa có nhóm hương nào.",
+        "deleteTitle": "Xoá nhóm hương “{name}”?",
+        "deleteDescription": "Chỉ xoá được khi không sản phẩm nào dùng nhóm hương này."
+      },
+      "note": {
+        "title": "Nốt hương",
+        "description": "Nốt hương dùng cho tháp hương của sản phẩm.",
+        "new": "Thêm nốt hương",
+        "createTitle": "Thêm nốt hương",
+        "empty": "Chưa có nốt hương nào.",
+        "deleteTitle": "Xoá nốt hương “{name}”?",
+        "deleteDescription": "Chỉ xoá được khi không sản phẩm nào dùng nốt hương này."
+      },
+      "search": "Tìm theo tên",
+      "columns": {
+        "name": "Tên",
+        "enName": "Tên tiếng Anh",
+        "slug": "Đường dẫn",
+        "products": "Sản phẩm"
+      },
+      "fields": {
+        "name": "Tên",
+        "description": "Mô tả",
+        "image": "Ảnh minh hoạ"
+      }
+    },
+    "products": {
+      "title": "Sản phẩm",
+      "description": "Mỗi nồng độ là một sản phẩm; dung tích và giá nằm ở biến thể.",
+      "new": "Thêm sản phẩm",
+      "createTitle": "Thêm sản phẩm",
+      "createDescription": "Tạo bản nháp, sau đó bổ sung biến thể, hình ảnh và nội dung.",
+      "search": "Tìm theo tên, thương hiệu hoặc SKU",
+      "empty": "Chưa có sản phẩm nào.",
+      "columns": {
+        "name": "Sản phẩm",
+        "brand": "Thương hiệu",
+        "concentration": "Nồng độ",
+        "status": "Trạng thái",
+        "english": "Tiếng Anh",
+        "variants": "Biến thể",
+        "price": "Giá từ",
+        "stock": "Có thể bán",
+        "updated": "Cập nhật"
+      },
+      "filters": {
+        "status": "Trạng thái",
+        "allStatuses": "Mọi trạng thái",
+        "brand": "Thương hiệu",
+        "allBrands": "Mọi thương hiệu"
+      },
+      "bulk": {
+        "archive": "Lưu trữ",
+        "draft": "Chuyển về nháp",
+        "done": "Đã cập nhật {count} sản phẩm",
+        "failed": "{count} sản phẩm không cập nhật được"
+      },
+      "create": {
+        "submit": "Tạo bản nháp",
+        "noLine": "Không thuộc dòng nào"
+      },
+      "tabs": {
+        "details": "Thông tin",
+        "variants": "Biến thể & giá",
+        "scent": "Mùi hương",
+        "media": "Hình ảnh",
+        "seo": "SEO",
+        "compliance": "Pháp lý"
+      },
+      "actions": {
+        "publish": "Xuất bản",
+        "unpublish": "Chuyển về nháp",
+        "archive": "Lưu trữ",
+        "duplicate": "Nhân bản",
+        "duplicated": "Đã tạo bản sao (nháp)",
+        "statusChanged": "Đã đổi trạng thái",
+        "delete": "Xoá sản phẩm",
+        "deleteTitle": "Xoá sản phẩm “{name}”?",
+        "deleteDescription": "Sản phẩm bị ẩn khỏi cửa hàng và chuyển vào lưu trữ. Lịch sử đơn hàng và tồn kho được giữ lại.",
+        "saveFirst": "Lưu các thay đổi trước khi đổi trạng thái."
+      },
+      "fields": {
+        "brand": "Thương hiệu",
+        "productLine": "Dòng sản phẩm",
+        "gender": "Giới tính",
+        "concentration": "Nồng độ",
+        "name": "Tên sản phẩm",
+        "subtitle": "Mô tả ngắn",
+        "description": "Mô tả chi tiết",
+        "descriptionHint": "Viết riêng cho từng ngôn ngữ, tối thiểu 150 từ; không sao chép từ hãng.",
+        "releaseYear": "Năm ra mắt",
+        "perfumer": "Nhà pha chế",
+        "longevity": "Độ lưu hương (1–5)",
+        "sillage": "Độ toả hương (1–5)",
+        "seasons": "Mùa phù hợp",
+        "occasions": "Dịp sử dụng",
+        "featured": "Sản phẩm nổi bật",
+        "categories": "Danh mục",
+        "notSet": "Chưa đặt"
+      },
+      "gender": {
+        "male": "Nam",
+        "female": "Nữ",
+        "unisex": "Unisex"
+      },
+      "concentration": {
+        "edc": "Eau de Cologne",
+        "edt": "Eau de Toilette",
+        "edp": "Eau de Parfum",
+        "parfum": "Parfum",
+        "extrait": "Extrait de Parfum",
+        "other": "Khác"
+      },
+      "seasons": {
+        "spring": "Xuân",
+        "summer": "Hạ",
+        "autumn": "Thu",
+        "winter": "Đông"
+      },
+      "occasions": {
+        "day": "Ban ngày",
+        "night": "Buổi tối",
+        "office": "Công sở",
+        "casual": "Thường ngày",
+        "date": "Hẹn hò",
+        "special": "Dịp đặc biệt"
+      },
+      "variants": {
+        "add": "Thêm biến thể",
+        "empty": "Chưa có biến thể. Thêm ít nhất một biến thể trước khi xuất bản.",
+        "sku": "SKU",
+        "barcode": "Mã vạch",
+        "size": "Dung tích (ml)",
+        "type": "Loại",
+        "price": "Giá bán (đ)",
+        "compareAt": "Giá gốc (đ)",
+        "cost": "Giá vốn (đ)",
+        "weight": "Khối lượng (g)",
+        "default": "Mặc định",
+        "active": "Đang bán",
+        "stock": "Tồn kho",
+        "remove": "Bỏ biến thể chưa lưu",
+        "row": "Biến thể {index}",
+        "pricesLocked": "Bạn chỉ được xem giá. Quản lý hoặc chủ cửa hàng mới được đổi giá hoặc thêm biến thể.",
+        "stockHint": "Tồn kho điều chỉnh tại mục Kho hàng."
+      },
+      "variantType": {
+        "full_size": "Chai đầy đủ",
+        "travel": "Du lịch",
+        "tester": "Tester",
+        "gift_set": "Bộ quà tặng"
+      },
+      "scent": {
+        "notes": "Tháp hương",
+        "layers": {
+          "top": "Hương đầu",
+          "middle": "Hương giữa",
+          "base": "Hương cuối"
+        },
+        "addNote": "Thêm nốt {layer}",
+        "removeNote": "Bỏ {name}",
+        "families": "Nhóm hương",
+        "addFamily": "Thêm nhóm hương",
+        "primary": "Nhóm chính",
+        "removeFamily": "Bỏ {name}",
+        "none": "Chưa chọn"
+      },
+      "media": {
+        "title": "Hình ảnh sản phẩm",
+        "dropHint": "Kéo thả ảnh vào đây hoặc chọn tệp. JPEG, PNG, WebP hoặc AVIF; tối đa 10 MB. Ảnh được nén lại và xoá thông tin EXIF.",
+        "choose": "Chọn ảnh",
+        "uploading": "Đang tải lên {name}…",
+        "uploaded": "Đã tải lên {name}",
+        "failed": "Không tải lên được {name}: {reason}",
+        "altVi": "Mô tả ảnh (tiếng Việt)",
+        "altEn": "Mô tả ảnh (tiếng Anh)",
+        "variant": "Gắn với biến thể",
+        "allVariants": "Mọi biến thể",
+        "moveUp": "Đưa ảnh {index} lên",
+        "moveDown": "Đưa ảnh {index} xuống",
+        "remove": "Bỏ ảnh {index}",
+        "empty": "Chưa có ảnh nào.",
+        "cover": "Ảnh đại diện",
+        "imageLabel": "Ảnh {index}",
+        "dimensions": "{width}×{height} px"
+      },
+      "compliance": {
+        "hint": "Thông tin bắt buộc theo quy định về mỹ phẩm, hiển thị trên trang sản phẩm.",
+        "countryOfOrigin": "Xuất xứ",
+        "importer": "Tổ chức, cá nhân chịu trách nhiệm đưa sản phẩm ra thị trường",
+        "notificationNo": "Số tiếp nhận phiếu công bố mỹ phẩm",
+        "ingredients": "Thành phần",
+        "warnings": "Cảnh báo, hướng dẫn an toàn"
+      }
+    },
+    "inventory": {
+      "title": "Tồn kho",
+      "description": "Tồn kho theo từng biến thể tại kho chính.",
+      "search": "Tìm theo SKU, sản phẩm hoặc thương hiệu",
+      "lowOnly": "Chỉ hàng sắp hết",
+      "empty": "Không có biến thể nào.",
+      "lowStockTitle": "Sắp hết hàng",
+      "lowStockEmpty": "Không có biến thể nào sắp hết.",
+      "columns": {
+        "product": "Sản phẩm",
+        "sku": "SKU",
+        "onHand": "Thực có",
+        "reserved": "Đang giữ",
+        "available": "Có thể bán",
+        "threshold": "Ngưỡng cảnh báo",
+        "status": "Tình trạng"
+      },
+      "filter": {
+        "label": "Lọc",
+        "all": "Tất cả biến thể",
+        "low": "Sắp hết hàng"
+      },
+      "adjust": {
+        "open": "Điều chỉnh",
+        "openFor": "Điều chỉnh tồn kho {sku}",
+        "title": "Điều chỉnh tồn kho",
+        "summary": "{sku} · thực có {onHand}, đang giữ {reserved}",
+        "mode": "Cách nhập",
+        "modeDelta": "Cộng hoặc trừ",
+        "modeSet": "Số lượng kiểm đếm",
+        "quantity": "Số lượng",
+        "quantityHintDelta": "Nhập số âm để giảm (ví dụ -2).",
+        "quantityHintSet": "Số lượng thực tế đếm được trong kho.",
+        "reason": "Lý do",
+        "note": "Ghi chú",
+        "preview": "Sau điều chỉnh: thực có {onHand}",
+        "submit": "Lưu điều chỉnh",
+        "done": "Đã cập nhật {sku}: thực có {onHand}"
+      },
+      "reasons": {
+        "purchase": "Nhập hàng",
+        "return": "Khách trả hàng",
+        "damage": "Hư hỏng, thất lạc",
+        "adjustment": "Kiểm kê",
+        "sale": "Bán hàng",
+        "reserve": "Giữ hàng",
+        "release": "Trả lại hàng giữ"
+      },
+      "threshold": {
+        "label": "Ngưỡng cảnh báo cho {sku}",
+        "save": "Lưu ngưỡng",
+        "saved": "Đã lưu ngưỡng cảnh báo"
+      },
+      "movements": {
+        "title": "Lịch sử nhập xuất",
+        "description": "Nhật ký mọi thay đổi tồn kho; không thể sửa hoặc xoá.",
+        "search": "Tìm theo SKU hoặc sản phẩm",
+        "empty": "Chưa có thay đổi tồn kho nào.",
+        "forVariant": "Chỉ hiển thị biến thể {sku}",
+        "showAll": "Xem tất cả",
+        "columns": {
+          "time": "Thời gian",
+          "product": "Sản phẩm",
+          "sku": "SKU",
+          "delta": "Thay đổi",
+          "reason": "Lý do",
+          "note": "Ghi chú",
+          "actor": "Người thực hiện"
+        },
+        "system": "Hệ thống"
       }
     }
   }

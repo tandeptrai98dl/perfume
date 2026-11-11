@@ -1,6 +1,8 @@
 import 'server-only';
 
 import { getContentSitemapEntries } from '@/data/content';
+import { getCatalogSitemapEntities } from '@/server/catalog-cache';
+import { catalogSitemapEntries, type CatalogRouteKind } from '@/server/modules/catalog';
 import { localizedPath } from '@/lib/seo/paths';
 import { urlsFromAlternates, type SitemapUrl } from '@/lib/seo/sitemap';
 
@@ -53,7 +55,24 @@ const journal: SitemapProvider = {
   },
 };
 
-export const SITEMAP_PROVIDERS: readonly SitemapProvider[] = [staticPages, contentPages, journal];
+function catalogProvider(id: string, kind: CatalogRouteKind): SitemapProvider {
+  return {
+    id,
+    urls: async (origin) =>
+      urlsFromAlternates(origin, catalogSitemapEntries(await getCatalogSitemapEntities(), kind)),
+  };
+}
+
+export const SITEMAP_PROVIDERS: readonly SitemapProvider[] = [
+  staticPages,
+  catalogProvider('products', 'product'),
+  catalogProvider('brands', 'brand'),
+  catalogProvider('categories', 'category'),
+  catalogProvider('collections', 'collection'),
+  catalogProvider('scent-families', 'family'),
+  contentPages,
+  journal,
+];
 
 export function findSitemapProvider(id: string): SitemapProvider | undefined {
   return SITEMAP_PROVIDERS.find((provider) => provider.id === id);
