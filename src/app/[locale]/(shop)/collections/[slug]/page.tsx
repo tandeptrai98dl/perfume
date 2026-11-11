@@ -6,7 +6,7 @@ import { placeholderParams } from '../../_lib/seo';
 import { TaxonomyListingPage, taxonomyMetadata } from '../../_lib/taxonomy-page';
 
 export const generateStaticParams = placeholderParams;
-/** Blocks on the slug lookup so unknown slugs return a real 404 (see PLACEHOLDER_SLUG). */
+/** The page awaits its slug outside Suspense on purpose (see PLACEHOLDER_SLUG). */
 export const instant = false;
 
 export async function generateMetadata({

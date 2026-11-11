@@ -55,8 +55,12 @@ export function truncate(text: string, max = 155): string {
 
 /**
  * Slug pages list one placeholder in generateStaticParams: it is not a valid slug, so the
- * build renders a 404 without touching the database, while real slugs render on first
- * request and are then cached (ISR). Awaiting params outside Suspense keeps real 404 statuses.
+ * build renders it as not found without touching the database (no DB at build time). Real
+ * slugs render on first request and are then cached (ISR) with their cache tags.
+ *
+ * Unknown slugs: the first request streams a 200 with `noindex` (Cache Components send the
+ * shell first); later requests get the cached 404. A hard 404 on the first request needs a
+ * slug check in proxy.ts (see the report / stream C).
  */
 export const PLACEHOLDER_SLUG = '__placeholder__';
 

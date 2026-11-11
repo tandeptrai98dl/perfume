@@ -21,7 +21,7 @@ async function expectNoAxeViolations(page: Page) {
 function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() === 'error') errors.push(`${message.text()} (${message.location().url})`);
   });
   page.on('pageerror', (error) => errors.push(error.message));
   return errors;
@@ -100,9 +100,9 @@ for (const flow of flows) {
       const errors = collectConsoleErrors(page);
       await page.goto(flow.listing);
       await expect(page.getByRole('heading', { level: 1, name: flow.heading })).toBeVisible();
-      // Interact only once streamed sections have hydrated (a modal sheet opened earlier
+      // Interact only once the streamed document has loaded (a modal sheet opened earlier
       // would mark not-yet-hydrated siblings aria-hidden and trigger a hydration warning).
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await expect(cards(page)).toHaveCount(flow.locale === 'vi' ? 4 : 3);
 
       await applyFilter(page, flow.filter, flow.sheet);
@@ -111,7 +111,6 @@ for (const flow of flows) {
 
       // Reload keeps the filters (URL state).
       await page.reload();
-      await page.waitForLoadState('networkidle');
       await expect(cards(page)).toHaveCount(2);
       await expect(
         page.getByRole('link', { name: new RegExp(flow.filter.source.replace('^', '')) }).first(),
@@ -199,8 +198,13 @@ test.describe('English visibility (ADR-0021)', () => {
       // innerText: earlier routes stay in the DOM as hidden <Activity> content.
       await expect(page.locator('body')).not.toContainText('Hoa Đêm', { useInnerText: true });
     }
-    const response = await page.goto('/en/products/atelier-suong-hoa-dem-edp');
-    expect(response?.status()).toBe(404);
+    // Not found and never indexed. The first request streams a 200 + noindex (Cache
+    // Components send the shell first); later requests get the cached 404.
+    await page.goto('/en/products/atelier-suong-hoa-dem-edp');
+    await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
+    await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute('content', /noindex/);
+    const again = await page.goto('/en/products/atelier-suong-hoa-dem-edp');
+    expect(again?.status()).toBe(404);
   });
 
   test('the switcher sends an untranslated product to the English listing', async ({ page }) => {
@@ -256,10 +260,12 @@ test.describe('search dialog', () => {
   test('Ctrl+K opens suggestions; Enter shows all results', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('link', { name: 'Tìm kiếm' })).toBeVisible();
-    await page.waitForLoadState('networkidle'); // hydrated: the shortcut listener is attached
-    await page.keyboard.press('Control+K');
+    // Retry until hydrated: the shortcut listener is attached on mount.
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
+    await expect(async () => {
+      await page.keyboard.press('Control+K');
+      await expect(dialog).toBeVisible({ timeout: 1_000 });
+    }).toPass();
     await dialog.getByRole('combobox').fill('lumi');
     await expect(dialog.getByRole('option', { name: /Cèdre Nocturne EDT/ })).toBeVisible();
     await expect(dialog.getByRole('option', { name: 'Maison Lumière', exact: true })).toBeVisible();
