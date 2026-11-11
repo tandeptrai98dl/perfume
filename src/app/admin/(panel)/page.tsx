@@ -1,9 +1,19 @@
 import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 
+import { PageSkeleton } from '@/components/admin/page-skeleton';
 import { requireAdminPage } from '@/server/auth/guards';
 import { isStaffRole } from '@/server/auth/permissions';
 
-export default async function AdminDashboardPage() {
+export default function AdminDashboardPage() {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <Dashboard />
+    </Suspense>
+  );
+}
+
+async function Dashboard() {
   const { user } = await requireAdminPage();
   const t = await getTranslations({ locale: 'vi', namespace: 'admin' });
   const role = user.role ?? 'customer';

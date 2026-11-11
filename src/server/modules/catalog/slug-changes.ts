@@ -1,5 +1,8 @@
 import { routing, type Locale } from '@/i18n/routing';
+import { storefrontPath, type SlugEntityType } from '@/lib/storefront-path';
 import type { Tx } from '@/server/lib/command-context';
+
+export { storefrontPath, type SlugEntityType };
 
 /**
  * Slug changes on published pages must keep their old URL alive with a 301
@@ -7,8 +10,6 @@ import type { Tx } from '@/server/lib/command-context';
  * report changes and call an optional hook inside the same transaction; the content module
  * plugs its redirect writer in there.
  */
-
-export type SlugEntityType = 'product' | 'brand' | 'category' | 'collection' | 'family';
 
 export type SlugChange = {
   entityType: SlugEntityType;
@@ -23,19 +24,6 @@ export type SlugChange = {
 
 /** Runs inside the command's transaction; throwing rolls the whole change back. */
 export type SlugChangeHook = (tx: Tx, changes: SlugChange[]) => Promise<void>;
-
-const PATTERNS = {
-  product: '/products/[slug]',
-  brand: '/brands/[slug]',
-  category: '/categories/[slug]',
-  collection: '/collections/[slug]',
-  family: '/scent-families/[slug]',
-} as const satisfies Record<SlugEntityType, keyof typeof routing.pathnames>;
-
-export function storefrontPath(entityType: SlugEntityType, locale: Locale, slug: string): string {
-  const localized = routing.pathnames[PATTERNS[entityType]][locale].replace('[slug]', slug);
-  return locale === routing.defaultLocale ? localized : `/${locale}${localized}`;
-}
 
 type SlugState = { slug: string; isPublished?: boolean } | null | undefined;
 
