@@ -230,3 +230,29 @@ describe('commerce lookups', () => {
     expect(settings.cart.maxQuantityPerLine).toBe(5);
   });
 });
+
+describe('cart read API', () => {
+  it('returns live prices, availability and names with a Vietnamese fallback', async () => {
+    const { carts: cartsTable, cartItems: items } = await import('@/server/db/schema');
+    const { findActiveCart, getCartLines, hashCartToken, newCartToken } =
+      await import('@/server/modules/cart');
+    const token = newCartToken();
+    const [cart] = await db
+      .insert(cartsTable)
+      .values({ tokenHash: hashCartToken(token), expiresAt: new Date(Date.now() + 86_400_000) })
+      .returning();
+    await setStock(4);
+    await db.insert(items).values({ cartId: cart!.id, variantId, quantity: 2, priceWhenAdded: 1 });
+    expect((await findActiveCart(db, { token }))?.id).toBe(cart!.id);
+    const [line] = await getCartLines(db, { cartId: cart!.id, locale: 'en' });
+    expect(line).toMatchObject({
+      variantId,
+      quantity: 2,
+      available: 4,
+      purchasable: true,
+      priceWhenAdded: 1,
+    });
+    expect(line!.unitPrice).toBeGreaterThan(0);
+    expect(line!.productName.length).toBeGreaterThan(0);
+  });
+});
