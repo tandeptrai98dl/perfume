@@ -82,7 +82,8 @@
     "metaTitle": "Quản trị — Perfume Store",
     "nav": {
       "dashboard": "Tổng quan",
-      "signOut": "Đăng xuất"
+      "signOut": "Đăng xuất",
+      "overview": "Tổng quan"
     },
     "dashboard": {
       "title": "Tổng quan",
