@@ -27,6 +27,11 @@ const REUSE_MARGIN_MS = 60_000;
 const MIN_SESSION_MS = 2 * 60_000;
 
 const PAYABLE_STATUSES = ['pending', 'awaiting_confirmation'];
+/**
+ * Stock already deducted: the only online money still possible is the difference after an
+ * admin edit raised the total (§3.4 step 8). No reservation to check or extend.
+ */
+const BALANCE_STATUSES = ['confirmed', 'processing'];
 
 type PaymentRow = typeof payments.$inferSelect;
 type OrderRow = typeof orders.$inferSelect;
@@ -119,10 +124,11 @@ export async function createPaymentSession(
 
   const prepared = await deps.db.transaction(async (tx) => {
     const order = await lockOrder(tx, input.orderId);
-    if (!PAYABLE_STATUSES.includes(order.status)) throw invalid('notPayable');
+    const balance = BALANCE_STATUSES.includes(order.status);
+    if (!PAYABLE_STATUSES.includes(order.status) && !balance) throw invalid('notPayable');
     const amount = nextSessionAmount(order);
     if (amount <= 0) throw invalid('nothingDue');
-    const kind = sessionKind(order.paymentMethod);
+    const kind = balance ? 'adjustment' : sessionKind(order.paymentMethod);
 
     const [reusable] = await tx
       .select()
@@ -141,23 +147,28 @@ export async function createPaymentSession(
       .limit(1);
     if (reusable) return { order, payment: reusable, reused: true };
 
-    const reservedUntil = await reservationExpiry(tx, order.id);
-    if (!reservedUntil || reservedUntil.getTime() <= now.getTime()) {
-      throw invalid('reservationExpired');
-    }
     const settings = await getCommerceSettings(tx);
     const sessionMinutes = settings.checkout.paymentSessionMinutes;
-    const cap = reservationCap(order, {
-      reservationMinutes:
-        order.paymentMethod === 'cod'
-          ? settings.cod.confirmationWindowHours * 60
-          : settings.checkout.onlineReservationMinutes,
-      sessionMinutes,
-    });
-    const expiresAt = new Date(Math.min(now.getTime() + sessionMinutes * 60_000, cap.getTime()));
-    if (expiresAt.getTime() - now.getTime() < MIN_SESSION_MS) throw invalid('reservationExpired');
-    if (reservedUntil.getTime() < expiresAt.getTime()) {
-      await extendReservations(tx, order.id, expiresAt);
+    let expiresAt = new Date(now.getTime() + sessionMinutes * 60_000);
+    if (!balance) {
+      const reservedUntil = await reservationExpiry(tx, order.id);
+      if (!reservedUntil || reservedUntil.getTime() <= now.getTime()) {
+        throw invalid('reservationExpired');
+      }
+      const cap = reservationCap(order, {
+        reservationMinutes:
+          order.paymentMethod === 'cod'
+            ? settings.cod.confirmationWindowHours * 60
+            : settings.checkout.onlineReservationMinutes,
+        sessionMinutes,
+      });
+      expiresAt = new Date(Math.min(expiresAt.getTime(), cap.getTime()));
+      if (expiresAt.getTime() - now.getTime() < MIN_SESSION_MS) {
+        throw invalid('reservationExpired');
+      }
+      if (reservedUntil.getTime() < expiresAt.getTime()) {
+        await extendReservations(tx, order.id, expiresAt);
+      }
     }
 
     // One live session per order: an older session paid later still counts (IPN), but the
@@ -167,7 +178,7 @@ export async function createPaymentSession(
       .set({ status: 'cancelled' })
       .where(and(eq(payments.orderId, order.id), eq(payments.status, 'pending')));
 
-    if (order.paymentMethod !== 'cod' && order.paymentMethod !== input.provider) {
+    if (!balance && order.paymentMethod !== 'cod' && order.paymentMethod !== input.provider) {
       await tx.update(orders).set({ paymentMethod: input.provider }).where(eq(orders.id, order.id));
     }
 
