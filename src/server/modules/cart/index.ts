@@ -4,3 +4,6 @@
  */
 export { CART_COOKIE, CART_TTL_DAYS, hashCartToken, newCartToken } from './token';
 export { findActiveCart, getCartLines, type CartLine, type CartRow } from './queries';
+
+// ---------- Checkout stream (M2): conversion inside the placeOrder transaction ----------
+export { lockCart, markCartConverted } from './conversion';

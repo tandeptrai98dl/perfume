@@ -23,6 +23,8 @@ export type ComboboxProps = {
   disabled?: boolean;
   id?: string;
   invalid?: boolean;
+  /** Hint/error ids, e.g. from <FormControl>. */
+  'aria-describedby'?: string;
   className?: string;
 };
 
@@ -40,6 +42,7 @@ export function Combobox({
   disabled,
   id,
   invalid,
+  'aria-describedby': describedBy,
   className,
 }: ComboboxProps) {
   const t = useTranslations('ui.combobox');
@@ -58,6 +61,7 @@ export function Combobox({
           aria-controls={listId}
           aria-haspopup="listbox"
           aria-invalid={invalid || undefined}
+          aria-describedby={describedBy}
           disabled={disabled}
           className={cn(
             fieldBase,
