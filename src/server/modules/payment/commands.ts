@@ -345,6 +345,7 @@ export async function completeRefund(
   assertCan(ctx.actor, 'payments.refund');
 
   if (input.mode === 'manual') {
+    if (!input.providerRef && !input.proofMediaId) throw field('providerRef', 'proofRequired');
     const paymentStatus = await finishRefund(ctx, input.refundId, {
       providerRef: input.providerRef,
       proofMediaId: input.proofMediaId ?? null,

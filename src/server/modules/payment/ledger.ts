@@ -256,6 +256,13 @@ export async function applyCompletedRefund(
         .where(eq(payments.id, refund.paymentId));
     }
   }
+  if (change.to === 'refunded') {
+    // Everything went back: no attempt of this order still holds money.
+    await tx
+      .update(payments)
+      .set({ status: 'refunded' })
+      .where(and(eq(payments.orderId, order.id), eq(payments.status, 'succeeded')));
+  }
   await recordOrderEvent(tx, {
     orderId: order.id,
     type: 'refund_completed',

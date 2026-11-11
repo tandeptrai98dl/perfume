@@ -1,4 +1,4 @@
-import type { ServerEnv } from '@/lib/env';
+import { serverEnv, type ServerEnv } from '@/lib/env';
 
 import { createPayosGateway } from './payos';
 import type { FetchLike, GatewayProvider, PaymentGateway } from './types';
@@ -99,6 +99,14 @@ export function createPaymentGateways(
       : null;
 
   return { vnpay, payos };
+}
+
+let cached: PaymentGateways | undefined;
+
+/** Process-wide gateways from the validated env (web app and worker). */
+export function getPaymentGateways(): PaymentGateways {
+  cached ??= createPaymentGateways(serverEnv());
+  return cached;
 }
 
 export {
