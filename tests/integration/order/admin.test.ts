@@ -16,6 +16,7 @@ import {
   shipments,
   stockReservations,
   users,
+  refunds,
 } from '@/server/db/schema';
 import { seed } from '@/server/db/seed';
 import { createBoss, ensureQueues, PGBOSS_SCHEMA } from '@/server/jobs/queue';
@@ -371,6 +372,16 @@ describe('order processing', () => {
     expect(detail?.money.refundOwed).toBe(0);
     await db.update(orders).set({ amountPaid: 200_000 }).where(eq(orders.id, order.id));
     expect((await getAdminOrderDetail(db, order.id, 'owner'))?.money.refundOwed).toBe(200_000);
+  });
+
+  it('queues a refund when a manager cancels an order that holds money', async () => {
+    const paid = await createOrder({ depositRequired: 500_000, amountPaid: 500_000 });
+    await cancelOrder(ctx('manager'), { orderId: paid.id, expectedVersion: 0, reason: 'Hết hàng' });
+    const queued = await db
+      .select({ amount: refunds.amount, status: refunds.status })
+      .from(refunds)
+      .where(eq(refunds.orderId, paid.id));
+    expect(queued).toEqual([{ amount: 500_000, status: 'requested' }]);
   });
 
   it('flags COD risk on a failed delivery and restocks the returned parcel', async () => {

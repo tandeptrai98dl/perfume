@@ -52,6 +52,28 @@ export const serverEnvSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((value) => value === 'true'),
+
+    // ---------- M2 payments (ADR-0007: secrets only here, never in the DB or admin) ----------
+    /** VNPay merchant (terminal) code and HMAC-SHA512 hash secret. Both or neither. */
+    VNPAY_TMN_CODE: z.string().min(1).optional(),
+    VNPAY_HASH_SECRET: z.string().min(1).optional(),
+    VNPAY_PAYMENT_URL: z.url().default('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
+    /** VNPay merchant API (refunds, queries). */
+    VNPAY_API_URL: z.url().default('https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'),
+    /** payOS (VietQR) channel credentials. All three or none. */
+    PAYOS_CLIENT_ID: z.string().min(1).optional(),
+    PAYOS_API_KEY: z.string().min(1).optional(),
+    PAYOS_CHECKSUM_KEY: z.string().min(1).optional(),
+    PAYOS_API_URL: z.url().default('https://api-merchant.payos.vn'),
+    /**
+     * Sandbox simulator for VNPay and payOS (no network, signed with public dev keys). On by
+     * default outside production for gateways without keys; `true` forces it for every gateway
+     * (E2E). Refused in production unless APP_URL is localhost.
+     */
+    PAYMENT_SIMULATOR: z
+      .enum(['true', 'false'])
+      .optional()
+      .transform((value) => (value === undefined ? undefined : value === 'true')),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -82,6 +104,31 @@ export const serverEnvSchema = z
         path: ['S3_BUCKET'],
         message: 'S3_BUCKET is required when MEDIA_STORAGE=s3',
       });
+    }
+    if (Boolean(env.VNPAY_TMN_CODE) !== Boolean(env.VNPAY_HASH_SECRET)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['VNPAY_HASH_SECRET'],
+        message: 'VNPAY_TMN_CODE and VNPAY_HASH_SECRET must be set together',
+      });
+    }
+    const payos = [env.PAYOS_CLIENT_ID, env.PAYOS_API_KEY, env.PAYOS_CHECKSUM_KEY].filter(Boolean);
+    if (payos.length !== 0 && payos.length !== 3) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['PAYOS_CHECKSUM_KEY'],
+        message: 'PAYOS_CLIENT_ID, PAYOS_API_KEY and PAYOS_CHECKSUM_KEY must be set together',
+      });
+    }
+    if (env.NODE_ENV === 'production' && env.PAYMENT_SIMULATOR) {
+      const host = new URL(env.APP_URL).hostname;
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['PAYMENT_SIMULATOR'],
+          message: 'the payment simulator is only allowed on localhost in production builds',
+        });
+      }
     }
     if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {
       ctx.addIssue({

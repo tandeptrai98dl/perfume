@@ -22,6 +22,7 @@ import type {
 import { depositSatisfied, staffOrderActor } from './admin-view';
 import type { OrderStatus } from './state-machine';
 import { lockOrder, recordOrderEvent, transitionOrder, type TransitionResult } from './transition';
+import { queueRefundForCancelledOrder } from '@/server/modules/payment';
 
 /*
  * Staff order commands (§11.2 Orders, ADR-0005). Every status change goes through
@@ -89,6 +90,14 @@ export async function transitionInTx(
     await flagCodRisk(ctx, tx, order);
   } else if (input.to === 'returned' && result.from === 'delivery_failed') {
     await updateLatestShipmentStatus(tx, order.id, 'returned');
+  }
+  if (input.to === 'cancelled' && order.amountPaid > order.amountRefunded) {
+    // Money already received goes to the payments refund queue (payment module owns refunds).
+    await queueRefundForCancelledOrder(tx, ctx.boss, {
+      orderId: order.id,
+      actorId: ctx.actor.id,
+      reason: input.reason ?? 'order_cancelled',
+    });
   }
 
   await recordAudit(tx, {

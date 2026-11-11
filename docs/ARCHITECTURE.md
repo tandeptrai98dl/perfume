@@ -258,6 +258,16 @@ stateDiagram-v2
 
 `payment_status`: `unpaid` → `partially_paid` → `paid` → `partially_refunded` | `refunded`. Gateway refunds call the provider API when supported; COD and bank-transfer refunds are manual and recorded in `refunds` with proof.
 
+**Payment rules as implemented (M2, `server/modules/payment`):**
+
+- `payment_status` is computed from money only: any refund → `partially_refunded`/`refunded` (all paid money returned); otherwise `unpaid` (nothing paid), `paid` (≥ total) or `partially_paid`.
+- Required online amount: the total for online/bank-transfer orders, `deposit_required` for COD above the threshold. Only a `pending` order is auto-confirmed by a payment; a COD order still `awaiting_confirmation` records its deposit and waits for staff.
+- One live session per order: a new session cancels older pending ones (an older one paid later still counts). `txn_ref` = 16 digits (`yyMMddHHmmss` + 4 random, Vietnam time) so it is also a valid payOS `orderCode`.
+- Retry extends the stock reservation to the new session's expiry, capped at `placed_at` + reservation window (30 min online / 24 h COD) + one session (15 min): stock is never held indefinitely.
+- Money that arrives for a cancelled/returned order, or beyond the total, is recorded and queued as a `requested` refund with a `late_payment_refund` alert. Invalid signature, unknown `txn_ref` or a different amount → `suspicious_ipn` alert, no state change. Customer bank details in payOS webhooks are masked before `payment_events` stores them.
+- payOS has no refund API: payOS refunds are completed manually (bank reference or proof image). VNPay refunds call the merchant API.
+- Without gateway keys outside production (or with `PAYMENT_SIMULATOR=true`, localhost only in production builds) both gateways run as a signed sandbox simulator for development and E2E.
+
 ### 3.6 Internationalization (D02, D11)
 
 - **Library:** next-intl (App Router, Server Components, localized pathnames, typed messages).

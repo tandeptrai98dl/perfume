@@ -50,6 +50,12 @@ export default defineConfig({
         url: `${baseURL}/api/health`,
         reuseExistingServer: !process.env.CI,
         timeout: 60_000,
-        env: { PORT: String(port), NODE_ENV: 'production', APP_URL: baseURL },
+        env: {
+          PORT: String(port),
+          NODE_ENV: 'production',
+          APP_URL: baseURL,
+          // Payment gateways run as the signed sandbox simulator (no network, localhost only).
+          PAYMENT_SIMULATOR: process.env.PAYMENT_SIMULATOR ?? 'true',
+        },
       },
 });

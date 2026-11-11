@@ -569,6 +569,158 @@
       "cartEmpty": "Giỏ hàng của bạn đang trống."
     }
   },
+  "checkoutResult": {
+    "metaTitle": "Kết quả đặt hàng",
+    "orderCode": "Mã đơn hàng",
+    "placedAt": "Đặt lúc {date}",
+    "notFound": {
+      "title": "Không tìm thấy đơn hàng",
+      "description": "Liên kết không hợp lệ hoặc đã hết hạn. Hãy mở liên kết trong email xác nhận đơn hàng hoặc đăng nhập để xem đơn của bạn."
+    },
+    "continueShopping": "Tiếp tục mua sắm",
+    "state": {
+      "paid": {
+        "title": "Thanh toán thành công",
+        "description": "Cảm ơn bạn! Chúng tôi đã nhận {amount} và đang chuẩn bị đơn hàng."
+      },
+      "depositPaid": {
+        "title": "Đã nhận tiền đặt cọc",
+        "description": "Đã nhận {amount}. Bạn thanh toán {balance} còn lại khi nhận hàng."
+      },
+      "codConfirm": {
+        "title": "Đặt hàng thành công",
+        "description": "Chúng tôi sẽ gọi điện hoặc nhắn Zalo để xác nhận đơn hàng trong vòng 24 giờ. Bạn thanh toán khi nhận hàng."
+      },
+      "codDepositReceived": {
+        "title": "Đã nhận tiền đặt cọc",
+        "description": "Đã nhận {amount}. Chúng tôi sẽ liên hệ để xác nhận đơn hàng; bạn thanh toán phần còn lại khi nhận hàng."
+      },
+      "awaitingPayment": {
+        "title": "Hoàn tất thanh toán",
+        "description": "Sản phẩm được giữ cho bạn đến {time}. Vui lòng thanh toán {amount}."
+      },
+      "depositRequired": {
+        "title": "Thanh toán tiền đặt cọc",
+        "description": "Đơn COD có giá trị cao cần đặt cọc {amount} trước khi xác nhận. Phần còn lại thanh toán khi nhận hàng. Sản phẩm được giữ đến {time}."
+      },
+      "sessionExpired": {
+        "title": "Phiên thanh toán đã hết hạn",
+        "description": "Sản phẩm vẫn được giữ cho bạn đến {time}. Bạn có thể thanh toán lại, kể cả bằng phương thức khác."
+      },
+      "windowClosed": {
+        "title": "Đã hết thời gian giữ hàng",
+        "description": "Đơn hàng chưa được thanh toán và sẽ được huỷ tự động. Bạn có thể đặt lại đơn mới."
+      },
+      "cancelled": {
+        "title": "Đơn hàng đã huỷ",
+        "description": "Đơn hàng này đã được huỷ.",
+        "refund": "Số tiền bạn đã thanh toán ({amount}) sẽ được hoàn lại. Chúng tôi sẽ liên hệ với bạn."
+      },
+      "other": {
+        "title": "Trạng thái đơn hàng",
+        "description": "Đơn hàng của bạn: {status}."
+      }
+    },
+    "orderStatus": {
+      "pending": "Chờ thanh toán",
+      "awaiting_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "processing": "Đang chuẩn bị hàng",
+      "shipped": "Đang giao",
+      "delivered": "Đã giao",
+      "completed": "Hoàn tất",
+      "cancelled": "Đã huỷ",
+      "delivery_failed": "Giao không thành công",
+      "return_requested": "Đang yêu cầu trả hàng",
+      "returned": "Đã trả hàng"
+    },
+    "paymentStatus": {
+      "unpaid": "Chưa thanh toán",
+      "partially_paid": "Đã đặt cọc",
+      "paid": "Đã thanh toán",
+      "partially_refunded": "Đã hoàn một phần",
+      "refunded": "Đã hoàn tiền"
+    },
+    "methods": {
+      "cod": "Thanh toán khi nhận hàng (COD)",
+      "vnpay": "VNPay",
+      "payos": "Chuyển khoản VietQR",
+      "bank_transfer": "Chuyển khoản ngân hàng",
+      "momo": "MoMo",
+      "zalopay": "ZaloPay"
+    },
+    "qr": {
+      "heading": "Quét mã VietQR để thanh toán",
+      "instructions": "Mở ứng dụng ngân hàng, quét mã và giữ nguyên số tiền và nội dung chuyển khoản.",
+      "alt": "Mã VietQR thanh toán {amount}",
+      "amount": "Số tiền",
+      "note": "Nội dung chuyển khoản",
+      "accountNumber": "Số tài khoản",
+      "accountName": "Chủ tài khoản",
+      "bin": "Mã ngân hàng (BIN)",
+      "openCheckout": "Mở trang thanh toán payOS",
+      "sandbox": "Môi trường thử nghiệm: mã QR này không dùng được với ứng dụng ngân hàng."
+    },
+    "countdown": {
+      "label": "Thời gian còn lại",
+      "expiresIn": "Mã hết hạn sau {time}",
+      "expired": "Phiên thanh toán đã hết hạn"
+    },
+    "live": {
+      "waiting": "Đang chờ xác nhận thanh toán…",
+      "paid": "Đã thanh toán",
+      "checking": "Đang cập nhật trạng thái…"
+    },
+    "vnpay": {
+      "heading": "Thanh toán qua VNPay",
+      "description": "Bạn sẽ được chuyển đến cổng VNPay để thanh toán bằng thẻ ATM, thẻ quốc tế hoặc ví VNPay. Kết quả được cập nhật tự động.",
+      "pay": "Thanh toán {amount} với VNPay",
+      "returned": "Đã quay lại từ VNPay. Đang chờ VNPay xác nhận…"
+    },
+    "retry": {
+      "heading": "Chọn cách thanh toán",
+      "method": "Phương thức thanh toán",
+      "submit": "Thanh toán lại",
+      "start": "Thanh toán",
+      "change": "Đổi phương thức thanh toán",
+      "providers": {
+        "vnpay": {
+          "title": "VNPay",
+          "description": "Thẻ ATM, thẻ quốc tế, ví VNPay"
+        },
+        "payos": {
+          "title": "Chuyển khoản VietQR",
+          "description": "Quét mã bằng ứng dụng ngân hàng"
+        }
+      },
+      "errors": {
+        "reservationExpired": "Đã hết thời gian giữ hàng cho đơn này.",
+        "providerUnavailable": "Phương thức này tạm thời không khả dụng. Vui lòng chọn cách khác.",
+        "gatewayError": "Không kết nối được cổng thanh toán. Vui lòng thử lại.",
+        "notPayable": "Đơn hàng này không còn cần thanh toán.",
+        "nothingDue": "Đơn hàng này không còn khoản nào cần thanh toán.",
+        "notFound": "Không tìm thấy đơn hàng.",
+        "validation": "Yêu cầu không hợp lệ.",
+        "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+      }
+    },
+    "summary": {
+      "heading": "Tóm tắt đơn hàng",
+      "quantity": "Số lượng: {quantity}",
+      "subtotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "shipping": "Phí vận chuyển",
+      "giftWrap": "Gói quà",
+      "total": "Tổng cộng",
+      "deposit": "Tiền đặt cọc",
+      "paid": "Đã thanh toán",
+      "due": "Còn lại",
+      "free": "Miễn phí",
+      "method": "Thanh toán",
+      "paymentStatus": "Tình trạng thanh toán",
+      "status": "Trạng thái đơn"
+    }
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
@@ -601,7 +753,13 @@
       "promotions": "Khuyến mãi",
       "coupons": "Mã giảm giá",
       "shipping": "Vận chuyển",
-      "shippingRates": "Khu vực & phí giao"
+      "shippingRates": "Khu vực & phí giao",
+      "payments": "Thanh toán",
+      "paymentTransactions": "Giao dịch",
+      "paymentEvents": "Nhật ký webhook",
+      "refunds": "Hoàn tiền",
+      "bankTransfers": "Xác nhận chuyển khoản",
+      "codRemittances": "Đối soát COD"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -1019,7 +1177,18 @@
       "percentRange": "Phần trăm từ 1 đến 100.",
       "provincesRequired": "Chọn ít nhất một tỉnh/thành.",
       "maxWeightNotHigher": "Cân nặng tối đa phải lớn hơn cân nặng tối thiểu.",
-      "etaMaxBeforeMin": "Số ngày chậm nhất phải lớn hơn hoặc bằng số ngày nhanh nhất."
+      "etaMaxBeforeMin": "Số ngày chậm nhất phải lớn hơn hoặc bằng số ngày nhanh nhất.",
+      "notPayable": "Đơn hàng không còn nhận thanh toán.",
+      "exceedsDue": "Số tiền vượt quá phần còn phải thu.",
+      "exceedsRefundable": "Số tiền vượt quá số có thể hoàn.",
+      "noGatewayPayment": "Đơn không có giao dịch qua cổng phù hợp để hoàn theo cách này.",
+      "proofRequired": "Nhập mã tham chiếu hoặc tải ảnh chứng từ.",
+      "refundClosed": "Yêu cầu hoàn tiền này đã được xử lý.",
+      "gatewayUnsupported": "Cổng này không hỗ trợ hoàn tiền tự động. Hãy hoàn thủ công.",
+      "notRemittable": "Đơn không phải COD đã giao.",
+      "alreadyRemitted": "Đơn đã có trong một phiên đối soát.",
+      "noOrders": "Chọn ít nhất một đơn.",
+      "orderNotFound": "Không tìm thấy đơn hàng."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -1848,6 +2017,243 @@
           "freeOver": "Miễn phí",
           "eta": "Thời gian giao",
           "active": "Áp dụng"
+        }
+      }
+    },
+    "payments": {
+      "title": "Giao dịch thanh toán",
+      "description": "Mọi lần thanh toán qua cổng, chuyển khoản và tiền thu hộ COD.",
+      "overview": {
+        "openRefunds": "{count, plural, other {# yêu cầu hoàn tiền đang chờ}}",
+        "suspicious": "{count, plural, other {# sự kiện webhook bất thường}}",
+        "awaitingTransfer": "{count, plural, other {# đơn chờ xác nhận chuyển khoản}}"
+      },
+      "search": "Tìm theo mã đơn, mã giao dịch",
+      "empty": "Chưa có giao dịch nào.",
+      "columns": {
+        "createdAt": "Thời gian",
+        "order": "Đơn hàng",
+        "provider": "Cổng",
+        "kind": "Loại",
+        "amount": "Số tiền",
+        "status": "Trạng thái",
+        "txnRef": "Mã giao dịch",
+        "providerTxnId": "Mã phía cổng",
+        "confirmedBy": "Xác nhận bởi"
+      },
+      "filter": {
+        "provider": "Cổng thanh toán",
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "providers": {
+        "vnpay": "VNPay",
+        "payos": "payOS (VietQR)",
+        "bank_manual": "Chuyển khoản (thủ công)",
+        "cod": "Thu hộ COD",
+        "momo": "MoMo",
+        "zalopay": "ZaloPay"
+      },
+      "kinds": {
+        "full": "Toàn bộ",
+        "deposit": "Đặt cọc",
+        "balance": "Phần còn lại",
+        "adjustment": "Điều chỉnh"
+      },
+      "attemptStatus": {
+        "pending": "Đang chờ",
+        "succeeded": "Thành công",
+        "failed": "Thất bại",
+        "expired": "Hết hạn",
+        "cancelled": "Đã huỷ",
+        "refunded": "Đã hoàn"
+      },
+      "paymentStatus": {
+        "unpaid": "Chưa thanh toán",
+        "partially_paid": "Đã đặt cọc",
+        "paid": "Đã thanh toán",
+        "partially_refunded": "Đã hoàn một phần",
+        "refunded": "Đã hoàn tiền"
+      },
+      "orderStatus": {
+        "pending": "Chờ thanh toán",
+        "awaiting_confirmation": "Chờ xác nhận",
+        "confirmed": "Đã xác nhận",
+        "processing": "Đang chuẩn bị hàng",
+        "shipped": "Đang giao",
+        "delivered": "Đã giao",
+        "completed": "Hoàn tất",
+        "cancelled": "Đã huỷ",
+        "delivery_failed": "Giao không thành công",
+        "return_requested": "Đang yêu cầu trả hàng",
+        "returned": "Đã trả hàng"
+      },
+      "events": {
+        "title": "Nhật ký webhook",
+        "description": "Mọi IPN/webhook nhận được, kể cả chữ ký sai hoặc không khớp đơn hàng. Gửi lại cùng sự kiện không tạo tác động mới.",
+        "empty": "Chưa có sự kiện nào.",
+        "filter": {
+          "label": "Lọc",
+          "all": "Tất cả",
+          "invalid": "Chữ ký không hợp lệ",
+          "unmatched": "Không khớp / bị từ chối"
+        },
+        "columns": {
+          "createdAt": "Nhận lúc",
+          "provider": "Cổng",
+          "eventType": "Loại sự kiện",
+          "signature": "Chữ ký",
+          "result": "Kết quả",
+          "order": "Đơn hàng",
+          "payload": "Dữ liệu"
+        },
+        "valid": "Hợp lệ",
+        "invalid": "Không hợp lệ",
+        "processed": "Đã xử lý",
+        "showPayload": "Xem dữ liệu",
+        "errors": {
+          "invalid_signature": "Chữ ký sai",
+          "unknown_txn_ref": "Không có giao dịch",
+          "amount_mismatch": "Sai số tiền",
+          "already_succeeded": "Giao dịch đã thanh toán trước đó"
+        },
+        "back": "Giao dịch"
+      },
+      "refunds": {
+        "title": "Hoàn tiền",
+        "description": "Hàng đợi hoàn tiền, gồm cả tiền nhận được sau khi đơn đã huỷ.",
+        "empty": "Không có yêu cầu hoàn tiền.",
+        "filter": {
+          "label": "Trạng thái",
+          "open": "Đang chờ",
+          "completed": "Đã hoàn tất",
+          "all": "Tất cả"
+        },
+        "columns": {
+          "createdAt": "Tạo lúc",
+          "order": "Đơn hàng",
+          "amount": "Số tiền",
+          "reason": "Lý do",
+          "method": "Hình thức",
+          "status": "Trạng thái",
+          "reference": "Tham chiếu"
+        },
+        "methods": {
+          "gateway": "Qua cổng thanh toán",
+          "bank_transfer": "Chuyển khoản",
+          "cash": "Tiền mặt"
+        },
+        "status": {
+          "requested": "Chờ hoàn",
+          "processing": "Đang xử lý",
+          "completed": "Đã hoàn",
+          "failed": "Thất bại"
+        },
+        "reasons": {
+          "late_payment_after_cancellation": "Nhận tiền sau khi đơn đã huỷ",
+          "overpayment": "Thanh toán thừa",
+          "order_cancelled": "Đơn đã huỷ"
+        },
+        "proof": "Ảnh chứng từ",
+        "complete": {
+          "open": "Hoàn tất",
+          "openFor": "Hoàn tất hoàn tiền đơn {code}",
+          "title": "Hoàn tất hoàn tiền",
+          "summary": "Hoàn {amount} cho đơn {code}.",
+          "mode": "Cách hoàn tiền",
+          "modeGateway": "Gọi API hoàn tiền của cổng ({provider})",
+          "modeManual": "Đã chuyển khoản / trả tiền mặt thủ công",
+          "providerRef": "Mã tham chiếu giao dịch hoàn",
+          "providerRefHint": "Bắt buộc nhập mã tham chiếu hoặc tải ảnh chứng từ.",
+          "proof": "Ảnh chứng từ (không bắt buộc nếu đã có mã)",
+          "submit": "Xác nhận đã hoàn tiền",
+          "done": "Đã hoàn tất hoàn tiền",
+          "failed": "Cổng thanh toán từ chối hoàn tiền ({error}). Có thể thử lại hoặc hoàn thủ công."
+        },
+        "request": {
+          "open": "Tạo yêu cầu hoàn tiền",
+          "title": "Tạo yêu cầu hoàn tiền",
+          "orderCode": "Mã đơn hàng",
+          "amount": "Số tiền hoàn (₫)",
+          "reason": "Lý do",
+          "method": "Hình thức",
+          "submit": "Tạo yêu cầu",
+          "done": "Đã thêm vào hàng đợi hoàn tiền"
+        }
+      },
+      "bankTransfers": {
+        "title": "Xác nhận chuyển khoản",
+        "description": "Đối chiếu sao kê ngân hàng rồi xác nhận số tiền đã nhận cho đơn hàng. Đơn chờ thanh toán sẽ tự chuyển sang Đã xác nhận khi đủ tiền.",
+        "search": "Tìm đơn theo mã",
+        "searchHint": "Danh sách mặc định là các đơn chọn chuyển khoản ngân hàng. Tìm theo mã để xác nhận cho đơn khác.",
+        "empty": "Không có đơn nào chờ chuyển khoản.",
+        "columns": {
+          "order": "Đơn hàng",
+          "placedAt": "Ngày đặt",
+          "method": "Phương thức",
+          "status": "Trạng thái",
+          "total": "Tổng",
+          "paid": "Đã nhận",
+          "due": "Còn lại"
+        },
+        "confirm": {
+          "open": "Xác nhận",
+          "openFor": "Xác nhận chuyển khoản cho đơn {code}",
+          "title": "Xác nhận đã nhận chuyển khoản",
+          "summary": "Đơn {code}: còn phải thu {due}.",
+          "amount": "Số tiền đã nhận (₫)",
+          "bankReference": "Mã giao dịch ngân hàng",
+          "note": "Ghi chú",
+          "submit": "Xác nhận đã nhận tiền",
+          "done": "Đã ghi nhận {amount} cho đơn {code}"
+        }
+      },
+      "cod": {
+        "title": "Đối soát COD",
+        "description": "Khi đơn vị vận chuyển chuyển tiền thu hộ, tạo phiên đối soát, đánh dấu các đơn có trong bảng kê và so với số tiền thực nhận.",
+        "listTitle": "Các phiên đối soát",
+        "empty": "Chưa có phiên đối soát nào.",
+        "columns": {
+          "receivedAt": "Ngày nhận",
+          "carrier": "Đơn vị",
+          "period": "Kỳ",
+          "orders": "Số đơn",
+          "ordersAmount": "Tiền thu hộ",
+          "fee": "Phí",
+          "total": "Thực nhận",
+          "reference": "Tham chiếu",
+          "createdBy": "Người tạo"
+        },
+        "carriers": {
+          "ghn": "GHN",
+          "ghtk": "GHTK",
+          "viettel_post": "Viettel Post",
+          "self": "Tự giao",
+          "other": "Khác"
+        },
+        "form": {
+          "title": "Tạo phiên đối soát",
+          "carrier": "Đơn vị vận chuyển",
+          "periodStart": "Từ ngày",
+          "periodEnd": "Đến ngày",
+          "receivedAt": "Ngày nhận tiền",
+          "bankReference": "Mã giao dịch ngân hàng",
+          "carrierFee": "Phí đối soát (₫)",
+          "totalAmount": "Số tiền thực nhận (₫)",
+          "orders": "Đơn hàng trong bảng kê",
+          "noCandidates": "Không có đơn COD đã giao nào chờ đối soát.",
+          "select": "Chọn đơn {code}",
+          "selectAll": "Chọn tất cả",
+          "orderAmount": "Tiền thu hộ đơn {code}",
+          "delivered": "Giao {date}",
+          "expected": "Tổng thu hộ trừ phí",
+          "received": "Thực nhận",
+          "difference": "Chênh lệch",
+          "matches": "Khớp với số tiền thực nhận",
+          "mismatch": "Lệch {amount} so với bảng kê",
+          "submit": "Lưu đối soát",
+          "done": "Đã đối soát {count} đơn",
+          "orderColumn": "Đơn hàng"
         }
       }
     }

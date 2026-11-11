@@ -69,6 +69,25 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/inventory/movements', labelKey: 'movements', permission: 'inventory.adjust' },
     ],
   },
+  // M2 stream "payments": transactions, webhook log, refunds, bank transfers, COD.
+  {
+    labelKey: 'payments',
+    items: [
+      { href: '/admin/payments', labelKey: 'paymentTransactions', permission: 'payments.refund' },
+      { href: '/admin/payments/refunds', labelKey: 'refunds', permission: 'payments.refund' },
+      {
+        href: '/admin/payments/bank-transfers',
+        labelKey: 'bankTransfers',
+        permission: 'payments.confirmBankTransfer',
+      },
+      {
+        href: '/admin/payments/cod-remittances',
+        labelKey: 'codRemittances',
+        permission: 'payments.reconcileCod',
+      },
+      { href: '/admin/payments/events', labelKey: 'paymentEvents', permission: 'payments.refund' },
+    ],
+  },
   {
     labelKey: 'content',
     items: [
