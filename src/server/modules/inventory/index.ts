@@ -40,3 +40,13 @@ export {
   type StockAdjustInput,
 } from './admin-schemas';
 export { availableStock, computeAdjustment, isLowStock } from './adjustment';
+
+// Reservations (M2 foundation): placeOrder, payments and transitionOrder use these.
+export {
+  commitReservations,
+  extendReservations,
+  releaseReservations,
+  reserveStock,
+  restockOrder,
+  type ReservationLine,
+} from './reservations';

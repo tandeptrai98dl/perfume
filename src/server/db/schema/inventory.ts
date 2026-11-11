@@ -8,12 +8,14 @@ import {
   pgTable,
   primaryKey,
   text,
+  timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
 
 import { createdAt, primaryId, timestamps } from './_shared';
 import { users } from './auth';
 import { productVariants } from './catalog';
+import { orders } from './orders';
 
 /** MVP has a single default location (ADR-0022); the model is multi-location ready. */
 export const locations = pgTable('locations', {
@@ -57,7 +59,7 @@ export const stockMovementReasonEnum = pgEnum('stock_movement_reason', [
   'damage',
 ]);
 
-/** Append-only log of every stock change. Stock reservations arrive with orders (M2). */
+/** Append-only log of every stock change. */
 export const stockMovements = pgTable(
   'stock_movements',
   {
@@ -79,5 +81,41 @@ export const stockMovements = pgTable(
   (t) => [
     index().on(t.variantId, t.createdAt),
     check('stock_movements_delta_check', sql`${t.delta} <> 0`),
+  ],
+);
+
+export const reservationStatusEnum = pgEnum('reservation_status', [
+  'active',
+  'committed',
+  'released',
+]);
+
+/**
+ * Time-limited holds on stock for unpaid / unconfirmed orders (ADR-0006). `inventory_items.reserved`
+ * is the sum of active reservations; a reservation is either committed (turned into a real
+ * deduction when the order is paid/confirmed) or released (expiry, cancellation).
+ */
+export const stockReservations = pgTable(
+  'stock_reservations',
+  {
+    id: primaryId(),
+    orderId: uuid()
+      .notNull()
+      .references(() => orders.id, { onDelete: 'cascade' }),
+    variantId: uuid()
+      .notNull()
+      .references(() => productVariants.id),
+    locationId: uuid()
+      .notNull()
+      .references(() => locations.id),
+    quantity: integer().notNull(),
+    status: reservationStatusEnum().notNull().default('active'),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    ...timestamps(),
+  },
+  (t) => [
+    index().on(t.status, t.expiresAt),
+    index().on(t.orderId),
+    check('stock_reservations_quantity_check', sql`${t.quantity} > 0`),
   ],
 );

@@ -118,7 +118,14 @@ describe('transactional outbox (pg-boss inside a Drizzle transaction)', () => {
     await worker.start();
     await registerWorkers(
       worker,
-      createHandlers({ email, internalBaseUrl: 'http://web.internal', internalSecret: SECRET }),
+      createHandlers({
+        db,
+        boss: producer,
+        email,
+        appUrl: 'http://localhost:3000',
+        internalBaseUrl: 'http://web.internal',
+        internalSecret: SECRET,
+      }),
     );
     try {
       const message = await waitFor(() => sent[0]);
@@ -143,6 +150,9 @@ describe('cache.revalidate handler', () => {
   it('signs the request so /api/internal/revalidate can verify it', async () => {
     let captured: Request | undefined;
     const handlers = createHandlers({
+      db,
+      boss: producer,
+      appUrl: 'http://localhost:3000',
       email: createEmailSender({
         transport: nodemailer.createTransport({ jsonTransport: true }),
         from: 'x@example.com',
@@ -171,6 +181,9 @@ describe('cache.revalidate handler', () => {
 
   it('throws on a non-2xx response so pg-boss retries', async () => {
     const handlers = createHandlers({
+      db,
+      boss: producer,
+      appUrl: 'http://localhost:3000',
       email: createEmailSender({
         transport: nodemailer.createTransport({ jsonTransport: true }),
         from: 'x@example.com',

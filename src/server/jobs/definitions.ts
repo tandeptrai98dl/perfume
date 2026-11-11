@@ -26,7 +26,72 @@ export const JOBS = {
     }),
     queue: { ...retryPolicy, retryDelay: 5 },
   },
+
+  // ---------- M2: orders, payments, notifications ----------
+  /** Customer confirmation email + staff "new order" alert (order locale, §10.5). */
+  'order.placed': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: retryPolicy,
+  },
+  /** Every status change: customer email for shipped/delivered/cancelled, staff alerts. */
+  'order.status-changed': {
+    schema: z.object({ orderId: z.uuid(), from: z.string(), to: z.string() }),
+    queue: retryPolicy,
+  },
+  /** A payment succeeded (full, deposit, balance): customer "payment received" email. */
+  'payment.received': {
+    schema: z.object({ orderId: z.uuid(), paymentId: z.uuid() }),
+    queue: retryPolicy,
+  },
+  /** Internal alert by email + Telegram (ADR-0019). Never put PII in `message`. */
+  'staff.alert': {
+    schema: z.object({
+      kind: z.enum([
+        'new_order',
+        'high_value_cod',
+        'suspicious_ipn',
+        'late_payment_refund',
+        'low_stock',
+        'job_failed',
+      ]),
+      orderId: z.uuid().optional(),
+      message: z.string().max(500).optional(),
+    }),
+    queue: retryPolicy,
+  },
+  /** Account emails (verification, password reset) in the user's locale. */
+  'auth.email': {
+    schema: z.object({
+      to: z.email(),
+      locale: z.enum(['vi', 'en']),
+      kind: z.enum(['verify_email', 'reset_password']),
+      url: z.url(),
+    }),
+    queue: retryPolicy,
+  },
+  /** Cron: cancel online orders whose reservation expired unpaid; expire stale payment sessions. */
+  'orders.expire-unpaid': {
+    schema: z.object({}).default({}),
+    queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 120 },
+  },
+  /** Cron: cancel COD orders not confirmed by staff within the window (24 h, ADR-0006). */
+  'orders.cancel-unconfirmed-cod': {
+    schema: z.object({}).default({}),
+    queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 120 },
+  },
+  /** Cron: delivered → completed once the return window has passed (§3.5). */
+  'orders.complete-delivered': {
+    schema: z.object({}).default({}),
+    queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 300 },
+  },
 } as const;
+
+/** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */
+export const CRON_JOBS: Partial<Record<keyof typeof JOBS, string>> = {
+  'orders.expire-unpaid': '* * * * *',
+  'orders.cancel-unconfirmed-cod': '*/5 * * * *',
+  'orders.complete-delivered': '17 * * * *',
+};
 
 export type JobName = keyof typeof JOBS;
 export type JobInput<N extends JobName> = z.input<(typeof JOBS)[N]['schema']>;

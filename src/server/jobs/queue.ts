@@ -3,7 +3,14 @@ import { fromDrizzle, PgBoss, type SendOptions } from 'pg-boss';
 
 import type { Database } from '@/server/db/client';
 
-import { DEAD_LETTER_QUEUE, JOB_NAMES, JOBS, type JobInput, type JobName } from './definitions';
+import {
+  CRON_JOBS,
+  DEAD_LETTER_QUEUE,
+  JOB_NAMES,
+  JOBS,
+  type JobInput,
+  type JobName,
+} from './definitions';
 
 /**
  * pg-boss setup shared by the web app (producer) and the worker (consumer).
@@ -65,4 +72,11 @@ export async function enqueue<N extends JobName>(
   const id = await boss.send(name, payload, { ...options, db: fromDrizzle(tx, sql) });
   if (!id) throw new Error(`pg-boss did not create a job for ${name}`);
   return id;
+}
+
+/** Registers the recurring jobs (worker only; pg-boss runs one schedule per name cluster-wide). */
+export async function scheduleCronJobs(boss: PgBoss): Promise<void> {
+  for (const [name, cron] of Object.entries(CRON_JOBS)) {
+    if (cron) await boss.schedule(name, cron, {}, { tz: 'UTC' });
+  }
 }
