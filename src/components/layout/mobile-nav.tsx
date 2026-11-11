@@ -8,8 +8,8 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { Link } from '@/i18n/navigation';
 
 export type MobileNavItem = {
-  href: '/perfumes' | '/brands' | '/journal' | '/search';
-  key: 'perfumes' | 'brands' | 'journal' | 'search';
+  href: '/perfumes' | '/brands' | '/journal' | '/search' | '/account';
+  key: 'perfumes' | 'brands' | 'journal' | 'search' | 'account';
 };
 
 /** Primary navigation below 768px (§8.2 MobileNav). */

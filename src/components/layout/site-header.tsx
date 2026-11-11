@@ -1,4 +1,4 @@
-import { ShoppingBag, type LucideIcon } from 'lucide-react';
+import { ShoppingBag, User, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
@@ -31,6 +31,8 @@ const NAV: readonly NavItem[] = [
   { href: '/journal', key: 'journal' },
 ];
 const ACTIONS: readonly ActionItem[] = [
+  // Account (M2 account stream): signed-out visitors are sent to sign-in with `?next=`.
+  { href: '/account', key: 'account', icon: User },
   // Cart (M2 cart stream): live count badge, see CartLink / CartCountSeed.
   { href: '/cart', key: 'cart', icon: ShoppingBag },
 ];
@@ -39,6 +41,8 @@ const MOBILE_NAV: readonly MobileNavItem[] = [
   { href: '/brands', key: 'brands' },
   { href: '/journal', key: 'journal' },
   { href: '/search', key: 'search' },
+  // The header account icon is hidden below 640 px; the menu links it instead.
+  { href: '/account', key: 'account' },
 ];
 
 /** Storefront header (§8.2). Mega menu and mini-cart arrive later. */

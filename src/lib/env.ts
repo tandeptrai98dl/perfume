@@ -74,6 +74,12 @@ export const serverEnvSchema = z
       .enum(['true', 'false'])
       .optional()
       .transform((value) => (value === undefined ? undefined : value === 'true')),
+    // ---------- M2 account & notifications ----------
+    /** Internal alerts by email (new order, high-value COD, …, ADR-0019); skipped when unset. */
+    STAFF_ALERT_EMAIL: z.email().optional(),
+    /** Telegram bot for internal alerts (ADR-0019). Both or neither; skipped when unset. */
+    TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
+    TELEGRAM_CHAT_ID: z.string().min(1).optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -135,6 +141,13 @@ export const serverEnvSchema = z
         code: 'custom',
         path: ['GOOGLE_CLIENT_SECRET'],
         message: 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set together',
+      });
+    }
+    if (Boolean(env.TELEGRAM_BOT_TOKEN) !== Boolean(env.TELEGRAM_CHAT_ID)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['TELEGRAM_CHAT_ID'],
+        message: 'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set together',
       });
     }
   });

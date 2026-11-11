@@ -55,6 +55,7 @@ class Browser {
   }
 }
 
+/** Sign-up requires e-mail verification (M2): confirm in the DB, then sign in. */
 async function signUp(email: string): Promise<Browser> {
   const browser = new Browser();
   const response = await browser.post('/sign-up/email', {
@@ -63,6 +64,9 @@ async function signUp(email: string): Promise<Browser> {
     name: 'Test',
   });
   expect(response.status).toBe(200);
+  await db.update(users).set({ emailVerified: true }).where(eq(users.email, email));
+  const signIn = await browser.post('/sign-in/email', { email, password: PASSWORD });
+  expect(signIn.status).toBe(200);
   return browser;
 }
 
@@ -116,7 +120,7 @@ describe('Better Auth integration', () => {
     // Better Auth either rejects or drops `input: false` fields; never trusts them.
     if (response.ok) {
       const current = await currentSession(browser);
-      expect(current?.session.twoFactorVerified).toBe(false);
+      expect(current?.session.twoFactorVerified ?? false).toBe(false);
     }
     const [row] = await db.select().from(users).where(eq(users.email, 'sneaky@example.com'));
     expect(row?.role ?? 'customer').toBe('customer');

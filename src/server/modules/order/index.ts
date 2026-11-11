@@ -106,3 +106,17 @@ export {
   type PrintLine,
 } from './admin-view';
 // ---------- End admin ----------
+// Customer (account & notifications stream): own-order reads scoped by user_id, guest lookup,
+// read model for emails, customer cancellation.
+export {
+  findOrderCodeForLookup,
+  getCustomerOrder,
+  getOrderViewByCode,
+  getOrderViewById,
+  listCustomerOrders,
+  normalizeOrderCode,
+  type CustomerOrderRow,
+  type OrderTimelineEntry,
+  type OrderView,
+} from './customer-queries';
+export { cancelCustomerOrder, CUSTOMER_CANCEL_REASON } from './customer-commands';

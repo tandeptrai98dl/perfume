@@ -31,3 +31,12 @@ export function formatVietnamesePhone(phone: string): string {
   if (!/^0\d{9}$/.test(normalized)) return phone;
   return `${normalized.slice(0, 4)} ${normalized.slice(4, 7)} ${normalized.slice(7)}`;
 }
+
+/** Normalised national form when the input is a valid Vietnamese mobile number, else null. */
+export function parseVietnamesePhone(input: string): string | null {
+  const normalized = normalizeVietnamesePhone(input);
+  return VN_MOBILE_PATTERN.test(normalized) ? normalized : null;
+}
+
+/** Alias kept for the account forms. */
+export const isVietnamesePhone = isVietnameseMobile;

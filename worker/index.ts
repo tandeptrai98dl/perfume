@@ -42,6 +42,10 @@ async function main() {
       appUrl: env.APP_URL,
       internalBaseUrl: env.INTERNAL_APP_URL ?? env.APP_URL,
       internalSecret: env.INTERNAL_API_SECRET,
+      orderLinkSecret: env.BETTER_AUTH_SECRET,
+      staffAlertEmail: env.STAFF_ALERT_EMAIL,
+      telegramBotToken: env.TELEGRAM_BOT_TOKEN,
+      telegramChatId: env.TELEGRAM_CHAT_ID,
     }),
     (error, context) => Sentry.captureException(error, { tags: context }),
   );

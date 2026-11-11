@@ -1,7 +1,10 @@
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 import type { Database } from '@/server/db/client';
 import { addresses, provinces, wards } from '@/server/db/schema';
+
+import type { SavedAddress } from './addresses';
+import type { AdminUnit } from './geo';
 
 /*
  * Read-only queries for the two-level administrative units (province → ward, 2025 reform) and
@@ -12,23 +15,7 @@ import { addresses, provinces, wards } from '@/server/db/schema';
 
 type Executor = Pick<Database, 'select'>;
 
-export type AdminUnit = { code: string; name: string; nameAscii: string };
 export type WardUnit = AdminUnit & { provinceCode: string };
-
-export async function listProvinces(db: Executor): Promise<AdminUnit[]> {
-  return db
-    .select({ code: provinces.code, name: provinces.name, nameAscii: provinces.nameAscii })
-    .from(provinces)
-    .orderBy(asc(provinces.nameAscii));
-}
-
-export async function listWards(db: Executor, provinceCode: string): Promise<AdminUnit[]> {
-  return db
-    .select({ code: wards.code, name: wards.name, nameAscii: wards.nameAscii })
-    .from(wards)
-    .where(eq(wards.provinceCode, provinceCode))
-    .orderBy(asc(wards.nameAscii));
-}
 
 /** A ward with its province, when both exist and belong together; otherwise a reason. */
 export async function resolveWard(
@@ -57,20 +44,6 @@ export async function resolveWard(
   if (!ward) return { ok: false, field: 'wardCode', code: 'wardMismatch' };
   return { ok: true, province, ward };
 }
-
-export type SavedAddress = {
-  id: string;
-  fullName: string;
-  phone: string;
-  provinceCode: string;
-  provinceName: string;
-  provinceNameAscii: string;
-  wardCode: string;
-  wardName: string;
-  wardNameAscii: string;
-  street: string;
-  isDefault: boolean;
-};
 
 /** A member's address book, default first (§10.6, max 10 enforced by the account stream). */
 export async function listSavedAddresses(db: Executor, userId: string): Promise<SavedAddress[]> {

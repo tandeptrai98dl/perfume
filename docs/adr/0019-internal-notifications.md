@@ -15,7 +15,7 @@ Send internal alerts through a Telegram bot (official, free Bot API) plus email.
 ## Consequences
 
 - Adapter `integrations/chat/telegram.ts`; channels configured in settings.
-- All sends logged in `notification_logs`.
+- All sends logged in `notification_logs`. M2 note: that table is not created yet; order-related sends are recorded in `order_events` (`email_sent`, `staff_alert_sent`) and channels are configured by env (`STAFF_ALERT_EMAIL`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) until the M3 settings screen.
 - No personal data beyond order code and amount in Telegram messages.
 
 See also: [ARCHITECTURE.md](../ARCHITECTURE.md), section 0.
