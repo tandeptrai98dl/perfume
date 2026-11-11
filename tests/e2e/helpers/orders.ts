@@ -136,20 +136,19 @@ export async function cleanupOrders(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   await withDb(async (db) => {
     await db.query('begin');
-    await db.query(
-      `update inventory_items i set reserved = i.reserved - r.quantity
-       from stock_reservations r
-       where r.order_id = any($1) and r.status = 'active'
-         and i.variant_id = r.variant_id and i.location_id = r.location_id`,
-      [ids],
-    );
-    await db.query(
-      `update inventory_items i set on_hand = i.on_hand + r.quantity
-       from stock_reservations r
-       where r.order_id = any($1) and r.status = 'committed'
-         and i.variant_id = r.variant_id and i.location_id = r.location_id`,
-      [ids],
-    );
+    // Aggregate first: UPDATE … FROM applies only one joined row per target row.
+    for (const [status, column] of [
+      ['active', 'reserved = i.reserved - s.qty'],
+      ['committed', 'on_hand = i.on_hand + s.qty'],
+    ] as const) {
+      await db.query(
+        `update inventory_items i set ${column}
+         from (select variant_id, location_id, sum(quantity)::int as qty from stock_reservations
+               where order_id = any($1) and status = $2 group by variant_id, location_id) s
+         where i.variant_id = s.variant_id and i.location_id = s.location_id`,
+        [ids, status],
+      );
+    }
     await db.query(`delete from stock_movements where ref_type = 'order' and ref_id = any($1)`, [
       ids,
     ]);
