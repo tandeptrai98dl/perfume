@@ -38,6 +38,8 @@ export function OrderTimeline({ events }: { events: AdminOrderEvent[] }) {
         return t('timeline.note');
       case 'cod_risk_flagged':
         return t('timeline.cod_risk_flagged');
+      case 'created_by_staff':
+        return t('timeline.created_by_staff');
       default:
         return t('timeline.other', { type: event.type });
     }
