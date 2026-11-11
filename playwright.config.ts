@@ -18,6 +18,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // Animations off (globals.css honours prefers-reduced-motion): no mid-transition
+    // screenshots or axe colour-contrast readings on fading toasts and sheets.
+    contextOptions: { reducedMotion: 'reduce' },
     ...(channel ? { channel } : {}),
   },
   projects: [
