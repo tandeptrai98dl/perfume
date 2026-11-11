@@ -75,7 +75,47 @@
   "footer": {
     "tagline": "Nước hoa chính hãng, tuyển chọn tại Việt Nam.",
     "copyright": "© {siteName}. Bảo lưu mọi quyền.",
-    "primaryNav": "Điều hướng chính"
+    "primaryNav": "Điều hướng chính",
+    "menuNav": "Về Perfume Store",
+    "legalNav": "Chính sách",
+    "seller": {
+      "title": "Thông tin người bán",
+      "taxCode": "Mã số thuế: {value}",
+      "address": "Địa chỉ: {value}",
+      "representative": "Người đại diện: {value}",
+      "phone": "Điện thoại: {value}",
+      "email": "Email: {value}"
+    }
+  },
+  "journal": {
+    "title": "Tạp chí",
+    "pagedTitle": "Tạp chí – trang {page}",
+    "description": "Câu chuyện mùi hương, cách chọn nước hoa và gợi ý quà tặng từ Perfume Store.",
+    "empty": "Chưa có bài viết nào.",
+    "publishedOn": "Đăng ngày {date}",
+    "byAuthor": "Bởi {name}",
+    "topics": "Chủ đề",
+    "topic": "Chủ đề",
+    "allTopics": "Tất cả",
+    "topicTitle": "{name} – Tạp chí",
+    "topicDescription": "Các bài viết về {name} trên Tạp chí Perfume Store."
+  },
+  "content": {
+    "updatedOn": "Cập nhật ngày {date}",
+    "policies": "Chính sách",
+    "legalPrevails": "Nếu có khác biệt giữa bản tiếng Việt và bản tiếng Anh, bản tiếng Việt được ưu tiên áp dụng.",
+    "seller": {
+      "title": "Thông tin liên hệ",
+      "companyName": "Doanh nghiệp",
+      "address": "Địa chỉ",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "taxCode": "Mã số thuế"
+    }
+  },
+  "banner": {
+    "region": "Thông báo",
+    "dismiss": "Ẩn thông báo"
   },
   "admin": {
     "title": "Quản trị",

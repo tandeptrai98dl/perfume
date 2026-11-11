@@ -20,7 +20,7 @@ type ActionItem = {
  * Only routes that exist are linked (no links to 404s). M1 adds entries as pages ship:
  * perfumes, brands, journal; actions: search (Search), account (User), cart (ShoppingBag).
  */
-const NAV: readonly NavItem[] = [];
+const NAV: readonly NavItem[] = [{ href: '/journal', key: 'journal' }];
 const ACTIONS: readonly ActionItem[] = [];
 
 /** Storefront header (§8.2). Mega menu, search dialog, mini-cart and mobile nav arrive in M1. */
