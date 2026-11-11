@@ -39,7 +39,7 @@ async function withDb<T>(run: (db: Client) => Promise<T>): Promise<T> {
   }
 }
 
-/** Two sellable full-size variants with stock to spare (seed data). */
+/** Two sellable variants of different products with stock to spare (seed data). */
 async function pickVariants(): Promise<[Variant, Variant]> {
   return withDb(async (db) => {
     const { rows } = await db.query<{
@@ -49,15 +49,17 @@ async function pickVariants(): Promise<[Variant, Variant]> {
       price: string;
       name: string;
     }>(
-      `select v.id, v.product_id, v.sku, v.price, t.name
-         from product_variants v
-         join products p on p.id = v.product_id and p.status = 'active' and p.deleted_at is null
-         join brands b on b.id = p.brand_id and b.status = 'active' and b.deleted_at is null
-         join product_translations t on t.product_id = p.id and t.locale = 'vi' and t.is_published
-         join inventory_items ii on ii.variant_id = v.id
-        where v.is_active and v.variant_type = 'full_size' and ii.on_hand - ii.reserved >= 5
-          and v.price between 1000000 and 2400000
-        order by v.sku limit 2`,
+      `select * from (
+         select distinct on (v.product_id) v.id, v.product_id, v.sku, v.price, t.name
+           from product_variants v
+           join products p on p.id = v.product_id and p.status = 'active' and p.deleted_at is null
+           join brands b on b.id = p.brand_id and b.status = 'active' and b.deleted_at is null
+           join product_translations t on t.product_id = p.id and t.locale = 'vi' and t.is_published
+           join inventory_items ii on ii.variant_id = v.id
+          where v.is_active and v.variant_type in ('full_size', 'travel')
+            and ii.on_hand - ii.reserved >= 5 and v.price <= 4000000
+          order by v.product_id, v.price
+       ) picked order by sku limit 2`,
     );
     if (rows.length < 2) throw new Error('Seed needs two variants with stock: run pnpm db:seed');
     const map = (r: (typeof rows)[number]): Variant => ({
@@ -84,7 +86,7 @@ async function confirmedOrder(variant: Variant, customerName: string): Promise<F
   return withDb(async (db) => {
     const id = uuidv7();
     const code = orderCode();
-    const phone = `09${String(randomInt(10_000_000, 99_999_999))}`;
+    const phone = `0912${String(randomInt(100_000, 999_999))}`;
     await db.query('begin');
     try {
       await db.query(
@@ -110,8 +112,9 @@ async function confirmedOrder(variant: Variant, customerName: string): Promise<F
       await db.query(
         `insert into order_addresses (order_id, type, full_name, phone, province_code, province_name,
            ward_code, ward_name, street)
-         values ($1, 'shipping', $2, $3, '79', 'Thành phố Hồ Chí Minh', '26734', 'Phường Bến Thành',
-           '12 Lê Lợi')`,
+         select $1, 'shipping', $2, $3, p.code, p.name, w.code, w.name, '12 Lê Lợi'
+           from provinces p join wards w on w.province_code = p.code
+          where p.code = '79' order by w.code limit 1`,
         [id, customerName, phone],
       );
       await db.query(

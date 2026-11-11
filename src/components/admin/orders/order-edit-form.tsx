@@ -762,11 +762,13 @@ function PreviewPanel({ preview }: { preview: OrderEditPreview }) {
   return (
     <div className="flex flex-col gap-4" data-testid="order-edit-preview">
       {preview.issues.length > 0 && (
-        <ul role="alert" className="text-small text-danger flex list-disc flex-col gap-1 pl-5">
-          {preview.issues.map((issue) => (
-            <li key={`${issue.path}:${issue.code}`}>{feedback.message(issue.code)}</li>
-          ))}
-        </ul>
+        <div role="alert">
+          <ul className="text-small text-danger flex list-disc flex-col gap-1 pl-5">
+            {preview.issues.map((issue) => (
+              <li key={`${issue.path}:${issue.code}`}>{feedback.message(issue.code)}</li>
+            ))}
+          </ul>
+        </div>
       )}
       <table className="text-small w-full border-collapse text-left">
         <caption className="sr-only">{t('preview.totals')}</caption>
