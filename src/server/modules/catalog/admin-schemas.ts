@@ -40,7 +40,9 @@ export const requiredText = (max = 200) =>
 
 /** Optional text: blank strings become `null`. */
 export const optionalText = (max = 2000) =>
-  z.union([trimmed(max), z.null(), z.undefined()]).transform((value) => (value ? value : null));
+  trimmed(max)
+    .nullish()
+    .transform((value) => (value ? value : null));
 
 export const slugSchema = z
   .string({ error: 'required' })

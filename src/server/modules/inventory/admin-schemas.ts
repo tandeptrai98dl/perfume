@@ -25,7 +25,10 @@ export const stockAdjustSchema = z.object({
     .max(MAX_STOCK_QUANTITY, { error: 'tooLarge' }),
   reason: z.enum(ADJUSTMENT_REASONS, { error: 'reasonRequired' }),
   note: z
-    .union([z.string().trim().max(500, { error: 'tooLong' }), z.null(), z.undefined()])
+    .string()
+    .trim()
+    .max(500, { error: 'tooLong' })
+    .nullish()
     .transform((value) => value || null),
 });
 export type StockAdjustInput = z.output<typeof stockAdjustSchema>;
