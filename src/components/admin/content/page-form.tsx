@@ -25,7 +25,7 @@ export type PageFormValues = TranslatableForm & {
 export function PageForm({ id, defaultValues }: { id?: string; defaultValues: PageFormValues }) {
   const t = useTranslations('admin.content');
   const form = useForm<PageFormValues>({ defaultValues });
-  const { pending, formError, submit } = useActionSubmit(form, {
+  const { pending, formError, saved, submit } = useActionSubmit(form, {
     redirectTo: id ? undefined : (newId) => `/admin/content/pages/${newId}`,
   });
   const errors = form.formState.errors;
@@ -90,7 +90,7 @@ export function PageForm({ id, defaultValues }: { id?: string; defaultValues: Pa
         </Field>
       </div>
       <TranslationFields form={form} />
-      <SubmitBar pending={pending}>
+      <SubmitBar pending={pending} saved={saved}>
         {id && (
           <DeleteButton action={() => deletePageAction(id)} redirectTo="/admin/content/pages" />
         )}

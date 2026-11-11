@@ -27,7 +27,7 @@ function payload(values: TranslationValues) {
 export function TopicForm({ id, defaultValues }: { id?: string; defaultValues: TranslatableForm }) {
   const t = useTranslations('admin.content');
   const form = useForm<TranslatableForm>({ defaultValues });
-  const { pending, formError, submit } = useActionSubmit(form, {
+  const { pending, formError, saved, submit } = useActionSubmit(form, {
     redirectTo: id ? undefined : (newId) => `/admin/content/topics/${newId}`,
   });
   return (
@@ -48,7 +48,7 @@ export function TopicForm({ id, defaultValues }: { id?: string; defaultValues: T
     >
       <FormError code={formError} />
       <TranslationFields form={form} options={OPTIONS} titleLabel={t('fields.name')} />
-      <SubmitBar pending={pending}>
+      <SubmitBar pending={pending} saved={saved}>
         {id && (
           <DeleteButton action={() => deleteTopicAction(id)} redirectTo="/admin/content/topics" />
         )}

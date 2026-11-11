@@ -31,12 +31,15 @@ export function useActionSubmit<T extends FieldValues>(
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   function submit(run: () => Promise<ActionResult>) {
     setFormError(null);
+    setSaved(false);
     startTransition(async () => {
       const result = await run();
       if (result.ok) {
+        setSaved(true);
         toast.success(t('saved'));
         if (options.redirectTo) router.push(options.redirectTo(result.id) as Route);
         else router.refresh();
@@ -49,7 +52,7 @@ export function useActionSubmit<T extends FieldValues>(
     });
   }
 
-  return { pending, formError, submit };
+  return { pending, formError, saved, submit };
 }
 
 export function FormError({ code }: { code: string | null }) {
@@ -121,7 +124,16 @@ export function CheckboxRow({
   );
 }
 
-export function SubmitBar({ pending, children }: { pending: boolean; children?: ReactNode }) {
+/** Save button, extra actions and a polite "Saved" status (works without a toaster). */
+export function SubmitBar({
+  pending,
+  saved = false,
+  children,
+}: {
+  pending: boolean;
+  saved?: boolean;
+  children?: ReactNode;
+}) {
   const t = useTranslations('admin.content');
   return (
     <div className="border-line-200 flex flex-wrap items-center gap-3 border-t pt-6">
@@ -129,6 +141,9 @@ export function SubmitBar({ pending, children }: { pending: boolean; children?: 
         {t('save')}
       </Button>
       {children}
+      <p role="status" className="text-small text-success">
+        {saved && !pending ? t('saved') : null}
+      </p>
     </div>
   );
 }

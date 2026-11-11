@@ -46,7 +46,7 @@ export function PostForm({
 }) {
   const t = useTranslations('admin.content');
   const form = useForm<PostFormValues>({ defaultValues });
-  const { pending, formError, submit } = useActionSubmit(form, {
+  const { pending, formError, saved, submit } = useActionSubmit(form, {
     redirectTo: id ? undefined : (newId) => `/admin/content/posts/${newId}`,
   });
   const errors = form.formState.errors;
@@ -139,7 +139,7 @@ export function PostForm({
           </div>
         </fieldset>
       </div>
-      <SubmitBar pending={pending}>
+      <SubmitBar pending={pending} saved={saved}>
         {id && (
           <DeleteButton action={() => deletePostAction(id)} redirectTo="/admin/content/posts" />
         )}

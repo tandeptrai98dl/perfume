@@ -38,7 +38,7 @@ export function MenuBuilder({ menuKey, rows }: { menuKey: string; rows: MenuRow[
   const t = useTranslations('admin.content');
   const form = useForm<FormValues>({ defaultValues: { rows } });
   const { fields, append, remove, move } = useFieldArray({ control: form.control, name: 'rows' });
-  const { pending, formError, submit } = useActionSubmit(form);
+  const { pending, formError, saved, submit } = useActionSubmit(form);
 
   return (
     <form
@@ -150,7 +150,7 @@ export function MenuBuilder({ menuKey, rows }: { menuKey: string; rows: MenuRow[
           {t('menu.add')}
         </Button>
       </div>
-      <SubmitBar pending={pending} />
+      <SubmitBar pending={pending} saved={saved} />
     </form>
   );
 }
