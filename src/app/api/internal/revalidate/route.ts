@@ -5,6 +5,8 @@ import { serverEnv } from '@/lib/env';
 import { JOBS } from '@/server/jobs/definitions';
 import { SIGNATURE_HEADER, TIMESTAMP_HEADER, verify } from '@/server/lib/hmac';
 import { logger } from '@/server/lib/logger';
+import { contentTags } from '@/server/modules/catalog/cache-tags';
+import { invalidateRouteTable } from '@/server/modules/content';
 
 const MAX_BODY_BYTES = 16 * 1024;
 
@@ -43,5 +45,7 @@ export async function POST(request: Request) {
 
   const profile = parsed.data.expire === 'now' ? { expire: 0 } : 'max';
   for (const tag of parsed.data.tags) revalidateTag(tag, profile);
+  // The proxy keeps redirects in memory (not in the Next.js cache): reload on next request.
+  if (parsed.data.tags.includes(contentTags.redirects)) invalidateRouteTable();
   return NextResponse.json({ revalidated: parsed.data.tags.length });
 }
