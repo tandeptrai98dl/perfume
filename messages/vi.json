@@ -1563,7 +1563,29 @@
       "notRemittable": "Đơn không phải COD đã giao.",
       "alreadyRemitted": "Đơn đã có trong một phiên đối soát.",
       "noOrders": "Chọn ít nhất một đơn.",
-      "orderNotFound": "Không tìm thấy đơn hàng."
+      "orderNotFound": "Không tìm thấy đơn hàng.",
+      "phoneInvalid": "Số di động Việt Nam gồm 10 chữ số, ví dụ 0912 345 678.",
+      "emailInvalid": "Email chưa hợp lệ.",
+      "selectRequired": "Vui lòng chọn một mục.",
+      "tooShort": "Quá ngắn.",
+      "shippingRequired": "Chọn phương thức giao hàng.",
+      "paymentRequired": "Chọn hình thức thanh toán.",
+      "itemsRequired": "Thêm ít nhất một sản phẩm.",
+      "cartEmpty": "Thêm ít nhất một sản phẩm.",
+      "itemUnavailable": "Có sản phẩm không còn bán.",
+      "itemQuantityLimit": "Có sản phẩm vượt quá số lượng tối đa mỗi đơn.",
+      "itemInsufficientStock": "Có sản phẩm không đủ hàng trong kho.",
+      "provinceUnknown": "Chọn tỉnh, thành phố trong danh sách.",
+      "wardMismatch": "Phường, xã không thuộc tỉnh, thành phố đã chọn.",
+      "shippingRateUnavailable": "Phương thức giao hàng không còn áp dụng cho địa chỉ này. Chọn lại.",
+      "couponNotFound": "Mã giảm giá không tồn tại.",
+      "couponInactive": "Mã giảm giá không còn hiệu lực.",
+      "couponNotStarted": "Mã giảm giá chưa đến thời gian áp dụng.",
+      "couponExpired": "Mã giảm giá đã hết hạn.",
+      "couponUsageLimit": "Mã giảm giá đã hết lượt sử dụng.",
+      "couponPerCustomerLimit": "Khách này đã dùng mã giảm giá này.",
+      "couponMinSubtotal": "Đơn chưa đạt giá trị tối thiểu của mã.",
+      "couponNoEligibleItems": "Mã không áp dụng cho sản phẩm trong đơn."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -1955,7 +1977,6 @@
       "title": "Đơn hàng",
       "description": "Xác nhận, đóng gói và giao đơn. Mọi thao tác đều được ghi nhật ký.",
       "newManual": "Tạo đơn thủ công",
-      "newManualSoon": "Tạo đơn qua điện thoại/Zalo sẽ có trong bản cập nhật tới.",
       "tabs": {
         "label": "Hàng đợi xử lý",
         "all": "Tất cả",
@@ -2205,7 +2226,8 @@
         "note": "Ghi chú nội bộ",
         "cod_risk_flagged": "Đánh dấu rủi ro COD",
         "shipment": "Vận đơn {carrier} · {code}",
-        "other": "Sự kiện: {type}"
+        "other": "Sự kiện: {type}",
+        "created_by_staff": "Nhân viên tạo đơn thủ công"
       },
       "print": {
         "packing-slip": "Phiếu đóng gói",
@@ -2239,6 +2261,149 @@
         "empty": "Không có đơn nào để in.",
         "count": "{count, plural, other {# đơn}}",
         "shopName": "Perfume Store"
+      },
+      "new": {
+        "title": "Tạo đơn thủ công",
+        "description": "Đơn cho khách đặt qua điện thoại hoặc Zalo. Giá, mã giảm giá, phí giao hàng và tồn kho được tính lại trên máy chủ như đơn trên website.",
+        "created": "Đã tạo đơn {code}",
+        "submit": "Tạo đơn",
+        "staffNote": "Ghi chú nội bộ",
+        "staffNoteHint": "Chỉ nhân viên thấy, ví dụ: khách hẹn giao giờ hành chính.",
+        "sections": {
+          "customer": "Khách hàng",
+          "items": "Sản phẩm",
+          "delivery": "Giao hàng",
+          "coupon": "Mã giảm giá",
+          "payment": "Thanh toán",
+          "note": "Ghi chú"
+        },
+        "customer": {
+          "lookup": "Tìm khách theo số điện thoại hoặc email",
+          "lookupHint": "Nhập đầy đủ số điện thoại hoặc email. Thông tin liên hệ được che một phần.",
+          "search": "Tìm",
+          "matches": "Khách hàng tìm thấy",
+          "noMatch": "Không tìm thấy khách. Nhập thông tin khách mới bên dưới.",
+          "registered": "Có tài khoản",
+          "guest": "Khách vãng lai",
+          "codRisk": "Rủi ro COD",
+          "orders": "{count, plural, =0 {Chưa có đơn} other {# đơn}}",
+          "choose": "Chọn",
+          "chooseNamed": "Chọn khách {name}",
+          "selected": "Đã chọn: {name}",
+          "clear": "Bỏ chọn",
+          "fullName": "Họ và tên",
+          "phone": "Số điện thoại",
+          "phoneFromMatch": "Để trống để dùng số đã lưu ({phone}).",
+          "email": "Email",
+          "emailHint": "Không có email thì khách sẽ không nhận email xác nhận đơn.",
+          "emailFromMatch": "Để trống để dùng email đã lưu ({email}).",
+          "emailLocale": "Ngôn ngữ email và trang thanh toán",
+          "emailLocaleHint": "Email xác nhận và trang thanh toán dùng ngôn ngữ này.",
+          "locale": {
+            "vi": "Tiếng Việt",
+            "en": "Tiếng Anh"
+          }
+        },
+        "items": {
+          "search": "Tìm sản phẩm theo tên, thương hiệu hoặc SKU",
+          "searchHint": "Chỉ hiện biến thể đang bán. Số lượng còn lại tính theo tồn kho trừ hàng đang giữ.",
+          "results": "Kết quả tìm sản phẩm",
+          "noResults": "Không tìm thấy sản phẩm đang bán.",
+          "add": "Thêm {name}",
+          "available": "Còn {count}",
+          "outOfStock": "Hết hàng",
+          "empty": "Chưa có sản phẩm nào.",
+          "caption": "Sản phẩm trong đơn",
+          "product": "Sản phẩm",
+          "quantity": "Số lượng",
+          "quantityOf": "Số lượng {name}",
+          "lineTotal": "Thành tiền",
+          "actions": "Thao tác",
+          "remove": "Bỏ {name}",
+          "variantType": {
+            "full_size": "{size} ml",
+            "travel": "Du lịch {size} ml",
+            "tester": "Tester {size} ml",
+            "gift_set": "Bộ quà tặng"
+          },
+          "issue": {
+            "itemUnavailable": "Sản phẩm này không còn bán.",
+            "itemQuantityLimit": "Vượt quá số lượng tối đa mỗi đơn.",
+            "itemInsufficientStock": "Không đủ hàng trong kho.",
+            "invalid": "Dòng này chưa hợp lệ."
+          }
+        },
+        "address": {
+          "province": "Tỉnh, thành phố",
+          "provincePlaceholder": "Chọn tỉnh, thành phố",
+          "ward": "Phường, xã",
+          "wardPlaceholder": "Chọn phường, xã",
+          "wardFirst": "Chọn tỉnh, thành phố trước",
+          "street": "Số nhà, tên đường",
+          "streetHint": "Ví dụ: 12 Lê Lợi, toà nhà, tầng."
+        },
+        "shipping": {
+          "label": "Phương thức giao hàng",
+          "eta": "Dự kiến {min}–{max} ngày",
+          "free": "Miễn phí",
+          "chooseProvince": "Chọn tỉnh, thành phố để xem phí giao hàng.",
+          "addItems": "Thêm sản phẩm để tính phí giao hàng.",
+          "none": "Không có phương thức giao hàng cho địa chỉ và cân nặng này."
+        },
+        "coupon": {
+          "label": "Mã giảm giá",
+          "apply": "Áp dụng",
+          "remove": "Bỏ mã",
+          "applied": "Đã áp dụng mã {code}."
+        },
+        "payment": {
+          "label": "Hình thức thanh toán",
+          "options": {
+            "cod": {
+              "title": "Thanh toán khi nhận hàng (COD)",
+              "description": "Đơn trên ngưỡng COD cần khách đặt cọc online trước."
+            },
+            "bank_transfer": {
+              "title": "Chuyển khoản ngân hàng",
+              "description": "Quản lý xác nhận khi tiền đã về tài khoản."
+            },
+            "payment_link": {
+              "title": "Gửi link thanh toán",
+              "description": "Tạo link VietQR hoặc VNPay để gửi khách qua Zalo hoặc email."
+            }
+          },
+          "confirmNow": "Khách đã xác nhận qua điện thoại",
+          "confirmNowHint": "Đơn chuyển sang Đã xác nhận ngay, không cần gọi lại.",
+          "depositNotice": "Đơn COD vượt ngưỡng: khách cần đặt cọc {amount} qua link thanh toán trước khi đơn được xác nhận.",
+          "provider": "Cổng thanh toán",
+          "transferReceived": "Đã nhận tiền chuyển khoản",
+          "transferReceivedHint": "Chỉ bật khi tiền đã có trên sao kê. Đơn được xác nhận ngay.",
+          "bankReference": "Mã giao dịch ngân hàng",
+          "transferByManager": "Đơn chờ chuyển khoản. Quản lý xác nhận tại Thanh toán › Chuyển khoản khi tiền về; đơn tự huỷ nếu quá thời gian giữ hàng."
+        },
+        "summary": {
+          "title": "Tóm tắt đơn",
+          "subtotal": "Tạm tính",
+          "discount": "Giảm giá",
+          "shipping": "Phí giao hàng",
+          "total": "Tổng cộng",
+          "deposit": "Tiền cọc online",
+          "serverPriced": "Giá được tính lại trên máy chủ khi tạo đơn."
+        },
+        "result": {
+          "title": "Đã tạo đơn {code}",
+          "titleDuplicate": "Đơn {code} đã được tạo trước đó",
+          "total": "Tổng cộng {total}",
+          "deposit": "cần cọc {amount}",
+          "link": "Link thanh toán {provider}",
+          "copy": "Sao chép",
+          "copied": "Đã sao chép",
+          "open": "Mở link",
+          "linkHint": "Gửi link này cho khách. Phiên thanh toán hiện tại hết hạn lúc {time}; khách có thể thử lại trên trang này khi hàng còn được giữ.",
+          "linkSessionFailed": "Chưa mở được phiên thanh toán; khách mở link sẽ được tạo phiên mới.",
+          "view": "Xem đơn hàng",
+          "another": "Tạo đơn khác"
+        }
       }
     },
     "coupons": {

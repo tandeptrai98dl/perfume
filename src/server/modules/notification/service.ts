@@ -81,9 +81,19 @@ async function loadOrder(db: Database, orderId: string): Promise<OrderView | nul
   return order;
 }
 
+/** Manual (phone/Zalo) orders may have no e-mail: nothing to send, the job succeeds. */
+async function loadMailableOrder(db: Database, orderId: string): Promise<OrderView | null> {
+  const order = await loadOrder(db, orderId);
+  if (order && !order.email) {
+    logger.info('notification.no_customer_email', { orderId });
+    return null;
+  }
+  return order;
+}
+
 /** Order confirmation (`order.placed`). Returns false when it was already sent. */
 export async function sendOrderConfirmation(deps: NotificationDeps, orderId: string) {
-  const order = await loadOrder(deps.db, orderId);
+  const order = await loadMailableOrder(deps.db, orderId);
   if (!order) return false;
   const locale = order.locale;
   return sendOnce(
@@ -134,7 +144,7 @@ export async function sendOrderUpdate(
   deps: NotificationDeps,
   input: { orderId: string; kind: OrderUpdateKind; key: string; paymentAmount?: number },
 ) {
-  const order = await loadOrder(deps.db, input.orderId);
+  const order = await loadMailableOrder(deps.db, input.orderId);
   if (!order) return false;
   const locale = order.locale;
   const latest = order.shipments.at(-1);

@@ -66,60 +66,75 @@ const UNPAYABLE = ['cancelled', 'returned'];
 
 // ---------- Manual bank transfer (§3.4 step 7) ----------
 
+export type ManualTransferResult = { paymentId: string; paymentStatus: string; confirmed: boolean };
+
+/**
+ * Records money a Manager saw on the bank statement, inside the caller's transaction: a
+ * succeeded `bank_manual` attempt, the ledger update (order `pending` → `confirmed` once
+ * covered), an audit row. Used by the bank-transfer queue and by manual orders whose transfer
+ * was received before the order was entered (§3.4 step 7).
+ */
+export async function recordManualBankTransfer(
+  ctx: CommandContext,
+  tx: Tx,
+  input: ConfirmBankTransferInput,
+): Promise<ManualTransferResult> {
+  assertCan(ctx.actor, 'payments.confirmBankTransfer');
+  const order = await lockOrder(tx, input.orderId);
+  if (UNPAYABLE.includes(order.status)) throw field('orderId', 'notPayable');
+  const due = order.total - order.amountPaid;
+  if (input.amount > due) throw field('amount', 'exceedsDue');
+
+  const kind =
+    order.amountPaid === 0 && input.amount >= order.total
+      ? 'full'
+      : order.paymentMethod === 'cod' && order.amountPaid === 0
+        ? 'deposit'
+        : 'balance';
+  const payment = await insertSucceededAttempt(tx, {
+    orderId: order.id,
+    provider: 'bank_manual',
+    kind,
+    amount: input.amount,
+    providerTxnId: input.bankReference,
+    confirmedBy: ctx.actor.id,
+    raw: input.note ? { note: input.note } : null,
+  });
+  const applied = await applySucceededPayment(tx, ctx.boss, {
+    order,
+    payment,
+    providerTxnId: input.bankReference,
+    confirmedBy: ctx.actor.id,
+    actor: staffActor(ctx),
+  });
+  await recordAudit(tx, {
+    actorId: ctx.actor.id,
+    action: 'payment.confirm_bank_transfer',
+    entityType: 'order',
+    entityId: order.id,
+    diff: {
+      amount: input.amount,
+      bankReference: input.bankReference,
+      paymentStatus: { from: order.paymentStatus, to: applied.paymentStatus },
+    },
+    ip: ctx.ip,
+  });
+  return {
+    paymentId: payment.id,
+    paymentStatus: applied.paymentStatus,
+    confirmed: applied.confirmed,
+  };
+}
+
 export async function confirmBankTransfer(
   ctx: CommandContext,
   input: ConfirmBankTransferInput,
-): Promise<CommandResult<{ paymentId: string; paymentStatus: string; confirmed: boolean }>> {
+): Promise<CommandResult<ManualTransferResult>> {
   assertCan(ctx.actor, 'payments.confirmBankTransfer');
-  return ctx.db.transaction(async (tx) => {
-    const order = await lockOrder(tx, input.orderId);
-    if (UNPAYABLE.includes(order.status)) throw field('orderId', 'notPayable');
-    const due = order.total - order.amountPaid;
-    if (input.amount > due) throw field('amount', 'exceedsDue');
-
-    const kind =
-      order.amountPaid === 0 && input.amount >= order.total
-        ? 'full'
-        : order.paymentMethod === 'cod' && order.amountPaid === 0
-          ? 'deposit'
-          : 'balance';
-    const payment = await insertSucceededAttempt(tx, {
-      orderId: order.id,
-      provider: 'bank_manual',
-      kind,
-      amount: input.amount,
-      providerTxnId: input.bankReference,
-      confirmedBy: ctx.actor.id,
-      raw: input.note ? { note: input.note } : null,
-    });
-    const applied = await applySucceededPayment(tx, ctx.boss, {
-      order,
-      payment,
-      providerTxnId: input.bankReference,
-      confirmedBy: ctx.actor.id,
-      actor: staffActor(ctx),
-    });
-    await recordAudit(tx, {
-      actorId: ctx.actor.id,
-      action: 'payment.confirm_bank_transfer',
-      entityType: 'order',
-      entityId: order.id,
-      diff: {
-        amount: input.amount,
-        bankReference: input.bankReference,
-        paymentStatus: { from: order.paymentStatus, to: applied.paymentStatus },
-      },
-      ip: ctx.ip,
-    });
-    return {
-      data: {
-        paymentId: payment.id,
-        paymentStatus: applied.paymentStatus,
-        confirmed: applied.confirmed,
-      },
-      tags: NO_TAGS,
-    };
-  });
+  return ctx.db.transaction(async (tx) => ({
+    data: await recordManualBankTransfer(ctx, tx, input),
+    tags: NO_TAGS,
+  }));
 }
 
 // ---------- COD remittance (§3.4 step 6) ----------

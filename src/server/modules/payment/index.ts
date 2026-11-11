@@ -9,7 +9,9 @@ export {
   completeRefund,
   confirmBankTransfer,
   createCodRemittance,
+  recordManualBankTransfer,
   requestRefund,
+  type ManualTransferResult,
 } from './commands';
 export { queueRefundForCancelledOrder } from './ledger';
 export {

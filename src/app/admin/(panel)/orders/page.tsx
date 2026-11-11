@@ -10,6 +10,7 @@ import { PageSkeleton } from '@/components/admin/page-skeleton';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { requireAdminPage } from '@/server/auth/guards';
+import { hasPermission } from '@/server/auth/permissions';
 import { getDb } from '@/server/db/client';
 import {
   countOrdersByStatus,
@@ -56,15 +57,11 @@ async function Content({ searchParams }: PageProps<'/admin/orders'>) {
         title={t('title')}
         description={t('description')}
         actions={
-          // Manual orders arrive with the checkout stream's placeOrder (M2 wave 2).
-          <>
-            <Button variant="secondary" disabled aria-describedby="manual-order-soon">
-              {t('newManual')}
+          hasPermission(user.role ?? 'customer', 'orders.createManual') ? (
+            <Button asChild variant="secondary">
+              <Link href="/admin/orders/new">{t('newManual')}</Link>
             </Button>
-            <span id="manual-order-soon" className="text-small basis-full text-taupe-600">
-              {t('newManualSoon')}
-            </span>
-          </>
+          ) : undefined
         }
       />
       <nav

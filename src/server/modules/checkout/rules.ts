@@ -12,7 +12,13 @@ import type { PricingResult } from './pricing';
 
 export type InitialOrderStatus = 'pending' | 'awaiting_confirmation';
 
-export function isOnlineMethod(method: CheckoutPaymentMethod): boolean {
+/**
+ * Payment methods an order can be placed with: the storefront ones plus `bank_transfer`, which
+ * only staff offer on manual orders (§3.4 step 7; money confirmed by a Manager).
+ */
+export type OrderPaymentMethod = CheckoutPaymentMethod | 'bank_transfer';
+
+export function isOnlineMethod(method: OrderPaymentMethod): boolean {
   return method !== 'cod';
 }
 
@@ -22,7 +28,7 @@ export function isOnlineMethod(method: CheckoutPaymentMethod): boolean {
  * `awaiting_confirmation`.
  */
 export function decideInitialStatus(
-  method: CheckoutPaymentMethod,
+  method: OrderPaymentMethod,
   depositRequired: number,
 ): InitialOrderStatus {
   return isOnlineMethod(method) || depositRequired > 0 ? 'pending' : 'awaiting_confirmation';
@@ -30,16 +36,18 @@ export function decideInitialStatus(
 
 /**
  * Reservation lifetime (ADR-0006): orders waiting for a payment (online or COD deposit) hold
- * stock for `checkout.onlineReservationMinutes`; COD orders waiting for staff hold it for
- * `cod.confirmationWindowHours`.
+ * stock for `checkout.onlineReservationMinutes`; orders waiting for staff hold it for
+ * `cod.confirmationWindowHours` — COD orders awaiting confirmation, and manual bank-transfer
+ * orders, whose money is confirmed by a Manager from the bank statement (no gateway IPN).
  */
 export function reservationExpiry(
   status: InitialOrderStatus,
   settings: Pick<CommerceSettings, 'checkout' | 'cod'>,
   now: Date = new Date(),
+  method?: OrderPaymentMethod,
 ): Date {
   const ms =
-    status === 'pending'
+    status === 'pending' && method !== 'bank_transfer'
       ? settings.checkout.onlineReservationMinutes * 60_000
       : settings.cod.confirmationWindowHours * 3_600_000;
   return new Date(now.getTime() + ms);
@@ -73,7 +81,7 @@ export function couponRedemptionAmount(
 
 /** Staff are alerted about COD orders above the no-deposit threshold (ADR-0016, ADR-0019). */
 export function isHighValueCod(
-  method: CheckoutPaymentMethod,
+  method: OrderPaymentMethod,
   total: number,
   settings: Pick<CommerceSettings, 'cod'>,
 ): boolean {

@@ -40,3 +40,12 @@ export {
   type AddressValues,
   type ProfileValues,
 } from '@/lib/validation/account';
+
+// Manual orders (wave 2): masked customer lookup + server-side resolution of the chosen match
+export {
+  lookupCustomers,
+  resolveCustomerRef,
+  type CustomerMatch,
+  type CustomerRef,
+  type ResolvedCustomer,
+} from './lookup';
