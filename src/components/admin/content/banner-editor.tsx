@@ -51,7 +51,7 @@ export function BannerEditor({
   const t = useTranslations('admin.content');
   const form = useForm<BannerFormValues>({ defaultValues });
   const { register, formState, control } = form;
-  const { pending, formError, submit } = useActionSubmit(form, {
+  const { pending, formError, saved, submit } = useActionSubmit(form, {
     redirectTo: id ? undefined : (newId) => `/admin/content/banners/${newId}`,
   });
   const [previewLocale, setPreviewLocale] = useState<Locale>('vi');
@@ -241,7 +241,7 @@ export function BannerEditor({
             {panel('en')}
           </TabsContent>
         </Tabs>
-        <SubmitBar pending={pending}>
+        <SubmitBar pending={pending} saved={saved}>
           {id && (
             <DeleteButton
               action={() => deleteBannerAction(id)}
