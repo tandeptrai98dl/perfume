@@ -2,7 +2,10 @@
  * Background worker entry (pg-boss). Built with tsup into dist/worker (see tsup.config.ts)
  * and run with `node dist/worker/index.mjs` (`pnpm worker:start`). See ADR-0023.
  */
+import * as Sentry from '@sentry/node';
+
 import { serverEnv } from '@/lib/env';
+import { sentryOptions } from '@/lib/observability/sentry-options';
 import { createEmailSender } from '@/server/integrations/email/send';
 import { createHandlers } from '@/server/jobs/handlers';
 import { createBoss, ensureQueues } from '@/server/jobs/queue';
@@ -11,6 +14,15 @@ import { errorFields, logger } from '@/server/lib/logger';
 
 async function main() {
   const env = serverEnv();
+  if (env.SENTRY_DSN) {
+    Sentry.init(
+      sentryOptions({
+        dsn: env.SENTRY_DSN,
+        environment: env.SENTRY_ENVIRONMENT ?? env.NODE_ENV,
+        tracesSampleRate: 0,
+      }),
+    );
+  }
   const boss = createBoss(env.DATABASE_URL, { role: 'worker' });
   boss.on('error', (error) => logger.error('pgboss.error', errorFields(error)));
 
@@ -25,6 +37,7 @@ async function main() {
       internalBaseUrl: env.INTERNAL_APP_URL ?? env.APP_URL,
       internalSecret: env.INTERNAL_API_SECRET,
     }),
+    (error, context) => Sentry.captureException(error, { tags: context }),
   );
   logger.info('worker.started');
 
@@ -35,6 +48,7 @@ async function main() {
     logger.info('worker.stopping', { signal });
     await boss.stop({ graceful: true, timeout: 30_000 });
     email.close();
+    await Sentry.flush(2_000);
     logger.info('worker.stopped');
     process.exit(0);
   };
@@ -42,7 +56,9 @@ async function main() {
   process.on('SIGINT', () => void shutdown('SIGINT'));
 }
 
-main().catch((error: unknown) => {
+main().catch(async (error: unknown) => {
   logger.error('worker.crashed', errorFields(error));
+  Sentry.captureException(error);
+  await Sentry.flush(2_000);
   process.exit(1);
 });

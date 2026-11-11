@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { sql } from 'drizzle-orm';
@@ -30,6 +29,7 @@ import {
 } from '../schema';
 
 import { demoCatalog } from './demo-catalog';
+import adminUnitsData from './data/vn-admin-units.json';
 
 type AdminUnits = {
   source: string;
@@ -49,8 +49,7 @@ export function toSlug(value: string): string {
 }
 
 async function seedAdminUnits(db: Database) {
-  const file = join(process.cwd(), 'src/server/db/seed/data/vn-admin-units.json');
-  const data = JSON.parse(readFileSync(file, 'utf8')) as AdminUnits;
+  const data = adminUnitsData as AdminUnits;
 
   await db
     .insert(provinces)

@@ -2,11 +2,19 @@ import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 import { createDb } from './client';
 
-/** Applies pending migrations from src/server/db/migrations. Used by `pnpm db:migrate`. */
-export async function runMigrations(connectionString: string): Promise<void> {
+export const DEFAULT_MIGRATIONS_DIR = 'src/server/db/migrations';
+
+/**
+ * Applies pending migrations. Used by `pnpm db:migrate` and, in production, by the worker
+ * image (`node dist/worker/migrate.mjs`, migrations copied to MIGRATIONS_DIR).
+ */
+export async function runMigrations(
+  connectionString: string,
+  migrationsFolder: string = process.env.MIGRATIONS_DIR ?? DEFAULT_MIGRATIONS_DIR,
+): Promise<void> {
   const { db, pool } = createDb(connectionString);
   try {
-    await migrate(db, { migrationsFolder: 'src/server/db/migrations' });
+    await migrate(db, { migrationsFolder });
   } finally {
     await pool.end();
   }
