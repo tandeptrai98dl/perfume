@@ -2,7 +2,7 @@ import 'server-only';
 
 import { isIP } from 'node:net';
 
-import { revalidateTag } from 'next/cache';
+import { refresh, revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import type { z } from 'zod';
 
@@ -23,7 +23,8 @@ import type { CatalogContext, SlugChangeHook } from '@/server/modules/catalog';
  * Shared skeleton of every admin Server Action (CLAUDE.md, ARCHITECTURE.md §12):
  * 1. Zod validation of the raw input; 2. `requirePermission` (2FA-verified staff session);
  * 3. the module command (transaction + audit + outbox job); 4. immediate `revalidateTag` for
- * read-your-own-writes, while the outbox job covers other instances and retries.
+ * read-your-own-writes, while the outbox job covers other instances and retries; 5. `refresh()`
+ * so the admin page re-renders with the new data in the same response.
  * Failures come back as typed results; nothing user-facing is thrown.
  */
 
@@ -59,6 +60,7 @@ export async function runAdminAction<S extends z.ZodType, T>(
   rawInput: unknown,
   permission: Permission,
   command: (ctx: CatalogContext, input: z.output<S>) => Promise<CommandResult<T>>,
+  options: { refresh?: boolean } = {},
 ): Promise<ActionResult<T>> {
   const parsed = schema.safeParse(rawInput);
   if (!parsed.success) {
@@ -85,6 +87,9 @@ export async function runAdminAction<S extends z.ZodType, T>(
     };
     const result = await command(ctx, parsed.data);
     for (const tag of result.tags) revalidateTag(tag, 'max');
+    // Re-render the current admin page in the same response (no separate client refresh).
+    // Deletes skip it: the page they ran on no longer exists, the client navigates away.
+    if (options.refresh !== false) refresh();
     return { ok: true, data: result.data };
   } catch (error) {
     if (error instanceof DomainError) {

@@ -191,11 +191,14 @@ export function SelectField<T extends FieldValues>({
   options,
   placeholder,
   noneLabel,
+  numeric = false,
 }: Base<T> & {
   options: { value: string; label: string }[];
   placeholder?: string;
   /** Adds an empty choice mapped to `null`. */
   noneLabel?: string;
+  /** The form value is a number (option values are its string form). */
+  numeric?: boolean;
 }) {
   const form = useFormContext<T>();
   return (
@@ -206,8 +209,16 @@ export function SelectField<T extends FieldValues>({
         <FormItem className={className}>
           <FormLabel>{label}</FormLabel>
           <Select
-            value={(field.value as string | null) ?? (noneLabel ? NONE : '')}
-            onValueChange={(value) => field.onChange(value === NONE ? null : value)}
+            value={
+              field.value === null || field.value === undefined
+                ? noneLabel
+                  ? NONE
+                  : ''
+                : String(field.value)
+            }
+            onValueChange={(value) =>
+              field.onChange(value === NONE ? null : numeric ? Number(value) : value)
+            }
             disabled={disabled}
           >
             <FormControl>

@@ -42,8 +42,12 @@ export async function saveBrandAction(raw: unknown) {
 }
 
 export async function deleteBrandAction(raw: unknown) {
-  return runAdminAction(adminSchemas.idInputSchema, raw, 'products.editContent', (ctx, { id }) =>
-    deleteBrand(ctx, id),
+  return runAdminAction(
+    adminSchemas.idInputSchema,
+    raw,
+    'products.editContent',
+    (ctx, { id }) => deleteBrand(ctx, id),
+    { refresh: false },
   );
 }
 
@@ -57,8 +61,12 @@ export async function saveProductLineAction(raw: unknown) {
 }
 
 export async function deleteProductLineAction(raw: unknown) {
-  return runAdminAction(adminSchemas.idInputSchema, raw, 'products.editContent', (ctx, { id }) =>
-    deleteProductLine(ctx, id),
+  return runAdminAction(
+    adminSchemas.idInputSchema,
+    raw,
+    'products.editContent',
+    // Deleted from the list page, which must re-render.
+    (ctx, { id }) => deleteProductLine(ctx, id),
   );
 }
 
@@ -72,8 +80,12 @@ export async function saveCategoryAction(raw: unknown) {
 }
 
 export async function deleteCategoryAction(raw: unknown) {
-  return runAdminAction(adminSchemas.idInputSchema, raw, 'products.editContent', (ctx, { id }) =>
-    deleteCategory(ctx, id),
+  return runAdminAction(
+    adminSchemas.idInputSchema,
+    raw,
+    'products.editContent',
+    (ctx, { id }) => deleteCategory(ctx, id),
+    { refresh: false },
   );
 }
 
@@ -96,8 +108,12 @@ export async function setCollectionProductsAction(raw: unknown) {
 }
 
 export async function deleteCollectionAction(raw: unknown) {
-  return runAdminAction(adminSchemas.idInputSchema, raw, 'products.editContent', (ctx, { id }) =>
-    deleteCollection(ctx, id),
+  return runAdminAction(
+    adminSchemas.idInputSchema,
+    raw,
+    'products.editContent',
+    (ctx, { id }) => deleteCollection(ctx, id),
+    { refresh: false },
   );
 }
 
@@ -121,5 +137,6 @@ export async function deleteTaxonomyAction(raw: unknown) {
     raw,
     'products.editContent',
     (ctx, { kind, id }) => (kind === 'family' ? deleteFamily(ctx, id) : deleteNote(ctx, id)),
+    { refresh: false },
   );
 }

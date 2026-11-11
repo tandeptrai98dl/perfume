@@ -1,8 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 import { BrandForm } from '@/components/admin/catalog/brand-form';
 import { PageHeader } from '@/components/admin/page-header';
+import { PageSkeleton } from '@/components/admin/page-skeleton';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { serverEnv } from '@/lib/env';
 import { requireAdminPage } from '@/server/auth/guards';
@@ -12,7 +14,15 @@ import { getBrand } from '@/server/modules/catalog';
 import { isUuid } from '../../../_lib/params';
 
 /** `/admin/catalog/brands/new` creates; a UUID edits. */
-export default async function AdminBrandPage({ params }: PageProps<'/admin/catalog/brands/[id]'>) {
+export default function AdminBrandPage(props: PageProps<'/admin/catalog/brands/[id]'>) {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <Content {...props} />
+    </Suspense>
+  );
+}
+
+async function Content({ params }: PageProps<'/admin/catalog/brands/[id]'>) {
   await requireAdminPage('products.editContent');
   const { id } = await params;
   const t = await getTranslations({ locale: 'vi', namespace: 'admin' });

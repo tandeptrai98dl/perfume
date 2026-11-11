@@ -106,7 +106,6 @@ export function BrandForm({ brand, appUrl }: { brand: BrandDetail | null; appUrl
       if (brand) {
         feedback.success(t('form.saved'));
         form.reset(data);
-        router.refresh();
       } else {
         feedback.success(t('form.created'));
         router.replace(`/admin/catalog/brands/${result.data.id}` as Route);

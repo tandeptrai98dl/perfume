@@ -74,10 +74,8 @@ export function TranslationTabs({
 }
 
 /** Status of one translation in a form: missing, draft or published. */
-export function formTranslationStatus(
-  value: { isPublished?: boolean } | null | undefined,
-): TranslationStatus {
+export function formTranslationStatus(value: object | null | undefined): TranslationStatus {
   if (!value) return 'missing';
-  if (value.isPublished === undefined) return 'published';
+  if (!('isPublished' in value)) return 'published';
   return value.isPublished ? 'published' : 'draft';
 }

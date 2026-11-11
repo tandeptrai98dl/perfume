@@ -50,7 +50,9 @@ export async function duplicateProductAction(raw: unknown) {
 }
 
 export async function deleteProductAction(raw: unknown) {
-  return runAdminAction(adminSchemas.idInputSchema, raw, 'products.editContent', deleteProduct);
+  return runAdminAction(adminSchemas.idInputSchema, raw, 'products.editContent', deleteProduct, {
+    refresh: false,
+  });
 }
 
 export type ProductOption = { id: string; name: string; brandName: string; status: string };
