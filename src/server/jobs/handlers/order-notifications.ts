@@ -1,6 +1,7 @@
 import { createTelegramNotifier } from '@/server/integrations/chat/telegram';
 import {
   handleOrderPlaced,
+  sendOrderEdited,
   sendAuthEmail,
   sendPaymentReceived,
   sendStaffAlert,
@@ -38,6 +39,9 @@ export function createOrderNotificationHandlers(deps: HandlerDeps) {
     },
     'order.status-changed': async (payload: JobPayload<'order.status-changed'>) => {
       await sendStatusChangeEmail(notify, payload);
+    },
+    'order.updated': async (payload: JobPayload<'order.updated'>) => {
+      await sendOrderEdited(notify, payload);
     },
     'payment.received': async (payload: JobPayload<'payment.received'>) => {
       await sendPaymentReceived(notify, payload);

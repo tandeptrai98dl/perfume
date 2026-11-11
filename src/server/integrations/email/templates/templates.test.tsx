@@ -86,6 +86,27 @@ describe('order e-mail templates', () => {
     },
   );
 
+  it.each(LOCALES)(
+    'renders the %s "order updated" e-mail with the pay-difference link',
+    async (locale) => {
+      const html = await render(
+        <OrderUpdateEmail
+          locale={locale}
+          kind="updated"
+          order={{ ...ORDER, amountPaid: 6_000_000, amountDue: 250_000 }}
+          orderUrl="https://shop.test/o"
+          amountDueOnline={250_000}
+          payUrl="https://shop.test/pay?t=x"
+        />,
+      );
+      const text = plain(html);
+      expect(html).toContain('https://shop.test/pay?t=x');
+      expect(text).toContain(locale === 'vi' ? '250.000 ₫' : '₫250,000');
+      expect(text).toContain('Cèdre Nocturne EDT');
+      expect(text).toContain('12 Hàng Bạc');
+    },
+  );
+
   it('uses different copy per locale', async () => {
     const vi = toPlainText(
       await render(<OrderUpdateEmail locale="vi" kind="delivered" order={ORDER} orderUrl="u" />),

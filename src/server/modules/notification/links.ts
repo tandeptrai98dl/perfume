@@ -18,6 +18,23 @@ export function orderPageUrl(input: {
   return url.toString();
 }
 
+/**
+ * Payment page of an order (checkout result page with the signed token), e.g. to pay the
+ * difference after an admin edit raised the total. Same URL as the web app's
+ * `checkoutResultUrl`; without a secret it opens the page's "not found" state.
+ */
+export function orderPaymentUrl(input: {
+  appUrl: string;
+  locale: 'vi' | 'en';
+  code: string;
+  secret?: string | null;
+}): string {
+  const url = new URL(absoluteUrl(input.appUrl, localizedPath(input.locale, '/checkout/result')));
+  url.searchParams.set('code', input.code);
+  if (input.secret) url.searchParams.set('t', computeOrderAccessToken(input.secret, input.code));
+  return url.toString();
+}
+
 /** Public tracking pages of carriers that publish one (others: tracking code only). */
 export function carrierTrackingUrl(carrier: string, trackingCode: string): string | null {
   const code = encodeURIComponent(trackingCode);

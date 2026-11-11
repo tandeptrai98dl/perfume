@@ -119,6 +119,16 @@
         "heading": "Chúng tôi đã nhận hàng trả lại",
         "body": "Chúng tôi đã nhận được sản phẩm trả lại của đơn hàng {code}.",
         "refund": "Chúng tôi đang hoàn lại {amount} và sẽ gửi xác nhận khi hoàn tiền xong."
+      },
+      "updated": {
+        "subject": "Đơn hàng {code} đã được cập nhật",
+        "preview": "Đơn hàng của bạn vừa được cập nhật.",
+        "heading": "Đơn hàng đã được cập nhật",
+        "body": "Theo trao đổi với bạn, chúng tôi đã cập nhật đơn hàng {code}. Thông tin mới nhất ở bên dưới.",
+        "payDifference": "Tổng tiền mới cao hơn số bạn đã thanh toán. Vui lòng thanh toán thêm {amount} qua đường dẫn bên dưới.",
+        "pay": "Thanh toán phần chênh lệch",
+        "refund": "Bạn đã thanh toán nhiều hơn tổng tiền mới. Chúng tôi sẽ hoàn lại {amount} cho bạn.",
+        "help": "Nếu thay đổi này chưa đúng, vui lòng trả lời email này hoặc liên hệ với chúng tôi."
       }
     },
     "auth": {
@@ -714,6 +724,10 @@
       "other": {
         "title": "Trạng thái đơn hàng",
         "description": "Đơn hàng của bạn: {status}."
+      },
+      "balanceDue": {
+        "title": "Thanh toán phần chênh lệch",
+        "description": "Đơn hàng của bạn đã được cập nhật. Vui lòng thanh toán thêm {amount} để chúng tôi tiếp tục chuẩn bị đơn hàng."
       }
     },
     "orderStatus": {

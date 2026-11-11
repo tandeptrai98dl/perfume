@@ -120,3 +120,37 @@ export {
   type OrderView,
 } from './customer-queries';
 export { cancelCustomerOrder, CUSTOMER_CANCEL_REASON } from './customer-commands';
+// ---------- Order edits before shipment (order-edits stream, wave 2) ----------
+export {
+  editOrder,
+  previewOrderEdit,
+  type EditCouponOutcome,
+  type EditPreviewLine,
+  type OrderEditPreview,
+  type OrderEditResult,
+} from './admin-edit';
+export {
+  canEditOrder,
+  EDITABLE_STATUSES,
+  type CurrentLine,
+  type EditAddress,
+  type LineDiff,
+} from './admin-edit-plan';
+export {
+  getOrderEditForm,
+  ORDER_EDITED_EVENT,
+  searchEditVariants,
+  type EditVariantOption,
+  type OrderEditForm,
+} from './admin-edit-queries';
+export {
+  EDIT_LIMITS,
+  editVariantSearchSchema,
+  MAX_EDIT_LINES,
+  MAX_EDIT_QUANTITY,
+  orderEditSchema,
+  type EditVariantSearchInput,
+  type OrderEditFormInput,
+  type OrderEditInput,
+} from './admin-edit-schemas';
+// ---------- End order edits ----------
