@@ -29,6 +29,7 @@ import {
 } from '../schema';
 
 import { demoCatalog } from './demo-catalog';
+import { seedDemoContent } from './demo-content';
 import adminUnitsData from './data/vn-admin-units.json';
 
 type AdminUnits = {
@@ -255,7 +256,10 @@ export async function seed(connectionString: string, options: { demo: boolean })
     const demo = options.demo
       ? await seedDemoCatalog(db, locationId)
       : { skipped: true, products: 0 };
-    return { units, demo };
+    const content = options.demo
+      ? await seedDemoContent(db)
+      : { skipped: true, pages: 0, posts: 0 };
+    return { units, demo, content };
   } finally {
     await pool.end();
   }
