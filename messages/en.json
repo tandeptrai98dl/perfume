@@ -28,5 +28,12 @@
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has moved.",
     "backHome": "Back to home"
+  },
+  "email": {
+    "test": {
+      "subject": "Test email from Perfume Store",
+      "heading": "Email delivery is working",
+      "body": "This email was sent from the background job queue to check the setup."
+    }
   }
 }

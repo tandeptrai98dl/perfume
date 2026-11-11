@@ -1,7 +1,7 @@
 # Perfume Store — Claude Code guide
 
 ## Source of truth
-- Architecture: `docs/ARCHITECTURE.md`. Decisions: `docs/adr/` (ADR-0001 … ADR-0022 = D01 … D22).
+- Architecture: `docs/ARCHITECTURE.md`. Decisions: `docs/adr/` (ADR-0001 … ADR-0023 = D01 … D23).
 - If the code, a prompt and an ADR disagree, the ADR wins.
 - Do not change the stack, add a major dependency, or change the schema shape outside
   the task scope. Ask first and propose a new ADR (copy `docs/adr/0000-template.md`).
@@ -42,8 +42,11 @@ pnpm db:generate    pnpm db:migrate     pnpm db:seed
   Only the owning module writes to its tables.
 - Side effects (emails, Telegram alerts, e-invoices, revalidation from the worker) go
   through pg-boss jobs enqueued in the same DB transaction (transactional outbox).
-- Do not import `server-only` inside `server/modules` (the worker shares them);
-  use it only in Next-only files (`actions/`, `server/auth/`).
+- Code under `server/{modules,jobs,integrations,db,lib}` is shared with the worker: no
+  `server-only`, no Next.js runtime APIs (`next/headers`, `next/cache`, `next/navigation`).
+  Use them only in Next-only files (`app/`, `actions/`, `server/auth/`) (ADR-0023).
+- Enqueue side effects with `enqueue(boss, tx, ...)` inside the business transaction; declare
+  every job with a Zod schema in `server/jobs/definitions.ts`.
 - Integrations sit behind adapters in `src/server/integrations/*`.
 
 ## Code rules

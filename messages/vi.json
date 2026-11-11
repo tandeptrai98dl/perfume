@@ -29,6 +29,13 @@
     "description": "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
     "backHome": "Về trang chủ"
   },
+  "email": {
+    "test": {
+      "subject": "Email thử nghiệm từ Perfume Store",
+      "heading": "Hệ thống email đã hoạt động",
+      "body": "Email này được gửi từ hàng đợi công việc nền để kiểm tra cấu hình."
+    }
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
