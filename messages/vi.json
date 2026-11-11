@@ -1163,6 +1163,7 @@
       "unavailable": "Sản phẩm này hiện không thể đặt mua.",
       "out_of_stock": "Sản phẩm này vừa hết hàng.",
       "limit_reached": "Bạn đã có tối đa {max} sản phẩm này trong giỏ.",
+      "rate_limited": "Bạn đã thử quá nhiều mã. Vui lòng đợi một phút rồi thử lại.",
       "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại sau ít phút."
     },
     "mini": {

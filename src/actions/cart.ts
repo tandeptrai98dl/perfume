@@ -4,7 +4,12 @@ import { refresh } from 'next/cache';
 import type { z } from 'zod';
 
 import type { Locale } from '@/i18n/routing';
-import { ensureCurrentCart, loadCurrentCart, refreshCartCookie } from '@/server/cart-session';
+import {
+  allowCouponAttempt,
+  ensureCurrentCart,
+  loadCurrentCart,
+  refreshCartCookie,
+} from '@/server/cart-session';
 import { getDb } from '@/server/db/client';
 import { errorFields, logger } from '@/server/lib/logger';
 import {
@@ -146,6 +151,7 @@ export async function applyCoupon(
     const current = await loadCurrentCart();
     const { cart, userId } = current;
     if (!cart) return { ok: false, error: 'coupon', coupon: { reason: 'empty_cart' } };
+    if (!allowCouponAttempt(cart.id)) return { ok: false, error: 'rate_limited' };
     await refreshCartCookie(current);
     const outcome = await applyCartCoupon(getDb(), {
       cartId: cart.id,

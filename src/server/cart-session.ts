@@ -120,3 +120,27 @@ export async function getCurrentCartCount(): Promise<number> {
   const { cart } = await getCurrentCart();
   return countCartItems(getDb(), cart?.id ?? null);
 }
+
+/*
+ * Coupon attempts: 10 per minute per cart (§12 rate limiting), so codes cannot be guessed
+ * by brute force. In memory: one web instance in MVP; move to the DB/Redis with scale-out.
+ */
+const COUPON_ATTEMPTS = 10;
+const COUPON_WINDOW_MS = 60_000;
+const couponAttempts = new Map<string, number[]>();
+
+export function allowCouponAttempt(key: string, now = Date.now()): boolean {
+  const recent = (couponAttempts.get(key) ?? []).filter((at) => now - at < COUPON_WINDOW_MS);
+  if (recent.length >= COUPON_ATTEMPTS) {
+    couponAttempts.set(key, recent);
+    return false;
+  }
+  recent.push(now);
+  couponAttempts.set(key, recent);
+  if (couponAttempts.size > 10_000) {
+    for (const [k, times] of couponAttempts) {
+      if (times.every((at) => now - at >= COUPON_WINDOW_MS)) couponAttempts.delete(k);
+    }
+  }
+  return true;
+}

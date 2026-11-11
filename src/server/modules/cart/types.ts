@@ -73,6 +73,7 @@ export type CartErrorCode =
   | 'out_of_stock'
   | 'limit_reached'
   | 'coupon'
+  | 'rate_limited'
   | 'unexpected';
 
 export type CartActionResult<T> =
