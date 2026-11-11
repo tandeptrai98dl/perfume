@@ -82,6 +82,8 @@ test.describe.serial('admin: confirm a storefront COD order', () => {
       const row = page.getByRole('row').filter({ hasText: code });
       await expect(row).toContainText('Chờ xác nhận');
       await expect(row).toContainText(new RegExp(total.toLocaleString('en').replace(/,/g, '[.,]')));
+      // The table is dimmed (aria-busy) while the search navigation is still pending.
+      await expect(page.locator('[aria-busy="true"]:has(> table)')).toHaveCount(0);
       await expectNoAdminAxeViolations(page);
       await row.getByRole('link', { name: code }).click();
       await expect(page.getByRole('heading', { level: 1, name: code })).toBeVisible();
