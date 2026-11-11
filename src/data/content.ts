@@ -99,3 +99,11 @@ export async function getContentSitemapEntries() {
 export function visibleNow<T extends { publishedAt: Date | string }>(items: T[], now = new Date()) {
   return items.filter((item) => new Date(item.publishedAt).getTime() <= now.getTime());
 }
+
+/** Banners of a placement whose schedule includes the current request time. */
+export async function getLiveBanners(placement: BannerPlacement, locale: Locale) {
+  const now = new Date();
+  return (await getBanners(placement, locale)).filter((banner) =>
+    content.isBannerLive(banner, now),
+  );
+}

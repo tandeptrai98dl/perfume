@@ -75,6 +75,46 @@
   "footer": {
     "tagline": "Authentic perfume, curated in Vietnam.",
     "copyright": "© {siteName}. All rights reserved.",
-    "primaryNav": "Main navigation"
+    "primaryNav": "Main navigation",
+    "menuNav": "About Perfume Store",
+    "legalNav": "Policies",
+    "seller": {
+      "title": "Seller information",
+      "taxCode": "Tax code: {value}",
+      "address": "Address: {value}",
+      "representative": "Legal representative: {value}",
+      "phone": "Phone: {value}",
+      "email": "Email: {value}"
+    }
+  },
+  "journal": {
+    "title": "Journal",
+    "pagedTitle": "Journal – page {page}",
+    "description": "Stories about scent, how to choose a fragrance and gift ideas from Perfume Store.",
+    "empty": "No articles yet.",
+    "publishedOn": "Published {date}",
+    "byAuthor": "By {name}",
+    "topics": "Topics",
+    "topic": "Topic",
+    "allTopics": "All",
+    "topicTitle": "{name} – Journal",
+    "topicDescription": "Articles about {name} in the Perfume Store journal."
+  },
+  "content": {
+    "updatedOn": "Updated {date}",
+    "policies": "Policies",
+    "legalPrevails": "If the Vietnamese and English versions differ, the Vietnamese version prevails.",
+    "seller": {
+      "title": "Contact details",
+      "companyName": "Company",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "taxCode": "Tax code"
+    }
+  },
+  "banner": {
+    "region": "Announcement",
+    "dismiss": "Dismiss announcement"
   }
 }

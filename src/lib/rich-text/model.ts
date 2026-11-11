@@ -182,6 +182,35 @@ export function extractFaq(value: unknown): FaqEntry[] {
   return entries;
 }
 
+/**
+ * Splits a document at its headings (FAQ accordion): blocks before the first heading form the
+ * intro; each heading starts a section whose body is the blocks until the next heading.
+ * Bodies stay raw Tiptap JSON and are normalized again when rendered.
+ */
+export function splitByHeadings(value: unknown): {
+  intro: RichTextDoc;
+  sections: { heading: string; body: RichTextDoc }[];
+} {
+  const intro: RichTextNode[] = [];
+  const sections: { heading: string; body: RichTextDoc }[] = [];
+  const raw = (
+    typeof value === 'object' && value && (value as RichTextNode).type === 'doc'
+      ? ((value as RichTextNode).content ?? [])
+      : []
+  ) as RichTextNode[];
+  for (const node of raw) {
+    if (node?.type === 'heading') {
+      const heading = richTextToPlainText({ type: 'doc', content: [node] });
+      if (heading) sections.push({ heading, body: { type: 'doc', content: [] } });
+    } else if (sections.length) {
+      sections.at(-1)!.body.content!.push(node);
+    } else {
+      intro.push(node);
+    }
+  }
+  return { intro: { type: 'doc', content: intro }, sections };
+}
+
 /** Builds a minimal Tiptap doc from paragraphs/headings (seed data and tests). */
 export function docFromBlocks(
   blocks: ({ h2: string } | { h3: string } | { p: string } | { ul: string[] })[],

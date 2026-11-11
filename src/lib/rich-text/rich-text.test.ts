@@ -9,6 +9,7 @@ import {
   normalizeDoc,
   richTextToPlainText,
   safeHref,
+  splitByHeadings,
 } from './model';
 import { RichText } from './react';
 
@@ -219,5 +220,15 @@ describe('text helpers', () => {
     expect(richTextToPlainText(docFromBlocks([{ h2: 'A' }, { p: 'B  C' }]))).toBe('A B C');
     expect(isEmptyDoc(docFromBlocks([{ p: '' }]))).toBe(true);
     expect(isEmptyDoc(faq)).toBe(false);
+  });
+
+  it('splits a document at its headings', () => {
+    const { intro, sections } = splitByHeadings(faq);
+    expect(richTextToPlainText(intro)).toBe('Intro');
+    expect(sections.map((s) => [s.heading, richTextToPlainText(s.body)])).toEqual([
+      ['Is every bottle authentic?', 'Yes. Always.'],
+      ['Empty question', ''],
+      ['How long is delivery?', '1–2 days 3–5 days'],
+    ]);
   });
 });
