@@ -90,8 +90,11 @@ jobs:
       - run: pnpm db:migrate
       - run: pnpm db:seed
       - run: pnpm build
-      - run: pnpm exec playwright install --with-deps chromium
+      # GitHub's Ubuntu runners ship Google Chrome: no browser download or apt step
+      # (avoids flaky apt mirrors and saves ~5 minutes).
       - run: pnpm test:e2e
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
