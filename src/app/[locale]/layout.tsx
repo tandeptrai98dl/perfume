@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 
 import { Toaster } from '@/components/ui/toaster';
 import { routing } from '@/i18n/routing';
+import { OG_LOCALES } from '@/lib/seo/content-metadata';
 
 import '../fonts';
 import '../globals.css';
@@ -20,6 +21,15 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
   return {
     title: { default: t('defaultTitle'), template: `%s | ${t('siteName')}` },
     description: t('defaultDescription'),
+    // Defaults for pages without their own Open Graph data (§13.1).
+    openGraph: {
+      type: 'website',
+      siteName: t('siteName'),
+      title: t('defaultTitle'),
+      description: t('defaultDescription'),
+      locale: OG_LOCALES[locale],
+    },
+    twitter: { card: 'summary_large_image' },
   };
 }
 
