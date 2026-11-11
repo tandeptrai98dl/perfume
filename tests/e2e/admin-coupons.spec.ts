@@ -1,8 +1,15 @@
-import AxeBuilder from '@axe-core/playwright';
-import { expect as baseExpect, test, type Locator, type Page } from '@playwright/test';
+import { expect as baseExpect, test } from '@playwright/test';
 
+import {
+  collectConsoleErrors,
+  createStaff,
+  expectNoAxeViolations,
+  field,
+  signInAdmin as signIn,
+  toast,
+} from './helpers/admin-session';
 import { deleteE2EPromotions } from './helpers/orders';
-import { createStaffWithTotp, freshTotp, type StaffAccount } from './helpers/staff';
+import type { StaffAccount } from './helpers/staff';
 
 /*
  * Coupons and shipping zones (M2 admin stream). Data is uniquely named (E2E prefix) and removed
@@ -10,41 +17,6 @@ import { createStaffWithTotp, freshTotp, type StaffAccount } from './helpers/sta
  */
 
 const expect = baseExpect.configure({ timeout: 15_000 });
-
-async function expectNoAxeViolations(page: Page) {
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-    .exclude('[data-sonner-toast][data-front="false"]')
-    .analyze();
-  expect(
-    results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
-  ).toEqual([]);
-}
-
-function collectConsoleErrors(page: Page): string[] {
-  const errors: string[] = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
-  });
-  page.on('pageerror', (error) => errors.push(error.message));
-  return errors;
-}
-
-const field = (scope: Page | Locator, label: string) =>
-  scope.getByLabel(label, { exact: true }).filter({ visible: true });
-
-const toast = (page: Page, text: string | RegExp) =>
-  page.locator('[data-sonner-toast]').filter({ hasText: text }).first();
-
-async function signIn(page: Page, account: StaffAccount) {
-  await page.goto('/admin/login');
-  await field(page, 'Email').fill(account.email);
-  await field(page, 'Mật khẩu').fill(account.password);
-  await page.getByRole('button', { name: 'Đăng nhập' }).click();
-  await field(page, 'Mã xác thực').fill(await freshTotp(account.secret));
-  await page.getByRole('button', { name: 'Xác nhận' }).click();
-  await expect(page).toHaveURL(/\/admin$/);
-}
 
 test.describe.serial('admin coupons and shipping', () => {
   test.skip(({ isMobile }) => isMobile, 'Admin targets ≥ 1024 px screens and tablets');
@@ -54,7 +26,9 @@ test.describe.serial('admin coupons and shipping', () => {
   let owner: StaffAccount;
 
   test.beforeAll(async ({}, testInfo) => {
-    owner = await createStaffWithTotp(testInfo.project.use.baseURL!, 'owner');
+    // Account creation may wait out the auth rate limit (see helpers/admin-session.ts).
+    test.setTimeout(240_000);
+    owner = await createStaff(testInfo.project.use.baseURL!, 'owner');
   });
 
   test.afterAll(async () => {
@@ -62,7 +36,7 @@ test.describe.serial('admin coupons and shipping', () => {
   });
 
   test('owner creates, edits and switches off a coupon', async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000);
     const errors = collectConsoleErrors(page);
     const code = `${prefix}-TET`;
     await signIn(page, owner);
@@ -115,7 +89,7 @@ test.describe.serial('admin coupons and shipping', () => {
   });
 
   test('owner manages a shipping zone and its rates', async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000);
     const errors = collectConsoleErrors(page);
     const zoneName = `${prefix} Miền Tây`;
     await signIn(page, owner);

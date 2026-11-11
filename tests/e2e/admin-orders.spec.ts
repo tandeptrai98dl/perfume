@@ -1,8 +1,15 @@
-import AxeBuilder from '@axe-core/playwright';
-import { expect as baseExpect, test, type Locator, type Page } from '@playwright/test';
+import { expect as baseExpect, test } from '@playwright/test';
 
+import {
+  collectConsoleErrors,
+  createStaff,
+  expectNoAxeViolations,
+  field,
+  signInAdmin as signIn,
+  toast,
+} from './helpers/admin-session';
 import { createE2EOrder, deleteE2EOrders, type E2EOrder } from './helpers/orders';
-import { createStaffWithTotp, freshTotp, type StaffAccount } from './helpers/staff';
+import type { StaffAccount } from './helpers/staff';
 
 /*
  * Admin orders (M2 admin stream, §11 target: confirm → pack → tracking in under 2 minutes).
@@ -11,41 +18,6 @@ import { createStaffWithTotp, freshTotp, type StaffAccount } from './helpers/sta
  */
 
 const expect = baseExpect.configure({ timeout: 15_000 });
-
-async function expectNoAxeViolations(page: Page) {
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-    .exclude('[data-sonner-toast][data-front="false"]')
-    .analyze();
-  expect(
-    results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
-  ).toEqual([]);
-}
-
-function collectConsoleErrors(page: Page): string[] {
-  const errors: string[] = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
-  });
-  page.on('pageerror', (error) => errors.push(error.message));
-  return errors;
-}
-
-const field = (scope: Page | Locator, label: string) =>
-  scope.getByLabel(label, { exact: true }).filter({ visible: true });
-
-const toast = (page: Page, text: string | RegExp) =>
-  page.locator('[data-sonner-toast]').filter({ hasText: text }).first();
-
-async function signIn(page: Page, account: StaffAccount) {
-  await page.goto('/admin/login');
-  await field(page, 'Email').fill(account.email);
-  await field(page, 'Mật khẩu').fill(account.password);
-  await page.getByRole('button', { name: 'Đăng nhập' }).click();
-  await field(page, 'Mã xác thực').fill(await freshTotp(account.secret));
-  await page.getByRole('button', { name: 'Xác nhận' }).click();
-  await expect(page).toHaveURL(/\/admin$/);
-}
 
 test.describe.serial('admin orders', () => {
   test.skip(({ isMobile }) => isMobile, 'Admin targets ≥ 1024 px screens and tablets');
@@ -63,9 +35,11 @@ test.describe.serial('admin orders', () => {
   }
 
   test.beforeAll(async ({}, testInfo) => {
+    // Account creation may wait out the auth rate limit (see helpers/admin-session.ts).
+    test.setTimeout(240_000);
     const baseURL = testInfo.project.use.baseURL!;
-    owner = await createStaffWithTotp(baseURL, 'owner');
-    staff = await createStaffWithTotp(baseURL, 'staff');
+    owner = await createStaff(baseURL, 'owner');
+    staff = await createStaff(baseURL, 'staff');
   });
 
   test.afterAll(async () => {
@@ -73,7 +47,7 @@ test.describe.serial('admin orders', () => {
   });
 
   test('owner confirms, packs and ships a COD order in under two minutes', async ({ page }) => {
-    test.setTimeout(180_000);
+    test.setTimeout(300_000);
     const errors = collectConsoleErrors(page);
     const cod = await order();
     const bulk = await order();
@@ -163,7 +137,7 @@ test.describe.serial('admin orders', () => {
   });
 
   test('deposit guard and manager-only cancellation', async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000);
     const errors = collectConsoleErrors(page);
     const deposit = await order({ depositRequired: 1_000_000 });
     const confirmed = await order({ status: 'confirmed' });
