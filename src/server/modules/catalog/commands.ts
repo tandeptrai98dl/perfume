@@ -719,20 +719,19 @@ async function productTags(tx: Tx, productId: string, extraBrandIds: string[] = 
     .select({ brandId: products.brandId })
     .from(products)
     .where(eq(products.id, productId));
-  const [cats, fams, cols] = await Promise.all([
-    tx
-      .select({ id: productCategories.categoryId })
-      .from(productCategories)
-      .where(eq(productCategories.productId, productId)),
-    tx
-      .select({ id: productFamilies.familyId })
-      .from(productFamilies)
-      .where(eq(productFamilies.productId, productId)),
-    tx
-      .select({ id: collectionProducts.collectionId })
-      .from(collectionProducts)
-      .where(eq(collectionProducts.productId, productId)),
-  ]);
+  // Sequential on purpose: a transaction is one connection (no concurrent queries).
+  const cats = await tx
+    .select({ id: productCategories.categoryId })
+    .from(productCategories)
+    .where(eq(productCategories.productId, productId));
+  const fams = await tx
+    .select({ id: productFamilies.familyId })
+    .from(productFamilies)
+    .where(eq(productFamilies.productId, productId));
+  const cols = await tx
+    .select({ id: collectionProducts.collectionId })
+    .from(collectionProducts)
+    .where(eq(collectionProducts.productId, productId));
   return [
     catalogTags.product(productId),
     catalogTags.productList,
@@ -1029,32 +1028,26 @@ export async function saveProduct(
 }
 
 async function readRelations(tx: Tx, productId: string) {
-  const [cats, notes, fams, mediaRows] = await Promise.all([
-    tx
-      .select({ id: productCategories.categoryId })
-      .from(productCategories)
-      .where(eq(productCategories.productId, productId)),
-    tx
-      .select({
-        id: productNotes.noteId,
-        layer: productNotes.layer,
-        position: productNotes.position,
-      })
-      .from(productNotes)
-      .where(eq(productNotes.productId, productId)),
-    tx
-      .select({ id: productFamilies.familyId, isPrimary: productFamilies.isPrimary })
-      .from(productFamilies)
-      .where(eq(productFamilies.productId, productId)),
-    tx
-      .select({
-        id: productMedia.mediaId,
-        position: productMedia.position,
-        variantId: productMedia.variantId,
-      })
-      .from(productMedia)
-      .where(eq(productMedia.productId, productId)),
-  ]);
+  const cats = await tx
+    .select({ id: productCategories.categoryId })
+    .from(productCategories)
+    .where(eq(productCategories.productId, productId));
+  const notes = await tx
+    .select({ id: productNotes.noteId, layer: productNotes.layer, position: productNotes.position })
+    .from(productNotes)
+    .where(eq(productNotes.productId, productId));
+  const fams = await tx
+    .select({ id: productFamilies.familyId, isPrimary: productFamilies.isPrimary })
+    .from(productFamilies)
+    .where(eq(productFamilies.productId, productId));
+  const mediaRows = await tx
+    .select({
+      id: productMedia.mediaId,
+      position: productMedia.position,
+      variantId: productMedia.variantId,
+    })
+    .from(productMedia)
+    .where(eq(productMedia.productId, productId));
   const sortedNotes = notes.sort(
     (a, b) => a.layer.localeCompare(b.layer) || a.position - b.position,
   );
