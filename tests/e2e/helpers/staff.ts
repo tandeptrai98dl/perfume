@@ -14,8 +14,18 @@ export type StaffAccount = {
 type Role = 'owner' | 'manager' | 'staff' | 'editor';
 
 /** Minimal cookie-aware client for /api/auth on the running app. */
+/**
+ * Each helper client gets its own client IP: Better Auth rate-limits sign-up/sign-in per IP in
+ * production builds, and every E2E account would otherwise share one bucket (HTTP 429).
+ */
+function randomTestIp(): string {
+  const octet = () => 1 + Math.floor(Math.random() * 254);
+  return `10.${octet()}.${octet()}.${octet()}`;
+}
+
 class AuthClient {
   private cookies = new Map<string, string>();
+  private readonly ip = randomTestIp();
   constructor(private readonly baseURL: string) {}
 
   async post(path: string, body: unknown): Promise<Response> {
@@ -24,6 +34,7 @@ class AuthClient {
       headers: {
         'content-type': 'application/json',
         origin: new URL(this.baseURL).origin,
+        'x-forwarded-for': this.ip,
         cookie: [...this.cookies].map(([k, v]) => `${k}=${v}`).join('; '),
       },
       body: JSON.stringify(body),
