@@ -123,7 +123,14 @@
     "nav": {
       "dashboard": "Tổng quan",
       "signOut": "Đăng xuất",
-      "overview": "Tổng quan"
+      "overview": "Tổng quan",
+      "content": "Nội dung",
+      "banners": "Banner",
+      "pages": "Trang tĩnh",
+      "posts": "Bài viết",
+      "topics": "Chủ đề",
+      "navigation": "Menu điều hướng",
+      "redirects": "Chuyển hướng"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -175,6 +182,223 @@
       "title": "Không có quyền truy cập",
       "description": "Vai trò của bạn không được phép xem trang này.",
       "back": "Về trang tổng quan"
+    },
+    "richText": {
+      "toolbar": "Định dạng văn bản",
+      "heading2": "Tiêu đề lớn (H2)",
+      "heading3": "Tiêu đề nhỏ (H3)",
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "bulletList": "Danh sách dấu chấm",
+      "orderedList": "Danh sách đánh số",
+      "blockquote": "Trích dẫn",
+      "link": "Chèn liên kết",
+      "unlink": "Bỏ liên kết",
+      "undo": "Hoàn tác",
+      "redo": "Làm lại",
+      "linkUrl": "Địa chỉ liên kết",
+      "linkInvalid": "Liên kết không hợp lệ. Dùng đường dẫn bắt đầu bằng / hoặc địa chỉ https://.",
+      "linkApply": "Áp dụng",
+      "linkCancel": "Huỷ"
+    },
+    "content": {
+      "title": "Nội dung",
+      "description": "Banner, trang tĩnh, bài viết tạp chí, menu và chuyển hướng cho cả tiếng Việt và tiếng Anh.",
+      "new": "Tạo mới",
+      "save": "Lưu",
+      "saved": "Đã lưu",
+      "delete": "Xoá",
+      "deleted": "Đã xoá",
+      "confirmDelete": "Bạn có chắc muốn xoá? Thao tác này không thể hoàn tác.",
+      "translations": "Bản dịch",
+      "hasErrors": "Có lỗi",
+      "actions": "Thao tác",
+      "search": "Tìm kiếm",
+      "searchSubmit": "Tìm",
+      "pagination": "Phân trang",
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "locale": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "status": {
+        "draft": "Bản nháp",
+        "active": "Đang hiển thị",
+        "archived": "Lưu trữ"
+      },
+      "translationState": {
+        "published": "Đã xuất bản",
+        "draft": "Bản nháp",
+        "missing": "Chưa có"
+      },
+      "bannerState": {
+        "live": "Đang chạy",
+        "off": "Không hiển thị"
+      },
+      "placement": {
+        "home_hero": "Trang chủ – banner lớn",
+        "home_promo": "Trang chủ – khuyến mãi",
+        "category_top": "Đầu trang danh mục",
+        "announcement": "Thanh thông báo"
+      },
+      "menuKeys": {
+        "header": "Menu đầu trang",
+        "footer": "Menu chân trang",
+        "legal": "Chính sách (chân trang)"
+      },
+      "statusCodes": {
+        "301": "301 – Vĩnh viễn",
+        "302": "302 – Tạm thời",
+        "307": "307 – Tạm thời (giữ phương thức)",
+        "308": "308 – Vĩnh viễn (giữ phương thức)"
+      },
+      "sections": {
+        "banners": {
+          "title": "Banner",
+          "description": "Banner theo vị trí hiển thị, có lịch chạy và bản xem trước máy tính/điện thoại.",
+          "new": "Banner mới"
+        },
+        "pages": {
+          "title": "Trang tĩnh",
+          "description": "Giới thiệu, cam kết chính hãng, liên hệ, câu hỏi thường gặp và các trang chính sách.",
+          "new": "Trang mới"
+        },
+        "posts": {
+          "title": "Bài viết",
+          "description": "Bài viết tạp chí với ảnh bìa, chủ đề và sản phẩm liên quan.",
+          "new": "Bài viết mới"
+        },
+        "topics": {
+          "title": "Chủ đề",
+          "description": "Nhóm bài viết tạp chí theo chủ đề.",
+          "new": "Chủ đề mới"
+        },
+        "navigation": {
+          "title": "Menu điều hướng",
+          "description": "Liên kết ở đầu trang và chân trang cho từng ngôn ngữ."
+        },
+        "redirects": {
+          "title": "Chuyển hướng",
+          "description": "Giữ thứ hạng tìm kiếm khi đổi đường dẫn. Đổi slug của nội dung đã xuất bản sẽ tự tạo chuyển hướng 301."
+        }
+      },
+      "columns": {
+        "title": "Tiêu đề",
+        "key": "Mã trang",
+        "status": "Trạng thái",
+        "updatedAt": "Cập nhật",
+        "publishedAt": "Ngày đăng",
+        "placement": "Vị trí",
+        "position": "Thứ tự",
+        "schedule": "Lịch chạy",
+        "menu": "Menu",
+        "from": "Đường dẫn cũ",
+        "to": "Đường dẫn mới",
+        "code": "Mã",
+        "hits": "Lượt truy cập",
+        "lastHit": "Lần cuối"
+      },
+      "fields": {
+        "title": "Tiêu đề",
+        "name": "Tên",
+        "slug": "Đường dẫn (slug)",
+        "excerpt": "Mô tả ngắn",
+        "content": "Nội dung",
+        "seoTitle": "Tiêu đề SEO",
+        "seoDescription": "Mô tả SEO",
+        "publishVi": "Xuất bản bản tiếng Việt",
+        "publishEn": "Xuất bản bản tiếng Anh (đã được biên tập viên tiếng Anh duyệt)",
+        "hasEn": "Có bản tiếng Anh",
+        "key": "Mã trang",
+        "status": "Trạng thái",
+        "publishedAt": "Thời điểm đăng",
+        "cover": "Ảnh bìa",
+        "topics": "Chủ đề",
+        "products": "Sản phẩm liên quan",
+        "noImage": "Không có ảnh",
+        "placement": "Vị trí",
+        "position": "Thứ tự",
+        "isActive": "Bật banner",
+        "startsAt": "Bắt đầu",
+        "endsAt": "Kết thúc",
+        "subtitle": "Dòng phụ",
+        "ctaLabel": "Nút kêu gọi",
+        "ctaUrl": "Liên kết của nút",
+        "desktopImage": "Ảnh máy tính",
+        "mobileImage": "Ảnh điện thoại",
+        "fromPath": "Đường dẫn cũ",
+        "toPath": "Đường dẫn mới",
+        "statusCode": "Loại chuyển hướng",
+        "labelVi": "Tên (VI)",
+        "hrefVi": "Liên kết (VI)",
+        "labelEn": "Tên (EN)",
+        "hrefEn": "Liên kết (EN)"
+      },
+      "hints": {
+        "slug": "Chữ thường không dấu, nối bằng dấu gạch ngang. Đổi slug của nội dung đã xuất bản sẽ tạo chuyển hướng 301.",
+        "seoTitle": "Tối đa 60–70 ký tự. Để trống để dùng tiêu đề.",
+        "seoDescription": "Tối đa 155 ký tự. Để trống để dùng đoạn đầu nội dung.",
+        "pageKey": "about, authenticity, contact, faq có đường dẫn cố định; mã khác hiển thị trong mục Chính sách.",
+        "publishedAt": "Giờ Việt Nam. Để trống sẽ dùng thời điểm xuất bản; chọn thời gian trong tương lai để hẹn giờ.",
+        "products": "Chọn sản phẩm được nhắc đến trong bài.",
+        "noMedia": "Chưa có ảnh nào. Hãy tải ảnh lên thư viện ảnh trước.",
+        "schedule": "Lịch chạy (giờ Việt Nam, để trống nếu không giới hạn)",
+        "href": "Đường dẫn trong trang (ví dụ /nuoc-hoa) hoặc địa chỉ https:// đầy đủ.",
+        "hrefEn": "Để trống để dùng trang tiếng Anh tương ứng",
+        "fromPath": "Đường dẫn công khai, ví dụ /tap-chi/ten-cu hoặc /en/journal/old-name.",
+        "menu": "Mỗi dòng là một liên kết. Bỏ trống tên tiếng Anh nếu liên kết không có ở menu tiếng Anh."
+      },
+      "empty": {
+        "pages": "Chưa có trang nào.",
+        "posts": "Chưa có bài viết nào.",
+        "topics": "Chưa có chủ đề nào.",
+        "banners": "Chưa có banner nào.",
+        "redirects": "Chưa có chuyển hướng nào.",
+        "menu": "Menu chưa có liên kết nào."
+      },
+      "preview": {
+        "title": "Xem trước",
+        "desktop": "Máy tính",
+        "mobile": "Điện thoại",
+        "device": "Thiết bị",
+        "locale": "Ngôn ngữ xem trước",
+        "placeholder": "Tiêu đề banner"
+      },
+      "menu": {
+        "add": "Thêm liên kết",
+        "moveUp": "Đưa dòng {n} lên",
+        "moveDown": "Đưa dòng {n} xuống",
+        "remove": "Xoá dòng {n}",
+        "count": "{count, plural, other {# liên kết}}"
+      },
+      "redirects": {
+        "create": "Thêm chuyển hướng",
+        "total": "{count, plural, other {# chuyển hướng}}"
+      },
+      "errors": {
+        "invalid": "Giá trị không hợp lệ.",
+        "required": "Vui lòng nhập trường này.",
+        "too_long": "Nội dung quá dài.",
+        "slug_invalid": "Slug chỉ gồm chữ thường không dấu, số và dấu gạch ngang.",
+        "key_invalid": "Mã trang chỉ gồm chữ thường, số và dấu gạch ngang.",
+        "url_invalid": "Liên kết không hợp lệ.",
+        "path_invalid": "Đường dẫn phải bắt đầu bằng / và không chứa ? hoặc #.",
+        "vi_required": "Cần xuất bản bản tiếng Việt trước khi hiển thị nội dung hoặc xuất bản bản tiếng Anh.",
+        "schedule_invalid": "Thời điểm kết thúc phải sau thời điểm bắt đầu.",
+        "cta_incomplete": "Cần nhập cả tên nút và liên kết của nút.",
+        "content_too_large": "Nội dung quá lớn.",
+        "status_invalid": "Loại chuyển hướng không hợp lệ.",
+        "redirect_self": "Đường dẫn mới phải khác đường dẫn cũ.",
+        "path_reserved": "Không thể chuyển hướng đường dẫn /admin hoặc /api.",
+        "slug_taken": "Slug này đã được dùng trong cùng ngôn ngữ.",
+        "key_taken": "Mã trang này đã tồn tại.",
+        "redirect_exists": "Đường dẫn cũ này đã có chuyển hướng.",
+        "not_found": "Không tìm thấy nội dung.",
+        "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+        "validation": "Vui lòng kiểm tra lại các trường được đánh dấu.",
+        "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+      }
     }
   }
 }
