@@ -4,6 +4,9 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
+/** Product media host (object storage / CDN), see src/lib/media-url.ts. */
+const mediaBaseUrl = process.env.NEXT_PUBLIC_MEDIA_BASE_URL?.replace(/\/+$/, '');
+
 const nextConfig: NextConfig = {
   // Self-hosted in Docker on a Vietnam-based cloud (ADR-0012).
   output: 'standalone',
@@ -13,6 +16,9 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   typedRoutes: true,
   poweredByHeader: false,
+  images: {
+    remotePatterns: mediaBaseUrl ? [new URL(`${mediaBaseUrl}/**`)] : [],
+  },
   // Sentry loads parts of its runtime hooks dynamically, which file tracing cannot see.
   outputFileTracingIncludes: {
     '/*': ['./node_modules/.pnpm/@sentry+*/node_modules/@sentry/**/*'],

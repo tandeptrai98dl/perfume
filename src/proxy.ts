@@ -4,19 +4,23 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { matchLocalizedPath } from './lib/seo/paths';
 import { errorFields, logger } from './server/lib/logger';
+import { CATALOG_ROUTES } from './server/modules/catalog';
 import { CONTENT_ROUTES, decideRoute, normalizePath } from './server/modules/content';
 import { countRedirectHit, getRouteTable } from './server/routing/route-table';
 import { routing } from './i18n/routing';
 
 const handleI18nRouting = createMiddleware(routing);
 
+/** Catalogue detail routes whose slugs are checked against the route table (real 404s). */
+const ROUTED_CATALOG_PATHS = new Set<string>(Object.values(CATALOG_ROUTES));
+
 /** Admin pages reachable without a session. */
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login']);
 
 /**
  * Next.js 16 proxy (formerly middleware).
- * - Storefront: `redirects` table and content existence (cached route table, no DB query per
- *   request), then locale routing (next-intl).
+ * - Storefront: `redirects` table and content/catalogue existence (cached route table, no DB
+ *   query per request), then locale routing (next-intl).
  * - /admin: optimistic cookie check only, so anonymous visitors get a fast redirect. The real
  *   check (role, 2FA-verified session, permission) runs in the admin layout and in every
  *   Server Action / Route Handler via `requirePermission`.
@@ -48,7 +52,9 @@ async function routeFromTable(request: NextRequest): Promise<NextResponse | null
     const table = await getRouteTable();
     if (!table) return null;
     const match = matchLocalizedPath(path);
-    const isContentRoute = !!match && CONTENT_ROUTES.includes(match.pathname);
+    const isContentRoute =
+      !!match &&
+      (CONTENT_ROUTES.includes(match.pathname) || ROUTED_CATALOG_PATHS.has(match.pathname));
     const decision = decideRoute(table, path, isContentRoute);
 
     if (decision.kind === 'redirect') {

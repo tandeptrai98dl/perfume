@@ -65,6 +65,8 @@ export const serverEnvSchema = z
 export const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default('Perfume Store'),
   NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
+  /** Public base URL of media in object storage / CDN, e.g. https://cdn.example.vn/media. */
+  NEXT_PUBLIC_MEDIA_BASE_URL: z.url().optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -112,4 +114,5 @@ export function serverEnv(): ServerEnv {
 export const clientEnv: ClientEnv = parseClientEnv({
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  NEXT_PUBLIC_MEDIA_BASE_URL: process.env.NEXT_PUBLIC_MEDIA_BASE_URL,
 });
