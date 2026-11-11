@@ -41,3 +41,27 @@ STAFF_PASSWORD='choose-a-strong-password' pnpm auth:create-staff --email you@exa
 | `pnpm auth:create-staff`                             | Create or promote a staff account (`owner`, `manager`, `staff`, `editor`) |
 
 Local services: Mailpit UI http://localhost:8025, MinIO console http://localhost:9001.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and on `main`: lint, format, types,
+unit tests, i18n parity, worker bundle, dependency audit; integration tests against
+PostgreSQL 17; Playwright E2E (desktop 1280 px and mobile 375 px, vi and en, axe WCAG 2.2 AA);
+Docker image builds; Gitleaks secret scan. Dependabot opens weekly update PRs.
+
+## Docker images
+
+| Image  | Dockerfile                 | Runs                                                                                |
+| ------ | -------------------------- | ----------------------------------------------------------------------------------- |
+| web    | `docker/Dockerfile`        | Next.js standalone server on port 3000, health check `/api/health`                  |
+| worker | `docker/Dockerfile.worker` | pg-boss worker; also `node dist/worker/migrate.mjs` and `node dist/worker/seed.mjs` |
+
+```bash
+docker build -f docker/Dockerfile -t perfume-web .
+docker build -f docker/Dockerfile.worker -t perfume-worker .
+docker run --rm --env-file .env.production perfume-worker node dist/worker/migrate.mjs
+```
+
+Error reporting uses Sentry when `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` are set. Default PII
+is off and every event is scrubbed (emails, phone numbers, cookies, auth headers, request
+bodies, query values) by `src/lib/observability/scrub.ts`.

@@ -10,7 +10,7 @@ import { defineConfig } from 'tsup';
  * `server-only` (ESLint enforces this); as a safety net `server-only` is aliased to a no-op.
  */
 export default defineConfig({
-  entry: { index: 'worker/index.ts' },
+  entry: { index: 'worker/index.ts', migrate: 'worker/migrate.ts', seed: 'worker/seed.ts' },
   outDir: 'dist/worker',
   format: ['esm'],
   platform: 'node',

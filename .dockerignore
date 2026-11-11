@@ -1,0 +1,13 @@
+.git
+.github
+.next
+.husky
+node_modules
+dist
+coverage
+playwright-report
+test-results
+docker/data
+.env*
+!.env.example
+*.log

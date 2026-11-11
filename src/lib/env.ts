@@ -31,6 +31,10 @@ export const serverEnvSchema = z
       .regex(/^smtps?:\/\//, 'must be an smtp:// or smtps:// URL')
       .default('smtp://localhost:1025'),
     EMAIL_FROM: z.string().min(3).default('Perfume Store <no-reply@localhost>'),
+    /** Error reporting; disabled when unset. Events are PII-scrubbed (src/lib/observability). */
+    SENTRY_DSN: z.url().optional(),
+    SENTRY_ENVIRONMENT: z.string().min(1).optional(),
+    SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -60,6 +64,7 @@ export const serverEnvSchema = z
 /** Client-exposed variables must be prefixed with NEXT_PUBLIC_. */
 export const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default('Perfume Store'),
+  NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -88,7 +93,7 @@ export function parseServerEnv(source: Record<string, string | undefined>): Serv
 }
 
 export function parseClientEnv(source: Record<string, string | undefined>): ClientEnv {
-  const result = clientEnvSchema.safeParse(source);
+  const result = clientEnvSchema.safeParse(withoutEmptyValues(source));
   if (!result.success) throw new EnvValidationError(formatIssues(result.error));
   return result.data;
 }
@@ -106,4 +111,5 @@ export function serverEnv(): ServerEnv {
  */
 export const clientEnv: ClientEnv = parseClientEnv({
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
 });

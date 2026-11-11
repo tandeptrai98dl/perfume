@@ -1,4 +1,4 @@
-import { Search, ShoppingBag, User } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { SkipLink } from '@/components/ui/skip-link';
@@ -6,11 +6,22 @@ import { Link } from '@/i18n/navigation';
 
 import { LanguageSwitcher } from './language-switcher';
 
-const NAV = [
-  { href: '/perfumes', key: 'perfumes' },
-  { href: '/brands', key: 'brands' },
-  { href: '/journal', key: 'journal' },
-] as const;
+type NavItem = {
+  href: '/perfumes' | '/brands' | '/journal';
+  key: 'perfumes' | 'brands' | 'journal';
+};
+type ActionItem = {
+  href: '/search' | '/account' | '/cart';
+  key: 'search' | 'account' | 'cart';
+  icon: LucideIcon;
+};
+
+/**
+ * Only routes that exist are linked (no links to 404s). M1 adds entries as pages ship:
+ * perfumes, brands, journal; actions: search (Search), account (User), cart (ShoppingBag).
+ */
+const NAV: readonly NavItem[] = [];
+const ACTIONS: readonly ActionItem[] = [];
 
 /** Storefront header (§8.2). Mega menu, search dialog, mini-cart and mobile nav arrive in M1. */
 export function SiteHeader() {
@@ -42,19 +53,16 @@ export function SiteHeader() {
           </Link>
           <div className="flex items-center justify-end md:col-start-3 md:gap-1">
             <LanguageSwitcher className="md:mr-2" />
-            <Link href="/search" className={iconLink} aria-label={t('navigation.search')}>
-              <Search aria-hidden />
-            </Link>
-            <Link
-              href="/account"
-              className={`${iconLink} max-sm:hidden`}
-              aria-label={t('navigation.account')}
-            >
-              <User aria-hidden />
-            </Link>
-            <Link href="/cart" className={iconLink} aria-label={t('navigation.cart')}>
-              <ShoppingBag aria-hidden />
-            </Link>
+            {ACTIONS.map(({ href, key, icon: Icon }) => (
+              <Link
+                key={key}
+                href={href}
+                className={key === 'account' ? `${iconLink} max-sm:hidden` : iconLink}
+                aria-label={t(`navigation.${key}`)}
+              >
+                <Icon aria-hidden />
+              </Link>
+            ))}
           </div>
         </div>
       </header>

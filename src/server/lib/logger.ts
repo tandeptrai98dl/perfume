@@ -1,11 +1,19 @@
+import { scrubText, scrubValue } from '@/lib/observability/scrub';
+
 /**
- * Minimal structured logger (JSON lines). Never pass raw PII: mask with `server/lib/mask.ts`.
- * Sentry and log shipping come in M0-7.
+ * Minimal structured logger (JSON lines). Messages and fields are PII-scrubbed as a safety
+ * net; still prefer masking at the call site (`server/lib/mask.ts`).
  */
 type Level = 'debug' | 'info' | 'warn' | 'error';
 
 function write(level: Level, message: string, fields?: Record<string, unknown>) {
-  const line = JSON.stringify({ level, time: new Date().toISOString(), message, ...fields });
+  const safeFields = fields ? (scrubValue(fields) as Record<string, unknown>) : undefined;
+  const line = JSON.stringify({
+    level,
+    time: new Date().toISOString(),
+    message: scrubText(message),
+    ...safeFields,
+  });
   if (level === 'error' || level === 'warn') console.error(line);
   else console.log(line);
 }
