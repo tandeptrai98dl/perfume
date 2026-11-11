@@ -63,6 +63,8 @@ test('editor manages content from the admin screens', async ({ page, request }) 
 
   // Create and publish a Vietnamese policy page with the rich text editor.
   await page.goto('/admin/content/pages/new');
+  // Typing into server-rendered inputs before hydration is lost.
+  await page.waitForLoadState('networkidle');
   await page.getByLabel('Mã trang').fill(`e2e-${run}`);
   await page.getByLabel('Trạng thái').selectOption('active');
   const viPanel = page.getByRole('tabpanel', { name: 'Tiếng Việt' });
@@ -74,6 +76,7 @@ test('editor manages content from the admin screens', async ({ page, request }) 
   await page.keyboard.type('Nội dung kiểm thử ');
   await viPanel.getByRole('button', { name: 'In đậm' }).click();
   await page.keyboard.type('quan trọng');
+  await expect(editor.locator('strong')).toHaveText('quan trọng');
   await viPanel.getByLabel('Xuất bản bản tiếng Việt').check();
   await page.getByRole('button', { name: 'Lưu' }).click();
   await expect(page).toHaveURL(/\/admin\/content\/pages\/[0-9a-f-]{36}$/);

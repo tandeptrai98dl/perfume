@@ -117,7 +117,10 @@ test.describe('journal', () => {
   }) => {
     const errors = collectConsoleErrors(page);
     await page.goto('/tap-chi/edt-hay-edp');
-    await page.getByRole('link', { name: 'English' }).click();
+    // The switcher streams in after the static shell (whose fallback links to the home page).
+    const english = page.getByRole('link', { name: 'English' });
+    await expect(english).not.toHaveAttribute('href', '/en');
+    await english.click();
     await expect(page).toHaveURL(/\/en\/journal\/edt-or-edp$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'EDT or EDP: which concentration suits you?',
