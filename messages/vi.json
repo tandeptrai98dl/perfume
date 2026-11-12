@@ -980,6 +980,7 @@
         "reservationExpired": "Đã hết thời gian giữ hàng cho đơn này.",
         "providerUnavailable": "Phương thức này tạm thời không khả dụng. Vui lòng chọn cách khác.",
         "gatewayError": "Không kết nối được cổng thanh toán. Vui lòng thử lại.",
+        "rateLimited": "Bạn đã thử thanh toán quá nhiều lần. Vui lòng đợi một phút rồi thử lại.",
         "notPayable": "Đơn hàng này không còn cần thanh toán.",
         "nothingDue": "Đơn hàng này không còn khoản nào cần thanh toán.",
         "notFound": "Không tìm thấy đơn hàng.",
