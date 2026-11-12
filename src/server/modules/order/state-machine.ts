@@ -56,8 +56,11 @@ const RULES: Record<OrderStatus, readonly Rule[]> = {
   return_requested: [
     { to: 'returned', actors: ['staff'] },
     { to: 'delivered', actors: ['staff'], note: 'return rejected' },
+    // ADR-0027: a return a manager reopened on a completed order closes back to `completed`.
+    { to: 'completed', actors: ['staff'], note: 'return on a reopened order closed' },
   ],
-  completed: [],
+  // ADR-0027: a manager may open a return past the window (audited override); otherwise final.
+  completed: [{ to: 'return_requested', actors: ['manager'], note: 'return window override' }],
   cancelled: [],
   returned: [],
 };
@@ -79,6 +82,12 @@ export function nextStatuses(from: OrderStatus, actor: TransitionActor): OrderSt
 export function isTerminal(status: OrderStatus): boolean {
   return RULES[status].length === 0;
 }
+
+/**
+ * Orders whose fulfilment is over (privacy deletion, reporting): the terminal states plus
+ * `completed`, which only a manager's audited return-window override can reopen (ADR-0027).
+ */
+export const CLOSED_STATUSES: readonly OrderStatus[] = ['completed', 'cancelled', 'returned'];
 
 /** Orders in these states still hold stock reservations (not yet deducted). */
 export const RESERVING_STATUSES: readonly OrderStatus[] = ['pending', 'awaiting_confirmation'];

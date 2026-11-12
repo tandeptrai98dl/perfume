@@ -12,13 +12,15 @@ import {
   type Tx,
 } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
-import { lockOrder, type OrderActor } from '@/server/modules/order';
+import { lockOrder, recordOrderEvent, type OrderActor } from '@/server/modules/order';
 
 import {
   applyCompletedRefund,
   applySucceededPayment,
+  isPayoutRefund,
   openRefundTotal,
   queueRefund,
+  RETURN_PAYOUT_REASON,
 } from './ledger';
 import type {
   CodRemittanceInput,
@@ -139,8 +141,18 @@ export async function confirmBankTransfer(
 
 // ---------- COD remittance (§3.4 step 6) ----------
 
-/** Carriers remit after delivery; delivery-failed/returned parcels collected nothing. */
+/**
+ * Carriers remit after delivery. A parcel that failed delivery collected nothing; an order the
+ * customer returned after a delivery (`returned` with `delivered_at`) was collected all the
+ * same: the remittance records the money and the return's deferred refund is queued.
+ */
 const REMITTABLE = ['delivered', 'completed', 'return_requested'];
+
+export function isRemittable(order: { status: string; deliveredAt: Date | null }): boolean {
+  return (
+    REMITTABLE.includes(order.status) || (order.status === 'returned' && order.deliveredAt !== null)
+  );
+}
 
 export async function createCodRemittance(
   ctx: CommandContext,
@@ -167,7 +179,7 @@ export async function createCodRemittance(
     for (const [index, line] of sorted.entries()) {
       const order = await lockOrder(tx, line.orderId).catch(() => null);
       const path = `orders.${input.orders.findIndex((o) => o.orderId === line.orderId)}`;
-      if (!order || order.paymentMethod !== 'cod' || !REMITTABLE.includes(order.status)) {
+      if (!order || order.paymentMethod !== 'cod' || !isRemittable(order)) {
         issues.push({ path, code: 'notRemittable' });
         continue;
       }
@@ -239,6 +251,8 @@ export async function requestRefund(
   input: RequestRefundInput,
 ): Promise<CommandResult<{ refundId: string }>> {
   assertCan(ctx.actor, 'payments.refund');
+  // Return-shipping payouts are created by the return flow only (they bypass the money cap).
+  if (input.reason === RETURN_PAYOUT_REASON) throw field('reason', 'reservedReason');
   return ctx.db.transaction(async (tx) => {
     const order = await lockOrder(tx, input.orderId);
     const available = refundableAmount(order, await openRefundTotal(tx, order.id));
@@ -311,7 +325,9 @@ async function finishRefund(
     const order = await lockOrder(tx, peek.orderId);
     const refund = await lockRefund(tx, refundId);
     if (refund.status === 'completed') throw field('refundId', 'refundClosed');
-    if (order.amountRefunded + refund.amount > order.amountPaid) {
+    const payout = isPayoutRefund(refund);
+    if (payout && values.mode !== 'manual') throw field('mode', 'gatewayUnsupported');
+    if (!payout && order.amountRefunded + refund.amount > order.amountPaid) {
       throw field('refundId', 'exceedsRefundable');
     }
     await tx
@@ -324,11 +340,20 @@ async function finishRefund(
         actorId: refund.actorId ?? ctx.actor.id,
       })
       .where(eq(refunds.id, refund.id));
-    const paymentStatus = await applyCompletedRefund(tx, {
-      order,
-      refund,
-      actor: staffActor(ctx),
-    });
+    // A return-shipping payout is the shop's cost, not money of the order: the ledger
+    // (amount_refunded, payment_status) does not change; the timeline records it.
+    const paymentStatus = payout
+      ? order.paymentStatus
+      : await applyCompletedRefund(tx, { order, refund, actor: staffActor(ctx) });
+    if (payout) {
+      await recordOrderEvent(tx, {
+        orderId: order.id,
+        type: 'refund_completed',
+        message: refund.reason,
+        actor: staffActor(ctx),
+        metadata: { refundId: refund.id, amount: refund.amount, method: refund.method, payout },
+      });
+    }
     await recordAudit(tx, {
       actorId: ctx.actor.id,
       action: 'refund.complete',
@@ -339,6 +364,7 @@ async function finishRefund(
         amount: refund.amount,
         mode: values.mode,
         providerRef: values.providerRef,
+        ...(payout ? { payout } : {}),
         paymentStatus: { from: order.paymentStatus, to: paymentStatus },
       },
       ip: ctx.ip,

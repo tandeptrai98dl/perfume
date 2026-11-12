@@ -1,10 +1,11 @@
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, ne, or, sql } from 'drizzle-orm';
 import type { PgBoss } from 'pg-boss';
 
-import { orders, payments, refunds } from '@/server/db/schema';
+import { orderEvents, orders, payments, refunds } from '@/server/db/schema';
 import { enqueue } from '@/server/jobs/queue';
 import type { Tx } from '@/server/lib/command-context';
 import {
+  RETURN_EVENTS,
   recordOrderEvent,
   refreshBestSellersOnChange,
   transitionOrder,
@@ -49,13 +50,145 @@ export async function alertStaff(
   });
 }
 
+/**
+ * Reimbursed return shipping paid out beyond the money the order holds (ADR-0017, M3 wave 3):
+ * a manual bank-transfer/cash refund with this reason and no payment attempt. It never reserves
+ * or consumes the order's own money (`openRefundTotal`, `amount_refunded`): it is a cost of the
+ * shop, not a refund of the sale. Staff cannot create one by hand (`requestRefund`).
+ */
+export const RETURN_PAYOUT_REASON = 'return_shipping_payout';
+
+export function isPayoutRefund(refund: { reason: string; paymentId: string | null }): boolean {
+  return refund.reason === RETURN_PAYOUT_REASON && refund.paymentId === null;
+}
+
+/** Refunds taken from the order's money (everything except return-shipping payouts). */
+const notPayout = or(ne(refunds.reason, RETURN_PAYOUT_REASON), isNotNull(refunds.paymentId));
+
 /** Sum of refunds that are queued or in progress (they reserve refundable money). */
 export async function openRefundTotal(tx: Pick<Tx, 'select'>, orderId: string): Promise<number> {
   const [row] = await tx
     .select({ total: sql<string>`coalesce(sum(${refunds.amount}), 0)` })
     .from(refunds)
-    .where(and(eq(refunds.orderId, orderId), inArray(refunds.status, ['requested', 'processing'])));
+    .where(
+      and(
+        eq(refunds.orderId, orderId),
+        inArray(refunds.status, ['requested', 'processing']),
+        notPayout,
+      ),
+    );
   return Number(row?.total ?? 0);
+}
+
+// ---------- Deferred refunds (customer returns before the money arrived) ----------
+
+/**
+ * `refund_deferred` order event: a customer return is owed money the order does not hold yet
+ * (COD the carrier has not remitted). Metadata `{ amount, reason, requestId? }`. Every
+ * `refund_requested` event that settles part of it carries `metadata.deferred` (the amount
+ * settled), so the outstanding balance is Σ deferred − Σ settled.
+ */
+export const DEFERRED_REFUND_EVENT = 'refund_deferred';
+
+export async function deferredRefundBalance(
+  tx: Pick<Tx, 'select'>,
+  orderId: string,
+): Promise<{ deferred: number; settled: number; outstanding: number; reason: string | null }> {
+  const [row] = await tx
+    .select({
+      deferred: sql<string>`coalesce(sum(case when ${orderEvents.type} = ${DEFERRED_REFUND_EVENT}
+        then (${orderEvents.metadata}->>'amount')::bigint end), 0)`,
+      settled: sql<string>`coalesce(sum(case when ${orderEvents.type} = 'refund_requested'
+        then (${orderEvents.metadata}->>'deferred')::bigint end), 0)`,
+      reason: sql<string | null>`(array_agg(${orderEvents.metadata}->>'reason' order by
+        ${orderEvents.createdAt} desc) filter (where ${orderEvents.type} = ${DEFERRED_REFUND_EVENT}))[1]`,
+    })
+    .from(orderEvents)
+    .where(
+      and(
+        eq(orderEvents.orderId, orderId),
+        inArray(orderEvents.type, [DEFERRED_REFUND_EVENT, 'refund_requested']),
+      ),
+    );
+  const deferred = Number(row?.deferred ?? 0);
+  const settled = Number(row?.settled ?? 0);
+  return {
+    deferred,
+    settled,
+    outstanding: Math.max(0, deferred - settled),
+    reason: row?.reason ?? null,
+  };
+}
+
+/** Records a deferred refund (caller holds the order lock). */
+export async function recordDeferredRefund(
+  tx: Tx,
+  input: {
+    orderId: string;
+    amount: number;
+    reason: string;
+    actorId: string | null;
+    requestId?: string;
+  },
+): Promise<void> {
+  await recordOrderEvent(tx, {
+    orderId: input.orderId,
+    type: DEFERRED_REFUND_EVENT,
+    message: input.reason,
+    actor: input.actorId ? { type: 'staff', id: input.actorId } : SYSTEM_ACTOR,
+    metadata: {
+      amount: input.amount,
+      reason: input.reason,
+      ...(input.requestId ? { requestId: input.requestId } : {}),
+    },
+  });
+}
+
+/**
+ * Money arrived (COD remittance, bank transfer): queue what is owed from deferred return
+ * refunds, as far as the order now holds it (manual bank transfer to the customer). Returns
+ * the refund id, or null when nothing was owed or held. Caller holds the order lock.
+ */
+export async function settleDeferredRefunds(
+  tx: Tx,
+  boss: PgBoss,
+  input: { orderId: string },
+): Promise<string | null> {
+  const balance = await deferredRefundBalance(tx, input.orderId);
+  if (balance.outstanding <= 0) return null;
+  const [order] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
+  if (!order) return null;
+  const amount = Math.min(
+    balance.outstanding,
+    refundableAmount(order, await openRefundTotal(tx, order.id)),
+  );
+  if (amount <= 0) return null;
+  const refundId = await queueRefund(tx, {
+    orderId: order.id,
+    paymentId: null,
+    amount,
+    reason: balance.reason ?? 'return',
+    method: 'bank_transfer',
+    actorId: null,
+    deferred: amount,
+  });
+  await alertStaff(boss, tx, 'late_payment_refund', {
+    orderId: order.id,
+    message: `Payment received for a returned order: ${amount} VND owed to the customer queued for refund (bank transfer)${
+      balance.outstanding > amount ? `, ${balance.outstanding - amount} VND still owed` : ''
+    }.`,
+  });
+  return refundId;
+}
+
+/** The order went through a received customer return (not a failed delivery sent back). */
+async function hasReceivedReturn(tx: Pick<Tx, 'select'>, orderId: string): Promise<boolean> {
+  const [row] = await tx
+    .select({ id: orderEvents.id })
+    .from(orderEvents)
+    .where(and(eq(orderEvents.orderId, orderId), eq(orderEvents.type, RETURN_EVENTS.received)))
+    .limit(1);
+  return !!row;
 }
 
 /** Adds a refund to the queue (status `requested`); the caller has locked the order. */
@@ -68,6 +201,8 @@ export async function queueRefund(
     reason: string;
     method: 'gateway' | 'bank_transfer' | 'cash';
     actorId: string | null;
+    /** Part of a deferred return refund this refund settles (`deferredRefundBalance`). */
+    deferred?: number;
   },
 ): Promise<string> {
   const [row] = await tx
@@ -86,7 +221,12 @@ export async function queueRefund(
     type: 'refund_requested',
     message: input.reason,
     actor: input.actorId ? { type: 'staff', id: input.actorId } : SYSTEM_ACTOR,
-    metadata: { refundId: row!.id, amount: input.amount, method: input.method },
+    metadata: {
+      refundId: row!.id,
+      amount: input.amount,
+      method: input.method,
+      ...(input.deferred ? { deferred: input.deferred } : {}),
+    },
   });
   return row!.id;
 }
@@ -180,7 +320,11 @@ export async function applySucceededPayment(
 
   let confirmed = false;
   let refundId: string | null = null;
-  if (REFUND_ON_PAYMENT.includes(order.status)) {
+  // A customer return received before the money arrived (COD not remitted yet, ADR-0017):
+  // the money is the shop's except what the return owes, which the deferred refund queues
+  // below — not the whole payment as for a cancelled order or a failed delivery.
+  const customerReturn = order.status === 'returned' && (await hasReceivedReturn(tx, order.id));
+  if (REFUND_ON_PAYMENT.includes(order.status) && !customerReturn) {
     refundId = await queueRefund(tx, {
       orderId: order.id,
       paymentId: payment.id,
@@ -234,6 +378,7 @@ export async function applySucceededPayment(
       });
     }
   }
+  refundId = (await settleDeferredRefunds(tx, boss, { orderId: order.id })) ?? refundId;
   return { paymentStatus: change.to, confirmed, refundId };
 }
 

@@ -5,10 +5,12 @@ import 'server-only';
 import {
   approveReturn,
   approveReturnSchema,
+  openReturnForCustomer,
   receiveReturn,
   receiveReturnSchema,
   rejectReturn,
   rejectReturnSchema,
+  staffReturnSchema,
 } from '@/server/modules/returns';
 
 import { runAdminAction } from './run';
@@ -30,4 +32,15 @@ export async function rejectReturnAction(raw: unknown) {
 
 export async function receiveReturnAction(raw: unknown) {
   return runAdminAction(receiveReturnSchema, raw, 'orders.process', receiveReturn);
+}
+
+/**
+ * Open a return on the customer's behalf (phone, chat) — warehouse/order work
+ * (`orders.process`); lifting the return window needs `payments.refund` (checked by the
+ * module) and is audited (ADR-0027).
+ */
+export async function openReturnForCustomerAction(raw: unknown) {
+  return runAdminAction(staffReturnSchema, raw, 'orders.process', (ctx, input) =>
+    openReturnForCustomer(ctx, input),
+  );
 }

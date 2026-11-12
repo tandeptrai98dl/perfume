@@ -78,11 +78,47 @@ export function ReturnPanel({ view, orderCode, canManage, canProcess }: Props) {
         <Row label={t('panel.reason')}>{t(`reasons.${view.reason}`)}</Row>
         <Row label={t('panel.resolution')}>{t(`resolutions.${view.resolution}`)}</Row>
       </dl>
+      {view.openedBy === 'staff' && <p className="text-small">{t('panel.openedByStaff')}</p>}
+      {view.windowOverride && (
+        <p className="text-small text-warning">
+          {t('panel.windowOverride', { reason: view.windowOverride.reason })}
+        </p>
+      )}
       {view.sealIntact && <p className="text-small">{t('panel.seal')}</p>}
       <div className="text-small flex flex-col gap-1">
         <p className="font-medium">{t('panel.description')}</p>
         <p className="whitespace-pre-line">{view.description ?? t('panel.noDescription')}</p>
       </div>
+      {view.photos.length > 0 && (
+        <div className="text-small flex flex-col gap-2">
+          <p className="font-medium">{t('panel.photos', { count: view.photos.length })}</p>
+          <ul className="flex flex-wrap gap-3">
+            {view.photos.map((photo, index) => (
+              <li key={photo.id}>
+                <a
+                  href={photo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-line-200 focus-visible:outline-gold-700 block border focus-visible:outline-2"
+                >
+                  {/* Private, staff-only bytes: not optimised or cached by next/image. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photo.url}
+                    alt={t('panel.photoAlt', { index: index + 1, code: orderCode })}
+                    width={photo.width}
+                    height={photo.height}
+                    loading="lazy"
+                    className="h-28 w-28 object-cover"
+                    data-testid="return-photo"
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="text-taupe-600">{t('panel.photosHint')}</p>
+        </div>
+      )}
       <div className="text-small flex flex-col gap-1">
         <p className="font-medium">{t('panel.lines')}</p>
         <ul className="flex flex-col gap-1">
@@ -144,6 +180,14 @@ export function ReturnPanel({ view, orderCode, canManage, canProcess }: Props) {
           {view.refund && view.refund.queued > 0 && (
             <p>{t('panel.refundQueued', { amount: format.vnd(view.refund.queued) })}</p>
           )}
+          {view.refund && view.refund.deferred > 0 && (
+            <p className="text-warning">
+              {t('panel.refundDeferred', { amount: format.vnd(view.refund.deferred) })}
+            </p>
+          )}
+          {view.refund && view.refund.payout > 0 && (
+            <p>{t('panel.refundPayout', { amount: format.vnd(view.refund.payout) })}</p>
+          )}
           {view.refund && view.refund.shortfall > 0 && (
             <p className="text-warning">
               {t('panel.refundShortfall', { amount: format.vnd(view.refund.shortfall) })}
@@ -172,7 +216,7 @@ export function ReturnPanel({ view, orderCode, canManage, canProcess }: Props) {
   );
 }
 
-function ActionDialog({
+export function ActionDialog({
   trigger,
   title,
   description,

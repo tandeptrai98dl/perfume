@@ -4,6 +4,7 @@ import type { Database } from '@/server/db/client';
 import type { ChatNotifier } from '@/server/integrations/chat/telegram';
 import type { EinvoiceProvider } from '@/server/integrations/einvoice';
 import type { EmailSender } from '@/server/integrations/email/send';
+import type { PrivateStorage } from '@/server/integrations/storage';
 
 import type { JobName, JobPayload } from '../definitions';
 import { createEinvoiceHandlers } from './einvoice';
@@ -12,6 +13,7 @@ import { createNewsletterHandlers } from './newsletter';
 import { createOrderTimeoutHandlers } from './order-timeouts';
 import { createPruneRateLimitsHandler } from './prune-rate-limits';
 import { createPrivacyHandlers } from './privacy';
+import { createReturnPhotoHandlers } from './return-photos';
 import { createRevalidateHandler } from './revalidate';
 import { createReviewInvitationHandlers } from './review-invitations';
 import { createTestEmailHandler } from './test-email';
@@ -42,6 +44,9 @@ export type HandlerDeps = {
   // ---------- M3 e-invoicing ----------
   /** E-invoice provider from env (`createEinvoiceProvider`); null = not configured. */
   einvoice?: EinvoiceProvider | null;
+  // ---------- M3 wave 3 returns ----------
+  /** Private storage for return photos; defaults to `getPrivateStorage()` from env. */
+  privateStorage?: PrivateStorage | null;
 };
 
 /** One handler per job; the map type guarantees every job in JOBS is handled. */
@@ -69,5 +74,7 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
     ...createPrivacyHandlers(deps),
     // M3 wave 2: newsletter double opt-in.
     ...createNewsletterHandlers(deps),
+    // M3 wave 3: private return photos erased after a privacy anonymisation.
+    ...createReturnPhotoHandlers(deps),
   };
 }

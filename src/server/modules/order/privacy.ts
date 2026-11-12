@@ -5,7 +5,7 @@ import { orderAddresses, orderEvents, orderItems, orders } from '@/server/db/sch
 import type { Tx } from '@/server/lib/command-context';
 
 import { RETURN_EVENTS } from './return-events';
-import { ORDER_STATUSES, isTerminal, type OrderStatus } from './state-machine';
+import { CLOSED_STATUSES, type OrderStatus } from './state-machine';
 
 /*
  * Personal data held by the order module, for data-subject requests (PDPL 91/2025, privacy
@@ -23,7 +23,7 @@ export const ANONYMIZED_TEXT = '[anonymized]';
 const ADDRESS_PII_FIELDS = ['fullName', 'phone', 'street', 'legacyDistrict'] as const;
 
 /** Statuses after which an order no longer needs the customer's contact details. */
-export const CLOSED_ORDER_STATUSES: readonly OrderStatus[] = ORDER_STATUSES.filter(isTerminal);
+export const CLOSED_ORDER_STATUSES: readonly OrderStatus[] = CLOSED_STATUSES;
 
 function subjectWhere(subject: OrderSubject): SQL {
   const byEmail = eq(orders.email, subject.email);
@@ -222,4 +222,39 @@ export async function anonymizeOrdersForSubject(tx: Tx, subject: OrderSubject): 
     if (changed) await tx.update(orderEvents).set({ diff }).where(eq(orderEvents.id, event.id));
   }
   return rows.length;
+}
+
+/**
+ * Return photos (M3 wave 3): removes the private photo references from the subject's return
+ * requests and returns their storage keys, so the caller deletes the objects through an
+ * outbox job once the anonymisation commits. Run it before `anonymizeOrdersForSubject`
+ * (guest orders are matched by the e-mail that anonymisation replaces).
+ */
+export async function takeReturnPhotosForSubject(tx: Tx, subject: OrderSubject): Promise<string[]> {
+  const rows = await tx
+    .select({ id: orderEvents.id, metadata: orderEvents.metadata })
+    .from(orderEvents)
+    .innerJoin(orders, eq(orders.id, orderEvents.orderId))
+    .where(
+      and(
+        subjectWhere(subject),
+        eq(orderEvents.type, RETURN_EVENTS.requested),
+        sql`jsonb_array_length(coalesce(${orderEvents.metadata}->'photos', '[]'::jsonb)) > 0`,
+      ),
+    )
+    .for('update', { of: orderEvents });
+  const keys: string[] = [];
+  for (const row of rows) {
+    const metadata = (row.metadata ?? {}) as Record<string, unknown>;
+    const photos = Array.isArray(metadata.photos) ? metadata.photos : [];
+    for (const photo of photos) {
+      const key = (photo as { key?: unknown } | null)?.key;
+      if (typeof key === 'string') keys.push(key);
+    }
+    await tx
+      .update(orderEvents)
+      .set({ metadata: { ...metadata, photos: [] } })
+      .where(eq(orderEvents.id, row.id));
+  }
+  return keys;
 }

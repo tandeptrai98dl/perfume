@@ -1,6 +1,7 @@
 import type { FieldIssue } from '@/server/lib/command-context';
 import {
   FAULT_REASONS,
+  type ReturnPhoto,
   parseReturnReceived,
   parseReturnRequested,
   RETURN_EVENTS,
@@ -14,8 +15,10 @@ import {
  * Customer return rules (ADR-0017), pure and unit-tested:
  * - a return can be requested only for a `delivered` order, within the return window
  *   (`returns.windowDays` setting, default 7 days) counted from the real delivery time;
- * - one request per order (a rejected request is not reopened by the customer: they contact
- *   the shop, which keeps the decision with staff);
+ * - at most one open request per order at a time: after a rejection a new request may be filed
+ *   (within the window); once goods were received the order's return is over;
+ * - staff may open a request on the customer's behalf (same rules); a manager may override the
+ *   window — also for an order already `completed` — with an audited reason (ADR-0027);
  * - the customer chooses lines and quantities (≤ bought), a reason and, for the shop's fault
  *   (defective / wrong / damaged), refund or replacement; unopened change of mind is refund only
  *   and needs the seal confirmation;
@@ -43,27 +46,38 @@ export function returnDeadline(deliveredAt: Date, windowDays: number): Date {
 export type ReturnIneligibility = 'notDelivered' | 'windowExpired' | 'alreadyRequested';
 
 export type ReturnEligibility =
-  | { eligible: true; deadline: Date }
+  | { eligible: true; deadline: Date; windowOverride: boolean }
   | { eligible: false; reason: ReturnIneligibility; deadline: Date | null };
+
+/** A request blocks a new one unless it was rejected. */
+export function blocksNewRequest(status: ReturnStatus | null | undefined): boolean {
+  return !!status && status !== 'rejected';
+}
 
 export function returnEligibility(input: {
   status: string;
   deliveredAt: Date | null;
   windowDays: number;
   now: Date;
-  hasRequest: boolean;
+  /** Status of the order's latest request, if any. */
+  latest: ReturnStatus | null;
+  /** A manager lifts the window (staff-opened returns only, audited by the caller). */
+  overrideWindow?: boolean;
 }): ReturnEligibility {
   const deadline = input.deliveredAt ? returnDeadline(input.deliveredAt, input.windowDays) : null;
-  if (input.hasRequest) return { eligible: false, reason: 'alreadyRequested', deadline };
+  if (blocksNewRequest(input.latest)) {
+    return { eligible: false, reason: 'alreadyRequested', deadline };
+  }
+  if (!deadline) return { eligible: false, reason: 'notDelivered', deadline };
+  const expired = input.status === 'completed' || input.now.getTime() > deadline.getTime();
   // `completed` = the window passed (orders.complete-delivered).
-  if (input.status === 'completed') return { eligible: false, reason: 'windowExpired', deadline };
-  if (input.status !== 'delivered' || !deadline) {
+  if (input.status !== 'delivered' && input.status !== 'completed') {
     return { eligible: false, reason: 'notDelivered', deadline };
   }
-  if (input.now.getTime() > deadline.getTime()) {
+  if (expired && !input.overrideWindow) {
     return { eligible: false, reason: 'windowExpired', deadline };
   }
-  return { eligible: true, deadline };
+  return { eligible: true, deadline, windowOverride: expired };
 }
 
 export type ReturnOrderLine = {
@@ -190,6 +204,10 @@ export type ReturnState = {
   lines: ReturnLineInput[];
   sealIntact: boolean;
   description: string | null;
+  openedBy: 'customer' | 'staff';
+  openedFrom: 'delivered' | 'completed';
+  windowOverride: { reason: string } | null;
+  photos: ReturnPhoto[];
   requestedAt: Date;
   approvedAt: Date | null;
   approvalNote: string | null;
@@ -198,7 +216,14 @@ export type ReturnState = {
   receivedAt: Date | null;
   outcome: ReturnOutcome | null;
   restocked: boolean | null;
-  refund: (ReturnRefundBreakdown & { queued: number; shortfall: number }) | null;
+  refund:
+    | (ReturnRefundBreakdown & {
+        queued: number;
+        deferred: number;
+        payout: number;
+        shortfall: number;
+      })
+    | null;
 };
 
 function requestIdOf(metadata: unknown): string | null {
@@ -208,7 +233,8 @@ function requestIdOf(metadata: unknown): string | null {
 
 /**
  * The latest return request of an order and what happened to it, from its timeline events
- * (oldest first). Null when the customer never asked for a return.
+ * (oldest first). A request filed after a rejection replaces it. Null when nobody ever asked
+ * for a return.
  */
 export function foldReturnEvents(events: readonly ReturnEventRow[]): ReturnState | null {
   let state: ReturnState | null = null;
@@ -224,6 +250,10 @@ export function foldReturnEvents(events: readonly ReturnEventRow[]): ReturnState
         lines: meta.lines,
         sealIntact: meta.sealIntact,
         description: event.message,
+        openedBy: meta.openedBy,
+        openedFrom: meta.openedFrom,
+        windowOverride: meta.windowOverride,
+        photos: meta.photos,
         requestedAt: event.createdAt,
         approvedAt: null,
         approvalNote: null,
@@ -257,15 +287,34 @@ export function foldReturnEvents(events: readonly ReturnEventRow[]): ReturnState
     } else if (event.type === RETURN_EVENTS.received && state.status === 'approved') {
       const meta = parseReturnReceived(event.metadata);
       if (!meta) continue;
-      const { merchandise, shipping, giftWrap, returnShipping, total, queued, shortfall } =
-        meta.refund;
+      const {
+        merchandise,
+        shipping,
+        giftWrap,
+        returnShipping,
+        total,
+        queued,
+        deferred,
+        payout,
+        shortfall,
+      } = meta.refund;
       state = {
         ...state,
         status: 'received',
         receivedAt: event.createdAt,
         outcome: meta.outcome,
         restocked: meta.restocked,
-        refund: { merchandise, shipping, giftWrap, returnShipping, total, queued, shortfall },
+        refund: {
+          merchandise,
+          shipping,
+          giftWrap,
+          returnShipping,
+          total,
+          queued,
+          deferred,
+          payout,
+          shortfall,
+        },
       };
     }
   }

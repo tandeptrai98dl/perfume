@@ -1695,11 +1695,15 @@
       "descriptionFault": "Mô tả lỗi hoặc tình trạng sản phẩm (ít nhất 10 ký tự).",
       "descriptionOptional": "Không bắt buộc.",
       "sealIntact": "Tôi xác nhận sản phẩm chưa mở và còn nguyên seal.",
-      "photos": "Nếu cần ảnh chụp sản phẩm hoặc bao bì, chúng tôi sẽ liên hệ bạn qua e-mail hoặc điện thoại sau khi nhận yêu cầu.",
+      "photos": "Ảnh sản phẩm hoặc bao bì (không bắt buộc)",
       "estimate": "Số tiền hoàn dự kiến được tính khi chúng tôi nhận lại hàng.",
       "submit": "Gửi yêu cầu",
       "cancel": "Đóng",
-      "done": "Đã gửi yêu cầu trả hàng. Chúng tôi sẽ phản hồi qua e-mail."
+      "done": "Đã gửi yêu cầu trả hàng. Chúng tôi sẽ phản hồi qua e-mail.",
+      "photosHint": "Tối đa {max} ảnh JPEG, PNG hoặc WebP, mỗi ảnh đến 8 MB. Ảnh chỉ nhân viên cửa hàng xem được; thông tin vị trí trong ảnh được xoá.",
+      "photosSelected": "Ảnh đã chọn",
+      "removePhoto": "Xoá",
+      "removePhotoLabel": "Xoá ảnh {name}"
     },
     "reasons": {
       "unopened": "Đổi ý (sản phẩm chưa mở, còn nguyên seal)",
@@ -1730,7 +1734,8 @@
       "note": "Ghi chú của cửa hàng: {note}",
       "rejection": "Lý do: {reason}",
       "refund": "Số tiền hoàn: {amount}",
-      "replacement": "Sản phẩm thay thế sẽ được gửi tới bạn."
+      "replacement": "Sản phẩm thay thế sẽ được gửi tới bạn.",
+      "photos": "Đã gửi kèm {count, plural, other {# ảnh}}"
     },
     "errors": {
       "validation": "Vui lòng sửa các mục được đánh dấu.",
@@ -1750,8 +1755,16 @@
       "notFound": "Không tìm thấy đơn hàng.",
       "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
       "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
-      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
-    }
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "photoType": "Chỉ nhận ảnh JPEG, PNG hoặc WebP.",
+      "photoTooLarge": "Mỗi ảnh tối đa 8 MB.",
+      "photoEmpty": "Tệp ảnh trống.",
+      "photoCorrupt": "Không đọc được ảnh. Vui lòng chọn ảnh khác.",
+      "tooManyPhotos": "Tối đa 3 ảnh.",
+      "photosUnavailable": "Hiện chưa thể tải ảnh lên. Bạn có thể gửi yêu cầu không kèm ảnh.",
+      "payloadTooLarge": "Ảnh quá lớn. Mỗi ảnh tối đa 8 MB."
+    },
+    "again": "Bạn có thể gửi yêu cầu mới đến hết {deadline}."
   },
   "admin": {
     "title": "Quản trị",
@@ -2338,7 +2351,19 @@
       "refundForbidden": "Chỉ Quản lý hoặc Chủ shop được hoàn phí gửi trả.",
       "noInvoice": "Đơn chưa có hoá đơn điện tử.",
       "invoiceCancelled": "Hoá đơn đã bị huỷ.",
-      "adjustmentRunning": "Đang xử lý một yêu cầu huỷ / thay thế hoá đơn khác."
+      "adjustmentRunning": "Đang xử lý một yêu cầu huỷ / thay thế hoá đơn khác.",
+      "windowExpired": "Đã quá thời hạn trả hàng.",
+      "notDelivered": "Đơn chưa giao hoặc không thể trả hàng.",
+      "alreadyRequested": "Đơn đang có yêu cầu trả hàng hoặc đã trả hàng.",
+      "noLines": "Chọn ít nhất một sản phẩm.",
+      "unknownLine": "Sản phẩm không thuộc đơn này.",
+      "duplicateLine": "Sản phẩm bị chọn trùng.",
+      "quantityTooLarge": "Số lượng vượt quá số đã mua.",
+      "sealRequired": "Hàng đổi ý chỉ được trả khi còn nguyên seal.",
+      "refundOnly": "Hàng đổi ý chỉ được hoàn tiền.",
+      "describeProblem": "Hãy mô tả vấn đề (ít nhất 10 ký tự).",
+      "windowOverrideForbidden": "Chỉ Quản lý hoặc Chủ shop được cho phép trả hàng sau thời hạn.",
+      "reservedReason": "Lý do này chỉ dành cho hệ thống."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -3605,7 +3630,9 @@
         "reasons": {
           "late_payment_after_cancellation": "Nhận tiền sau khi đơn đã huỷ",
           "overpayment": "Thanh toán thừa",
-          "order_cancelled": "Đơn đã huỷ"
+          "order_cancelled": "Đơn đã huỷ",
+          "return_shipping_payout": "Chi trả phí gửi trả cho khách (ngoài tiền đơn)",
+          "return": "Khách trả hàng: {reason}"
         },
         "proof": "Ảnh chứng từ",
         "complete": {
@@ -3706,7 +3733,9 @@
           "mismatch": "Lệch {amount} so với bảng kê",
           "submit": "Lưu đối soát",
           "done": "Đã đối soát {count} đơn",
-          "orderColumn": "Đơn hàng"
+          "orderColumn": "Đơn hàng",
+          "returned": "Khách đã trả hàng",
+          "deferredRefund": "Khi lưu, tự động xếp hoàn {amount} cho khách"
         }
       }
     },
@@ -4446,7 +4475,7 @@
         "returnShipping": "Phí gửi trả",
         "total": "Tổng hoàn",
         "refundable": "Tiền đơn đang giữ có thể hoàn: {amount}",
-        "shortfallHint": "Đơn chưa nhận đủ tiền (ví dụ COD chưa đối soát): phần còn thiếu sẽ được ghi nhận và báo cho quản lý để hoàn sau.",
+        "shortfallHint": "Đơn chưa nhận đủ tiền (ví dụ COD chưa đối soát): phần còn lại sẽ tự động xếp hoàn khi đối soát COD ghi nhận tiền.",
         "approvedAt": "Đã chấp nhận lúc {date}",
         "approvalNote": "Ghi chú gửi khách: {note}",
         "rejectedAt": "Đã từ chối lúc {date}",
@@ -4454,10 +4483,17 @@
         "receivedAt": "Đã nhận hàng lúc {date}",
         "outcome": "Kết quả",
         "refundQueued": "Đã xếp hoàn {amount} vào hàng đợi hoàn tiền",
-        "refundShortfall": "Còn phải hoàn {amount} khi nhận được tiền",
+        "refundShortfall": "Còn {amount} vượt số tiền khách đã trả: kiểm tra các khoản hoàn trước và chi trả thủ công nếu cần",
         "restocked": "Hàng đã nhập lại kho bán",
         "writtenOff": "Hàng không bán lại được (đã ghi giảm kho: hư hỏng)",
-        "managerOnly": "Chỉ Quản lý hoặc Chủ shop được chấp nhận / từ chối yêu cầu đổi trả."
+        "managerOnly": "Chỉ Quản lý hoặc Chủ shop được chấp nhận / từ chối yêu cầu đổi trả.",
+        "openedByStaff": "Nhân viên tạo yêu cầu thay khách (điện thoại, chat).",
+        "windowOverride": "Quản lý cho phép trả hàng sau thời hạn: {reason}",
+        "photos": "Ảnh khách gửi ({count})",
+        "photoAlt": "Ảnh {index} khách gửi cho yêu cầu trả hàng đơn {code}",
+        "photosHint": "Ảnh riêng tư: chỉ nhân viên xem được, không chia sẻ ra ngoài.",
+        "refundDeferred": "Còn phải hoàn {amount}: tự động xếp vào hàng đợi hoàn tiền khi đối soát COD ghi nhận tiền",
+        "refundPayout": "Phí gửi trả {amount} vượt số tiền đơn đang giữ: đã xếp chi trả thủ công (chuyển khoản)"
       },
       "approve": {
         "button": "Chấp nhận",
@@ -4489,6 +4525,23 @@
         "partialNote": "Khách trả một phần: đơn trở lại Đã giao, chỉ hoàn kho và hoàn tiền phần trả.",
         "confirm": "Xác nhận đã nhận hàng",
         "done": "Đã ghi nhận hàng trả của đơn {code}."
+      },
+      "open": {
+        "button": "Tạo yêu cầu trả hàng thay khách",
+        "title": "Tạo yêu cầu trả hàng cho đơn {code}",
+        "description": "Dùng khi khách yêu cầu qua điện thoại hoặc chat. Áp dụng cùng quy định đổi trả; yêu cầu sau đó được duyệt và nhận hàng như bình thường. Khách nhận e-mail xác nhận.",
+        "lines": "Sản phẩm trả",
+        "lineLabel": "{name} (đã mua {quantity})",
+        "quantity": "Số lượng trả: {name}",
+        "seal": "Khách xác nhận sản phẩm chưa mở, còn nguyên seal",
+        "descriptionLabel": "Mô tả của khách",
+        "descriptionFault": "Ghi lại lỗi khách mô tả (ít nhất 10 ký tự).",
+        "descriptionHint": "Không bắt buộc.",
+        "overrideNote": "Đã quá thời hạn trả hàng ({date}). Chỉ Quản lý / Chủ shop được cho phép ngoại lệ; lý do được ghi vào nhật ký.",
+        "overrideReason": "Lý do cho phép trả sau thời hạn",
+        "expiredManagerOnly": "Đã quá thời hạn trả hàng ({date}). Chỉ Quản lý hoặc Chủ shop được tạo yêu cầu trả hàng ngoại lệ.",
+        "confirm": "Tạo yêu cầu",
+        "done": "Đã tạo yêu cầu trả hàng cho đơn {code}."
       }
     }
   }

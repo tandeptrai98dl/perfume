@@ -6,6 +6,7 @@ import { OrderStatusBadge, PaymentStatusBadge } from '@/components/admin/orders/
 import { EinvoiceStatus } from '@/components/admin/orders/einvoice-status';
 import { NotificationLog } from '@/components/admin/orders/notification-log';
 import { OrderDetailView } from '@/components/admin/orders/order-detail';
+import { OpenReturnDialog } from '@/components/admin/orders/open-return-dialog';
 import { ReturnPanel } from '@/components/admin/orders/return-panel';
 import { PageHeader } from '@/components/admin/page-header';
 import { PageSkeleton } from '@/components/admin/page-skeleton';
@@ -15,7 +16,7 @@ import { getDb } from '@/server/db/client';
 import { getOrderEinvoice } from '@/server/modules/einvoice';
 import { listNotificationLogs } from '@/server/modules/notification';
 import { canEditOrder, getAdminOrderDetail } from '@/server/modules/order';
-import { getAdminReturn } from '@/server/modules/returns';
+import { getAdminReturn, getStaffReturnOptions } from '@/server/modules/returns';
 
 import { isUuid } from '../../_lib/params';
 
@@ -33,11 +34,14 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
   if (!isUuid(id)) notFound();
   const role = user.role ?? 'customer';
   const db = getDb();
-  const [order, einvoice, notifications, returnView] = await Promise.all([
+  const canProcess = hasPermission(role, 'orders.process');
+  const [order, einvoice, notifications, returnView, returnOptions] = await Promise.all([
     getAdminOrderDetail(db, id, role),
     getOrderEinvoice(db, id),
     listNotificationLogs(db, { refType: 'order', refId: id }),
     getAdminReturn(db, id),
+    // Staff-opened returns (on the customer's behalf): `orders.process` only.
+    canProcess ? getStaffReturnOptions(db, id) : null,
   ]);
   if (!order) notFound();
   const t = await getTranslations({ locale: 'vi', namespace: 'admin.orders' });
@@ -76,13 +80,25 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
           )
         }
         returns={
-          returnView && (
-            <ReturnPanel
-              view={returnView}
-              orderCode={order.code}
-              canManage={hasPermission(role, 'payments.refund')}
-              canProcess={hasPermission(role, 'orders.process')}
-            />
+          (returnView || returnOptions?.canOpen) && (
+            <div className="flex flex-col gap-6">
+              {returnView && (
+                <ReturnPanel
+                  view={returnView}
+                  orderCode={order.code}
+                  canManage={hasPermission(role, 'payments.refund')}
+                  canProcess={canProcess}
+                />
+              )}
+              {returnOptions?.canOpen && (
+                <OpenReturnDialog
+                  orderId={order.id}
+                  orderCode={order.code}
+                  options={returnOptions}
+                  canOverride={hasPermission(role, 'payments.refund')}
+                />
+              )}
+            </div>
           )
         }
         notifications={<NotificationLog rows={notifications} />}

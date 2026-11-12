@@ -61,6 +61,9 @@ function received(
       total,
       refundId: null,
       queued: total,
+      deferred: 0,
+      payout: 0,
+      payoutRefundId: null,
       shortfall: 0,
     },
   };

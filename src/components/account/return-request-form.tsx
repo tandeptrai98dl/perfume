@@ -1,25 +1,33 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useId, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
-import { requestReturnAction, type ReturnActionResult } from '@/actions/returns';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  RETURN_PHOTO_ACCEPT,
+  RETURN_PHOTO_LIMIT,
+  RETURN_PHOTO_MAX_BYTES,
+  RETURN_REQUEST_PATH,
+  type ReturnRequestResponse,
+} from '@/lib/returns-request';
 import { cn } from '@/lib/utils';
 
 import { FormNotice } from './form-message';
 
 /*
  * ReturnRequestForm (ADR-0017, §10.5): lines + quantities, reason, refund or replacement (for
- * the shop's fault), description, seal confirmation for change-of-mind returns. Photos are not
- * uploaded (no safe public upload pipeline yet): the shop contacts the customer when needed.
- * Validation is repeated on the server; errors come back as `returns.errors.*` codes.
+ * the shop's fault), description, seal confirmation for change-of-mind returns, up to three
+ * photos (JPEG/PNG/WebP ≤ 8 MB; stored privately, seen by staff only). Posted as multipart to
+ * `POST /api/returns/request`; validation is repeated on the server, errors come back as
+ * `returns.errors.*` codes.
  */
 
 const REASONS = ['unopened', 'defective', 'wrong_item', 'damaged'] as const;
@@ -33,7 +41,18 @@ export type ReturnFormItem = {
   quantity: number;
 };
 
-type Failure = Extract<ReturnActionResult, { ok: false }>;
+type Failure = Extract<ReturnRequestResponse, { ok: false }>;
+
+const PHOTO_TYPES = RETURN_PHOTO_ACCEPT.split(',');
+
+async function postRequest(body: FormData): Promise<ReturnRequestResponse> {
+  try {
+    const response = await fetch(RETURN_REQUEST_PATH, { method: 'POST', body });
+    return (await response.json()) as ReturnRequestResponse;
+  } catch {
+    return { ok: false, error: 'unexpected', fieldErrors: [] };
+  }
+}
 
 export function ReturnRequestForm({
   code,
@@ -46,6 +65,7 @@ export function ReturnRequestForm({
   items: ReturnFormItem[];
 }) {
   const t = useTranslations('returns');
+  const router = useRouter();
   const id = useId();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Record<string, number>>(
@@ -55,6 +75,8 @@ export function ReturnRequestForm({
   const [resolution, setResolution] = useState<'refund' | 'replacement'>('refund');
   const [description, setDescription] = useState('');
   const [sealIntact, setSealIntact] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
   const [pending, startTransition] = useTransition();
   const fault = reason !== null && reason !== 'unopened';
@@ -71,8 +93,10 @@ export function ReturnRequestForm({
     const lines = Object.entries(selected)
       .filter(([, quantity]) => quantity > 0)
       .map(([orderItemId, quantity]) => ({ orderItemId, quantity }));
-    startTransition(async () => {
-      const result = await requestReturnAction({
+    const body = new FormData();
+    body.set(
+      'payload',
+      JSON.stringify({
         code,
         token: token ?? null,
         request: {
@@ -82,8 +106,14 @@ export function ReturnRequestForm({
           description,
           sealIntact: reason === 'unopened' && sealIntact,
         },
-      });
+      }),
+    );
+    for (const photo of photos) body.append('photos', photo);
+    startTransition(async () => {
+      const result = await postRequest(body);
       if (result.ok) {
+        // The order page shows the request's progress from now on.
+        router.refresh();
         setFailure(null);
         toast.success(t('form.done'));
         return;
@@ -111,6 +141,27 @@ export function ReturnRequestForm({
   const reasonError = fieldError('request.reason');
   const descriptionError = fieldError('request.description');
   const sealError = fieldError('request.sealIntact');
+  const photosServerError = fieldError('request.photos');
+  const photosMessage = photoError ?? (photosServerError ? message(photosServerError.code) : null);
+
+  function addPhotos(files: FileList | null) {
+    const picked = Array.from(files ?? []);
+    if (picked.some((file) => !PHOTO_TYPES.includes(file.type))) {
+      setPhotoError(t('errors.photoType'));
+      return;
+    }
+    if (picked.some((file) => file.size > RETURN_PHOTO_MAX_BYTES)) {
+      setPhotoError(t('errors.photoTooLarge'));
+      return;
+    }
+    const next = [...photos, ...picked];
+    if (next.length > RETURN_PHOTO_LIMIT) {
+      setPhotoError(t('errors.tooManyPhotos'));
+      return;
+    }
+    setPhotoError(null);
+    setPhotos(next);
+  }
 
   return (
     <form
@@ -273,7 +324,50 @@ export function ReturnRequestForm({
         </p>
       </div>
 
-      <p className="text-small text-taupe-600">{t('form.photos')}</p>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor={`${id}-photos`}>{t('form.photos')}</Label>
+        <input
+          id={`${id}-photos`}
+          type="file"
+          accept={RETURN_PHOTO_ACCEPT}
+          multiple
+          disabled={photos.length >= RETURN_PHOTO_LIMIT}
+          aria-describedby={`${id}-photos-hint`}
+          aria-invalid={!!photosMessage || undefined}
+          className="text-small file:border-line-200 file:text-small file:mr-3 file:min-h-11 file:border file:bg-white file:px-4 file:py-2 disabled:opacity-60"
+          onChange={(event) => {
+            addPhotos(event.target.files);
+            event.target.value = '';
+          }}
+        />
+        <p
+          id={`${id}-photos-hint`}
+          className={cn('text-small', photosMessage ? 'text-danger' : 'text-taupe-600')}
+          role={photosMessage ? 'alert' : undefined}
+        >
+          {photosMessage ?? t('form.photosHint', { max: RETURN_PHOTO_LIMIT })}
+        </p>
+        {photos.length > 0 && (
+          <ul className="flex flex-col gap-2" aria-label={t('form.photosSelected')}>
+            {photos.map((photo, index) => (
+              <li key={`${photo.name}-${index}`} className="flex flex-wrap items-center gap-3">
+                <span className="text-small min-w-0 flex-1 break-all">{photo.name}</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  aria-label={t('form.removePhotoLabel', { name: photo.name })}
+                  onClick={() => {
+                    setPhotoError(null);
+                    setPhotos((current) => current.filter((_, i) => i !== index));
+                  }}
+                >
+                  {t('form.removePhoto')}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <p className="text-small text-taupe-600">{t('form.estimate')}</p>
 
       <div className="flex flex-wrap gap-3">

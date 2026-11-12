@@ -74,6 +74,7 @@ export {
   refundableAmount,
   remittanceDifference,
   requiredOnlineAmount,
+  splitReturnRefund,
   type PaymentStatus,
 } from './status';
 export { generateTxnRef, transferNote, TXN_REF_PATTERN } from './txn-ref';
@@ -87,3 +88,12 @@ export type {
 } from './types';
 // Customer returns (M3 wave 2 returns stream, ADR-0017): refund of a received return.
 export { queueReturnRefund, type ReturnRefundResult } from './returns';
+// M3 wave 3 returns follow-ups: deferred refunds (COD not remitted) and return-shipping payouts.
+export {
+  DEFERRED_REFUND_EVENT,
+  deferredRefundBalance,
+  isPayoutRefund,
+  RETURN_PAYOUT_REASON,
+  settleDeferredRefunds,
+} from './ledger';
+export { isRemittable } from './commands';

@@ -5,7 +5,9 @@ import { orderEvents, orderItems, orders } from '@/server/db/schema';
 import {
   normalizeOrderCode,
   ORDER_CODE_PATTERN,
+  parseReturnRequested,
   RETURN_EVENT_TYPES,
+  RETURN_EVENTS,
   type ReturnReason,
   type ReturnResolution,
 } from '@/server/modules/order';
@@ -58,7 +60,7 @@ export type CustomerReturnView = {
         | 'approvalNote'
         | 'rejectionReason'
         | 'outcome'
-      > & { refundTotal: number | null })
+      > & { refundTotal: number | null; photoCount: number })
     | null;
 };
 
@@ -79,7 +81,7 @@ export async function getCustomerReturnView(
     deliveredAt: row?.deliveredAt ?? null,
     windowDays: settings.returnsWindowDays,
     now,
-    hasRequest: state !== null,
+    latest: state?.status ?? null,
   });
   return {
     canRequest: eligibility.eligible,
@@ -96,6 +98,7 @@ export async function getCustomerReturnView(
       rejectionReason: state.rejectionReason,
       outcome: state.outcome,
       refundTotal: state.refund?.total ?? null,
+      photoCount: state.photos.length,
     },
   };
 }
@@ -109,7 +112,15 @@ export type AdminReturnLine = {
   quantity: number;
 };
 
-export type AdminReturnView = ReturnState & {
+export type AdminReturnPhoto = { id: string; width: number; height: number; url: string };
+
+/** Staff-only URL of a return photo (authenticated Route Handler, never public). */
+export function adminReturnPhotoUrl(orderId: string, photoId: string): string {
+  return `/api/admin/orders/${orderId}/return-photos/${photoId}`;
+}
+
+export type AdminReturnView = Omit<ReturnState, 'photos'> & {
+  photos: AdminReturnPhoto[];
   orderId: string;
   items: AdminReturnLine[];
   /** Refund the parcel would queue (without a return-shipping reimbursement). */
@@ -161,6 +172,12 @@ export async function getAdminReturn(db: Reader, orderId: string): Promise<Admin
   });
   return {
     ...state,
+    photos: state.photos.map((photo) => ({
+      id: photo.id,
+      width: photo.width,
+      height: photo.height,
+      url: adminReturnPhotoUrl(orderId, photo.id),
+    })),
     orderId,
     items: lines.map((line) => {
       const item = items.find((candidate) => candidate.id === line.orderItemId)!;
@@ -272,4 +289,75 @@ export async function listReturnQueue(db: Reader, options: { limit?: number } = 
 /** Badge count for the admin navigation / dashboard. */
 export async function countReturnQueue(db: Reader): Promise<number> {
   return (await listReturnQueue(db)).length;
+}
+
+/**
+ * Private photo of one of the order's return requests (any request, also a rejected one), for
+ * the staff-only route. The key comes from the order timeline, never from the URL.
+ */
+export async function findReturnPhoto(
+  db: Reader,
+  orderId: string,
+  photoId: string,
+): Promise<{ key: string; mime: string } | null> {
+  for (const event of await returnEvents(db, orderId)) {
+    if (event.type !== RETURN_EVENTS.requested) continue;
+    const photo = parseReturnRequested(event.metadata)?.photos.find((p) => p.id === photoId);
+    if (photo) return { key: photo.key, mime: photo.mime };
+  }
+  return null;
+}
+
+export type StaffReturnOptions = {
+  /** The order can take a new request now (status, open request, window). */
+  canOpen: boolean;
+  /** Only with the manager's window override. */
+  needsOverride: boolean;
+  ineligibility: ReturnIneligibility | null;
+  deadline: Date | null;
+  items: Array<{ id: string; productName: string; variantLabel: string; quantity: number }>;
+};
+
+/** What the admin order page offers for opening a return on the customer's behalf. */
+export async function getStaffReturnOptions(
+  db: Reader,
+  orderId: string,
+  now = new Date(),
+): Promise<StaffReturnOptions | null> {
+  const [order] = await db
+    .select({ status: orders.status, deliveredAt: orders.deliveredAt })
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .limit(1);
+  if (!order || (order.status !== 'delivered' && order.status !== 'completed')) return null;
+  const [settings, events, items] = await Promise.all([
+    getCommerceSettings(db),
+    returnEvents(db, orderId),
+    db
+      .select({
+        id: orderItems.id,
+        productName: orderItems.productName,
+        variantLabel: orderItems.variantLabel,
+        quantity: orderItems.quantity,
+      })
+      .from(orderItems)
+      .where(eq(orderItems.orderId, orderId))
+      .orderBy(asc(orderItems.createdAt), asc(orderItems.id)),
+  ]);
+  const input = {
+    status: order.status,
+    deliveredAt: order.deliveredAt,
+    windowDays: settings.returnsWindowDays,
+    now,
+    latest: foldReturnEvents(events)?.status ?? null,
+  };
+  const plain = returnEligibility(input);
+  const overridden = returnEligibility({ ...input, overrideWindow: true });
+  return {
+    canOpen: overridden.eligible,
+    needsOverride: !plain.eligible && overridden.eligible,
+    ineligibility: plain.eligible ? null : plain.reason,
+    deadline: plain.deadline,
+    items,
+  };
 }

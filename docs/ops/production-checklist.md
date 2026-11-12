@@ -9,7 +9,7 @@ go-live gate). Owner signs off in the go-live notes.
       automatic security updates; firewall: 80/443 only from Cloudflare ranges, 22 from admin IPs.
 - [ ] Managed PostgreSQL 17, private network, TLS, daily snapshots + PITR 14 days; pool sized
       for web (10) + worker (10) + pg-boss.
-- [ ] S3-compatible media bucket (public read via CDN) and a separate backup bucket
+- [ ] S3-compatible media bucket — public read **only on `media/*`** (via CDN); `private/*` (customer return photos) must stay private: no anonymous/CDN access, served by the app only — and a separate backup bucket
       (private, versioning/object lock); backup cron installed and one backup verified
       ([backup-restore.md](./backup-restore.md)).
 - [ ] `docker/compose.prod.yml` + `docker/Caddyfile` deployed; `SITE_DOMAIN` set; Caddy got

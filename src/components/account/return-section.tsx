@@ -8,7 +8,8 @@ import { ReturnRequestForm } from './return-request-form';
 
 /**
  * Returns block of the order page (account and guest lookup, ADR-0017): the request form while
- * the window is open, the request's progress afterwards, or the end of the window.
+ * the window is open, the latest request's progress afterwards (after a rejection, the form
+ * again while the window is open), or the end of the window.
  * Nothing for orders that were never delivered.
  */
 export function ReturnSection({
@@ -47,7 +48,7 @@ export function ReturnSection({
         {t('title')}
       </h2>
 
-      {request ? (
+      {request && (
         <div className="bg-sand-100 flex flex-col gap-2 p-6" role="status">
           <p className="font-medium">{t(`status.${request.status}`)}</p>
           <p className="text-small">
@@ -71,6 +72,9 @@ export function ReturnSection({
                 </li>
               ) : null;
             })}
+            {request.photoCount > 0 && (
+              <li>{t('summary.photos', { count: request.photoCount })}</li>
+            )}
           </ul>
           {request.status === 'approved' && request.approvalNote && (
             <p className="text-small whitespace-pre-line">
@@ -95,9 +99,14 @@ export function ReturnSection({
             ))}
           <p className="text-small">{policyLink}</p>
         </div>
-      ) : view.canRequest && view.deadline ? (
+      )}
+      {view.canRequest && view.deadline ? (
         <>
-          <p>{t('eligible', { deadline: date(view.deadline) })}</p>
+          <p>
+            {request
+              ? t('again', { deadline: date(view.deadline) })
+              : t('eligible', { deadline: date(view.deadline) })}
+          </p>
           <p className="text-small text-taupe-600">
             {t('policy', { days: view.windowDays })} {policyLink}
           </p>
@@ -113,6 +122,7 @@ export function ReturnSection({
           />
         </>
       ) : (
+        !request &&
         view.deadline && (
           <p className="text-small text-taupe-600">
             {t('windowExpired', { date: date(view.deadline) })} {policyLink}
