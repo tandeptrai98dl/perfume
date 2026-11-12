@@ -1,36 +1,87 @@
 name: OWASP ZAP baseline
 
-# Passive ZAP baseline scan (ARCHITECTURE.md §12 "Before go-live"). Manual: point it at
-# staging (never production during business hours). Rules: .zap/rules.tsv.
+# Passive ZAP baseline scan (ARCHITECTURE.md §12 "Before go-live", §16.2) of the production
+# build started inside the job with the demo seed: no external target, nothing leaves the
+# runner. Weekly and on demand. Rules and the reason for every ignored/downgraded rule:
+# .zap/rules.tsv. Any FAIL fails the run (warnings are reported, not fatal: `-I`).
+# HTTPS-only rules (HSTS, Secure cookies) cannot fire over http://localhost; they are covered by
+# tests/e2e/security-headers.spec.ts and the staging checks in docs/ops/runbook.md §5.
 on:
   workflow_dispatch:
     inputs:
-      target:
-        description: Base URL to scan (staging)
-        required: true
-        default: https://staging.example.vn
       fail_on_alerts:
-        description: Fail the run when ZAP reports FAIL or WARN alerts (see .zap/rules.tsv)
+        description: Fail the run when ZAP reports a FAIL alert (see .zap/rules.tsv)
         type: boolean
         default: true
+  schedule:
+    # Mondays 01:23 UTC (08:23 in Vietnam).
+    - cron: '23 1 * * 1'
 
 permissions:
   contents: read
 
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+  HUSKY: 0
+
 jobs:
   zap:
-    name: ZAP baseline
+    name: ZAP baseline (local production build)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: perfume
+          POSTGRES_PASSWORD: perfume
+          POSTGRES_DB: perfume
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U perfume" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://perfume:perfume@localhost:5432/perfume
+      BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere-else
+      INTERNAL_API_SECRET: ci-only-internal-api-secret-not-used-anywhere-else
+      BASE_URL: http://localhost:3200
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+      - run: pnpm build
+      - name: Start the production server
+        run: |
+          node scripts/start-standalone.mjs > server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fs "$BASE_URL/api/health" && exit 0; sleep 2; done
+          cat server.log; exit 1
+        env:
+          PORT: 3200
+          NODE_ENV: production
+          APP_URL: http://localhost:3200
+          PAYMENT_SIMULATOR: 'true'
+      - name: Warm the caches
+        run: for path in / /en /nuoc-hoa /en/perfumes; do curl -fs -o /dev/null "$BASE_URL$path"; done
+      # The action runs ZAP's container with --network=host, so it reaches localhost:3200.
       - name: ZAP baseline scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
-          target: ${{ inputs.target }}
+          target: http://localhost:3200/
           rules_file_name: .zap/rules.tsv
-          # -j: AJAX spider for client-side navigation; -a: include alpha passive rules.
-          cmd_options: '-j -a'
+          # -j: AJAX spider for client-side navigation; -a: include alpha passive rules;
+          # -I: warnings do not fail the run (FAIL rules do); -m 5: spider for 5 minutes.
+          cmd_options: '-j -a -I -m 5'
           allow_issue_writing: false
-          fail_action: ${{ inputs.fail_on_alerts }}
+          fail_action: ${{ github.event_name == 'schedule' || inputs.fail_on_alerts }}
           artifact_name: zap-baseline-report
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zap-server-log
+          path: server.log
+          retention-days: 14

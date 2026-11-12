@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { getCustomerSession } from '@/server/auth/customer';
 import { getDb } from '@/server/db/client';
+import { getProducer } from '@/server/jobs/producer';
 import { DomainError, type FieldIssue } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
 import {
@@ -91,6 +92,7 @@ export async function submitMemberReviewAction(raw: unknown): Promise<ReviewActi
       orderItemId,
       locale: parsed.data.locale,
       values,
+      boss: await getProducer(),
     });
     refresh();
     return { ok: true };
@@ -107,7 +109,12 @@ export async function submitGuestReviewAction(raw: unknown): Promise<ReviewActio
   if (!guard.ok) return { ok: false, error: 'rateLimited', fieldErrors: [] };
   try {
     const { token, ...values } = parsed.data.review;
-    await submitGuestReview(getDb(), { token, locale: parsed.data.locale, values });
+    await submitGuestReview(getDb(), {
+      token,
+      locale: parsed.data.locale,
+      values,
+      boss: await getProducer(),
+    });
     // No refresh(): the link page would re-render as "already used" over the thank-you note.
     return { ok: true };
   } catch (error) {

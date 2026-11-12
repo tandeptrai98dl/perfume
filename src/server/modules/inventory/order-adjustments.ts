@@ -1,9 +1,11 @@
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
+import type { PgBoss } from 'pg-boss';
 
 import { inventoryItems, stockMovements, stockReservations } from '@/server/db/schema';
 import { DomainError, type Tx } from '@/server/lib/command-context';
 
 import { getDefaultLocationId } from './commands';
+import { enqueueLowStockAlerts, type StockLevelChange } from './low-stock';
 
 /*
  * Stock side of an admin order edit (ARCHITECTURE.md §3.4 step 8, ADR-0006). Runs inside the
@@ -30,9 +32,11 @@ export type AdjustOrderStockInput = {
   expiresAt?: Date;
   actorId: string | null;
   note?: string;
+  /** Producer for low-stock alerts (outbox); no alert without it. */
+  boss?: PgBoss | null;
 };
 
-type LockedRow = { variantId: string; onHand: number; reserved: number };
+type LockedRow = { variantId: string; onHand: number; reserved: number; lowStockThreshold: number };
 
 /** Merges duplicate variants and drops zero deltas. */
 function netChanges(changes: readonly OrderStockChange[]): Map<string, number> {
@@ -62,6 +66,7 @@ export async function adjustOrderStock(tx: Tx, input: AdjustOrderStockInput): Pr
       variantId: inventoryItems.variantId,
       onHand: inventoryItems.onHand,
       reserved: inventoryItems.reserved,
+      lowStockThreshold: inventoryItems.lowStockThreshold,
     })
     .from(inventoryItems)
     .where(
@@ -97,6 +102,15 @@ export async function adjustOrderStock(tx: Tx, input: AdjustOrderStockInput): Pr
     // Shrink the newest rows first (an earlier edit's increase goes back before the original).
     .orderBy(asc(stockReservations.variantId), desc(stockReservations.createdAt))
     .for('update');
+
+  // Both modes lower availability by `delta` (reserve more / deduct more) or raise it.
+  const levels: StockLevelChange[] = [];
+  for (const [variantId, delta] of deltas) {
+    const row = locked.get(variantId);
+    if (!row) continue;
+    const before = row.onHand - row.reserved;
+    levels.push({ variantId, before, after: before - delta, threshold: row.lowStockThreshold });
+  }
 
   for (const [variantId, delta] of deltas) {
     const where = and(
@@ -179,6 +193,7 @@ export async function adjustOrderStock(tx: Tx, input: AdjustOrderStockInput): Pr
       });
     }
   }
+  await enqueueLowStockAlerts(input.boss, tx, levels);
 }
 
 /** Latest expiry among the order's active reservations (null when none is still active). */

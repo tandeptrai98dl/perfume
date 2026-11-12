@@ -65,9 +65,25 @@ export const JOBS = {
         // M3: e-invoice failed for good; staff edit queued a refund.
         'einvoice_failed',
         'edit_refund',
+        // M3 wave 2 (customers & alerts stream): reviews awaiting moderation (throttled).
+        'review_pending',
+        // M3 wave 2 returns: a customer asked for a return; an invoice cancel/replace failed.
+        'return_requested',
+        'einvoice_adjustment_failed',
       ]),
       orderId: z.uuid().optional(),
       message: z.string().max(500).optional(),
+      // ---------- M3 wave 2 (customers & alerts stream) ----------
+      /** `low_stock`: the variant that crossed its threshold (details read at send time). */
+      variantId: z.uuid().optional(),
+      /** `job_failed`: the dead-lettered job (queue name + id only, never its payload). */
+      job: z
+        .object({
+          name: z.string().min(1).max(100),
+          id: z.uuid(),
+          attempts: z.number().int().nonnegative(),
+        })
+        .optional(),
     }),
     queue: retryPolicy,
   },
@@ -156,6 +172,41 @@ export const JOBS = {
   'privacy.export': {
     schema: z.object({ requestId: z.uuid() }),
     queue: retryPolicy,
+  },
+
+  // ---------- M3 wave 2: newsletter double opt-in (§2 Marketing) ----------
+  /** Sign-up: e-mail with the signed confirmation link (nothing stored before the click). */
+  'newsletter.confirm-request': {
+    schema: z.object({ to: z.email(), locale: z.enum(['vi', 'en']), url: z.url() }),
+    queue: retryPolicy,
+  },
+  /** Confirmed: welcome e-mail with the signed unsubscribe link (+ RFC 8058 headers). */
+  'newsletter.welcome': {
+    schema: z.object({ subscriberId: z.uuid() }),
+    queue: retryPolicy,
+  },
+
+  // ---------- M3 wave 2: customer returns (ADR-0017) and e-invoice adjustments ----------
+  /**
+   * Customer e-mail about a return request, in the order's locale: received, approved (with
+   * the staff note), rejected (with the reason), goods received (refund or replacement).
+   * `eventId` is the request id, so each step is sent once per request.
+   */
+  'return.notify': {
+    schema: z.object({
+      orderId: z.uuid(),
+      requestId: z.uuid(),
+      kind: z.enum(['requested', 'approved', 'rejected', 'received']),
+    }),
+    queue: retryPolicy,
+  },
+  /**
+   * Cancel or replace the order's issued e-invoice through the provider (returns, staff
+   * corrections). Same attempt counting and backoff as `einvoice.issue`.
+   */
+  'einvoice.adjust': {
+    schema: z.object({ orderId: z.uuid(), adjustmentId: z.uuid() }),
+    queue: { retryLimit: 5, retryDelay: 120, retryBackoff: true, expireInSeconds: 180 },
   },
 } as const;
 

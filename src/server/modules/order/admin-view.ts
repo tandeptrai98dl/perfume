@@ -28,9 +28,11 @@ export function staffNextStatuses(
   amountPaid = 0,
 ): OrderStatus[] {
   if (!hasPermission(role, 'orders.process')) return [];
+  // Returns (ADR-0017) are opened by the customer and closed in the return panel.
+  if (status === 'return_requested') return [];
   const manager = hasPermission(role, 'orders.cancelPaid');
   return nextStatuses(status, manager ? 'manager' : 'staff').filter(
-    (to) => to !== 'cancelled' || manager || amountPaid <= 0,
+    (to) => to !== 'return_requested' && (to !== 'cancelled' || manager || amountPaid <= 0),
   );
 }
 

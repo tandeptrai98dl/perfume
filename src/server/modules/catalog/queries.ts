@@ -163,6 +163,7 @@ function scopePosition(scope: InternalScope): SQL {
 
 function orderBy(sort: ListingQuery['sort'], hasSearch: boolean): SQL {
   const featured = sql`scope_position asc nulls last, is_featured desc, published_at desc nulls last, id desc`;
+  const sales = sql`sales_rank asc nulls last, ${featured}`;
   switch (sort) {
     case 'newest':
       return sql`published_at desc nulls last, created_at desc, id desc`;
@@ -172,7 +173,10 @@ function orderBy(sort: ListingQuery['sort'], hasSearch: boolean): SQL {
       return sql`match_min_price desc, id desc`;
     case 'relevance':
       return hasSearch ? sql`rank desc, ${featured}` : featured;
-    case 'best_selling': // Falls back to featured until order data exists (M2).
+    case 'best_selling':
+      // Ranked ids come from the order module (`salesRank`); unranked products follow in
+      // featured order, so a shop without sales still gets a sensible list.
+      return sales;
     case 'featured':
       return featured;
   }
@@ -183,8 +187,13 @@ function buildListingSql(
   scope: InternalScope,
   search: { tsQuery: string | null; fuzzyText: string | null; genders: Gender[] },
   withFacets: boolean,
+  salesRank: readonly string[] = [],
 ): SQL {
   const { locale, filters } = query;
+  const salesRankSql =
+    query.sort === 'best_selling' && salesRank.length > 0
+      ? sql`array_position(${uuidArray(salesRank)}, p.id)`
+      : sql`null::int`;
 
   let searchCondition = sql`true`;
   let rank = sql`0::real`;
@@ -283,7 +292,7 @@ function buildListingSql(
       select p.id, p.brand_id, p.gender::text as gender, p.concentration::text as concentration,
         p.is_featured, p.published_at, p.created_at, p.rating_avg, p.rating_count,
         pt.name, pt.slug, pt.subtitle, b.name as brand_name, bt.slug as brand_slug,
-        ${rank} as rank, ${scopePosition(scope)} as scope_position
+        ${rank} as rank, ${scopePosition(scope)} as scope_position, ${salesRankSql} as sales_rank
       from products p
       join product_translations pt on pt.product_id = p.id and pt.locale = ${locale}
       join brands b on b.id = p.brand_id
@@ -440,12 +449,15 @@ async function runListing(
   query: ListingQuery,
   scope: InternalScope,
   withFacets: boolean,
+  salesRank: readonly string[] = [],
 ): Promise<ListingResult> {
   const normalized = normalizeSearchQuery(query.q);
   const tsQuery = toPrefixTsQuery(normalized.terms);
 
   const execute = async (search: Parameters<typeof buildListingSql>[2]) => {
-    const result = await db.execute<ListingRow>(buildListingSql(query, scope, search, withFacets));
+    const result = await db.execute<ListingRow>(
+      buildListingSql(query, scope, search, withFacets, salesRank),
+    );
     return result.rows[0] ?? { items: [], facets: [], total: 0 };
   };
 
@@ -477,13 +489,18 @@ async function runListing(
 /**
  * Product listing with filters, sort, pagination and disjunctive facet counts (each facet is
  * counted with every other filter applied). Also used for search (`q`).
+ *
+ * `options.salesRank`: product ids ranked by units sold (order module,
+ * `listBestSellingProductIds`), used by the `best_selling` sort; the catalogue does not read
+ * order tables itself.
  */
 export async function getProductListing(
   input: ListingQueryInput,
   dbOverride?: Executor,
+  options: { salesRank?: readonly string[] } = {},
 ): Promise<ListingResult> {
   const query = listingQuerySchema.parse(input);
-  return runListing(dbOverride ?? getDb(), query, query.scope, true);
+  return runListing(dbOverride ?? getDb(), query, query.scope, true, options.salesRank ?? []);
 }
 
 /** Featured products for the home page (featured first, then newest). */
@@ -493,6 +510,16 @@ export async function getFeaturedProducts(
   dbOverride?: Executor,
 ): Promise<ProductSummary[]> {
   const query = listingQuerySchema.parse({ locale, pageSize: Math.min(limit, 24) });
+  return (await runListing(dbOverride ?? getDb(), query, query.scope, false)).items;
+}
+
+/** Newest visible products (home "New arrivals" rail, §2 Discovery). */
+export async function getNewestProducts(
+  locale: CatalogLocale,
+  limit = 8,
+  dbOverride?: Executor,
+): Promise<ProductSummary[]> {
+  const query = listingQuerySchema.parse({ locale, sort: 'newest', pageSize: Math.min(limit, 24) });
   return (await runListing(dbOverride ?? getDb(), query, query.scope, false)).items;
 }
 

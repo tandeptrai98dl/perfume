@@ -120,7 +120,12 @@ export function AddressForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+      <form
+        method="post"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         {formError && <FormNotice tone="error">{formError}</FormNotice>}
         <FormField
           control={form.control}

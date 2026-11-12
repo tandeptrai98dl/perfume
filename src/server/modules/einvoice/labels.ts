@@ -40,3 +40,16 @@ export function invoiceLabels(): InvoiceLabels {
     },
   };
 }
+
+/** Reason sent to the provider when a customer return cancels or replaces the invoice. */
+export function returnAdjustmentReason(code: string): string {
+  const t = createTranslator({
+    locale: 'vi',
+    messages: viMessages,
+    namespace: 'admin.einvoices.adjust',
+    onError(error) {
+      throw error;
+    },
+  });
+  return t('returnReason', { code });
+}

@@ -21,9 +21,15 @@ import {
   orderUpdateSubject,
   type OrderUpdateKind,
 } from '@/server/integrations/email/templates/order-update';
+import {
+  returnEmailSubject,
+  ReturnUpdateEmail,
+  type ReturnEmailKind,
+} from '@/server/integrations/email/templates/return-update';
 import { StaffAlertEmail } from '@/server/integrations/email/templates/staff-alert';
 import { errorFields, logger } from '@/server/lib/logger';
 import { getOrderViewById, type OrderStatus, type OrderView } from '@/server/modules/order';
+import { foldReturnEvents, returnEvents } from '@/server/modules/returns';
 import { getCommerceSettings } from '@/server/modules/settings';
 
 import { nextSessionAmount } from '@/server/modules/payment';
@@ -31,7 +37,7 @@ import { nextSessionAmount } from '@/server/modules/payment';
 import { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';
 import { deliverLogged, logSkipped } from './log';
 import { EMAIL_SENT_EVENT, sendOnce, STAFF_ALERT_EVENT } from './once';
-import { buildStaffAlert, type StaffAlertKind } from './staff-alerts';
+import { buildStaffAlert, type StaffAlertDetails, type StaffAlertKind } from './staff-alerts';
 
 /**
  * Customer e-mails in the order's locale (§10.5, §3.6) and internal alerts (ADR-0019), sent
@@ -48,6 +54,11 @@ export type NotificationDeps = {
   orderLinkSecret?: string | null;
   /** Internal alert recipient (STAFF_ALERT_EMAIL); the channel is skipped when unset. */
   staffAlertEmail?: string | null;
+  /**
+   * Alert channels resolved per alert from admin settings (D19), env as fallback. When given it
+   * replaces `staffAlertEmail` and `chat` for staff alerts.
+   */
+  alertChannels?: () => Promise<{ emails: readonly string[]; chat: ChatNotifier | null }>;
   /** Telegram bot (TELEGRAM_*); skipped when null. */
   chat?: ChatNotifier | null;
 };
@@ -172,8 +183,9 @@ export function emailForTransition(from: string, to: OrderStatus): OrderUpdateKi
       return from === 'shipped' ? 'delivered' : null;
     case 'cancelled':
       return 'cancelled';
+    // A customer return sends its own "goods received" e-mail (returns flow, `return.notify`).
     case 'returned':
-      return 'refunded';
+      return from === 'return_requested' ? null : 'refunded';
     default:
       return null;
   }
@@ -352,13 +364,20 @@ export async function sendPaymentLink(deps: NotificationDeps, input: { orderId: 
  */
 export async function sendStaffAlert(
   deps: NotificationDeps,
-  input: { kind: StaffAlertKind; orderId?: string; message?: string },
+  input: {
+    kind: StaffAlertKind;
+    orderId?: string;
+    message?: string;
+    /** M3 wave 2: low stock / pending reviews / dead-lettered job, resolved by the caller. */
+    details?: StaffAlertDetails | null;
+  },
 ): Promise<string[]> {
   const view = input.orderId ? await getOrderViewById(deps.db, input.orderId) : null;
   const alert = buildStaffAlert({
     kind: input.kind,
     appUrl: deps.appUrl,
     message: input.message,
+    details: input.details,
     order: view
       ? {
           id: view.id,
@@ -375,11 +394,16 @@ export async function sendStaffAlert(
   const logRef = {
     template: `staff_alert:${input.kind}`,
     locale: 'vi' as const,
-    refType: input.orderId ? ('order' as const) : null,
-    refId: input.orderId ?? null,
+    refType: input.orderId
+      ? ('order' as const)
+      : input.details?.kind === 'low_stock'
+        ? ('product_variant' as const)
+        : null,
+    refId: input.orderId ?? (input.details?.kind === 'low_stock' ? input.details.variantId : null),
   };
-  const staffEmail = deps.staffAlertEmail;
-  if (staffEmail) {
+  const resolved = deps.alertChannels ? await deps.alertChannels() : null;
+  const staffEmails = resolved?.emails ?? (deps.staffAlertEmail ? [deps.staffAlertEmail] : []);
+  for (const staffEmail of staffEmails) {
     channels.push([
       'email',
       () =>
@@ -398,7 +422,7 @@ export async function sendStaffAlert(
         ),
     ]);
   }
-  const chat = deps.chat;
+  const chat = resolved ? resolved.chat : deps.chat;
   if (chat) {
     channels.push([
       'telegram',
@@ -448,4 +472,71 @@ export async function handleOrderPlaced(deps: NotificationDeps, orderId: string)
       async () => ({ channels: await sendStaffAlert(deps, { kind, orderId }) }),
     );
   }
+}
+
+// ---------- Customer returns (M3 wave 2 returns stream, ADR-0017) ----------
+
+/**
+ * `return.notify`: one e-mail per step of a return request (received, approved, rejected,
+ * goods received), keyed by request id + step, in the order's locale. Reads the request from
+ * the order timeline (returns module read model).
+ */
+export async function sendReturnUpdate(
+  deps: NotificationDeps,
+  input: { orderId: string; requestId: string; kind: ReturnEmailKind },
+) {
+  const template = `return_${input.kind}`;
+  const order = await loadMailableOrder(deps.db, input.orderId, template);
+  if (!order) return false;
+  const state = foldReturnEvents(await returnEvents(deps.db, input.orderId));
+  if (!state || state.requestId !== input.requestId) {
+    logger.warn('notification.return_missing', { orderId: input.orderId });
+    return false;
+  }
+  const locale = order.locale;
+  const lines = state.lines.flatMap((line) => {
+    const item = order.items.find((candidate) => candidate.id === line.orderItemId);
+    return item
+      ? [
+          {
+            productName: item.productName,
+            variantLabel: item.variantLabel,
+            quantity: line.quantity,
+          },
+        ]
+      : [];
+  });
+  return sendOnce(
+    deps.db,
+    {
+      orderId: input.orderId,
+      type: EMAIL_SENT_EVENT,
+      key: `return:${input.requestId}:${input.kind}`,
+      message: template,
+      metadata: { template, locale },
+    },
+    async () => {
+      await sendCustomerEmail(deps, order, template, {
+        to: order.email,
+        subject: returnEmailSubject(locale, input.kind, order.code),
+        template: createElement(ReturnUpdateEmail, {
+          locale,
+          kind: input.kind,
+          code: order.code,
+          customerName: order.customerName,
+          orderUrl: orderPageUrl({ ...linkOptions(deps), locale, code: order.code }),
+          lines,
+          note:
+            input.kind === 'approved'
+              ? state.approvalNote
+              : input.kind === 'rejected'
+                ? state.rejectionReason
+                : null,
+          outcome: state.outcome,
+          refundTotal: state.refund?.total ?? 0,
+          refundQueued: state.refund?.queued ?? 0,
+        }),
+      });
+    },
+  );
 }

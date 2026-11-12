@@ -4,8 +4,17 @@ import type { Database } from '@/server/db/client';
 import { orderEvents, orders } from '@/server/db/schema';
 import { einvoiceLookupUrl } from '@/server/integrations/einvoice';
 
+import { einvoiceAdjustmentEvents } from './adjustments';
 import { einvoiceEvents } from './service';
-import { EINVOICE_EVENT_TYPES, EINVOICE_EVENTS, einvoiceStatus, type EinvoiceState } from './state';
+import {
+  EINVOICE_ADJUSTMENT_EVENTS,
+  EINVOICE_EVENT_TYPES,
+  EINVOICE_EVENTS,
+  einvoiceAdjustmentStatus,
+  einvoiceStatus,
+  type EinvoiceAdjustmentSummary,
+  type EinvoiceState,
+} from './state';
 
 /** Read models for the admin order detail (EInvoiceStatus) and the failed-invoice list. */
 
@@ -24,6 +33,8 @@ export type IssuedEinvoiceView = {
 
 export type OrderEinvoiceView = {
   orderId: string;
+  /** Cancellation / replacement after issuing (returns, corrections). */
+  adjustment: EinvoiceAdjustmentSummary;
   state: EinvoiceState;
   attempts: number;
   reason: string | null;
@@ -55,11 +66,19 @@ export async function getOrderEinvoice(
     .where(eq(orders.id, orderId))
     .limit(1);
   if (!order) return null;
-  const events = await einvoiceEvents(db, orderId);
+  const [events, adjustments] = await Promise.all([
+    einvoiceEvents(db, orderId),
+    einvoiceAdjustmentEvents(db, orderId),
+  ]);
   const status = einvoiceStatus(order, events);
+  const adjustment = einvoiceAdjustmentStatus(order, adjustments);
   let invoice: IssuedEinvoiceView | null = null;
   if (order.einvoiceRef) {
-    const meta = events.findLast((e) => e.type === EINVOICE_EVENTS.issued)?.metadata ?? {};
+    // The standing invoice: the latest replacement, else the original.
+    const meta =
+      adjustments.findLast((e) => e.type === EINVOICE_ADJUSTMENT_EVENTS.replaced)?.metadata ??
+      events.findLast((e) => e.type === EINVOICE_EVENTS.issued)?.metadata ??
+      {};
     const provider = str(meta.provider);
     const lookupCode = str(meta.lookupCode);
     const buyer = meta.buyer === 'company' || meta.buyer === 'individual' ? meta.buyer : null;
@@ -76,7 +95,13 @@ export async function getOrderEinvoice(
       buyer,
     };
   }
-  return { orderId: order.id, ...status, company: order.vatInvoice != null, invoice };
+  return {
+    orderId: order.id,
+    ...status,
+    adjustment,
+    company: order.vatInvoice != null,
+    invoice,
+  };
 }
 
 export type FailedEinvoiceRow = {

@@ -5,11 +5,13 @@ import { Suspense } from 'react';
 
 import { CancelOrderButton } from '@/components/account/cancel-order-button';
 import { OrderDetail } from '@/components/account/order-detail';
+import { ReturnSection } from '@/components/account/return-section';
 import { Link } from '@/i18n/navigation';
 import { requireCustomerPage } from '@/server/auth/customer';
 import { getDb } from '@/server/db/client';
 import { carrierTrackingUrl } from '@/server/modules/notification';
 import { getCustomerOrder } from '@/server/modules/order';
+import { getCustomerReturnView } from '@/server/modules/returns';
 
 import {
   ACCOUNT_ROBOTS,
@@ -49,11 +51,13 @@ async function Order({ params }: { params: Props['params'] }) {
     pathname: '/account/orders/[code]',
     params: { code: decodeURIComponent(code) },
   });
-  const order = await getCustomerOrder(getDb(), {
+  const db = getDb();
+  const order = await getCustomerOrder(db, {
     userId: session.user.id,
     code: decodeURIComponent(code),
   });
   if (!order) notFound();
+  const returnView = await getCustomerReturnView(db, order);
   const t = await getTranslations({ locale, namespace: 'account.orders' });
 
   return (
@@ -73,6 +77,9 @@ async function Order({ params }: { params: Props['params'] }) {
         }))}
         actions={order.canCancel ? <CancelOrderButton code={order.code} /> : undefined}
       />
+      <div className="mt-10">
+        <ReturnSection order={order} view={returnView} />
+      </div>
     </>
   );
 }

@@ -8,11 +8,14 @@ import { routing } from './routing';
 /**
  * Locale resolution: an explicit `locale` (e.g. `getTranslations({ locale })`), else the
  * `[locale]` root param, else the default locale. Routes without a `[locale]` segment
- * (/admin is Vietnamese-only) fall back to `vi`; unknown locales are rejected with a 404
- * by `app/[locale]/layout.tsx`, not here.
+ * (/admin is Vietnamese-only) and unknown locales fall back to `vi` here; unknown locales are
+ * then rejected with a 404 by `app/[locale]/layout.tsx`.
  */
 export default getRequestConfig(async ({ locale }) => {
-  let resolved = locale;
+  // An explicit but unknown locale (e.g. `/llms.txt` matched as `[locale]`, which the proxy
+  // skips because of the dot) must not reach the dynamic import below: that threw a 500
+  // instead of the layout's 404.
+  let resolved = hasLocale(routing.locales, locale) ? locale : undefined;
   if (!resolved) {
     const paramValue = await rootParams.locale();
     resolved = hasLocale(routing.locales, paramValue) ? paramValue : routing.defaultLocale;

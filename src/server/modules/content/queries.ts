@@ -34,11 +34,12 @@ import {
   products,
   productTranslations,
   redirects,
-  settings,
   tagTranslations,
   tags,
   users,
 } from '@/server/db/schema';
+
+import { readSettings } from '@/server/modules/settings';
 
 import { homePath, journalPath, pagePath, postPath, topicPath } from './paths';
 import type { RouteTableData } from './route-table';
@@ -495,11 +496,11 @@ const SELLER_KEYS = {
 
 /** Legal seller information shown in the footer and contact page (from `settings`). */
 export async function getSellerInfo(db: DbExecutor): Promise<SellerInfo> {
-  const rows = await db
-    .select({ key: settings.key, value: settings.value })
-    .from(settings)
-    .where(inArray(settings.key, Object.values(SELLER_KEYS)));
-  const byKey = new Map(rows.map((r) => [r.key, r.value]));
+  // Typed per-key read from the settings module (digit-only values such as a hotline stay
+  // strings; invalid rows read as unset).
+  const byKey = new Map<string, unknown>(
+    Object.entries(await readSettings(db, Object.values(SELLER_KEYS))),
+  );
   const read = (key: string) => {
     const value = byKey.get(key);
     return typeof value === 'string' && value.trim() ? value : null;

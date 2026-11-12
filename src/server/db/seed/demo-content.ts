@@ -1,11 +1,10 @@
-import { sql } from 'drizzle-orm';
+import { inArray, sql } from 'drizzle-orm';
 
 import { docFromBlocks } from '@/lib/rich-text';
 import { localizedPath } from '@/lib/seo/paths';
 import { newId } from '@/server/lib/ids';
 
 import type { Database } from '../client';
-import { LEGAL_PAGES } from './legal-drafts';
 import {
   bannerTranslations,
   banners,
@@ -161,8 +160,7 @@ const PAGES: PageSeed[] = [
       ],
     },
   },
-  // Legal pages: draft texts pending lawyer review (M3 privacy stream).
-  ...LEGAL_PAGES,
+  // Policy pages (legal drafts) are part of the base seed: see legal-pages.ts.
 ];
 
 const TOPICS = [
@@ -232,9 +230,12 @@ const POSTS = [
 ];
 
 export async function seedDemoContent(db: Database) {
-  const [{ count }] = (
-    await db.execute<{ count: number }>(sql`select count(*)::int as count from pages`)
-  ).rows as [{ count: number }];
+  // The base seed already created the policy pages: only the demo pages mark a seeded DB.
+  const demoKeys = PAGES.map((page) => page.key);
+  const [{ count }] = (await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(pages)
+    .where(inArray(pages.key, demoKeys))) as [{ count: number }];
   if (count > 0) return { skipped: true, pages: 0, posts: 0 };
 
   for (const page of PAGES) {
@@ -335,17 +336,7 @@ export async function seedDemoContent(db: Database) {
         link('contact', 'Contact', localizedPath('en', '/contact')),
       ],
     },
-    legal: {
-      vi: PAGES.filter((p) => !['about', 'authenticity', 'contact', 'faq'].includes(p.key)).map(
-        (p) =>
-          link(p.key, p.vi.title, localizedPath('vi', '/policies/[slug]', { slug: p.vi.slug })),
-      ),
-      en: PAGES.filter(
-        (p) => !['about', 'authenticity', 'contact', 'faq'].includes(p.key) && p.en?.published,
-      ).map((p) =>
-        link(p.key, p.en!.title, localizedPath('en', '/policies/[slug]', { slug: p.en!.slug })),
-      ),
-    },
+    // The legal menu comes with the policy pages (base seed, legal-pages.ts).
   };
   for (const [key, items] of Object.entries(menus)) {
     await db.insert(navigationMenus).values([
@@ -393,7 +384,8 @@ export async function seedDemoContent(db: Database) {
       bannerId: announcementId,
       locale: 'en',
       title: 'Authenticity guaranteed · 7-day returns',
-      ctaLabel: 'Learn more',
+      // Descriptive link text (Lighthouse "link-text", WCAG 2.4.4): never a bare "Learn more".
+      ctaLabel: 'Our authenticity promise',
       ctaUrl: localizedPath('en', '/authenticity'),
       isPublished: true,
     },

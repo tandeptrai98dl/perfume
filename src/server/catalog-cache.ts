@@ -9,9 +9,11 @@ import {
   getFamilyBySlug,
   getFeaturedBrands,
   getFeaturedProducts,
+  getNewestProducts,
   getProductDetail,
   getProductListing,
   getRelatedProducts,
+  getProductSummariesByIds,
   getSearchSuggestions,
   loadCatalogRouteEntities,
   listingQuerySchema,
@@ -23,6 +25,7 @@ import {
   type ProductSummary,
 } from '@/server/modules/catalog';
 import { getDb } from '@/server/db/client';
+import { bestSellerWindowStart, listBestSellingProductIds } from '@/server/modules/order';
 
 /*
  * Next-only cached wrappers around the catalogue read API (ARCHITECTURE.md §14.1).
@@ -70,7 +73,8 @@ async function cachedListing(query: ListingQuery): Promise<ListingResult> {
   );
   const tag = scopeTag(query.scope);
   if (tag) cacheTag(tag);
-  const result = await getProductListing(query);
+  const salesRank = query.sort === 'best_selling' ? await getBestSellerRanking() : [];
+  const result = await getProductListing(query, undefined, { salesRank });
   tagProducts(result.items);
   return result;
 }
@@ -114,6 +118,53 @@ export async function getFeatured(locale: CatalogLocale, limit = 8) {
   cacheLife('hours');
   cacheTag(catalogTags.productList);
   const items = await getFeaturedProducts(locale, limit);
+  tagProducts(items);
+  return items;
+}
+
+// ---------- M3 wave 2: home discovery rails (§2 Discovery, §8.3) ----------
+
+/**
+ * Product ids ranked by units sold over the last 90 days (order module). Shared by the home
+ * rail and the "best selling" sort; refreshed hourly (orders do not expire catalogue tags),
+ * or at once by expiring `catalogTags.bestSellers`.
+ */
+async function getBestSellerRanking(): Promise<string[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(catalogTags.bestSellers);
+  return listBestSellingProductIds(getDb(), { since: bestSellerWindowStart(new Date()) });
+}
+
+export async function getNewArrivals(locale: CatalogLocale, limit = 8) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(catalogTags.productList);
+  const items = await getNewestProducts(locale, limit);
+  tagProducts(items);
+  return items;
+}
+
+/**
+ * Best sellers visible in `locale` (English only for published translations, ADR-0021).
+ * With fewer than `limit` ranked products the rail is topped up with featured products, and
+ * falls back to them entirely before the first sale.
+ */
+export async function getBestSellers(locale: CatalogLocale, limit = 8) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(catalogTags.productList, catalogTags.bestSellers);
+  const ranked = await getBestSellerRanking();
+  // Some ranked products may be hidden in this locale: ask for a few more than needed.
+  const sold = await getProductSummariesByIds(locale, ranked.slice(0, limit * 3));
+  const items = sold.slice(0, limit);
+  if (items.length < limit) {
+    const seen = new Set(items.map((item) => item.id));
+    for (const product of await getFeaturedProducts(locale, limit * 2)) {
+      if (items.length >= limit) break;
+      if (!seen.has(product.id)) items.push(product);
+    }
+  }
   tagProducts(items);
   return items;
 }

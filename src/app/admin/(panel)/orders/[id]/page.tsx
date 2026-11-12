@@ -6,6 +6,7 @@ import { OrderStatusBadge, PaymentStatusBadge } from '@/components/admin/orders/
 import { EinvoiceStatus } from '@/components/admin/orders/einvoice-status';
 import { NotificationLog } from '@/components/admin/orders/notification-log';
 import { OrderDetailView } from '@/components/admin/orders/order-detail';
+import { ReturnPanel } from '@/components/admin/orders/return-panel';
 import { PageHeader } from '@/components/admin/page-header';
 import { PageSkeleton } from '@/components/admin/page-skeleton';
 import { requireAdminPage } from '@/server/auth/guards';
@@ -14,6 +15,7 @@ import { getDb } from '@/server/db/client';
 import { getOrderEinvoice } from '@/server/modules/einvoice';
 import { listNotificationLogs } from '@/server/modules/notification';
 import { canEditOrder, getAdminOrderDetail } from '@/server/modules/order';
+import { getAdminReturn } from '@/server/modules/returns';
 
 import { isUuid } from '../../_lib/params';
 
@@ -31,10 +33,11 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
   if (!isUuid(id)) notFound();
   const role = user.role ?? 'customer';
   const db = getDb();
-  const [order, einvoice, notifications] = await Promise.all([
+  const [order, einvoice, notifications, returnView] = await Promise.all([
     getAdminOrderDetail(db, id, role),
     getOrderEinvoice(db, id),
     listNotificationLogs(db, { refType: 'order', refId: id }),
+    getAdminReturn(db, id),
   ]);
   if (!order) notFound();
   const t = await getTranslations({ locale: 'vi', namespace: 'admin.orders' });
@@ -68,10 +71,30 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
               einvoice={einvoice}
               orderCode={order.code}
               canProcess={hasPermission(role, 'orders.process')}
+              canAdjust={hasPermission(role, 'payments.refund')}
+            />
+          )
+        }
+        returns={
+          returnView && (
+            <ReturnPanel
+              view={returnView}
+              orderCode={order.code}
+              canManage={hasPermission(role, 'payments.refund')}
+              canProcess={hasPermission(role, 'orders.process')}
             />
           )
         }
         notifications={<NotificationLog rows={notifications} />}
+        customerHref={
+          hasPermission(role, 'customers.view')
+            ? order.userId
+              ? `/admin/customers/${order.userId}`
+              : order.contact.phone
+                ? `/admin/customers/g-${order.id}`
+                : null
+            : null
+        }
       />
     </>
   );

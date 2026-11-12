@@ -19,3 +19,20 @@ export async function recordEinvoiceIssued(
     .returning({ id: orders.id });
   return updated.length > 0;
 }
+
+/**
+ * A replacement e-invoice (returns, corrections) became the order's current invoice: swaps the
+ * reference written by `recordEinvoiceIssued`, only while it still holds `previousRef` (so two
+ * concurrent replacements cannot both win). Does not bump `version`.
+ */
+export async function recordEinvoiceReplaced(
+  tx: Pick<Tx, 'update'>,
+  input: { orderId: string; previousRef: string; ref: string; issuedAt: Date },
+): Promise<boolean> {
+  const updated = await tx
+    .update(orders)
+    .set({ einvoiceRef: input.ref, einvoiceIssuedAt: input.issuedAt })
+    .where(and(eq(orders.id, input.orderId), eq(orders.einvoiceRef, input.previousRef)))
+    .returning({ id: orders.id });
+  return updated.length > 0;
+}

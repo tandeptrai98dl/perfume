@@ -1,9 +1,11 @@
 import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import type { PgBoss } from 'pg-boss';
 
 import { inventoryItems, stockMovements, stockReservations } from '@/server/db/schema';
 import { DomainError, type Tx } from '@/server/lib/command-context';
 
 import { getDefaultLocationId } from './commands';
+import { enqueueLowStockAlerts } from './low-stock';
 
 /*
  * Stock reservations for orders (ARCHITECTURE.md §3.4 step 2, ADR-0006). All functions run
@@ -19,7 +21,13 @@ import { getDefaultLocationId } from './commands';
 
 export type ReservationLine = { variantId: string; quantity: number };
 
-type LockedRow = { variantId: string; locationId: string; onHand: number; reserved: number };
+type LockedRow = {
+  variantId: string;
+  locationId: string;
+  onHand: number;
+  reserved: number;
+  lowStockThreshold: number;
+};
 
 async function lockRows(
   tx: Tx,
@@ -34,6 +42,7 @@ async function lockRows(
       locationId: inventoryItems.locationId,
       onHand: inventoryItems.onHand,
       reserved: inventoryItems.reserved,
+      lowStockThreshold: inventoryItems.lowStockThreshold,
     })
     .from(inventoryItems)
     .where(
@@ -53,11 +62,17 @@ function totals(lines: readonly ReservationLine[]): Map<string, number> {
 
 /**
  * Reserves stock for an order. Throws `DomainError('insufficientStock')` with one field issue
- * per short variant (`path` = variant id) when any line cannot be fully reserved.
+ * per short variant (`path` = variant id) when any line cannot be fully reserved. With `boss`,
+ * a variant whose availability drops to its low-stock threshold gets a staff alert (outbox).
  */
 export async function reserveStock(
   tx: Tx,
-  input: { orderId: string; lines: readonly ReservationLine[]; expiresAt: Date },
+  input: {
+    orderId: string;
+    lines: readonly ReservationLine[];
+    expiresAt: Date;
+    boss?: PgBoss | null;
+  },
 ): Promise<void> {
   const locationId = await getDefaultLocationId(tx);
   const wanted = totals(input.lines);
@@ -89,6 +104,15 @@ export async function reserveStock(
       expiresAt: input.expiresAt,
     });
   }
+  await enqueueLowStockAlerts(
+    input.boss,
+    tx,
+    [...wanted].map(([variantId, quantity]) => {
+      const row = rows.get(variantId)!;
+      const before = row.onHand - row.reserved;
+      return { variantId, before, after: before - quantity, threshold: row.lowStockThreshold };
+    }),
+  );
 }
 
 async function activeReservations(tx: Tx, orderId: string) {

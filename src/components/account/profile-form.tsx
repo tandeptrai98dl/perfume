@@ -62,6 +62,7 @@ export function ProfileForm({ email, initial }: { email: string; initial: Profil
   return (
     <Form {...form}>
       <form
+        method="post"
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex max-w-xl flex-col gap-6"
         noValidate

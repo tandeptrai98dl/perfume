@@ -87,6 +87,7 @@ export function RequestActions({ openTypes }: { openTypes: RequestType[] }) {
       </div>
 
       <form
+        method="post"
         className="border-line-200 flex flex-col gap-3 border p-5"
         onSubmit={(event) => {
           event.preventDefault();
@@ -146,6 +147,7 @@ export function RequestActions({ openTypes }: { openTypes: RequestType[] }) {
               <DialogDescription>{t('delete.confirmDescription')}</DialogDescription>
             </DialogHeader>
             <form
+              method="post"
               className="flex flex-col gap-4"
               onSubmit={(event) => {
                 event.preventDefault();

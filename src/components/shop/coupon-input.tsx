@@ -92,7 +92,7 @@ export function CouponInput({
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-2" noValidate>
+    <form method="post" onSubmit={submit} className="flex flex-col gap-2" noValidate>
       <Label htmlFor={inputId}>{t('label')}</Label>
       <div className="flex gap-2">
         <Input

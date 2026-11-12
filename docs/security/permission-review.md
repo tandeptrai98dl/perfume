@@ -17,11 +17,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 67 |
+| Admin Server Actions | 75 |
 | Admin Server Actions without a permission | 0 |
-| Storefront Server Actions | 25 |
-| Route Handlers | 18 |
-| Admin pages | 59 |
+| Storefront Server Actions | 29 |
+| Route Handlers | 20 |
+| Admin pages | 63 |
 
 ## Admin Server Actions
 
@@ -49,6 +49,10 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `content.ts` | `savePageAction` | `content.manage` | owner, manager, editor | yes |
 | `content.ts` | `savePostAction` | `content.manage` | owner, manager, editor | yes |
 | `content.ts` | `saveTopicAction` | `content.manage` | owner, manager, editor | yes |
+| `customers.ts` | `addCustomerNoteAction` | `customers.view` | owner, manager | yes |
+| `customers.ts` | `setCustomerCodRiskAction` | `customers.view` | owner, manager | yes |
+| `einvoices.ts` | `cancelEinvoiceAction` | `payments.refund` | owner, manager | yes |
+| `einvoices.ts` | `replaceEinvoiceAction` | `payments.refund` | owner, manager | yes |
 | `einvoices.ts` | `retryEinvoiceAction` | `orders.process` | owner, manager, staff | yes |
 | `inventory.ts` | `adjustStockAction` | `inventory.adjust` | owner, manager, staff | yes |
 | `inventory.ts` | `setLowStockThresholdAction` | `inventory.adjust` | owner, manager, staff | yes |
@@ -81,8 +85,12 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `promotions.ts` | `saveCouponAction` | `coupons.manage` | owner, manager | yes |
 | `promotions.ts` | `searchCouponProductsAction` | `coupons.manage` | owner, manager | yes |
 | `promotions.ts` | `setCouponActiveAction` | `coupons.manage` | owner, manager | yes |
+| `returns.ts` | `approveReturnAction` | `payments.refund` | owner, manager | yes |
+| `returns.ts` | `receiveReturnAction` | `orders.process` | owner, manager, staff | yes |
+| `returns.ts` | `rejectReturnAction` | `payments.refund` | owner, manager | yes |
 | `reviews.ts` | `moderateReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
 | `reviews.ts` | `replyReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
+| `settings.ts` | `saveSettingsSectionAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `deleteShippingRateAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `deleteShippingZoneAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `saveShippingRateAction` | `settings.manage` | owner | yes |
@@ -100,6 +108,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | Route | Method | Permission | Other guards | Review note |
 | --- | --- | --- | --- | --- |
 | `/api/admin/audit-log/export` | GET | `customers.export`, `auditLog.view` | — | Cross-site requests refused (Fetch Metadata); the export itself is audited. |
+| `/api/admin/customers/export` | GET | `customers.export` | — | Owner only; cross-site requests refused (Fetch Metadata); capped at 5,000 rows, formula-safe CSV, audited. |
 | `/api/admin/media` | POST | `admin.access` | Origin check | Any staff session at the edge; `uploadMedia` then requires `products.editContent` or `content.manage`. |
 | `/api/auth/[...all]` | GET | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
 | `/api/auth/[...all]` | POST | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
@@ -109,6 +118,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/health` | GET | — | — | Liveness probe; no data. |
 | `/api/internal/revalidate` | POST | — | HMAC signature | Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session. |
 | `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only). |
+| `/api/newsletter/unsubscribe` | POST | — | — | RFC 8058 one-click unsubscribe from mail clients; signed link, rate-limited, only ever unsubscribes. |
 | `/api/payments/simulator/vnpay` | GET | — | simulator signature (non-production only); gateway signature + amount/txn_ref match + idempotency | Payment simulator: 404 unless the gateway runs in simulator mode (never in production). |
 | `/api/privacy/export/[id]` | GET | — | customer session (own data only) |  |
 | `/api/reviews` | GET | — | — |  |
@@ -139,6 +149,9 @@ No staff permission by design; the guard is ownership, a signed token or a rate 
 | `checkout.ts` | `listWardsAction` | — | yes | Public reference data (administrative units). |
 | `checkout.ts` | `placeOrderAction` | issues a signed order-access token | yes | Anonymous allowed. Rate-limited; prices recomputed on the server; returns a signed order-access token. |
 | `checkout.ts` | `quoteCheckoutAction` | — | yes | Anonymous allowed. Read-only price quote of the caller’s own cart; no PII returned. |
+| `newsletter.ts` | `confirmNewsletterAction` | — | yes | Signed, expiring double opt-in token is the authorisation; rate-limited. |
+| `newsletter.ts` | `subscribeNewsletterAction` | — | yes | Anonymous allowed. Rate-limited + Turnstile; same answer for every e-mail (no enumeration); nothing stored before the e-mailed link is confirmed. |
+| `newsletter.ts` | `unsubscribeNewsletterAction` | — | yes | Signed unsubscribe link (HMAC of the subscriber id) is the authorisation; rate-limited. |
 | `order-lookup.ts` | `lookupOrderAction` | issues a signed order-access token | yes | Guest order lookup: order code + phone, rate-limited, generic failure (no enumeration). |
 | `payment.ts` | `startPaymentAction` | order access (owner session or signed order token) | yes | Owner session or signed order token; unknown and foreign orders answer the same. |
 | `privacy.ts` | `confirmGuestPrivacyAction` | — | yes |  |
@@ -146,6 +159,7 @@ No staff permission by design; the guard is ownership, a signed token or a rate 
 | `privacy.ts` | `requestGuestPrivacyAction` | — | yes |  |
 | `privacy.ts` | `saveCookieConsentAction` | session lookup | yes |  |
 | `privacy.ts` | `updateAccountConsentsAction` | customer session (own data only) | yes |  |
+| `returns.ts` | `requestReturnAction` | customer session (own data only) | yes | Order owner session or the order access (signed `?t=` link / lookup cookie); rate-limited per IP; unknown and foreign orders answer the same. |
 | `review.ts` | `submitGuestReviewAction` | — | yes |  |
 | `review.ts` | `submitMemberReviewAction` | customer session (own data only) | yes |  |
 | `wishlist.ts` | `setWishlistedAction` | customer session (own data only) | yes |  |
@@ -185,15 +199,18 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/content/topics/[id]` | `content.manage` | owner, manager, editor | — |  |
 | `/admin/content/topics/new` | `content.manage` | owner, manager, editor | — |  |
 | `/admin/content/topics` | `content.manage` | owner, manager, editor | — |  |
+| `/admin/customers/[id]` | `customers.view` | owner, manager | `privacyRequests.handle`, `auditLog.view` |  |
+| `/admin/customers` | `customers.view` | owner, manager | `customers.export` |  |
 | `/admin/forbidden` | — | — | — | Covered by the panel layout (any staff member). |
 | `/admin/inventory/movements` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/inventory` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/orders/[id]/edit` | `orders.editBeforeShipping` | owner, manager, staff | `orders.cancelPaid` |  |
-| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping`, `orders.process` |  |
+| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping`, `orders.process`, `payments.refund`, `customers.view` |  |
 | `/admin/orders/einvoices` | `orders.view` | owner, manager, staff | `orders.process` |  |
 | `/admin/orders/new` | `orders.createManual` | owner, manager, staff | `orders.process`, `payments.confirmBankTransfer` |  |
 | `/admin/orders` | `orders.view` | owner, manager, staff | `orders.createManual` |  |
-| `/admin` | `admin.access` | owner, manager, staff, editor | `orders.view`, `inventory.adjust` |  |
+| `/admin/orders/returns` | `orders.view` | owner, manager, staff | — |  |
+| `/admin` | `admin.access` | owner, manager, staff, editor | `orders.view`, `inventory.adjust`, `customers.view` |  |
 | `/admin/payments/bank-transfers` | `payments.confirmBankTransfer` | owner, manager | — |  |
 | `/admin/payments/cod-remittances` | `payments.reconcileCod` | owner, manager | — |  |
 | `/admin/payments/events` | `payments.refund` | owner, manager | — |  |
@@ -208,6 +225,7 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/promotions/coupons/new` | `coupons.manage` | owner, manager | — |  |
 | `/admin/promotions/coupons` | `coupons.manage` | owner, manager | — |  |
 | `/admin/reviews` | `reviews.moderate` | owner, manager, editor | — |  |
+| `/admin/settings` | `settings.manage` | owner | — |  |
 | `/admin/shipping` | `settings.manage` | owner | — |  |
 | `/admin/staff/[id]` | `staff.manage` | owner | — |  |
 | `/admin/staff` | `staff.manage` | owner | — |  |

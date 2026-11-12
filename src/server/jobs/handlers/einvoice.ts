@@ -1,4 +1,4 @@
-import { runEinvoiceJob } from '@/server/modules/einvoice';
+import { runEinvoiceAdjustmentJob, runEinvoiceJob } from '@/server/modules/einvoice';
 
 import type { HandlerDeps } from '.';
 import type { JobPayload } from '../definitions';
@@ -14,6 +14,13 @@ export function createEinvoiceHandlers(deps: HandlerDeps) {
       await runEinvoiceJob(
         { db: deps.db, boss: deps.boss, provider: deps.einvoice ?? null },
         orderId,
+      );
+    },
+    // M3 wave 2 returns: cancel / replace an issued invoice (returns, staff corrections).
+    'einvoice.adjust': async (payload: JobPayload<'einvoice.adjust'>) => {
+      await runEinvoiceAdjustmentJob(
+        { db: deps.db, boss: deps.boss, provider: deps.einvoice ?? null },
+        payload,
       );
     },
   } as const;

@@ -5,7 +5,8 @@ import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { CookieSettingsButton } from '@/components/privacy/cookie-settings-button';
-import { getMenu, getSellerInfo } from '@/data/content';
+import { NewsletterSignup } from '@/components/shop/newsletter-signup-lazy';
+import { getMenu, getPolicyPath, getSellerInfo } from '@/data/content';
 import type { Locale } from '@/i18n/routing';
 import { localizedPath } from '@/lib/seo/paths';
 import type { MenuItem } from '@/server/modules/content';
@@ -19,6 +20,21 @@ export async function SiteFooter() {
   return (
     <footer className="border-line-200 bg-sand-100 mt-(--spacing-section) border-t lg:mt-(--spacing-section-lg)">
       <div className="container-content flex flex-col gap-10 py-12">
+        {/* M3 wave 2: newsletter sign-up (double opt-in). */}
+        <section
+          aria-labelledby="footer-newsletter"
+          className="border-line-200 grid gap-6 border-b pb-10 md:grid-cols-[1fr_1.2fr] md:gap-10"
+        >
+          <div className="flex flex-col gap-2">
+            <h2 id="footer-newsletter" className="font-display text-h3">
+              {t('footer.newsletter.title')}
+            </h2>
+            <p className="text-small text-taupe-600">{t('footer.newsletter.intro')}</p>
+          </div>
+          <Suspense fallback={null}>
+            <FooterNewsletter />
+          </Suspense>
+        </section>
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr]">
           <div className="flex flex-col gap-2">
             <p className="font-display text-h3">{t('metadata.siteName')}</p>
@@ -49,6 +65,13 @@ export async function SiteFooter() {
       </div>
     </footer>
   );
+}
+
+async function FooterNewsletter() {
+  await connection();
+  const locale = (await getLocale()) as Locale;
+  const privacyHref = await getPolicyPath('privacy', locale);
+  return <NewsletterSignup source="footer" privacyHref={privacyHref} layout="inline" />;
 }
 
 function MenuLinks({ items, label }: { items: MenuItem[]; label: string }) {

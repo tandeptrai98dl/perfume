@@ -1,11 +1,17 @@
 name: Lighthouse CI
 
 # Performance budgets (ARCHITECTURE.md §14.1) on home, listing, PDP, cart and checkout in vi
-# and en, against the production build with the demo seed. Manual for now: GitHub-hosted
-# runner timings vary, so switch to `pull_request` once a few runs have set the baseline
-# (see docs/ops/runbook.md "Quality gates").
+# and en, against the production build with the demo seed, on every pull request. One job per
+# Lighthouse preset (mobile = the §14 budgets' reference, desktop); each URL is run 3 times
+# and asserted on the median (see lighthouserc.cjs for the budgets and the documented
+# relaxation). Reports: workflow artifacts + the job summary. Runbook: docs/ops/runbook.md §5.
 on:
+  pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -16,9 +22,13 @@ env:
 
 jobs:
   lighthouse:
-    name: Lighthouse (vi + en)
+    name: Lighthouse ${{ matrix.preset }} (vi + en)
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [mobile, desktop]
     services:
       postgres:
         image: postgres:17-alpine
@@ -33,7 +43,8 @@ jobs:
       DATABASE_URL: postgres://perfume:perfume@localhost:5432/perfume
       BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere-else
       INTERNAL_API_SECRET: ci-only-internal-api-secret-not-used-anywhere-else
-      LHCI_BASE_URL: http://localhost:3200
+      LH_BASE_URL: http://localhost:3200
+      LH_PRESET: ${{ matrix.preset }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -42,13 +53,20 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # GitHub's Ubuntu runners ship Google Chrome (as the E2E job uses): no browser download
+      # or apt step, which earlier failed on DNS/mirror errors.
+      - name: Use the runner's Chrome
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable)"
+          "$chrome" --version
+          echo "CHROME_PATH=$chrome" >> "$GITHUB_ENV"
       - run: pnpm db:migrate
       - run: pnpm db:seed
       - run: pnpm build
       - name: Start the production server
         run: |
           node scripts/start-standalone.mjs > server.log 2>&1 &
-          for i in $(seq 1 60); do curl -fs "$LHCI_BASE_URL/api/health" && exit 0; sleep 2; done
+          for i in $(seq 1 60); do curl -fs "$LH_BASE_URL/api/health" && exit 0; sleep 2; done
           cat server.log; exit 1
         env:
           PORT: 3200
@@ -56,17 +74,24 @@ jobs:
           APP_URL: http://localhost:3200
           PAYMENT_SIMULATOR: 'true'
       - name: Seed a guest cart for cart/checkout
-        run: echo "LHCI_CART_TOKEN=$(node load/lighthouse/seed-cart.mjs)" >> "$GITHUB_ENV"
+        run: echo "LH_CART_TOKEN=$(node load/lighthouse/seed-cart.mjs)" >> "$GITHUB_ENV"
       - name: Warm the caches (first request renders and caches each page)
         run: |
-          for path in / /en /nuoc-hoa /en/perfumes /san-pham/maison-lumiere-cedre-nocturne-edt /en/products/maison-lumiere-cedre-nocturne-edt; do
-            curl -fs -o /dev/null "$LHCI_BASE_URL$path"
+          for path in / /en /nuoc-hoa /en/perfumes /san-pham/maison-lumiere-cedre-nocturne-edt \
+            /en/products/maison-lumiere-cedre-nocturne-edt /gio-hang /en/cart /thanh-toan /en/checkout; do
+            curl -fs -o /dev/null -H "Cookie: cart_token=$LH_CART_TOKEN" "$LH_BASE_URL$path"
           done
       - name: Lighthouse CI
-        run: npx --yes @lhci/cli@0.16.1 autorun --config=lighthouserc.cjs
+        run: pnpm exec lhci autorun --config=lighthouserc.cjs
+      - name: Summary
+        if: always()
+        run: node scripts/lighthouse-summary.mjs .lighthouseci || true
       - if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: lighthouse-reports
-          path: .lighthouseci
+          name: lighthouse-${{ matrix.preset }}
+          path: |
+            .lighthouseci
+            server.log
+          include-hidden-files: true
           retention-days: 14

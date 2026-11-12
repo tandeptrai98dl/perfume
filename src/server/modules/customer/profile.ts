@@ -3,9 +3,11 @@ import { eq } from 'drizzle-orm';
 import type { Database } from '@/server/db/client';
 import { consents, users } from '@/server/db/schema';
 import { DomainError } from '@/server/lib/command-context';
+import { newId } from '@/server/lib/ids';
 import type { ProfileValues } from '@/lib/validation/account';
 
 import { CONSENT_POLICY_VERSION } from './consents';
+import { syncAccountNewsletter } from './newsletter';
 
 /**
  * Customer profile (§10.6): name, phone, birthday, preferred language (`users.locale`, used for
@@ -72,7 +74,9 @@ export async function updateProfile(
 
     const marketingChanged = current.marketingOptIn !== values.marketingOptIn;
     if (marketingChanged) {
+      const consentId = newId();
       await tx.insert(consents).values({
+        id: consentId,
         userId: input.userId,
         email: current.email,
         purpose: 'marketing_email',
@@ -82,6 +86,14 @@ export async function updateProfile(
         source: 'account_profile',
         ip: input.context?.ip ?? null,
         userAgent: input.context?.userAgent?.slice(0, 512) ?? null,
+      });
+      // M3 wave 2: the newsletter row of the account e-mail follows the switch.
+      await syncAccountNewsletter(tx, {
+        email: current.email,
+        locale: values.locale,
+        granted: values.marketingOptIn,
+        consentId,
+        source: 'account_profile',
       });
     }
     return { marketingChanged };

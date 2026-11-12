@@ -59,6 +59,7 @@ export function OrderLookupForm({ defaultCode = '' }: { defaultCode?: string }) 
   return (
     <Form {...form}>
       <form
+        method="post"
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex max-w-md flex-col gap-5"
         noValidate

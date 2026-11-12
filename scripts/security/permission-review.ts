@@ -31,6 +31,8 @@ const REVIEW_NOTES: Record<string, string> = {
   'src/actions/checkout.ts#listWardsAction': 'Public reference data (administrative units).',
   'src/actions/order-lookup.ts#lookupOrderAction':
     'Guest order lookup: order code + phone, rate-limited, generic failure (no enumeration).',
+  'src/actions/returns.ts#requestReturnAction':
+    'Order owner session or the order access (signed `?t=` link / lookup cookie); rate-limited per IP; unknown and foreign orders answer the same.',
   'src/actions/payment.ts#startPaymentAction':
     'Owner session or signed order token; unknown and foreign orders answer the same.',
   'src/app/api/auth/[...all]/route.ts': 'Better Auth handler (rate limits, CSRF/Origin, sessions).',
@@ -53,6 +55,16 @@ const REVIEW_NOTES: Record<string, string> = {
     'Any staff session at the edge; `uploadMedia` then requires `products.editContent` or `content.manage`.',
   'src/app/api/admin/audit-log/export/route.ts':
     'Cross-site requests refused (Fetch Metadata); the export itself is audited.',
+  'src/app/api/admin/customers/export/route.ts':
+    'Owner only; cross-site requests refused (Fetch Metadata); capped at 5,000 rows, formula-safe CSV, audited.',
+  'src/actions/newsletter.ts#subscribeNewsletterAction':
+    'Anonymous allowed. Rate-limited + Turnstile; same answer for every e-mail (no enumeration); nothing stored before the e-mailed link is confirmed.',
+  'src/actions/newsletter.ts#confirmNewsletterAction':
+    'Signed, expiring double opt-in token is the authorisation; rate-limited.',
+  'src/actions/newsletter.ts#unsubscribeNewsletterAction':
+    'Signed unsubscribe link (HMAC of the subscriber id) is the authorisation; rate-limited.',
+  'src/app/api/newsletter/unsubscribe/route.ts':
+    'RFC 8058 one-click unsubscribe from mail clients; signed link, rate-limited, only ever unsubscribes.',
   'src/app/sitemap.xml/route.ts': 'Public sitemap index (published URLs only).',
   'src/app/sitemaps/[file]/route.ts': 'Public sitemaps (published URLs only).',
   'src/app/admin/login/page.tsx': 'Sign-in page.',

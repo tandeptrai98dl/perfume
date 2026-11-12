@@ -19,9 +19,17 @@ import {
   type Tx,
 } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
-import { orderTags, recordEinvoiceIssued, recordOrderEvent } from '@/server/modules/order';
+import {
+  orderTags,
+  parseReturnReceived,
+  recordEinvoiceIssued,
+  recordOrderEvent,
+  RETURN_EVENTS,
+  type ReturnReceivedMetadata,
+} from '@/server/modules/order';
 import { getEinvoiceSettings } from '@/server/modules/settings';
 
+import { invoiceAfterReturns } from './after-returns';
 import { buildEinvoiceDocument, InvoiceBuildError, type InvoiceLabels } from './build';
 import { invoiceLabels } from './labels';
 import type { EinvoiceRetryInput } from './schemas';
@@ -71,7 +79,7 @@ export function einvoiceRef(invoice: Pick<IssuedEinvoice, 'series' | 'invoiceNo'
   return `${invoice.series}-${invoice.invoiceNo}`;
 }
 
-async function lockInvoicing(tx: Tx, orderId: string) {
+export async function lockInvoicing(tx: Tx, orderId: string) {
   await tx.execute(
     sql`select pg_advisory_xact_lock(hashtextextended(${`einvoice:${orderId}`}, 0))`,
   );
@@ -98,7 +106,22 @@ export async function einvoiceEvents(
   }));
 }
 
-function shippingLine(
+/** Accepted customer returns of the order (`return_received` events), oldest first. */
+export async function acceptedReturns(
+  db: Pick<Database, 'select'>,
+  orderId: string,
+): Promise<ReturnReceivedMetadata[]> {
+  const rows = await db
+    .select({ metadata: orderEvents.metadata })
+    .from(orderEvents)
+    .where(and(eq(orderEvents.orderId, orderId), eq(orderEvents.type, RETURN_EVENTS.received)))
+    .orderBy(asc(orderEvents.createdAt), asc(orderEvents.id));
+  return rows
+    .map((row) => parseReturnReceived(row.metadata))
+    .filter((row): row is ReturnReceivedMetadata => row !== null);
+}
+
+export function shippingLine(
   address: { street: string; wardName: string; provinceName: string } | undefined,
 ) {
   return address
@@ -106,7 +129,7 @@ function shippingLine(
     : null;
 }
 
-function classify(error: unknown): { reason: string; retryable: boolean } {
+export function classify(error: unknown): { reason: string; retryable: boolean } {
   if (error instanceof EinvoiceError) return { reason: error.reason, retryable: error.retryable };
   if (error instanceof InvoiceBuildError) return { reason: error.reason, retryable: false };
   return { reason: 'unexpected', retryable: true };
@@ -141,9 +164,11 @@ export async function issueOrderEinvoice(
         .where(and(eq(orderAddresses.orderId, orderId), eq(orderAddresses.type, 'shipping')))
         .limit(1);
       const settings = await getEinvoiceSettings(tx);
+      // Lines already returned (ADR-0017) are not invoiced (invoice issued after a return).
+      const kept = invoiceAfterReturns(order, items, await acceptedReturns(tx, orderId));
       const document = buildEinvoiceDocument({
-        order,
-        items,
+        order: kept.order,
+        items: kept.items,
         shippingAddress: shippingLine(shipping),
         vatRatePercent: settings.vatRatePercent,
         issueDate: now(),

@@ -5,7 +5,7 @@ import { render, toPlainText } from 'react-email';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { createDb, type Database } from '@/server/db/client';
-import { orderEvents, orders, payments, shipments } from '@/server/db/schema';
+import { orderEvents, orders, payments, settings, shipments } from '@/server/db/schema';
 import { seed } from '@/server/db/seed';
 import type { ChatNotifier } from '@/server/integrations/chat/telegram';
 import { createEmailSender, type EmailSender } from '@/server/integrations/email/send';
@@ -187,6 +187,29 @@ describe('order.placed', () => {
     await expect(
       handlers['staff.alert']({ kind: 'suspicious_ipn', orderId: order.id }),
     ).rejects.toThrow(/every channel/);
+  });
+});
+
+describe('staff alert channels from settings (D19)', () => {
+  it('sends to every recipient saved in settings, falling back to env when none', async () => {
+    const order = await insertOrder(db, { locale: 'vi' });
+    await db
+      .insert(settings)
+      .values({ key: 'alerts.emailRecipients', value: ['ops1@shop.test', 'ops2@shop.test'] })
+      .onConflictDoUpdate({
+        target: settings.key,
+        set: { value: ['ops1@shop.test', 'ops2@shop.test'] },
+      });
+    try {
+      await handlers['staff.alert']({ kind: 'suspicious_ipn', orderId: order.id });
+      expect(sent.map((m) => m.to).sort()).toEqual(['ops1@shop.test', 'ops2@shop.test']);
+    } finally {
+      await db.delete(settings).where(eq(settings.key, 'alerts.emailRecipients'));
+    }
+    sent = [];
+    const other = await insertOrder(db, { locale: 'vi' });
+    await handlers['staff.alert']({ kind: 'suspicious_ipn', orderId: other.id });
+    expect(sent.map((m) => m.to)).toEqual(['alerts@shop.test']);
   });
 });
 

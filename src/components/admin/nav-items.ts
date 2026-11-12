@@ -29,7 +29,14 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' },
       // M3 e-invoicing (D13): invoices that failed after every retry.
       { href: '/admin/orders/einvoices', labelKey: 'einvoices', permission: 'orders.view' },
+      // M3 wave 2 returns (ADR-0017): return requests waiting for staff.
+      { href: '/admin/orders/returns', labelKey: 'returns', permission: 'orders.view' },
     ],
+  },
+  // M3 wave 2 (customers & alerts stream): customers, Owner + Manager (§11.1).
+  {
+    labelKey: 'customersSection',
+    items: [{ href: '/admin/customers', labelKey: 'customers', permission: 'customers.view' }],
   },
   {
     labelKey: 'promotions',
@@ -114,6 +121,8 @@ export const ADMIN_NAV: AdminNavSection[] = [
     items: [
       { href: '/admin/staff', labelKey: 'staff', permission: 'staff.manage' },
       { href: '/admin/audit-log', labelKey: 'auditLog', permission: 'auditLog.view' },
+      // M3 wave 2 settings stream: company info, COD, returns, VAT, alerts, SEO, sender.
+      { href: '/admin/settings', labelKey: 'settings', permission: 'settings.manage' },
     ],
   },
   // M3 privacy stream: data-subject requests (Owner only).

@@ -43,6 +43,13 @@
       "when": 1794448426747,
       "tag": "0005_m3_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794465027314,
+      "tag": "0006_customer_notes",
+      "breakpoints": true
     }
   ]
 }

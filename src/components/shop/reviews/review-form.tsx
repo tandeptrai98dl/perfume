@@ -163,6 +163,7 @@ export function ReviewForm({
   return (
     <Form {...form}>
       <form
+        method="post"
         onSubmit={form.handleSubmit(onSubmit)}
         noValidate
         className="flex flex-col gap-6"

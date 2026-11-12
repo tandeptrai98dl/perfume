@@ -309,6 +309,7 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
   return (
     <Form {...form}>
       <form
+        method="post"
         noValidate
         onSubmit={(event) =>
           void form.handleSubmit(placeOrder, () => setAlert({ kind: 'fixErrors' }))(event)

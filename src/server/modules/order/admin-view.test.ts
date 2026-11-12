@@ -33,6 +33,9 @@ describe('staff → state machine actor', () => {
     // `pending → confirmed` is automatic (payment); staff may only cancel.
     expect(staffNextStatuses('pending', 'staff')).toEqual(['cancelled']);
     expect(staffNextStatuses('completed', 'owner')).toEqual([]);
+    // Returns use the return panel, not the generic buttons.
+    expect(staffNextStatuses('delivered', 'owner')).toEqual([]);
+    expect(staffNextStatuses('return_requested', 'owner')).toEqual([]);
     expect(staffNextStatuses('awaiting_confirmation', 'editor')).toEqual([]);
     // A deposit already paid: only Manager/Owner may cancel.
     expect(staffNextStatuses('awaiting_confirmation', 'staff', 500_000)).toEqual(['confirmed']);

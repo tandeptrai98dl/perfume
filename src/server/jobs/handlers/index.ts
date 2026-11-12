@@ -8,6 +8,7 @@ import type { EmailSender } from '@/server/integrations/email/send';
 import type { JobName, JobPayload } from '../definitions';
 import { createEinvoiceHandlers } from './einvoice';
 import { createOrderNotificationHandlers } from './order-notifications';
+import { createNewsletterHandlers } from './newsletter';
 import { createOrderTimeoutHandlers } from './order-timeouts';
 import { createPruneRateLimitsHandler } from './prune-rate-limits';
 import { createPrivacyHandlers } from './privacy';
@@ -66,5 +67,7 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
     'system.prune-rate-limits': createPruneRateLimitsHandler(deps.db),
     // M3 privacy stream: data-subject request e-mails and exports.
     ...createPrivacyHandlers(deps),
+    // M3 wave 2: newsletter double opt-in.
+    ...createNewsletterHandlers(deps),
   };
 }

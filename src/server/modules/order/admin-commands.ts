@@ -63,6 +63,11 @@ export async function transitionInTx(
     throw new DomainError('conflict');
   }
 
+  // Customer returns (ADR-0017) have their own flow (request details, refund, restock of the
+  // returned lines, e-invoice): the generic status buttons never open or close them.
+  if (input.to === 'return_requested' || order.status === 'return_requested') {
+    throw new DomainError('invalid', [{ path: 'status', code: 'useReturnFlow' }]);
+  }
   if (input.to === 'confirmed' && order.status === 'awaiting_confirmation') {
     // D16: high-value COD orders need their online deposit before staff may confirm.
     if (!depositSatisfied(order)) {

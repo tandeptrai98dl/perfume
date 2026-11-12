@@ -11,8 +11,10 @@ import { createEmailSender } from '@/server/integrations/email/send';
 import { createHandlers } from '@/server/jobs/handlers';
 import { createBoss, ensureQueues, scheduleCronJobs } from '@/server/jobs/queue';
 import { createDb } from '@/server/db/client';
-import { registerWorkers } from '@/server/jobs/runner';
+import { createDeadLetterHandler } from '@/server/jobs/handlers/dead-letter';
+import { registerDeadLetterWorker, registerWorkers } from '@/server/jobs/runner';
 import { errorFields, logger } from '@/server/lib/logger';
+import { createSenderResolver } from '@/server/modules/settings';
 
 async function main() {
   const env = serverEnv();
@@ -28,8 +30,12 @@ async function main() {
   const boss = createBoss(env.DATABASE_URL, { role: 'worker' });
   boss.on('error', (error) => logger.error('pgboss.error', errorFields(error)));
 
-  const email = createEmailSender({ smtpUrl: env.SMTP_URL, from: env.EMAIL_FROM });
   const { db, pool } = createDb(env.DATABASE_URL);
+  // M3 settings: admin → Settings → sender overrides EMAIL_FROM (re-read every minute).
+  const email = createEmailSender({
+    smtpUrl: env.SMTP_URL,
+    from: createSenderResolver(db, env.EMAIL_FROM),
+  });
 
   await boss.start();
   await ensureQueues(boss);
@@ -50,6 +56,10 @@ async function main() {
       einvoice: createEinvoiceProvider(env),
     }),
     (error, context) => Sentry.captureException(error, { tags: context }),
+  );
+  // M3 wave 2: jobs that exhausted their retries → `job_failed` staff alert.
+  await registerDeadLetterWorker(boss, createDeadLetterHandler({ db, boss }), (error, context) =>
+    Sentry.captureException(error, { tags: context }),
   );
   logger.info('worker.started');
 

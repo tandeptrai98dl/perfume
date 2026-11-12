@@ -33,7 +33,37 @@
     "brandsEyebrow": "Nhà hương",
     "brandsTitle": "Thương hiệu",
     "viewAllBrands": "Xem tất cả thương hiệu",
-    "featuredEmpty": "Bộ sưu tập đang được cập nhật."
+    "featuredEmpty": "Bộ sưu tập đang được cập nhật.",
+    "newEyebrow": "Mới về",
+    "newTitle": "Hàng mới về",
+    "viewAllNew": "Xem tất cả hàng mới",
+    "bestEyebrow": "Được yêu thích",
+    "bestTitle": "Bán chạy nhất",
+    "viewAllBest": "Xem tất cả sản phẩm bán chạy",
+    "journalEyebrow": "Tạp chí",
+    "journalTitle": "Từ tạp chí",
+    "viewJournal": "Đọc tạp chí",
+    "newsletterEyebrow": "Bản tin",
+    "newsletterTitle": "Biết mùi hương mới trước tiên",
+    "newsletterText": "Hàng mới về, cẩm nang mùi hương và ưu đãi dành riêng cho bạn, khoảng hai lần mỗi tháng. Hủy đăng ký bất cứ lúc nào.",
+    "trust": {
+      "title": "Vì sao chọn chúng tôi",
+      "authentic": {
+        "title": "Chính hãng 100%",
+        "text": "Mọi chai nước hoa đều từ nhà phân phối chính thức, đầy đủ giấy tờ nhập khẩu.",
+        "link": "Cam kết chính hãng"
+      },
+      "returns": {
+        "title": "Đổi trả trong 7 ngày",
+        "text": "Đổi trả sản phẩm còn nguyên seal trong 7 ngày kể từ khi nhận hàng; hàng lỗi được đổi miễn phí.",
+        "link": "Chính sách đổi trả"
+      },
+      "delivery": {
+        "title": "Giao hàng nhanh",
+        "text": "Đóng gói cẩn thận, giao hàng toàn quốc, hỗ trợ thanh toán khi nhận hàng.",
+        "link": "Chính sách giao hàng"
+      }
+    }
   },
   "notFound": {
     "title": "Không tìm thấy trang",
@@ -232,6 +262,60 @@
         "cta": "Xem trang quyền riêng tư",
         "ignore": "Bạn có thể gửi lại yêu cầu hoặc liên hệ với chúng tôi."
       }
+    },
+    "newsletter": {
+      "confirm": {
+        "subject": "Xác nhận đăng ký bản tin",
+        "preview": "Một cú nhấp để xác nhận đăng ký",
+        "heading": "Xác nhận đăng ký",
+        "body": "Có người (hy vọng là bạn) đã đăng ký nhận bản tin Perfume Store bằng địa chỉ này. Nhấn nút bên dưới để xác nhận.",
+        "cta": "Xác nhận đăng ký",
+        "expires": "Liên kết có hiệu lực trong 72 giờ.",
+        "ignore": "Nếu bạn không đăng ký, hãy bỏ qua e-mail này: bạn sẽ không được thêm vào danh sách."
+      },
+      "welcome": {
+        "subject": "Chào mừng bạn đến với bản tin Perfume Store",
+        "preview": "Bạn đã đăng ký thành công",
+        "heading": "Chào mừng bạn",
+        "body": "Cảm ơn bạn đã đăng ký. Chúng tôi sẽ gửi bạn tin về hàng mới, cẩm nang mùi hương và ưu đãi, khoảng hai lần mỗi tháng.",
+        "cta": "Khám phá nước hoa"
+      },
+      "unsubscribeText": "Không muốn nhận những e-mail này?",
+      "unsubscribeLink": "Hủy đăng ký"
+    },
+    "return": {
+      "requested": {
+        "subject": "Đã nhận yêu cầu trả hàng cho đơn {code}",
+        "preview": "Chúng tôi sẽ phản hồi trong 1–2 ngày làm việc.",
+        "heading": "Đã nhận yêu cầu trả hàng",
+        "body": "Chúng tôi đã nhận yêu cầu trả hàng cho đơn {code} và sẽ phản hồi trong 1–2 ngày làm việc. Nếu cần ảnh chụp sản phẩm, chúng tôi sẽ liên hệ bạn."
+      },
+      "approved": {
+        "subject": "Yêu cầu trả hàng đơn {code} đã được chấp nhận",
+        "preview": "Hướng dẫn gửi trả hàng.",
+        "heading": "Yêu cầu trả hàng được chấp nhận",
+        "body": "Yêu cầu trả hàng cho đơn {code} đã được chấp nhận. Vui lòng đóng gói sản phẩm cẩn thận, kèm hộp và phụ kiện.",
+        "note": "Hướng dẫn từ cửa hàng: {note}"
+      },
+      "rejected": {
+        "subject": "Yêu cầu trả hàng đơn {code} không được chấp nhận",
+        "preview": "Thông tin về yêu cầu trả hàng của bạn.",
+        "heading": "Yêu cầu trả hàng không được chấp nhận",
+        "body": "Rất tiếc, yêu cầu trả hàng cho đơn {code} không được chấp nhận.",
+        "reason": "Lý do: {reason}"
+      },
+      "received": {
+        "subject": "Đã nhận lại hàng trả của đơn {code}",
+        "preview": "Yêu cầu trả hàng của bạn đã được xử lý.",
+        "heading": "Đã nhận lại hàng",
+        "body": "Chúng tôi đã nhận lại sản phẩm trả của đơn {code}.",
+        "refund": "Số tiền hoàn cho bạn: {amount}. Tiền sẽ về tài khoản trong vài ngày làm việc tuỳ ngân hàng.",
+        "refundLater": "Một phần sẽ được hoàn ngay khi chúng tôi nhận được tiền thu hộ từ đơn vị vận chuyển.",
+        "replacement": "Sản phẩm thay thế sẽ được gửi tới bạn; chúng tôi sẽ báo khi hàng được giao đi."
+      },
+      "items": "Sản phẩm trả:",
+      "item": "{name} × {quantity}",
+      "help": "Cần hỗ trợ? Hãy liên hệ chúng tôi qua website."
     }
   },
   "ui": {
@@ -285,7 +369,11 @@
       "email": "Email: {value}",
       "moitBadge": "Đã thông báo Bộ Công Thương"
     },
-    "privacyRequest": "Yêu cầu về dữ liệu cá nhân"
+    "privacyRequest": "Yêu cầu về dữ liệu cá nhân",
+    "newsletter": {
+      "title": "Đăng ký nhận bản tin",
+      "intro": "Hàng mới, cẩm nang và ưu đãi qua e-mail. Chúng tôi sẽ gửi e-mail để bạn xác nhận địa chỉ."
+    }
   },
   "journal": {
     "title": "Tạp chí",
@@ -1543,6 +1631,126 @@
       "again": "Gửi lại yêu cầu"
     }
   },
+  "newsletter": {
+    "email": "Địa chỉ e-mail nhận bản tin",
+    "submit": "Đăng ký",
+    "consent": "Tôi đồng ý nhận tin tức, sản phẩm mới và ưu đãi từ Perfume Store qua e-mail. Tôi có thể hủy đăng ký bất cứ lúc nào bằng liên kết trong mỗi e-mail.",
+    "privacyLink": "Cách chúng tôi xử lý dữ liệu cá nhân của bạn",
+    "sent": "Sắp xong: hãy kiểm tra hộp thư và nhấn vào liên kết trong e-mail của chúng tôi để xác nhận đăng ký.",
+    "errors": {
+      "validation": "Vui lòng kiểm tra lại biểu mẫu.",
+      "invalid": "Vui lòng kiểm tra lại giá trị này.",
+      "emailInvalid": "Nhập địa chỉ e-mail hợp lệ.",
+      "consentRequired": "Vui lòng đánh dấu ô đồng ý nhận e-mail từ chúng tôi.",
+      "rateLimited": "Bạn thử quá nhiều lần. Vui lòng thử lại sau vài phút.",
+      "captchaFailed": "Chúng tôi chưa xác minh được bạn. Vui lòng thử lại.",
+      "invalidLink": "Liên kết không hợp lệ hoặc đã hết hạn.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "confirm": {
+      "metaTitle": "Xác nhận đăng ký",
+      "title": "Xác nhận đăng ký bản tin",
+      "intro": "Nhấn nút bên dưới để bắt đầu nhận bản tin tại địa chỉ này.",
+      "email": "Email",
+      "submit": "Xác nhận đăng ký",
+      "done": "Cảm ơn bạn, bạn đã đăng ký thành công. E-mail chào mừng đang được gửi tới bạn.",
+      "already": "Địa chỉ này đã đăng ký nhận bản tin.",
+      "shop": "Khám phá nước hoa",
+      "invalidTitle": "Liên kết không hợp lệ hoặc đã hết hạn",
+      "invalidText": "Liên kết xác nhận có hiệu lực trong 72 giờ. Hãy đăng ký lại ở cuối bất kỳ trang nào.",
+      "home": "Về trang chủ"
+    },
+    "unsubscribe": {
+      "metaTitle": "Hủy đăng ký",
+      "title": "Hủy đăng ký bản tin",
+      "intro": "Bạn sẽ không nhận e-mail tiếp thị từ chúng tôi nữa. E-mail về đơn hàng không bị ảnh hưởng.",
+      "email": "Email",
+      "submit": "Hủy đăng ký",
+      "done": "Bạn đã hủy đăng ký. Bạn sẽ không nhận bản tin của chúng tôi nữa.",
+      "invalidTitle": "Liên kết không hợp lệ",
+      "invalidText": "Hãy dùng liên kết hủy đăng ký trong e-mail của chúng tôi, hoặc thay đổi lựa chọn trong mục quyền riêng tư của tài khoản.",
+      "home": "Về trang chủ"
+    }
+  },
+  "returns": {
+    "title": "Đổi trả hàng",
+    "eligible": "Bạn có thể gửi yêu cầu trả hàng đến hết {deadline}.",
+    "policy": "Sản phẩm chưa mở, còn nguyên seal được trả trong {days} ngày kể từ khi nhận hàng. Sản phẩm lỗi, giao nhầm hoặc vỡ được đổi mới hoặc hoàn tiền 100% và cửa hàng chịu phí vận chuyển.",
+    "policyLink": "Xem chính sách đổi trả",
+    "policySlug": "doi-tra",
+    "windowExpired": "Thời hạn trả hàng của đơn này đã kết thúc vào {date}. Nếu sản phẩm có vấn đề, hãy liên hệ chúng tôi.",
+    "start": "Yêu cầu trả hàng",
+    "form": {
+      "title": "Yêu cầu trả hàng cho đơn {code}",
+      "lines": "Sản phẩm muốn trả",
+      "linesHint": "Chọn sản phẩm và số lượng bạn muốn trả.",
+      "lineLabel": "{name} (đã mua {quantity})",
+      "quantity": "Số lượng trả: {name}",
+      "reason": "Lý do trả hàng",
+      "resolution": "Bạn muốn",
+      "resolutionUnopened": "Hàng đổi ý được hoàn tiền phần sản phẩm (không gồm phí giao hàng); phí gửi trả do bạn chịu.",
+      "description": "Mô tả",
+      "descriptionFault": "Mô tả lỗi hoặc tình trạng sản phẩm (ít nhất 10 ký tự).",
+      "descriptionOptional": "Không bắt buộc.",
+      "sealIntact": "Tôi xác nhận sản phẩm chưa mở và còn nguyên seal.",
+      "photos": "Nếu cần ảnh chụp sản phẩm hoặc bao bì, chúng tôi sẽ liên hệ bạn qua e-mail hoặc điện thoại sau khi nhận yêu cầu.",
+      "estimate": "Số tiền hoàn dự kiến được tính khi chúng tôi nhận lại hàng.",
+      "submit": "Gửi yêu cầu",
+      "cancel": "Đóng",
+      "done": "Đã gửi yêu cầu trả hàng. Chúng tôi sẽ phản hồi qua e-mail."
+    },
+    "reasons": {
+      "unopened": "Đổi ý (sản phẩm chưa mở, còn nguyên seal)",
+      "defective": "Sản phẩm lỗi",
+      "wrong_item": "Giao nhầm sản phẩm",
+      "damaged": "Sản phẩm bị vỡ, hư hỏng khi giao"
+    },
+    "resolutions": {
+      "refund": "Hoàn tiền",
+      "replacement": "Đổi sản phẩm mới"
+    },
+    "status": {
+      "requested": "Đã nhận yêu cầu trả hàng",
+      "approved": "Yêu cầu trả hàng đã được chấp nhận",
+      "rejected": "Yêu cầu trả hàng không được chấp nhận",
+      "received": "Cửa hàng đã nhận lại hàng"
+    },
+    "statusBody": {
+      "requested": "Gửi ngày {date}. Chúng tôi sẽ xem xét và phản hồi trong 1–2 ngày làm việc.",
+      "approved": "Vui lòng gửi hàng theo hướng dẫn trong e-mail của chúng tôi.",
+      "rejected": "Nếu bạn cần hỗ trợ thêm, hãy liên hệ chúng tôi.",
+      "received": "Cảm ơn bạn. Yêu cầu trả hàng đã được xử lý."
+    },
+    "summary": {
+      "reason": "Lý do: {reason}",
+      "resolution": "Phương án: {resolution}",
+      "item": "{name} × {quantity}",
+      "note": "Ghi chú của cửa hàng: {note}",
+      "rejection": "Lý do: {reason}",
+      "refund": "Số tiền hoàn: {amount}",
+      "replacement": "Sản phẩm thay thế sẽ được gửi tới bạn."
+    },
+    "errors": {
+      "validation": "Vui lòng sửa các mục được đánh dấu.",
+      "noLines": "Chọn ít nhất một sản phẩm.",
+      "unknownLine": "Sản phẩm không thuộc đơn hàng này.",
+      "duplicateLine": "Sản phẩm bị chọn trùng.",
+      "quantityTooLarge": "Số lượng vượt quá số đã mua.",
+      "tooSmall": "Số lượng ít nhất là 1.",
+      "sealRequired": "Hàng đổi ý chỉ được trả khi còn nguyên seal.",
+      "refundOnly": "Hàng đổi ý chỉ được hoàn tiền.",
+      "describeProblem": "Hãy mô tả vấn đề (ít nhất 10 ký tự).",
+      "tooLong": "Nội dung quá dài.",
+      "reasonRequired": "Chọn lý do trả hàng.",
+      "windowExpired": "Đã quá thời hạn trả hàng.",
+      "notDelivered": "Đơn hàng chưa được giao hoặc không thể trả.",
+      "alreadyRequested": "Đơn hàng này đã có yêu cầu trả hàng.",
+      "notFound": "Không tìm thấy đơn hàng.",
+      "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+      "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    }
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
@@ -1589,7 +1797,11 @@
       "reviewsSection": "Đánh giá",
       "reviews": "Kiểm duyệt đánh giá",
       "privacy": "Dữ liệu cá nhân",
-      "privacyRequests": "Yêu cầu dữ liệu"
+      "privacyRequests": "Yêu cầu dữ liệu",
+      "settings": "Cài đặt",
+      "customersSection": "Khách hàng",
+      "customers": "Danh sách khách hàng",
+      "returns": "Yêu cầu đổi trả"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -1646,7 +1858,9 @@
       "missingEnglish": "Sản phẩm thiếu bản tiếng Anh",
       "missingEnglishValue": "{missing}/{total} sản phẩm đang bán · {coverage}% đã có tiếng Anh",
       "open": "Mở",
-      "failedEinvoices": "Hoá đơn điện tử lỗi"
+      "failedEinvoices": "Hoá đơn điện tử lỗi",
+      "flaggedCustomers": "Khách bị gắn cờ rủi ro COD",
+      "returnQueue": "Yêu cầu đổi trả cần xử lý"
     },
     "roles": {
       "owner": "Chủ cửa hàng",
@@ -2105,7 +2319,24 @@
       "useAnonymize": "Yêu cầu xoá được hoàn tất bằng thao tác ẩn danh hoá.",
       "notExport": "Đây không phải yêu cầu xuất dữ liệu.",
       "notDelete": "Đây không phải yêu cầu xoá dữ liệu.",
-      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này."
+      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này.",
+      "taxCodeInvalid": "Mã số thuế gồm 10 chữ số (chi nhánh: 10 số-3 số) hoặc 12 chữ số.",
+      "hotlineInvalid": "Số điện thoại gồm 6–20 ký tự: chữ số, dấu cách, + . - ( ).",
+      "moitUrlInvalid": "Dán đường dẫn hồ sơ của website trên online.gov.vn.",
+      "moitUrlRequired": "Cần đường dẫn hồ sơ thông báo trước khi hiển thị logo.",
+      "badgeUrlInvalid": "Dùng ảnh từ https://online.gov.vn hoặc đường dẫn bắt đầu bằng / trên website.",
+      "vatRateInvalid": "Thuế suất chỉ nhận 0, 5, 8 hoặc 10 %.",
+      "telegramChatIdInvalid": "Chat ID là số (nhóm bắt đầu bằng dấu -) hoặc @tên_kênh.",
+      "reservationShorterThanSession": "Thời gian giữ hàng phải dài hơn hoặc bằng phiên thanh toán.",
+      "tooMany": "Quá nhiều mục.",
+      "riskUnchanged": "Trạng thái cờ rủi ro đã như vậy. Tải lại trang.",
+      "useReturnFlow": "Đơn đổi trả được xử lý trong mục Đổi trả của đơn.",
+      "notPending": "Yêu cầu đổi trả không còn ở bước này.",
+      "notApproved": "Cần chấp nhận yêu cầu trước khi nhận hàng.",
+      "refundForbidden": "Chỉ Quản lý hoặc Chủ shop được hoàn phí gửi trả.",
+      "noInvoice": "Đơn chưa có hoá đơn điện tử.",
+      "invoiceCancelled": "Hoá đơn đã bị huỷ.",
+      "adjustmentRunning": "Đang xử lý một yêu cầu huỷ / thay thế hoá đơn khác."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -2772,7 +3003,9 @@
             "no_recipient": "Khách không có email",
             "no_channel": "Chưa cấu hình kênh nhận"
           }
-        }
+        },
+        "customerProfile": "Xem hồ sơ khách hàng",
+        "returns": "Đổi trả"
       },
       "timeline": {
         "system": "Hệ thống",
@@ -2793,7 +3026,20 @@
         "einvoice_issued": "Đã xuất hoá đơn điện tử {number}",
         "einvoice_attempt_failed": "Xuất hoá đơn điện tử lỗi (lần {attempt}), sẽ thử lại",
         "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
-        "einvoice_retry_requested": "Yêu cầu xuất lại hoá đơn điện tử"
+        "einvoice_retry_requested": "Yêu cầu xuất lại hoá đơn điện tử",
+        "return_requested": "Khách yêu cầu trả hàng",
+        "return_approved": "Chấp nhận yêu cầu trả hàng",
+        "return_rejected": "Từ chối yêu cầu trả hàng",
+        "return_received": "Đã nhận lại hàng trả",
+        "einvoice_adjust_requested": "Yêu cầu {action} hoá đơn điện tử",
+        "einvoice_adjust_attempt_failed": "Huỷ / thay thế hoá đơn lỗi (lần {attempt})",
+        "einvoice_adjust_failed": "Huỷ / thay thế hoá đơn thất bại",
+        "einvoice_cancelled": "Đã huỷ hoá đơn điện tử {number}",
+        "einvoice_replaced": "Đã lập hoá đơn thay thế {number}",
+        "adjustActions": {
+          "cancel": "huỷ",
+          "replace": "thay thế"
+        }
       },
       "print": {
         "packing-slip": "Phiếu đóng gói",
@@ -3474,11 +3720,17 @@
         "low_stock": "Sắp hết hàng",
         "job_failed": "Tác vụ nền thất bại",
         "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
-        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền"
+        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền",
+        "review_pending": "Đánh giá chờ duyệt",
+        "return_requested": "Khách yêu cầu trả hàng",
+        "einvoice_adjustment_failed": "Huỷ / thay thế hoá đơn điện tử thất bại"
       },
       "order": "Đơn {code}: {amount} · {method} · {province}",
       "orderNoProvince": "Đơn {code}: {amount} · {method}",
-      "noDetails": "Không có thêm thông tin."
+      "noDetails": "Không có thêm thông tin.",
+      "lowStock": "{sku} · {product}: còn {available} có thể bán (ngưỡng {threshold})",
+      "reviewPending": "{count, plural, other {# đánh giá}} đang chờ kiểm duyệt",
+      "jobFailed": "Tác vụ {job} ({id}) thất bại sau {attempts, plural, other {# lần thử}}. Đã chuyển vào hàng lỗi."
     },
     "einvoices": {
       "title": "Hoá đơn điện tử lỗi",
@@ -3543,7 +3795,10 @@
         "totals_mismatch": "tổng các dòng không khớp tổng đơn",
         "timeout": "nhà cung cấp không phản hồi",
         "network_error": "lỗi kết nối",
-        "unexpected": "lỗi không xác định"
+        "unexpected": "lỗi không xác định",
+        "no_invoice": "không tìm thấy hoá đơn hiện tại",
+        "nothing_to_invoice": "không còn hàng để lập hoá đơn (hãy huỷ hoá đơn)",
+        "ref_changed": "hoá đơn đã được thay đổi bởi thao tác khác"
       },
       "document": {
         "unitGoods": "Chai",
@@ -3566,6 +3821,36 @@
         "million": "triệu",
         "billion": "tỷ",
         "currency": "đồng"
+      },
+      "adjust": {
+        "returnReason": "Khách trả hàng theo chính sách đổi trả (đơn {code})",
+        "cancel": "Huỷ hoá đơn",
+        "replace": "Lập hoá đơn thay thế",
+        "cancelTitle": "Huỷ hoá đơn {number}?",
+        "cancelDescription": "Hoá đơn sẽ bị huỷ trên hệ thống của nhà cung cấp. Chỉ huỷ khi giao dịch không còn (ví dụ khách trả toàn bộ hàng) hoặc theo hướng dẫn của kế toán. Không thể hoàn tác.",
+        "replaceTitle": "Lập hoá đơn thay thế cho {number}?",
+        "replaceDescription": "Hệ thống lập hoá đơn mới theo đơn hàng hiện tại (đã trừ hàng khách trả) thay thế hoá đơn này trên hệ thống của nhà cung cấp.",
+        "reason": "Lý do (ghi trên hoá đơn / biên bản)",
+        "confirmCancel": "Huỷ hoá đơn",
+        "confirmReplace": "Lập hoá đơn thay thế",
+        "cancelDone": "Đã xếp lịch huỷ hoá đơn điện tử.",
+        "replaceDone": "Đã xếp lịch lập hoá đơn thay thế.",
+        "actions": {
+          "cancel": "huỷ",
+          "replace": "thay thế"
+        },
+        "state": {
+          "pending": "Đang chờ {action} hoá đơn.",
+          "retrying": "Đang thử lại {action} hoá đơn: lần {attempts} bị lỗi ({reason}).",
+          "failed": "{action} hoá đơn thất bại sau {attempts} lần thử: {reason}. Có thể yêu cầu lại.",
+          "cancelled": "Hoá đơn đã bị huỷ.",
+          "replaced": "Hoá đơn hiện tại là hoá đơn thay thế."
+        },
+        "badge": {
+          "cancelled": "Đã huỷ",
+          "replaced": "Đã thay thế"
+        },
+        "hint": "Huỷ / thay thế hoá đơn do Quản lý hoặc Chủ shop thực hiện; kế toán xác nhận loại chứng từ khi trả hàng."
       }
     },
     "staff": {
@@ -3867,6 +4152,341 @@
         "anonymized": "Đã ẩn danh hoá dữ liệu.",
         "completed": "Đã hoàn tất yêu cầu.",
         "rejected": "Đã từ chối yêu cầu."
+      }
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "description": "Thông tin người bán, thanh toán & COD, đổi trả, hoá đơn điện tử, thông báo nội bộ, SEO và email gửi đi. Khoá cổng thanh toán, mật khẩu SMTP và token bot không lưu ở đây mà cấu hình bằng biến môi trường.",
+      "tabsLabel": "Nhóm cài đặt",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu cài đặt",
+      "noChanges": "Không có thay đổi nào để lưu",
+      "unsaved": "Có thay đổi chưa lưu",
+      "sections": {
+        "company": {
+          "tab": "Người bán",
+          "title": "Thông tin người bán",
+          "description": "Hiển thị ở chân trang và trang Liên hệ theo quy định về website thương mại điện tử. Để trống trường nào thì trường đó không hiển thị."
+        },
+        "checkout": {
+          "tab": "Thanh toán & COD",
+          "title": "Thanh toán, COD và giữ hàng",
+          "description": "Ngưỡng đặt cọc COD, thời gian xác nhận, phiên thanh toán online, thời gian giữ hàng và phí gói quà."
+        },
+        "returns": {
+          "tab": "Đổi trả",
+          "title": "Đổi trả",
+          "description": "Thời hạn nhận yêu cầu đổi trả tính từ ngày giao hàng."
+        },
+        "einvoice": {
+          "tab": "Hoá đơn điện tử",
+          "title": "Hoá đơn điện tử",
+          "description": "Thuế suất GTGT áp dụng cho mọi dòng hoá đơn (hàng hoá, phí giao hàng, phí gói quà)."
+        },
+        "alerts": {
+          "tab": "Thông báo nội bộ",
+          "title": "Kênh thông báo nội bộ",
+          "description": "Nơi nhận cảnh báo: đơn mới, COD giá trị cao, IPN đáng ngờ, sắp hết hàng, lỗi hoá đơn điện tử."
+        },
+        "seo": {
+          "tab": "SEO",
+          "title": "SEO mặc định",
+          "description": "Tiêu đề và mô tả mặc định của website cho từng ngôn ngữ. Để trống để dùng nội dung mặc định."
+        },
+        "email": {
+          "tab": "Email gửi đi",
+          "title": "Người gửi email",
+          "description": "Tên và địa chỉ hiển thị trong email gửi khách hàng và nhân viên."
+        }
+      },
+      "company": {
+        "name": "Tên doanh nghiệp",
+        "taxCode": "Mã số thuế",
+        "taxCodeHint": "10 chữ số, chi nhánh dạng 0123456789-001.",
+        "address": "Địa chỉ trụ sở",
+        "legalRepresentative": "Người đại diện theo pháp luật",
+        "phone": "Hotline",
+        "email": "Email liên hệ",
+        "businessRegistration": "Giấy phép kinh doanh",
+        "businessRegistrationHint": "Ví dụ: Giấy chứng nhận ĐKDN số …, cấp ngày …, nơi cấp ….",
+        "moitTitle": "Thông báo website với Bộ Công Thương",
+        "moitNote": "Logo \"Đã thông báo Bộ Công Thương\" chỉ hiện ở chân trang khi có đường dẫn hồ sơ. Không có ảnh thì hiển thị nhãn chữ.",
+        "moitNotificationUrl": "Đường dẫn hồ sơ trên online.gov.vn",
+        "moitNotificationUrlHint": "Ví dụ: http://online.gov.vn/Home/WebDetails/12345",
+        "moitBadgeImageUrl": "Ảnh logo đã thông báo",
+        "moitBadgeImageUrlHint": "Đường dẫn ảnh do online.gov.vn cung cấp, hoặc ảnh trên website (bắt đầu bằng /)."
+      },
+      "checkout": {
+        "pricesWarning": "Thay đổi ở đây ảnh hưởng ngay đến giá và điều kiện thanh toán khi khách đặt hàng (tiền cọc, phí gói quà, thời gian giữ hàng). Đơn đã đặt giữ nguyên điều kiện cũ.",
+        "codTitle": "Thanh toán khi nhận hàng (COD)",
+        "codMaxOrderWithoutDeposit": "Giá trị đơn tối đa không cần cọc (VND)",
+        "codMaxOrderWithoutDepositHint": "Đơn COD lớn hơn mức này phải đặt cọc online trước khi xác nhận.",
+        "codDepositPercent": "Tiền cọc (%)",
+        "codDepositPercentHint": "Phần trăm tổng đơn khách trả trước; đơn vị vận chuyển thu phần còn lại.",
+        "codConfirmationWindowHours": "Thời hạn xác nhận đơn COD (giờ)",
+        "codConfirmationWindowHoursHint": "Quá thời hạn mà chưa xác nhận, đơn tự huỷ và trả hàng về kho.",
+        "onlineTitle": "Thanh toán online",
+        "paymentSessionMinutes": "Phiên thanh toán (phút)",
+        "paymentSessionMinutesHint": "Thời gian một lần thanh toán qua VNPay/VietQR có hiệu lực.",
+        "onlineReservationMinutes": "Giữ hàng cho đơn online (phút)",
+        "onlineReservationMinutesHint": "Hết thời gian mà chưa thanh toán, đơn tự huỷ. Phải dài hơn hoặc bằng phiên thanh toán.",
+        "cartTitle": "Giỏ hàng",
+        "giftWrapFee": "Phí gói quà (VND)",
+        "giftWrapFeeHint": "Nhập 0 để miễn phí.",
+        "maxQuantityPerLine": "Số lượng tối đa mỗi sản phẩm",
+        "maxQuantityPerLineHint": "Giới hạn số lượng của một sản phẩm trong một đơn."
+      },
+      "returns": {
+        "policyWarning": "Thời hạn này dùng để tự động hoàn tất đơn đã giao. Khi đổi, hãy cập nhật cả trang Chính sách đổi trả (Nội dung → Trang tĩnh) để khách thấy cùng một con số.",
+        "windowDays": "Thời hạn đổi trả (ngày)",
+        "windowDaysHint": "Từ 7 đến 30 ngày kể từ khi giao hàng."
+      },
+      "einvoice": {
+        "pendingAccountant": "Chờ kế toán xác nhận: thuế suất, cách làm tròn theo dòng và việc áp cùng thuế suất cho phí giao hàng, phí gói quà. Chỉ đổi khi kế toán đã xác nhận.",
+        "vatRatePercent": "Thuế suất GTGT",
+        "vatRatePercentHint": "Giá bán đã gồm VAT; hoá đơn tách tiền hàng và tiền thuế. Áp dụng cho hoá đơn xuất sau khi lưu.",
+        "rate": "{rate} %"
+      },
+      "alerts": {
+        "precedence": "Giá trị lưu ở đây được dùng thay cho cấu hình máy chủ (STAFF_ALERT_EMAIL, TELEGRAM_CHAT_ID). Token của bot Telegram chỉ cấu hình trên máy chủ.",
+        "botConfigured": "Bot Telegram: đã cấu hình trên máy chủ.",
+        "botMissing": "Bot Telegram: chưa cấu hình token trên máy chủ, cảnh báo chỉ gửi qua email.",
+        "emailRecipients": "Email nhận cảnh báo",
+        "emailRecipientsHint": "Mỗi dòng một địa chỉ, tối đa 5. Để trống thì không gửi cảnh báo qua email.",
+        "emailRecipientsHintFallback": "Mỗi dòng một địa chỉ, tối đa 5. Để trống thì dùng địa chỉ cấu hình trên máy chủ.",
+        "telegramChatId": "Telegram chat ID",
+        "telegramChatIdHint": "ID của nhóm hoặc kênh nhận cảnh báo, ví dụ -1001234567890."
+      },
+      "seo": {
+        "legend": {
+          "vi": "Tiếng Việt",
+          "en": "Tiếng Anh"
+        },
+        "title": "Tiêu đề mặc định",
+        "titleHint": "Tối đa 70 ký tự, hiển thị sau tên website trên trang chủ.",
+        "description": "Mô tả mặc định",
+        "descriptionHint": "Tối đa 170 ký tự, dùng cho trang không có mô tả riêng."
+      },
+      "email": {
+        "fallback": "Để trống thì dùng người gửi cấu hình trên máy chủ: {from}",
+        "domainWarning": "Địa chỉ gửi phải thuộc tên miền đã cấu hình SPF/DKIM cho máy chủ email, nếu không email dễ vào thư rác.",
+        "senderName": "Tên người gửi",
+        "senderAddress": "Địa chỉ email gửi"
+      }
+    },
+    "customers": {
+      "title": "Khách hàng",
+      "description": "Tài khoản đã đăng ký và khách mua không đăng ký (gộp theo số điện thoại). Chi tiêu tính theo đơn đã xác nhận, trừ tiền hoàn.",
+      "search": "Tìm theo tên, số điện thoại hoặc email",
+      "export": "Xuất CSV",
+      "exportHint": "Tối đa {limit} dòng theo bộ lọc hiện tại; việc xuất được ghi nhật ký.",
+      "empty": "Không có khách hàng nào phù hợp.",
+      "noName": "(Chưa có tên)",
+      "back": "Khách hàng",
+      "yes": "Có",
+      "no": "Không",
+      "columns": {
+        "name": "Khách hàng",
+        "contact": "Liên hệ",
+        "orders": "Số đơn",
+        "spend": "Tổng chi tiêu",
+        "lastOrder": "Đơn gần nhất",
+        "risk": "Rủi ro COD"
+      },
+      "type": {
+        "registered": "Có tài khoản",
+        "guest": "Khách vãng lai"
+      },
+      "risk": {
+        "flagged": "Gắn cờ rủi ro",
+        "failed": "{count, plural, other {# lần giao thất bại}}"
+      },
+      "filter": {
+        "type": "Loại khách",
+        "allTypes": "Tất cả",
+        "risk": "Rủi ro",
+        "allRisk": "Tất cả",
+        "flagged": "Có rủi ro COD"
+      },
+      "locales": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "purposes": {
+        "terms": "Điều khoản sử dụng",
+        "privacy": "Chính sách bảo mật",
+        "marketing_email": "Nhận email tiếp thị",
+        "marketing_sms": "Nhận SMS tiếp thị",
+        "analytics": "Cookie phân tích",
+        "ads": "Cookie quảng cáo"
+      },
+      "orderColumns": {
+        "code": "Mã đơn",
+        "placedAt": "Ngày đặt",
+        "status": "Trạng thái",
+        "payment": "Thanh toán",
+        "total": "Tổng tiền",
+        "refunded": "Đã hoàn"
+      },
+      "detail": {
+        "profile": "Thông tin",
+        "phone": "Số điện thoại",
+        "email": "Email",
+        "locale": "Ngôn ngữ email",
+        "since": "Ngày tạo tài khoản",
+        "firstOrder": "Đơn đầu tiên",
+        "emailVerified": "Đã xác minh email",
+        "lastLogin": "Đăng nhập gần nhất",
+        "never": "Chưa đăng nhập",
+        "banned": "Tài khoản bị khoá",
+        "masked": "Thông tin liên hệ được che một phần theo quyền của bạn.",
+        "stats": "Tổng quan mua hàng",
+        "failedDeliveries": "Giao thất bại",
+        "spendHint": "Tổng chi tiêu = tổng tiền các đơn đã xác nhận trở đi trừ số tiền đã hoàn; không tính đơn chờ, đã huỷ, giao thất bại hoặc đã trả hàng.",
+        "orders": "Lịch sử đơn hàng",
+        "noOrders": "Khách chưa có đơn hàng.",
+        "moreOrders": "Chỉ hiển thị {shown} đơn gần nhất.",
+        "failedDelivery": "Giao thất bại",
+        "risk": "Rủi ro COD",
+        "riskFlagged": "Tài khoản đang bị gắn cờ rủi ro: đơn COD tiếp theo sẽ hiện cảnh báo.",
+        "riskNotFlagged": "Tài khoản không bị gắn cờ rủi ro.",
+        "phoneFailed": "Số điện thoại này có {count, plural, other {# đơn giao thất bại}} (tính cả đơn của người khác dùng số này).",
+        "guestRisk": "Khách vãng lai không có cờ rủi ro riêng: lịch sử giao thất bại của số điện thoại vẫn được cảnh báo trên đơn COD mới.",
+        "addresses": "Sổ địa chỉ",
+        "noAddresses": "Chưa lưu địa chỉ nào.",
+        "defaultAddress": "Mặc định",
+        "consents": "Đồng ý xử lý dữ liệu",
+        "noConsents": "Chưa có ghi nhận đồng ý nào.",
+        "consentGranted": "Đồng ý ngày {date} (phiên bản {version})",
+        "consentWithdrawn": "Từ chối hoặc rút lại ngày {date} (phiên bản {version})",
+        "marketingOn": "Đang nhận tin tiếp thị.",
+        "marketingOff": "Không nhận tin tiếp thị.",
+        "privacy": "Yêu cầu về dữ liệu",
+        "privacyCount": "{count, plural, =0 {Chưa có yêu cầu nào.} other {# yêu cầu về dữ liệu cá nhân.}}",
+        "privacyLink": "Xem yêu cầu dữ liệu của khách",
+        "auditLink": "Xem nhật ký thao tác trên tài khoản"
+      },
+      "riskControl": {
+        "set": "Gắn cờ rủi ro COD",
+        "clear": "Bỏ cờ rủi ro",
+        "setTitle": "Gắn cờ rủi ro COD cho {name}?",
+        "clearTitle": "Bỏ cờ rủi ro COD của {name}?",
+        "setDescription": "Đơn COD tiếp theo của khách sẽ hiện cảnh báo cho nhân viên xác nhận đơn.",
+        "clearDescription": "Lịch sử giao thất bại của số điện thoại vẫn được giữ và cảnh báo trên đơn COD mới.",
+        "reason": "Lý do",
+        "reasonHint": "Bắt buộc, ít nhất {min} ký tự. Lý do được ghi vào nhật ký.",
+        "flaggedDone": "Đã gắn cờ rủi ro COD.",
+        "cleared": "Đã bỏ cờ rủi ro COD."
+      },
+      "notes": {
+        "title": "Ghi chú nội bộ",
+        "label": "Thêm ghi chú",
+        "hint": "Chỉ nhân viên thấy. Ghi chú không sửa hoặc xoá được.",
+        "submit": "Lưu ghi chú",
+        "done": "Đã lưu ghi chú.",
+        "empty": "Chưa có ghi chú.",
+        "meta": "{actor} · {date}",
+        "system": "Hệ thống",
+        "riskSet": "Đã gắn cờ rủi ro COD",
+        "riskCleared": "Đã bỏ cờ rủi ro COD"
+      }
+    },
+    "returns": {
+      "title": "Yêu cầu đổi trả",
+      "description": "Đơn khách yêu cầu trả hàng, yêu cầu cũ nhất trước. Chấp nhận hoặc từ chối, rồi xác nhận khi nhận lại hàng để hoàn kho, xếp hoàn tiền và điều chỉnh hoá đơn.",
+      "empty": "Không có yêu cầu đổi trả nào đang chờ.",
+      "caption": "Yêu cầu đổi trả đang chờ xử lý",
+      "columns": {
+        "order": "Đơn hàng",
+        "requestedAt": "Yêu cầu lúc",
+        "deliveredAt": "Giao lúc",
+        "reason": "Lý do",
+        "resolution": "Phương án",
+        "units": "Số lượng",
+        "estimatedRefund": "Hoàn dự kiến",
+        "status": "Bước"
+      },
+      "status": {
+        "requested": "Chờ duyệt",
+        "approved": "Chờ nhận hàng",
+        "rejected": "Đã từ chối",
+        "received": "Đã nhận hàng"
+      },
+      "reasons": {
+        "unopened": "Đổi ý (còn seal)",
+        "defective": "Sản phẩm lỗi",
+        "wrong_item": "Giao nhầm",
+        "damaged": "Vỡ / hư hỏng"
+      },
+      "resolutions": {
+        "refund": "Hoàn tiền",
+        "replacement": "Đổi sản phẩm mới"
+      },
+      "outcomes": {
+        "full": "Trả toàn bộ đơn",
+        "partial": "Trả một phần",
+        "replacement": "Đổi sản phẩm mới"
+      },
+      "panel": {
+        "title": "Đổi trả",
+        "requestedAt": "Khách gửi lúc {date}",
+        "reason": "Lý do",
+        "resolution": "Khách muốn",
+        "seal": "Khách xác nhận còn nguyên seal",
+        "description": "Mô tả của khách",
+        "noDescription": "Khách không mô tả thêm.",
+        "lines": "Sản phẩm trả",
+        "line": "{name} · {sku} · trả {quantity}/{bought}",
+        "estimate": "Hoàn dự kiến",
+        "merchandise": "Tiền hàng",
+        "shipping": "Phí giao hàng ban đầu",
+        "giftWrap": "Phí gói quà",
+        "returnShipping": "Phí gửi trả",
+        "total": "Tổng hoàn",
+        "refundable": "Tiền đơn đang giữ có thể hoàn: {amount}",
+        "shortfallHint": "Đơn chưa nhận đủ tiền (ví dụ COD chưa đối soát): phần còn thiếu sẽ được ghi nhận và báo cho quản lý để hoàn sau.",
+        "approvedAt": "Đã chấp nhận lúc {date}",
+        "approvalNote": "Ghi chú gửi khách: {note}",
+        "rejectedAt": "Đã từ chối lúc {date}",
+        "rejectionReason": "Lý do từ chối: {reason}",
+        "receivedAt": "Đã nhận hàng lúc {date}",
+        "outcome": "Kết quả",
+        "refundQueued": "Đã xếp hoàn {amount} vào hàng đợi hoàn tiền",
+        "refundShortfall": "Còn phải hoàn {amount} khi nhận được tiền",
+        "restocked": "Hàng đã nhập lại kho bán",
+        "writtenOff": "Hàng không bán lại được (đã ghi giảm kho: hư hỏng)",
+        "managerOnly": "Chỉ Quản lý hoặc Chủ shop được chấp nhận / từ chối yêu cầu đổi trả."
+      },
+      "approve": {
+        "button": "Chấp nhận",
+        "title": "Chấp nhận yêu cầu trả hàng đơn {code}?",
+        "description": "Khách sẽ nhận e-mail báo yêu cầu được chấp nhận kèm ghi chú của bạn.",
+        "note": "Hướng dẫn gửi khách (cách gửi hàng, địa chỉ nhận, lịch lấy hàng)",
+        "confirm": "Chấp nhận",
+        "done": "Đã chấp nhận yêu cầu trả hàng đơn {code}."
+      },
+      "reject": {
+        "button": "Từ chối",
+        "title": "Từ chối yêu cầu trả hàng đơn {code}?",
+        "description": "Đơn trở lại trạng thái Đã giao. Lý do được gửi cho khách qua e-mail.",
+        "reason": "Lý do từ chối (gửi cho khách)",
+        "confirm": "Từ chối",
+        "done": "Đã từ chối yêu cầu trả hàng đơn {code}."
+      },
+      "receive": {
+        "button": "Đã nhận lại hàng",
+        "title": "Xác nhận đã nhận hàng trả của đơn {code}?",
+        "description": "Hệ thống hoàn kho các sản phẩm trả, xếp khoản hoàn tiền vào hàng đợi, điều chỉnh hoá đơn điện tử (nếu đã xuất) và gửi e-mail cho khách.",
+        "resellable": "Hàng còn nguyên seal, nhập lại kho bán",
+        "resellableHint": "Bỏ chọn nếu hàng đã mở, lỗi hoặc vỡ: hàng được ghi giảm kho (hư hỏng).",
+        "returnShippingFee": "Phí gửi trả khách đã trả (₫)",
+        "returnShippingHint": "Cửa hàng chịu phí vận chuyển khi hàng lỗi, giao nhầm hoặc vỡ (chỉ Quản lý / Chủ shop).",
+        "note": "Ghi chú nội bộ",
+        "replacementNote": "Đổi sản phẩm mới: không hoàn tiền; hệ thống trừ kho sản phẩm thay thế cho đơn này. Hãy gửi hàng thay thế cho khách.",
+        "fullNote": "Khách trả toàn bộ đơn: đơn chuyển sang Đã trả hàng.",
+        "partialNote": "Khách trả một phần: đơn trở lại Đã giao, chỉ hoàn kho và hoàn tiền phần trả.",
+        "confirm": "Xác nhận đã nhận hàng",
+        "done": "Đã ghi nhận hàng trả của đơn {code}."
       }
     }
   }

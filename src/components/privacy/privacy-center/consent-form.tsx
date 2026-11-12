@@ -33,6 +33,7 @@ export function ConsentForm({ initial }: { initial: Values }) {
 
   return (
     <form
+      method="post"
       className="flex max-w-2xl flex-col gap-6"
       onSubmit={(event) => {
         event.preventDefault();

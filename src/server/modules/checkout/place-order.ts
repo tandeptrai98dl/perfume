@@ -357,6 +357,8 @@ export async function placeOrderInTx(
     orderId,
     lines,
     expiresAt: reservationExpiry(status, settings, now, input.paymentMethod),
+    // M3 wave 2: low-stock staff alerts are enqueued with the reservation (outbox).
+    boss: deps.boss,
   });
 
   if (coupon) {
@@ -416,13 +418,19 @@ export async function placeOrderInTx(
 /** Maps the inventory module's per-variant shortage to the checkout's `items.<variantId>`. */
 async function reserveLines(
   tx: Tx,
-  input: { orderId: string; lines: { variantId: string; quantity: number }[]; expiresAt: Date },
+  input: {
+    orderId: string;
+    lines: { variantId: string; quantity: number }[];
+    expiresAt: Date;
+    boss: PgBoss;
+  },
 ): Promise<void> {
   try {
     await reserveStock(tx, {
       orderId: input.orderId,
       lines: input.lines.map((line) => ({ variantId: line.variantId, quantity: line.quantity })),
       expiresAt: input.expiresAt,
+      boss: input.boss,
     });
   } catch (error) {
     if (error instanceof DomainError && error.code === 'insufficientStock') {

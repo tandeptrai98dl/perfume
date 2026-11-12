@@ -33,7 +33,37 @@
     "brandsEyebrow": "Houses",
     "brandsTitle": "Brands",
     "viewAllBrands": "View all brands",
-    "featuredEmpty": "The collection is being updated."
+    "featuredEmpty": "The collection is being updated.",
+    "newEyebrow": "Just in",
+    "newTitle": "New arrivals",
+    "viewAllNew": "View all new arrivals",
+    "bestEyebrow": "Most loved",
+    "bestTitle": "Best sellers",
+    "viewAllBest": "View all best sellers",
+    "journalEyebrow": "Journal",
+    "journalTitle": "From the journal",
+    "viewJournal": "Read the journal",
+    "newsletterEyebrow": "Newsletter",
+    "newsletterTitle": "New scents, first",
+    "newsletterText": "New arrivals, fragrance guides and members-only offers, about twice a month. Unsubscribe anytime.",
+    "trust": {
+      "title": "Why shop with us",
+      "authentic": {
+        "title": "100% authentic",
+        "text": "Every bottle comes from authorised distributors, with full import papers.",
+        "link": "Our authenticity promise"
+      },
+      "returns": {
+        "title": "7-day returns",
+        "text": "Return sealed products within 7 days of delivery; defective items are replaced free.",
+        "link": "Returns policy"
+      },
+      "delivery": {
+        "title": "Fast delivery",
+        "text": "Carefully packed and shipped nationwide, with cash on delivery available.",
+        "link": "Shipping policy"
+      }
+    }
   },
   "notFound": {
     "title": "Page not found",
@@ -232,6 +262,60 @@
         "cta": "Open your privacy page",
         "ignore": "You can send the request again or contact us."
       }
+    },
+    "newsletter": {
+      "confirm": {
+        "subject": "Confirm your newsletter subscription",
+        "preview": "One click to confirm your subscription",
+        "heading": "Confirm your subscription",
+        "body": "Someone, hopefully you, asked to receive the Perfume Store newsletter at this address. Press the button to confirm.",
+        "cta": "Confirm subscription",
+        "expires": "This link is valid for 72 hours.",
+        "ignore": "If you did not sign up, ignore this e-mail: you will not be subscribed."
+      },
+      "welcome": {
+        "subject": "Welcome to the Perfume Store newsletter",
+        "preview": "You are subscribed",
+        "heading": "Welcome",
+        "body": "Thank you for subscribing. You will hear from us about new arrivals, fragrance guides and offers, about twice a month.",
+        "cta": "Explore perfumes"
+      },
+      "unsubscribeText": "Do not want these e-mails?",
+      "unsubscribeLink": "Unsubscribe"
+    },
+    "return": {
+      "requested": {
+        "subject": "Return request received for order {code}",
+        "preview": "We will reply within 1–2 business days.",
+        "heading": "Return request received",
+        "body": "We have received your return request for order {code} and will reply within 1–2 business days. If we need photos of the product, we will contact you."
+      },
+      "approved": {
+        "subject": "Return request for order {code} accepted",
+        "preview": "How to send the items back.",
+        "heading": "Return request accepted",
+        "body": "Your return request for order {code} has been accepted. Please pack the items carefully, with their box and accessories.",
+        "note": "Instructions from the shop: {note}"
+      },
+      "rejected": {
+        "subject": "Return request for order {code} declined",
+        "preview": "About your return request.",
+        "heading": "Return request declined",
+        "body": "We are sorry, your return request for order {code} could not be accepted.",
+        "reason": "Reason: {reason}"
+      },
+      "received": {
+        "subject": "Returned items of order {code} received",
+        "preview": "Your return has been processed.",
+        "heading": "Returned items received",
+        "body": "We have received the items you returned from order {code}.",
+        "refund": "Your refund: {amount}. It reaches your account within a few business days, depending on your bank.",
+        "refundLater": "Part of it will be refunded as soon as we receive the cash-on-delivery payment from the carrier.",
+        "replacement": "A replacement will be sent to you; we will let you know when it ships."
+      },
+      "items": "Returned items:",
+      "item": "{name} × {quantity}",
+      "help": "Need help? Contact us through the website."
     }
   },
   "ui": {
@@ -285,7 +369,11 @@
       "email": "Email: {value}",
       "moitBadge": "Notified to the Ministry of Industry and Trade"
     },
-    "privacyRequest": "Personal data requests"
+    "privacyRequest": "Personal data requests",
+    "newsletter": {
+      "title": "Join our newsletter",
+      "intro": "New arrivals, guides and offers by e-mail. We will ask you to confirm your address."
+    }
   },
   "journal": {
     "title": "Journal",
@@ -1541,6 +1629,126 @@
       "invalidTitle": "This link is no longer valid",
       "invalidText": "The confirmation link is invalid or older than 24 hours. Please send the request again.",
       "again": "Send the request again"
+    }
+  },
+  "newsletter": {
+    "email": "Newsletter e-mail address",
+    "submit": "Subscribe",
+    "consent": "I agree to receive news, new arrivals and offers from Perfume Store by e-mail. I can unsubscribe at any time with the link in every e-mail.",
+    "privacyLink": "How we handle your personal data",
+    "sent": "Almost done: check your inbox and press the link in our e-mail to confirm your subscription.",
+    "errors": {
+      "validation": "Please check the form.",
+      "invalid": "Please check this value.",
+      "emailInvalid": "Enter a valid e-mail address.",
+      "consentRequired": "Tick the box to agree to receive our e-mails.",
+      "rateLimited": "Too many attempts. Please try again in a few minutes.",
+      "captchaFailed": "We could not verify that you are human. Please try again.",
+      "invalidLink": "This link is invalid or has expired.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "confirm": {
+      "metaTitle": "Confirm your subscription",
+      "title": "Confirm your subscription",
+      "intro": "Press the button to start receiving our newsletter at this address.",
+      "email": "Email",
+      "submit": "Confirm subscription",
+      "done": "Thank you, you are subscribed. A welcome e-mail is on its way.",
+      "already": "This address is already subscribed.",
+      "shop": "Explore perfumes",
+      "invalidTitle": "This link is invalid or has expired",
+      "invalidText": "Confirmation links are valid for 72 hours. Sign up again from the bottom of any page.",
+      "home": "Back to the home page"
+    },
+    "unsubscribe": {
+      "metaTitle": "Unsubscribe",
+      "title": "Unsubscribe from the newsletter",
+      "intro": "You will no longer receive marketing e-mails from us. Order e-mails are not affected.",
+      "email": "Email",
+      "submit": "Unsubscribe",
+      "done": "You are unsubscribed. You will not receive our newsletter any more.",
+      "invalidTitle": "This link is invalid",
+      "invalidText": "Use the unsubscribe link from one of our e-mails, or change your choice in your account's privacy centre.",
+      "home": "Back to the home page"
+    }
+  },
+  "returns": {
+    "title": "Returns",
+    "eligible": "You can request a return until {deadline}.",
+    "policy": "Unopened products with the seal intact can be returned within {days} days of delivery. Defective, wrong or broken items are replaced or refunded in full, and we pay the shipping.",
+    "policyLink": "Read the returns policy",
+    "policySlug": "returns",
+    "windowExpired": "The return period for this order ended on {date}. If something is wrong with a product, please contact us.",
+    "start": "Request a return",
+    "form": {
+      "title": "Return request for order {code}",
+      "lines": "Items to return",
+      "linesHint": "Choose the items and quantities you want to return.",
+      "lineLabel": "{name} ({quantity} bought)",
+      "quantity": "Quantity to return: {name}",
+      "reason": "Reason for the return",
+      "resolution": "You would like",
+      "resolutionUnopened": "Change-of-mind returns refund the products (not the delivery fee); you pay the return shipping.",
+      "description": "Description",
+      "descriptionFault": "Describe the defect or the condition of the product (at least 10 characters).",
+      "descriptionOptional": "Optional.",
+      "sealIntact": "I confirm the product is unopened and the seal is intact.",
+      "photos": "If we need photos of the product or packaging, we will contact you by e-mail or phone after receiving your request.",
+      "estimate": "The refund amount is confirmed when we receive the items.",
+      "submit": "Send request",
+      "cancel": "Close",
+      "done": "Your return request has been sent. We will reply by e-mail."
+    },
+    "reasons": {
+      "unopened": "Changed my mind (unopened, seal intact)",
+      "defective": "Defective product",
+      "wrong_item": "Wrong item delivered",
+      "damaged": "Broken or damaged in delivery"
+    },
+    "resolutions": {
+      "refund": "Refund",
+      "replacement": "Replacement"
+    },
+    "status": {
+      "requested": "Return request received",
+      "approved": "Return request accepted",
+      "rejected": "Return request declined",
+      "received": "Returned items received"
+    },
+    "statusBody": {
+      "requested": "Sent on {date}. We will review it and reply within 1–2 business days.",
+      "approved": "Please send the items as described in our e-mail.",
+      "rejected": "If you need more help, please contact us.",
+      "received": "Thank you. Your return has been processed."
+    },
+    "summary": {
+      "reason": "Reason: {reason}",
+      "resolution": "Resolution: {resolution}",
+      "item": "{name} × {quantity}",
+      "note": "Note from the shop: {note}",
+      "rejection": "Reason: {reason}",
+      "refund": "Refund: {amount}",
+      "replacement": "A replacement will be sent to you."
+    },
+    "errors": {
+      "validation": "Please correct the highlighted fields.",
+      "noLines": "Choose at least one item.",
+      "unknownLine": "This item is not part of the order.",
+      "duplicateLine": "This item was chosen twice.",
+      "quantityTooLarge": "The quantity is more than you bought.",
+      "tooSmall": "The quantity must be at least 1.",
+      "sealRequired": "Change-of-mind returns need the seal intact.",
+      "refundOnly": "Change-of-mind returns are refunded only.",
+      "describeProblem": "Please describe the problem (at least 10 characters).",
+      "tooLong": "The text is too long.",
+      "reasonRequired": "Choose a reason for the return.",
+      "windowExpired": "The return period has ended.",
+      "notDelivered": "The order has not been delivered or cannot be returned.",
+      "alreadyRequested": "A return has already been requested for this order.",
+      "notFound": "Order not found.",
+      "rateLimited": "Too many requests. Please try again later.",
+      "conflict": "The order was just updated. Please reload the page.",
+      "unexpected": "Something went wrong. Please try again."
     }
   }
 }

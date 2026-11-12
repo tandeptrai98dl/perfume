@@ -53,6 +53,9 @@ export const routing = defineRouting({
       vi: '/quyen-rieng-tu/yeu-cau/xac-nhan',
       en: '/privacy-request/confirm',
     },
+    // M3 wave 2: newsletter double opt-in confirmation and unsubscribe (signed links).
+    '/newsletter/confirm': { vi: '/ban-tin/xac-nhan', en: '/newsletter/confirm' },
+    '/newsletter/unsubscribe': { vi: '/ban-tin/huy-dang-ky', en: '/newsletter/unsubscribe' },
   },
 });
 

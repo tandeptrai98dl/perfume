@@ -2,7 +2,7 @@
 
 > Living status of the MVP delivery plan. The plan itself (scope, exit criteria, go-live gate)
 > is [ARCHITECTURE.md §15](./ARCHITECTURE.md#15-delivery-plan); this file tracks progress against it.
-> Last updated: 2026-11-12 (M3 wave 1 integrated).
+> Last updated: 2026-11-12 (M3 wave 2 integrated).
 
 ## Milestones
 
@@ -11,7 +11,7 @@
 | M0 Foundations | Scaffold, i18n, DB + seed, Better Auth + 2FA, design system, worker + outbox, CI, Sentry | **Done** | #1, #2, #3 | Met. Staging deploy is still open and is tracked in M3. |
 | M1 Bilingual catalogue & storefront | Admin catalogue/inventory/media, storefront pages, search, CMS, redirects, SEO | **Done** | #4, #5 | Met. Lighthouse and Rich Results checks are carried into M3 hardening. |
 | M2 Checkout & orders | Cart, checkout, VNPay/payOS/COD, admin orders (manual orders, edits), account, notifications | **Done** (E5 partial) | #6, #7, #8, #9 | [m2-exit.md](./milestones/m2-exit.md). Only E5 is open: a manual order on staging, which needs the staging environment. |
-| M3 Completion, hardening, go-live | See below | **In progress**: wave 1 done | #10 (foundation), wave 1 PR | Go-live gate in §15 |
+| M3 Completion, hardening, go-live | See below | **In progress**: code waves 1–2 done | #10 (foundation), wave 1 PR | Go-live gate in §15 |
 
 ## M3 work streams
 
@@ -26,15 +26,22 @@ The streams below run in parallel and are integrated together.
 | E-invoicing & notifications | E-invoice adapters (MISA / Viettel / sandbox) issued on `delivered` with retries and staff alerts, notification log, M2 follow-ups | **Done** |
 | Hardening & ops | CSP without nonces (ADR-0024), security headers, shared Postgres rate limits, trusted client IP, Turnstile, webhook IP allowlist, Lighthouse/ZAP/k6, backups, runbook, health endpoints | **Done** |
 
-### M3 wave 2 (next)
+### M3 wave 2 (done)
 
-- Admin settings screen for the values stored in `settings`: company and seller info, MOIT notification URL and badge, VAT rate, COD and returns options, alert channels.
-- Make the Lighthouse CI and ZAP baseline jobs pass on GitHub runners, then run them on every PR.
-- Run the k6 load test against staging.
-- Keyboard-only purchase run (M2 exit checklist).
-- Move the legal drafts from the demo seed into the base seed.
-- Staff alert for new pending reviews.
-- Admin UI to cancel or replace e-invoices (returns).
+| Stream | Scope | Status |
+| --- | --- | --- |
+| Customers & alerts | `/admin/customers` (list, detail, COD risk flag, notes in `customer_notes` per ADR-0025, CSV export), low-stock / failed-job / pending-review alerts | **Done** |
+| Settings & seed | `/admin/settings` (seller + MOIT, checkout & COD, returns, VAT, alert channels, SEO defaults, sender), legal pages in the production seed | **Done** |
+| Home & newsletter | New arrivals, best sellers, journal teaser, trust strip; newsletter double opt-in + one-click unsubscribe; keyboard-only purchase, SEO alternates and axe E2E | **Done** |
+| Quality gates | Lighthouse CI on every PR (mobile + desktop, Performance ≥ 0.9), PDP JS budget (ADR-0026), weekly ZAP baseline, performance fixes (LCP ~1 s, CLS ≤ 0.01) | **Done** |
+| Returns & e-invoice adjustments | Customer return requests (D17), admin return flow with restock/refund/replacement, e-invoice cancel/replace | **Done** |
+
+### Remaining before go-live (code)
+
+- Return photo upload (needs private storage); staff-opened returns.
+- COD orders fully returned before the carrier remits: reconcile them in COD remittances instead of a manual refund.
+- Review the ZAP "Private IP Disclosure" warning on the privacy policy pages (likely a false positive).
+- Re-measure Lighthouse with real product images once content exists.
 
 After the streams are merged, these items need production accounts:
 - production infrastructure and staging
