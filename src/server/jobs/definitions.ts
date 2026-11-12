@@ -93,6 +93,31 @@ export const JOBS = {
     schema: z.object({}).default({}),
     queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 300 },
   },
+
+  // ---------- M3 privacy: data-subject requests (PDPL 91/2025, Decree 356/2025) ----------
+  /** Guest request: e-mail with the signed confirmation link (request created on confirm). */
+  'privacy.verify-request': {
+    schema: z.object({
+      to: z.email(),
+      locale: z.enum(['vi', 'en']),
+      type: z.enum(['export', 'delete', 'correct', 'withdraw_consent']),
+      url: z.url(),
+    }),
+    queue: retryPolicy,
+  },
+  /** Customer e-mail about a request: received (with due date), completed or rejected. */
+  'privacy.notify': {
+    schema: z.object({
+      requestId: z.uuid(),
+      kind: z.enum(['received', 'completed', 'rejected']),
+    }),
+    queue: retryPolicy,
+  },
+  /** Completes an export request and e-mails the download link (valid 7 days). */
+  'privacy.export': {
+    schema: z.object({ requestId: z.uuid() }),
+    queue: retryPolicy,
+  },
 } as const;
 
 /** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */

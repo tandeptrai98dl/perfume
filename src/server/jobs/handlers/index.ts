@@ -7,6 +7,7 @@ import type { EmailSender } from '@/server/integrations/email/send';
 import type { JobName, JobPayload } from '../definitions';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
+import { createPrivacyHandlers } from './privacy';
 import { createRevalidateHandler } from './revalidate';
 import { createTestEmailHandler } from './test-email';
 
@@ -46,5 +47,7 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
     }),
     ...createOrderNotificationHandlers(deps),
     ...createOrderTimeoutHandlers(deps),
+    // M3 privacy stream: data-subject request e-mails and exports.
+    ...createPrivacyHandlers(deps),
   };
 }

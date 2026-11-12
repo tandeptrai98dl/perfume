@@ -155,3 +155,15 @@ export {
   type OrderEditInput,
 } from './admin-edit-schemas';
 // ---------- End order edits ----------
+// ---------- Privacy requests (M3 privacy stream): data export + anonymisation ----------
+export {
+  ANONYMIZED_TEXT,
+  anonymizeOrdersForSubject,
+  CLOSED_ORDER_STATUSES,
+  countOpenOrdersForSubject,
+  listOrdersForDataExport,
+  scrubEventDiff,
+  type OrderDataExport,
+  type OrderSubject,
+} from './privacy';
+// ---------- End privacy ----------
