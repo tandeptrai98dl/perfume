@@ -232,6 +232,40 @@
         "cta": "Open your privacy page",
         "ignore": "You can send the request again or contact us."
       }
+    },
+    "return": {
+      "requested": {
+        "subject": "Return request received for order {code}",
+        "preview": "We will reply within 1–2 business days.",
+        "heading": "Return request received",
+        "body": "We have received your return request for order {code} and will reply within 1–2 business days. If we need photos of the product, we will contact you."
+      },
+      "approved": {
+        "subject": "Return request for order {code} accepted",
+        "preview": "How to send the items back.",
+        "heading": "Return request accepted",
+        "body": "Your return request for order {code} has been accepted. Please pack the items carefully, with their box and accessories.",
+        "note": "Instructions from the shop: {note}"
+      },
+      "rejected": {
+        "subject": "Return request for order {code} declined",
+        "preview": "About your return request.",
+        "heading": "Return request declined",
+        "body": "We are sorry, your return request for order {code} could not be accepted.",
+        "reason": "Reason: {reason}"
+      },
+      "received": {
+        "subject": "Returned items of order {code} received",
+        "preview": "Your return has been processed.",
+        "heading": "Returned items received",
+        "body": "We have received the items you returned from order {code}.",
+        "refund": "Your refund: {amount}. It reaches your account within a few business days, depending on your bank.",
+        "refundLater": "Part of it will be refunded as soon as we receive the cash-on-delivery payment from the carrier.",
+        "replacement": "A replacement will be sent to you; we will let you know when it ships."
+      },
+      "items": "Returned items:",
+      "item": "{name} × {quantity}",
+      "help": "Need help? Contact us through the website."
     }
   },
   "ui": {
@@ -1541,6 +1575,85 @@
       "invalidTitle": "This link is no longer valid",
       "invalidText": "The confirmation link is invalid or older than 24 hours. Please send the request again.",
       "again": "Send the request again"
+    }
+  },
+  "returns": {
+    "title": "Returns",
+    "eligible": "You can request a return until {deadline}.",
+    "policy": "Unopened products with the seal intact can be returned within {days} days of delivery. Defective, wrong or broken items are replaced or refunded in full, and we pay the shipping.",
+    "policyLink": "Read the returns policy",
+    "policySlug": "returns",
+    "windowExpired": "The return period for this order ended on {date}. If something is wrong with a product, please contact us.",
+    "start": "Request a return",
+    "form": {
+      "title": "Return request for order {code}",
+      "lines": "Items to return",
+      "linesHint": "Choose the items and quantities you want to return.",
+      "lineLabel": "{name} ({quantity} bought)",
+      "quantity": "Quantity to return: {name}",
+      "reason": "Reason for the return",
+      "resolution": "You would like",
+      "resolutionUnopened": "Change-of-mind returns refund the products (not the delivery fee); you pay the return shipping.",
+      "description": "Description",
+      "descriptionFault": "Describe the defect or the condition of the product (at least 10 characters).",
+      "descriptionOptional": "Optional.",
+      "sealIntact": "I confirm the product is unopened and the seal is intact.",
+      "photos": "If we need photos of the product or packaging, we will contact you by e-mail or phone after receiving your request.",
+      "estimate": "The refund amount is confirmed when we receive the items.",
+      "submit": "Send request",
+      "cancel": "Close",
+      "done": "Your return request has been sent. We will reply by e-mail."
+    },
+    "reasons": {
+      "unopened": "Changed my mind (unopened, seal intact)",
+      "defective": "Defective product",
+      "wrong_item": "Wrong item delivered",
+      "damaged": "Broken or damaged in delivery"
+    },
+    "resolutions": {
+      "refund": "Refund",
+      "replacement": "Replacement"
+    },
+    "status": {
+      "requested": "Return request received",
+      "approved": "Return request accepted",
+      "rejected": "Return request declined",
+      "received": "Returned items received"
+    },
+    "statusBody": {
+      "requested": "Sent on {date}. We will review it and reply within 1–2 business days.",
+      "approved": "Please send the items as described in our e-mail.",
+      "rejected": "If you need more help, please contact us.",
+      "received": "Thank you. Your return has been processed."
+    },
+    "summary": {
+      "reason": "Reason: {reason}",
+      "resolution": "Resolution: {resolution}",
+      "item": "{name} × {quantity}",
+      "note": "Note from the shop: {note}",
+      "rejection": "Reason: {reason}",
+      "refund": "Refund: {amount}",
+      "replacement": "A replacement will be sent to you."
+    },
+    "errors": {
+      "validation": "Please correct the highlighted fields.",
+      "noLines": "Choose at least one item.",
+      "unknownLine": "This item is not part of the order.",
+      "duplicateLine": "This item was chosen twice.",
+      "quantityTooLarge": "The quantity is more than you bought.",
+      "tooSmall": "The quantity must be at least 1.",
+      "sealRequired": "Change-of-mind returns need the seal intact.",
+      "refundOnly": "Change-of-mind returns are refunded only.",
+      "describeProblem": "Please describe the problem (at least 10 characters).",
+      "tooLong": "The text is too long.",
+      "reasonRequired": "Choose a reason for the return.",
+      "windowExpired": "The return period has ended.",
+      "notDelivered": "The order has not been delivered or cannot be returned.",
+      "alreadyRequested": "A return has already been requested for this order.",
+      "notFound": "Order not found.",
+      "rateLimited": "Too many requests. Please try again later.",
+      "conflict": "The order was just updated. Please reload the page.",
+      "unexpected": "Something went wrong. Please try again."
     }
   }
 }

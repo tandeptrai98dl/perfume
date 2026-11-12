@@ -76,6 +76,7 @@ export function OrderDetailView({
   canEdit = false,
   einvoice,
   notifications,
+  returns,
 }: {
   order: AdminOrderDetail;
   canCancelPaid: boolean;
@@ -85,6 +86,8 @@ export function OrderDetailView({
   einvoice?: ReactNode;
   /** Notification log (M3, `notification_logs`), its own section above the timeline. */
   notifications?: ReactNode;
+  /** Return request panel (M3 wave 2, ADR-0017), shown first when the order has one. */
+  returns?: ReactNode;
 }) {
   const t = useTranslations('admin.orders');
   const format = useOrderFormat();
@@ -108,6 +111,12 @@ export function OrderDetailView({
               <p>{t('detail.risk.advice')}</p>
             </div>
           </div>
+        )}
+
+        {returns && (
+          <Section id="order-returns" title={t('detail.returns')}>
+            {returns}
+          </Section>
         )}
 
         <Section id="order-items" title={t('detail.items')}>

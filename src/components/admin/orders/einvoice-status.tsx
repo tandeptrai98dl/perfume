@@ -1,10 +1,14 @@
 'use client';
 
-import { ExternalLink, FileText, RotateCcw } from 'lucide-react';
+import { ExternalLink, FilePen, FileText, FileX, RotateCcw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useTransition } from 'react';
+import { useId, useState, useTransition } from 'react';
 
-import { retryEinvoiceAction } from '@/actions/admin/einvoices';
+import {
+  cancelEinvoiceAction,
+  replaceEinvoiceAction,
+  retryEinvoiceAction,
+} from '@/actions/admin/einvoices';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +21,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import type { EinvoiceState, OrderEinvoiceView } from '@/server/modules/einvoice';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import type {
+  EinvoiceAdjustmentAction,
+  EinvoiceState,
+  OrderEinvoiceView,
+} from '@/server/modules/einvoice';
 
 import { useActionFeedback } from '../form/action-feedback';
 import { useOrderFormat } from './format';
@@ -85,29 +95,149 @@ export function EinvoiceRetryButton({
   );
 }
 
+/** "Huỷ hoá đơn" / "Lập hoá đơn thay thế" with a confirmation and a required reason. */
+function EinvoiceAdjustButton({
+  orderId,
+  invoiceRef,
+  action,
+}: {
+  orderId: string;
+  invoiceRef: string;
+  action: EinvoiceAdjustmentAction;
+}) {
+  const t = useTranslations('admin.einvoices.adjust');
+  const tForm = useTranslations('admin.form');
+  const feedback = useActionFeedback();
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [pending, startTransition] = useTransition();
+  const cancel = action === 'cancel';
+  const valid = reason.trim().length >= 5;
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setReason('');
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button type="button" variant="secondary" size="sm" className="w-fit">
+          {cancel ? <FileX aria-hidden /> : <FilePen aria-hidden />}
+          {cancel ? t('cancel') : t('replace')}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-white" aria-describedby={`${id}-desc`}>
+        <DialogHeader>
+          <DialogTitle>
+            {cancel
+              ? t('cancelTitle', { number: invoiceRef })
+              : t('replaceTitle', { number: invoiceRef })}
+          </DialogTitle>
+          <DialogDescription id={`${id}-desc`}>
+            {cancel ? t('cancelDescription') : t('replaceDescription')}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!valid) return;
+            startTransition(async () => {
+              const run = cancel ? cancelEinvoiceAction : replaceEinvoiceAction;
+              const result = await run({ orderId, reason: reason.trim() });
+              if (!result.ok) {
+                feedback.fail(result);
+                return;
+              }
+              feedback.success(cancel ? t('cancelDone') : t('replaceDone'));
+              setOpen(false);
+              setReason('');
+            });
+          }}
+        >
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={`${id}-reason`}>{t('reason')}</Label>
+            <Textarea
+              id={`${id}-reason`}
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              rows={3}
+              maxLength={300}
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+              {tForm('cancel')}
+            </Button>
+            <Button
+              type="submit"
+              variant={cancel ? 'danger' : 'primary'}
+              disabled={!valid}
+              loading={pending}
+            >
+              {cancel ? t('confirmCancel') : t('confirmReplace')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AdjustmentState({ einvoice }: { einvoice: OrderEinvoiceView }) {
+  const t = useTranslations('admin.einvoices.adjust');
+  const reason = useEinvoiceReason();
+  const adjustment = einvoice.adjustment;
+  if (adjustment.state === 'none') return null;
+  const action = adjustment.action ? t(`actions.${adjustment.action}`) : '';
+  return (
+    <p className="text-small" data-testid="einvoice-adjustment" data-state={adjustment.state}>
+      {t(`state.${adjustment.state}`, {
+        action,
+        attempts: adjustment.attempts,
+        reason: reason(adjustment.reason),
+      })}
+    </p>
+  );
+}
+
 export function EinvoiceStatus({
   einvoice,
   orderCode,
   canProcess,
+  canAdjust = false,
 }: {
   einvoice: OrderEinvoiceView;
   orderCode: string;
   /** Staff may retry (`orders.process`); the state decides whether a retry is offered. */
   canProcess: boolean;
+  /** Cancel / replace the issued invoice (`payments.refund`, Owner/Manager). */
+  canAdjust?: boolean;
 }) {
   const t = useTranslations('admin.einvoices');
   const format = useOrderFormat();
   const reason = useEinvoiceReason();
   const invoice = einvoice.invoice;
   const values = { attempts: einvoice.attempts, reason: reason(einvoice.reason) };
+  const adjustment = einvoice.adjustment;
+  const badge =
+    adjustment.state === 'cancelled' || adjustment.state === 'replaced'
+      ? t(`adjust.badge.${adjustment.state}`)
+      : t(`panel.badge.${einvoice.state}`);
 
   return (
     <div className="flex flex-col gap-3" data-testid="einvoice-status" data-state={einvoice.state}>
       <div className="flex flex-wrap items-center gap-2">
         <h3 className="text-body font-medium">{t('panel.title')}</h3>
-        <Badge variant={TONES[einvoice.state]}>{t(`panel.badge.${einvoice.state}`)}</Badge>
+        <Badge variant={adjustment.state === 'cancelled' ? 'neutral' : TONES[einvoice.state]}>
+          {badge}
+        </Badge>
       </div>
       <p className="text-small">{t(`panel.state.${einvoice.state}`, values)}</p>
+      <AdjustmentState einvoice={einvoice} />
       {invoice && (
         <dl className="text-small flex flex-col gap-1">
           <div className="flex justify-between gap-4">
@@ -181,6 +311,23 @@ export function EinvoiceStatus({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      )}
+      {canAdjust && invoice && adjustment.canAdjust && (
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap gap-2">
+            <EinvoiceAdjustButton
+              orderId={einvoice.orderId}
+              invoiceRef={invoice.ref}
+              action="cancel"
+            />
+            <EinvoiceAdjustButton
+              orderId={einvoice.orderId}
+              invoiceRef={invoice.ref}
+              action="replace"
+            />
+          </div>
+          <p className="text-small text-taupe-600">{t('adjust.hint')}</p>
+        </div>
       )}
       {canProcess && einvoice.canRetry && (
         <div className="flex flex-col gap-1">

@@ -21,9 +21,15 @@ import {
   orderUpdateSubject,
   type OrderUpdateKind,
 } from '@/server/integrations/email/templates/order-update';
+import {
+  returnEmailSubject,
+  ReturnUpdateEmail,
+  type ReturnEmailKind,
+} from '@/server/integrations/email/templates/return-update';
 import { StaffAlertEmail } from '@/server/integrations/email/templates/staff-alert';
 import { errorFields, logger } from '@/server/lib/logger';
 import { getOrderViewById, type OrderStatus, type OrderView } from '@/server/modules/order';
+import { foldReturnEvents, returnEvents } from '@/server/modules/returns';
 import { getCommerceSettings } from '@/server/modules/settings';
 
 import { nextSessionAmount } from '@/server/modules/payment';
@@ -172,8 +178,9 @@ export function emailForTransition(from: string, to: OrderStatus): OrderUpdateKi
       return from === 'shipped' ? 'delivered' : null;
     case 'cancelled':
       return 'cancelled';
+    // A customer return sends its own "goods received" e-mail (returns flow, `return.notify`).
     case 'returned':
-      return 'refunded';
+      return from === 'return_requested' ? null : 'refunded';
     default:
       return null;
   }
@@ -448,4 +455,71 @@ export async function handleOrderPlaced(deps: NotificationDeps, orderId: string)
       async () => ({ channels: await sendStaffAlert(deps, { kind, orderId }) }),
     );
   }
+}
+
+// ---------- Customer returns (M3 wave 2 returns stream, ADR-0017) ----------
+
+/**
+ * `return.notify`: one e-mail per step of a return request (received, approved, rejected,
+ * goods received), keyed by request id + step, in the order's locale. Reads the request from
+ * the order timeline (returns module read model).
+ */
+export async function sendReturnUpdate(
+  deps: NotificationDeps,
+  input: { orderId: string; requestId: string; kind: ReturnEmailKind },
+) {
+  const template = `return_${input.kind}`;
+  const order = await loadMailableOrder(deps.db, input.orderId, template);
+  if (!order) return false;
+  const state = foldReturnEvents(await returnEvents(deps.db, input.orderId));
+  if (!state || state.requestId !== input.requestId) {
+    logger.warn('notification.return_missing', { orderId: input.orderId });
+    return false;
+  }
+  const locale = order.locale;
+  const lines = state.lines.flatMap((line) => {
+    const item = order.items.find((candidate) => candidate.id === line.orderItemId);
+    return item
+      ? [
+          {
+            productName: item.productName,
+            variantLabel: item.variantLabel,
+            quantity: line.quantity,
+          },
+        ]
+      : [];
+  });
+  return sendOnce(
+    deps.db,
+    {
+      orderId: input.orderId,
+      type: EMAIL_SENT_EVENT,
+      key: `return:${input.requestId}:${input.kind}`,
+      message: template,
+      metadata: { template, locale },
+    },
+    async () => {
+      await sendCustomerEmail(deps, order, template, {
+        to: order.email,
+        subject: returnEmailSubject(locale, input.kind, order.code),
+        template: createElement(ReturnUpdateEmail, {
+          locale,
+          kind: input.kind,
+          code: order.code,
+          customerName: order.customerName,
+          orderUrl: orderPageUrl({ ...linkOptions(deps), locale, code: order.code }),
+          lines,
+          note:
+            input.kind === 'approved'
+              ? state.approvalNote
+              : input.kind === 'rejected'
+                ? state.rejectionReason
+                : null,
+          outcome: state.outcome,
+          refundTotal: state.refund?.total ?? 0,
+          refundQueued: state.refund?.queued ?? 0,
+        }),
+      });
+    },
+  );
 }

@@ -232,6 +232,40 @@
         "cta": "Xem trang quyền riêng tư",
         "ignore": "Bạn có thể gửi lại yêu cầu hoặc liên hệ với chúng tôi."
       }
+    },
+    "return": {
+      "requested": {
+        "subject": "Đã nhận yêu cầu trả hàng cho đơn {code}",
+        "preview": "Chúng tôi sẽ phản hồi trong 1–2 ngày làm việc.",
+        "heading": "Đã nhận yêu cầu trả hàng",
+        "body": "Chúng tôi đã nhận yêu cầu trả hàng cho đơn {code} và sẽ phản hồi trong 1–2 ngày làm việc. Nếu cần ảnh chụp sản phẩm, chúng tôi sẽ liên hệ bạn."
+      },
+      "approved": {
+        "subject": "Yêu cầu trả hàng đơn {code} đã được chấp nhận",
+        "preview": "Hướng dẫn gửi trả hàng.",
+        "heading": "Yêu cầu trả hàng được chấp nhận",
+        "body": "Yêu cầu trả hàng cho đơn {code} đã được chấp nhận. Vui lòng đóng gói sản phẩm cẩn thận, kèm hộp và phụ kiện.",
+        "note": "Hướng dẫn từ cửa hàng: {note}"
+      },
+      "rejected": {
+        "subject": "Yêu cầu trả hàng đơn {code} không được chấp nhận",
+        "preview": "Thông tin về yêu cầu trả hàng của bạn.",
+        "heading": "Yêu cầu trả hàng không được chấp nhận",
+        "body": "Rất tiếc, yêu cầu trả hàng cho đơn {code} không được chấp nhận.",
+        "reason": "Lý do: {reason}"
+      },
+      "received": {
+        "subject": "Đã nhận lại hàng trả của đơn {code}",
+        "preview": "Yêu cầu trả hàng của bạn đã được xử lý.",
+        "heading": "Đã nhận lại hàng",
+        "body": "Chúng tôi đã nhận lại sản phẩm trả của đơn {code}.",
+        "refund": "Số tiền hoàn cho bạn: {amount}. Tiền sẽ về tài khoản trong vài ngày làm việc tuỳ ngân hàng.",
+        "refundLater": "Một phần sẽ được hoàn ngay khi chúng tôi nhận được tiền thu hộ từ đơn vị vận chuyển.",
+        "replacement": "Sản phẩm thay thế sẽ được gửi tới bạn; chúng tôi sẽ báo khi hàng được giao đi."
+      },
+      "items": "Sản phẩm trả:",
+      "item": "{name} × {quantity}",
+      "help": "Cần hỗ trợ? Hãy liên hệ chúng tôi qua website."
     }
   },
   "ui": {
@@ -1589,7 +1623,8 @@
       "reviewsSection": "Đánh giá",
       "reviews": "Kiểm duyệt đánh giá",
       "privacy": "Dữ liệu cá nhân",
-      "privacyRequests": "Yêu cầu dữ liệu"
+      "privacyRequests": "Yêu cầu dữ liệu",
+      "returns": "Yêu cầu đổi trả"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -2105,7 +2140,14 @@
       "useAnonymize": "Yêu cầu xoá được hoàn tất bằng thao tác ẩn danh hoá.",
       "notExport": "Đây không phải yêu cầu xuất dữ liệu.",
       "notDelete": "Đây không phải yêu cầu xoá dữ liệu.",
-      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này."
+      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này.",
+      "useReturnFlow": "Đơn đổi trả được xử lý trong mục Đổi trả của đơn.",
+      "notPending": "Yêu cầu đổi trả không còn ở bước này.",
+      "notApproved": "Cần chấp nhận yêu cầu trước khi nhận hàng.",
+      "refundForbidden": "Chỉ Quản lý hoặc Chủ shop được hoàn phí gửi trả.",
+      "noInvoice": "Đơn chưa có hoá đơn điện tử.",
+      "invoiceCancelled": "Hoá đơn đã bị huỷ.",
+      "adjustmentRunning": "Đang xử lý một yêu cầu huỷ / thay thế hoá đơn khác."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -2772,7 +2814,8 @@
             "no_recipient": "Khách không có email",
             "no_channel": "Chưa cấu hình kênh nhận"
           }
-        }
+        },
+        "returns": "Đổi trả"
       },
       "timeline": {
         "system": "Hệ thống",
@@ -2793,7 +2836,20 @@
         "einvoice_issued": "Đã xuất hoá đơn điện tử {number}",
         "einvoice_attempt_failed": "Xuất hoá đơn điện tử lỗi (lần {attempt}), sẽ thử lại",
         "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
-        "einvoice_retry_requested": "Yêu cầu xuất lại hoá đơn điện tử"
+        "einvoice_retry_requested": "Yêu cầu xuất lại hoá đơn điện tử",
+        "return_requested": "Khách yêu cầu trả hàng",
+        "return_approved": "Chấp nhận yêu cầu trả hàng",
+        "return_rejected": "Từ chối yêu cầu trả hàng",
+        "return_received": "Đã nhận lại hàng trả",
+        "einvoice_adjust_requested": "Yêu cầu {action} hoá đơn điện tử",
+        "einvoice_adjust_attempt_failed": "Huỷ / thay thế hoá đơn lỗi (lần {attempt})",
+        "einvoice_adjust_failed": "Huỷ / thay thế hoá đơn thất bại",
+        "einvoice_cancelled": "Đã huỷ hoá đơn điện tử {number}",
+        "einvoice_replaced": "Đã lập hoá đơn thay thế {number}",
+        "adjustActions": {
+          "cancel": "huỷ",
+          "replace": "thay thế"
+        }
       },
       "print": {
         "packing-slip": "Phiếu đóng gói",
@@ -3474,7 +3530,9 @@
         "low_stock": "Sắp hết hàng",
         "job_failed": "Tác vụ nền thất bại",
         "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
-        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền"
+        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền",
+        "return_requested": "Khách yêu cầu trả hàng",
+        "einvoice_adjustment_failed": "Huỷ / thay thế hoá đơn điện tử thất bại"
       },
       "order": "Đơn {code}: {amount} · {method} · {province}",
       "orderNoProvince": "Đơn {code}: {amount} · {method}",
@@ -3543,7 +3601,10 @@
         "totals_mismatch": "tổng các dòng không khớp tổng đơn",
         "timeout": "nhà cung cấp không phản hồi",
         "network_error": "lỗi kết nối",
-        "unexpected": "lỗi không xác định"
+        "unexpected": "lỗi không xác định",
+        "no_invoice": "không tìm thấy hoá đơn hiện tại",
+        "nothing_to_invoice": "không còn hàng để lập hoá đơn (hãy huỷ hoá đơn)",
+        "ref_changed": "hoá đơn đã được thay đổi bởi thao tác khác"
       },
       "document": {
         "unitGoods": "Chai",
@@ -3566,6 +3627,36 @@
         "million": "triệu",
         "billion": "tỷ",
         "currency": "đồng"
+      },
+      "adjust": {
+        "returnReason": "Khách trả hàng theo chính sách đổi trả (đơn {code})",
+        "cancel": "Huỷ hoá đơn",
+        "replace": "Lập hoá đơn thay thế",
+        "cancelTitle": "Huỷ hoá đơn {number}?",
+        "cancelDescription": "Hoá đơn sẽ bị huỷ trên hệ thống của nhà cung cấp. Chỉ huỷ khi giao dịch không còn (ví dụ khách trả toàn bộ hàng) hoặc theo hướng dẫn của kế toán. Không thể hoàn tác.",
+        "replaceTitle": "Lập hoá đơn thay thế cho {number}?",
+        "replaceDescription": "Hệ thống lập hoá đơn mới theo đơn hàng hiện tại (đã trừ hàng khách trả) thay thế hoá đơn này trên hệ thống của nhà cung cấp.",
+        "reason": "Lý do (ghi trên hoá đơn / biên bản)",
+        "confirmCancel": "Huỷ hoá đơn",
+        "confirmReplace": "Lập hoá đơn thay thế",
+        "cancelDone": "Đã xếp lịch huỷ hoá đơn điện tử.",
+        "replaceDone": "Đã xếp lịch lập hoá đơn thay thế.",
+        "actions": {
+          "cancel": "huỷ",
+          "replace": "thay thế"
+        },
+        "state": {
+          "pending": "Đang chờ {action} hoá đơn.",
+          "retrying": "Đang thử lại {action} hoá đơn: lần {attempts} bị lỗi ({reason}).",
+          "failed": "{action} hoá đơn thất bại sau {attempts} lần thử: {reason}. Có thể yêu cầu lại.",
+          "cancelled": "Hoá đơn đã bị huỷ.",
+          "replaced": "Hoá đơn hiện tại là hoá đơn thay thế."
+        },
+        "badge": {
+          "cancelled": "Đã huỷ",
+          "replaced": "Đã thay thế"
+        },
+        "hint": "Huỷ / thay thế hoá đơn do Quản lý hoặc Chủ shop thực hiện; kế toán xác nhận loại chứng từ khi trả hàng."
       }
     },
     "staff": {
@@ -3868,6 +3959,183 @@
         "completed": "Đã hoàn tất yêu cầu.",
         "rejected": "Đã từ chối yêu cầu."
       }
+    },
+    "returns": {
+      "title": "Yêu cầu đổi trả",
+      "description": "Đơn khách yêu cầu trả hàng, yêu cầu cũ nhất trước. Chấp nhận hoặc từ chối, rồi xác nhận khi nhận lại hàng để hoàn kho, xếp hoàn tiền và điều chỉnh hoá đơn.",
+      "empty": "Không có yêu cầu đổi trả nào đang chờ.",
+      "caption": "Yêu cầu đổi trả đang chờ xử lý",
+      "columns": {
+        "order": "Đơn hàng",
+        "requestedAt": "Yêu cầu lúc",
+        "deliveredAt": "Giao lúc",
+        "reason": "Lý do",
+        "resolution": "Phương án",
+        "units": "Số lượng",
+        "estimatedRefund": "Hoàn dự kiến",
+        "status": "Bước"
+      },
+      "status": {
+        "requested": "Chờ duyệt",
+        "approved": "Chờ nhận hàng",
+        "rejected": "Đã từ chối",
+        "received": "Đã nhận hàng"
+      },
+      "reasons": {
+        "unopened": "Đổi ý (còn seal)",
+        "defective": "Sản phẩm lỗi",
+        "wrong_item": "Giao nhầm",
+        "damaged": "Vỡ / hư hỏng"
+      },
+      "resolutions": {
+        "refund": "Hoàn tiền",
+        "replacement": "Đổi sản phẩm mới"
+      },
+      "outcomes": {
+        "full": "Trả toàn bộ đơn",
+        "partial": "Trả một phần",
+        "replacement": "Đổi sản phẩm mới"
+      },
+      "panel": {
+        "title": "Đổi trả",
+        "requestedAt": "Khách gửi lúc {date}",
+        "reason": "Lý do",
+        "resolution": "Khách muốn",
+        "seal": "Khách xác nhận còn nguyên seal",
+        "description": "Mô tả của khách",
+        "noDescription": "Khách không mô tả thêm.",
+        "lines": "Sản phẩm trả",
+        "line": "{name} · {sku} · trả {quantity}/{bought}",
+        "estimate": "Hoàn dự kiến",
+        "merchandise": "Tiền hàng",
+        "shipping": "Phí giao hàng ban đầu",
+        "giftWrap": "Phí gói quà",
+        "returnShipping": "Phí gửi trả",
+        "total": "Tổng hoàn",
+        "refundable": "Tiền đơn đang giữ có thể hoàn: {amount}",
+        "shortfallHint": "Đơn chưa nhận đủ tiền (ví dụ COD chưa đối soát): phần còn thiếu sẽ được ghi nhận và báo cho quản lý để hoàn sau.",
+        "approvedAt": "Đã chấp nhận lúc {date}",
+        "approvalNote": "Ghi chú gửi khách: {note}",
+        "rejectedAt": "Đã từ chối lúc {date}",
+        "rejectionReason": "Lý do từ chối: {reason}",
+        "receivedAt": "Đã nhận hàng lúc {date}",
+        "outcome": "Kết quả",
+        "refundQueued": "Đã xếp hoàn {amount} vào hàng đợi hoàn tiền",
+        "refundShortfall": "Còn phải hoàn {amount} khi nhận được tiền",
+        "restocked": "Hàng đã nhập lại kho bán",
+        "writtenOff": "Hàng không bán lại được (đã ghi giảm kho: hư hỏng)",
+        "managerOnly": "Chỉ Quản lý hoặc Chủ shop được chấp nhận / từ chối yêu cầu đổi trả."
+      },
+      "approve": {
+        "button": "Chấp nhận",
+        "title": "Chấp nhận yêu cầu trả hàng đơn {code}?",
+        "description": "Khách sẽ nhận e-mail báo yêu cầu được chấp nhận kèm ghi chú của bạn.",
+        "note": "Hướng dẫn gửi khách (cách gửi hàng, địa chỉ nhận, lịch lấy hàng)",
+        "confirm": "Chấp nhận",
+        "done": "Đã chấp nhận yêu cầu trả hàng đơn {code}."
+      },
+      "reject": {
+        "button": "Từ chối",
+        "title": "Từ chối yêu cầu trả hàng đơn {code}?",
+        "description": "Đơn trở lại trạng thái Đã giao. Lý do được gửi cho khách qua e-mail.",
+        "reason": "Lý do từ chối (gửi cho khách)",
+        "confirm": "Từ chối",
+        "done": "Đã từ chối yêu cầu trả hàng đơn {code}."
+      },
+      "receive": {
+        "button": "Đã nhận lại hàng",
+        "title": "Xác nhận đã nhận hàng trả của đơn {code}?",
+        "description": "Hệ thống hoàn kho các sản phẩm trả, xếp khoản hoàn tiền vào hàng đợi, điều chỉnh hoá đơn điện tử (nếu đã xuất) và gửi e-mail cho khách.",
+        "resellable": "Hàng còn nguyên seal, nhập lại kho bán",
+        "resellableHint": "Bỏ chọn nếu hàng đã mở, lỗi hoặc vỡ: hàng được ghi giảm kho (hư hỏng).",
+        "returnShippingFee": "Phí gửi trả khách đã trả (₫)",
+        "returnShippingHint": "Cửa hàng chịu phí vận chuyển khi hàng lỗi, giao nhầm hoặc vỡ (chỉ Quản lý / Chủ shop).",
+        "note": "Ghi chú nội bộ",
+        "replacementNote": "Đổi sản phẩm mới: không hoàn tiền; hệ thống trừ kho sản phẩm thay thế cho đơn này. Hãy gửi hàng thay thế cho khách.",
+        "fullNote": "Khách trả toàn bộ đơn: đơn chuyển sang Đã trả hàng.",
+        "partialNote": "Khách trả một phần: đơn trở lại Đã giao, chỉ hoàn kho và hoàn tiền phần trả.",
+        "confirm": "Xác nhận đã nhận hàng",
+        "done": "Đã ghi nhận hàng trả của đơn {code}."
+      }
+    }
+  },
+  "returns": {
+    "title": "Đổi trả hàng",
+    "eligible": "Bạn có thể gửi yêu cầu trả hàng đến hết {deadline}.",
+    "policy": "Sản phẩm chưa mở, còn nguyên seal được trả trong {days} ngày kể từ khi nhận hàng. Sản phẩm lỗi, giao nhầm hoặc vỡ được đổi mới hoặc hoàn tiền 100% và cửa hàng chịu phí vận chuyển.",
+    "policyLink": "Xem chính sách đổi trả",
+    "policySlug": "doi-tra",
+    "windowExpired": "Thời hạn trả hàng của đơn này đã kết thúc vào {date}. Nếu sản phẩm có vấn đề, hãy liên hệ chúng tôi.",
+    "start": "Yêu cầu trả hàng",
+    "form": {
+      "title": "Yêu cầu trả hàng cho đơn {code}",
+      "lines": "Sản phẩm muốn trả",
+      "linesHint": "Chọn sản phẩm và số lượng bạn muốn trả.",
+      "lineLabel": "{name} (đã mua {quantity})",
+      "quantity": "Số lượng trả: {name}",
+      "reason": "Lý do trả hàng",
+      "resolution": "Bạn muốn",
+      "resolutionUnopened": "Hàng đổi ý được hoàn tiền phần sản phẩm (không gồm phí giao hàng); phí gửi trả do bạn chịu.",
+      "description": "Mô tả",
+      "descriptionFault": "Mô tả lỗi hoặc tình trạng sản phẩm (ít nhất 10 ký tự).",
+      "descriptionOptional": "Không bắt buộc.",
+      "sealIntact": "Tôi xác nhận sản phẩm chưa mở và còn nguyên seal.",
+      "photos": "Nếu cần ảnh chụp sản phẩm hoặc bao bì, chúng tôi sẽ liên hệ bạn qua e-mail hoặc điện thoại sau khi nhận yêu cầu.",
+      "estimate": "Số tiền hoàn dự kiến được tính khi chúng tôi nhận lại hàng.",
+      "submit": "Gửi yêu cầu",
+      "cancel": "Đóng",
+      "done": "Đã gửi yêu cầu trả hàng. Chúng tôi sẽ phản hồi qua e-mail."
+    },
+    "reasons": {
+      "unopened": "Đổi ý (sản phẩm chưa mở, còn nguyên seal)",
+      "defective": "Sản phẩm lỗi",
+      "wrong_item": "Giao nhầm sản phẩm",
+      "damaged": "Sản phẩm bị vỡ, hư hỏng khi giao"
+    },
+    "resolutions": {
+      "refund": "Hoàn tiền",
+      "replacement": "Đổi sản phẩm mới"
+    },
+    "status": {
+      "requested": "Đã nhận yêu cầu trả hàng",
+      "approved": "Yêu cầu trả hàng đã được chấp nhận",
+      "rejected": "Yêu cầu trả hàng không được chấp nhận",
+      "received": "Cửa hàng đã nhận lại hàng"
+    },
+    "statusBody": {
+      "requested": "Gửi ngày {date}. Chúng tôi sẽ xem xét và phản hồi trong 1–2 ngày làm việc.",
+      "approved": "Vui lòng gửi hàng theo hướng dẫn trong e-mail của chúng tôi.",
+      "rejected": "Nếu bạn cần hỗ trợ thêm, hãy liên hệ chúng tôi.",
+      "received": "Cảm ơn bạn. Yêu cầu trả hàng đã được xử lý."
+    },
+    "summary": {
+      "reason": "Lý do: {reason}",
+      "resolution": "Phương án: {resolution}",
+      "item": "{name} × {quantity}",
+      "note": "Ghi chú của cửa hàng: {note}",
+      "rejection": "Lý do: {reason}",
+      "refund": "Số tiền hoàn: {amount}",
+      "replacement": "Sản phẩm thay thế sẽ được gửi tới bạn."
+    },
+    "errors": {
+      "validation": "Vui lòng sửa các mục được đánh dấu.",
+      "noLines": "Chọn ít nhất một sản phẩm.",
+      "unknownLine": "Sản phẩm không thuộc đơn hàng này.",
+      "duplicateLine": "Sản phẩm bị chọn trùng.",
+      "quantityTooLarge": "Số lượng vượt quá số đã mua.",
+      "tooSmall": "Số lượng ít nhất là 1.",
+      "sealRequired": "Hàng đổi ý chỉ được trả khi còn nguyên seal.",
+      "refundOnly": "Hàng đổi ý chỉ được hoàn tiền.",
+      "describeProblem": "Hãy mô tả vấn đề (ít nhất 10 ký tự).",
+      "tooLong": "Nội dung quá dài.",
+      "reasonRequired": "Chọn lý do trả hàng.",
+      "windowExpired": "Đã quá thời hạn trả hàng.",
+      "notDelivered": "Đơn hàng chưa được giao hoặc không thể trả.",
+      "alreadyRequested": "Đơn hàng này đã có yêu cầu trả hàng.",
+      "notFound": "Không tìm thấy đơn hàng.",
+      "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+      "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
     }
   }
 }

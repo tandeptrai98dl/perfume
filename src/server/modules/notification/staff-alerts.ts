@@ -20,6 +20,9 @@ export const STAFF_ALERT_KINDS = [
   'job_failed',
   'einvoice_failed',
   'edit_refund',
+  // M3 wave 2 returns stream.
+  'return_requested',
+  'einvoice_adjustment_failed',
 ] as const;
 export type StaffAlertKind = (typeof STAFF_ALERT_KINDS)[number];
 

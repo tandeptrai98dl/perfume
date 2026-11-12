@@ -4,10 +4,12 @@ import { Suspense } from 'react';
 
 import { OrderDetail } from '@/components/account/order-detail';
 import { OrderLookupForm } from '@/components/account/order-lookup-form';
+import { ReturnSection } from '@/components/account/return-section';
 import { Link } from '@/i18n/navigation';
 import { getDb } from '@/server/db/client';
 import { carrierTrackingUrl } from '@/server/modules/notification';
 import { getOrderViewByCode, normalizeOrderCode } from '@/server/modules/order';
+import { getCustomerReturnView } from '@/server/modules/returns';
 import { hasOrderAccess } from '@/server/order-access';
 
 import { resolveLocale } from '../_content/shared';
@@ -57,7 +59,9 @@ async function LookupContent({
   const order =
     code && (await hasOrderAccess(code, token)) ? await getOrderViewByCode(getDb(), code) : null;
 
-  if (!order) {
+  const returnView = order ? await getCustomerReturnView(getDb(), order) : null;
+
+  if (!order || !returnView) {
     return (
       <div className="flex flex-col gap-8">
         <header className="flex flex-col gap-2">
@@ -87,6 +91,7 @@ async function LookupContent({
           trackingUrl: carrierTrackingUrl(s.carrier, s.trackingCode),
         }))}
       />
+      <ReturnSection order={order} view={returnView} token={token} />
       <Link href="/order-lookup" className="text-gold-700 self-start hover:underline">
         {t('another')}
       </Link>
