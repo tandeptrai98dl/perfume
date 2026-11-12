@@ -14,8 +14,8 @@ const handleI18nRouting = createMiddleware(routing);
 /** Catalogue detail routes whose slugs are checked against the route table (real 404s). */
 const ROUTED_CATALOG_PATHS = new Set<string>(Object.values(CATALOG_ROUTES));
 
-/** Admin pages reachable without a session. */
-const PUBLIC_ADMIN_PATHS = new Set(['/admin/login']);
+/** Admin pages reachable without a session (set-password: staff invitation link, M3). */
+const PUBLIC_ADMIN_PATHS = new Set(['/admin/login', '/admin/set-password']);
 
 /**
  * Next.js 16 proxy (formerly middleware).

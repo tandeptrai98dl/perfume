@@ -99,6 +99,14 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/content/redirects', labelKey: 'redirects', permission: 'content.manage' },
     ],
   },
+  // M3 admin stream: staff management and audit log.
+  {
+    labelKey: 'system',
+    items: [
+      { href: '/admin/staff', labelKey: 'staff', permission: 'staff.manage' },
+      { href: '/admin/audit-log', labelKey: 'auditLog', permission: 'auditLog.view' },
+    ],
+  },
 ];
 
 /** Sections and items visible to a role; empty sections are dropped. */

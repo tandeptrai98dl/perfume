@@ -149,6 +149,15 @@
         "cta": "Choose a new password",
         "expiry": "This link is valid for 30 minutes and can be used once.",
         "ignore": "If you did not ask for this, you can ignore this email: your password stays the same."
+      },
+      "staffInvite": {
+        "subject": "Your invitation to the Perfume Store admin",
+        "preview": "Set your password to start using the admin.",
+        "heading": "You have been invited to the admin",
+        "body": "The shop owner created a Perfume Store admin account for you. Set your password, then sign in and turn on two-step verification.",
+        "cta": "Set password",
+        "expiry": "This link is valid for 72 hours and can be used once.",
+        "ignore": "If you were not expecting this invitation, you can ignore this email."
       }
     }
   },

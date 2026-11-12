@@ -68,12 +68,15 @@ export const JOBS = {
     }),
     queue: retryPolicy,
   },
-  /** Account emails (verification, password reset) in the user's locale. */
+  /**
+   * Account emails (verification, password reset) in the user's locale. `staff_invite` (M3
+   * admin stream): set-password link for an invited staff member (admin is Vietnamese only).
+   */
   'auth.email': {
     schema: z.object({
       to: z.email(),
       locale: z.enum(['vi', 'en']),
-      kind: z.enum(['verify_email', 'reset_password']),
+      kind: z.enum(['verify_email', 'reset_password', 'staff_invite']),
       url: z.url(),
     }),
     queue: retryPolicy,
