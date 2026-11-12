@@ -317,6 +317,8 @@ for (const { locale, home, privacyCenter, guestForm, t } of flows) {
       'correct',
       'delete',
     ]);
+    // Stacked toasts slide in from the edge; measure the page once they are gone.
+    await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 20_000 });
     await expectNoHorizontalOverflow(page);
     expect(errors).toEqual([]);
   });

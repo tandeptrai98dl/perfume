@@ -35,7 +35,7 @@ export function ConsentHistory({ entries }: { entries: ConsentHistoryItem[] }) {
   const format = useFormatter();
   if (entries.length === 0) return <p className="text-small text-taupe-600">{t('empty')}</p>;
   return (
-    <div className="overflow-x-auto">
+    <div className="relative max-w-full min-w-0 overflow-x-auto">
       <table className="text-small w-full min-w-[36rem] border-collapse text-left">
         <caption className="sr-only">{t('caption')}</caption>
         <thead>

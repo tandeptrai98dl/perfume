@@ -107,7 +107,7 @@ test.describe('admin privacy requests', () => {
         [subject.orderCode],
       );
       const requests = await db.query(
-        'select type, status, note from privacy_requests where email = $1 order by type',
+        'select type, status, note from privacy_requests where email = $1 order by type::text',
         [subject.email],
       );
       const jobs = await db.query(

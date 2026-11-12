@@ -43,7 +43,7 @@ export function PrivacyRequests({ requests }: { requests: PrivacyRequestItem[] }
   }
   const date = (value: string) => format.dateTime(new Date(value), { dateStyle: 'medium' });
   return (
-    <div className="overflow-x-auto">
+    <div className="relative max-w-full min-w-0 overflow-x-auto">
       <table className="text-small w-full min-w-[36rem] border-collapse text-left">
         <caption className="sr-only">{t('listCaption')}</caption>
         <thead>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { GuestRequestConfirm } from '@/components/privacy/guest-request-confirm';
@@ -38,6 +39,8 @@ export default async function ConfirmPrivacyRequestPage({ params, searchParams }
 
 async function ConfirmContent({ searchParams }: { searchParams: Props['searchParams'] }) {
   const query = await searchParams;
+  // Token expiry is checked against the request time.
+  await connection();
   const token = Array.isArray(query.token) ? query.token[0] : query.token;
   const t = await getTranslations('privacyRequest');
   const request = readGuestRequestToken(serverEnv().BETTER_AUTH_SECRET, token);
