@@ -9,6 +9,7 @@ import {
   remittanceDifference,
   requiredOnlineAmount,
   sessionKind,
+  splitReturnRefund,
 } from './status';
 import { generateTxnRef, transferNote, TXN_REF_PATTERN } from './txn-ref';
 
@@ -92,5 +93,56 @@ describe('transaction references', () => {
 
   it('turns an order code into a bank-safe transfer note', () => {
     expect(transferNote('PF-261111-7K3Q')).toBe('PF2611117K3Q');
+  });
+});
+
+describe('splitReturnRefund', () => {
+  it('queues what the order holds first', () => {
+    expect(
+      splitReturnRefund({ amount: 500_000, available: 800_000, pending: 0, payoutCap: 0 }),
+    ).toEqual({ queued: 500_000, deferred: 0, payout: 0, shortfall: 0 });
+  });
+
+  it('defers what a COD order has not received yet', () => {
+    // COD with a 20 % deposit paid online, carrier has not remitted the balance.
+    expect(
+      splitReturnRefund({
+        amount: 3_000_000,
+        available: 640_000,
+        pending: 2_560_000,
+        payoutCap: 0,
+      }),
+    ).toEqual({ queued: 640_000, deferred: 2_360_000, payout: 0, shortfall: 0 });
+  });
+
+  it('pays reimbursed return shipping beyond the order’s money out manually', () => {
+    expect(
+      splitReturnRefund({
+        amount: 1_030_000,
+        available: 1_000_000,
+        pending: 0,
+        payoutCap: 30_000,
+      }),
+    ).toEqual({ queued: 1_000_000, deferred: 0, payout: 30_000, shortfall: 0 });
+    // COD not remitted: the goods wait for the money, the return shipping is paid now.
+    expect(
+      splitReturnRefund({ amount: 1_030_000, available: 0, pending: 1_000_000, payoutCap: 30_000 }),
+    ).toEqual({ queued: 0, deferred: 1_000_000, payout: 30_000, shortfall: 0 });
+  });
+
+  it('never pays out more than the return shipping: the rest is a shortfall', () => {
+    // A goodwill refund of 200 000 already went back; the return owes the full total.
+    expect(
+      splitReturnRefund({ amount: 1_030_000, available: 800_000, pending: 0, payoutCap: 30_000 }),
+    ).toEqual({ queued: 800_000, deferred: 0, payout: 30_000, shortfall: 200_000 });
+  });
+
+  it('treats negative inputs as zero', () => {
+    expect(splitReturnRefund({ amount: 100, available: -5, pending: -1, payoutCap: -1 })).toEqual({
+      queued: 0,
+      deferred: 0,
+      payout: 0,
+      shortfall: 100,
+    });
   });
 });

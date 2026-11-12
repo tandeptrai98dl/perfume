@@ -88,3 +88,29 @@ export function remittanceDifference(input: {
   const expected = collected - input.carrierFee;
   return { expected, difference: input.totalAmount - expected };
 }
+
+/**
+ * How the refund owed for a received customer return is paid (ADR-0017, ADR-0016), whole VND:
+ * - `queued`: from the money the order holds now (paid − refunded − queued);
+ * - `deferred`: from money still to come (typically the COD balance the carrier collected
+ *   but has not remitted yet), queued automatically when that payment is recorded;
+ * - `payout`: the reimbursed return shipping beyond what the order will ever hold, paid out
+ *   manually (bank transfer / cash) and never taken from the order's own money;
+ * - `shortfall`: anything left (e.g. an earlier goodwill refund already paid the money back):
+ *   staff decide, an alert says so.
+ */
+export function splitReturnRefund(input: {
+  amount: number;
+  /** Refundable now: `refundableAmount(order, openRefunds)`. */
+  available: number;
+  /** Still to be received (total − paid − refunds already deferred), never negative. */
+  pending: number;
+  /** Most that may be paid out beyond the order's money: the reimbursed return shipping. */
+  payoutCap: number;
+}): { queued: number; deferred: number; payout: number; shortfall: number } {
+  const amount = Math.max(0, input.amount);
+  const queued = Math.min(amount, Math.max(0, input.available));
+  const deferred = Math.min(amount - queued, Math.max(0, input.pending));
+  const payout = Math.min(amount - queued - deferred, Math.max(0, input.payoutCap));
+  return { queued, deferred, payout, shortfall: amount - queued - deferred - payout };
+}
