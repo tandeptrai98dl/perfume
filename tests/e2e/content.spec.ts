@@ -66,7 +66,13 @@ test.describe('policy pages', () => {
     await page.goto('/en/policies/returns');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Returns policy');
-    await expect(page.getByText('the Vietnamese version prevails')).toBeVisible();
+    // The page's own notice (the seeded draft text repeats the sentence inside its banner).
+    await expect(
+      page.getByText(
+        'If the Vietnamese and English versions differ, the Vietnamese version prevails.',
+        { exact: true },
+      ),
+    ).toBeVisible();
     await expect(page.locator('link[rel="alternate"][hreflang="vi"]')).toHaveAttribute(
       'href',
       /\/chinh-sach\/doi-tra$/,
