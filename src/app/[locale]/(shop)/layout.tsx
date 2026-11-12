@@ -7,6 +7,7 @@ import { AnnouncementBar } from '@/components/shop/announcement-bar';
 import { MiniCartSheet } from '@/components/shop/mini-cart-sheet';
 
 import { CartCount } from './_lib/cart-count';
+import { WishlistIds } from './_lib/wishlist-ids';
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,10 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       {/* Cart (M2): header badge count (per request) and the mini-cart drawer. */}
       <Suspense fallback={null}>
         <CartCount />
+      </Suspense>
+      {/* Wishlist (M3): signed-in state + wishlisted product ids for the hearts. */}
+      <Suspense fallback={null}>
+        <WishlistIds />
       </Suspense>
       {/* Reads the pathname (closes after navigating), so it streams in on dynamic routes. */}
       <Suspense fallback={null}>

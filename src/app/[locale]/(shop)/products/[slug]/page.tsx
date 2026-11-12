@@ -14,10 +14,12 @@ import { JsonLd } from '@/components/shop/json-ld';
 import { ProductGallery } from '@/components/shop/product-gallery';
 import { ProductLineSwitcher } from '@/components/shop/product-line-switcher';
 import { RelatedProducts } from '@/components/shop/related-products';
+import { ReviewsSection } from '@/components/shop/reviews/reviews-section';
 import { RichText, hasRichText } from '@/components/shop/rich-text';
 import { ScentProfile } from '@/components/shop/scent-profile';
 import { VariantSelector } from '@/components/shop/variant-selector';
 import { ProductVariantProvider } from '@/components/shop/variant-store';
+import { WishlistButton } from '@/components/shop/wishlist-button';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getPathname, Link } from '@/i18n/navigation';
@@ -27,6 +29,7 @@ import { getProduct, getRelated } from '@/server/catalog-cache';
 import { getDb } from '@/server/db/client';
 import { getVariantOffers, type ProductDetail, type VariantOffer } from '@/server/modules/catalog';
 import { getCommerceSettings } from '@/server/modules/settings';
+import { getProductReviews, getProductReviewSummary } from '@/server/review-cache';
 
 import {
   absoluteUrl,
@@ -162,7 +165,16 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
                 ) : (
                   <p className="eyebrow text-gold-700">{product.brand.name}</p>
                 )}
-                <h1 className="text-h1">{product.name}</h1>
+                <div className="flex items-start justify-between gap-4">
+                  <h1 className="text-h1">{product.name}</h1>
+                  <WishlistButton
+                    productId={product.id}
+                    productName={product.name}
+                    productSlug={product.slug}
+                    variant="outline"
+                    className="shrink-0"
+                  />
+                </div>
                 {product.subtitle && (
                   <p className="text-body-lg text-taupe-600">{product.subtitle}</p>
                 )}
@@ -211,6 +223,10 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
           <ComplianceInfo compliance={product.compliance} countryName={countryName} />
         </section>
 
+        <Suspense fallback={<ReviewsSkeleton />}>
+          <ProductReviews productId={product.id} locale={locale} />
+        </Suspense>
+
         <BrandStoryBlock brand={product.brand} />
         <RelatedProducts products={related} />
       </article>
@@ -227,9 +243,10 @@ const AVAILABILITY: Record<VariantOffer['stockState'], string> = {
 /** Live price and stock (never cached, §14.1) plus Product JSON-LD built from the same data. */
 async function PurchasePanel({ product, locale }: { product: ProductDetail; locale: Locale }) {
   await connection();
-  const [offers, settings] = await Promise.all([
+  const [offers, settings, reviewSummary] = await Promise.all([
     getVariantOffers(product.id),
     getCommerceSettings(getDb()),
+    getProductReviewSummary(product.id),
   ]);
   const byId = new Map(offers.map((offer) => [offer.variantId, offer]));
   const variants = product.variants.flatMap((variant) => {
@@ -277,12 +294,15 @@ async function PurchasePanel({ product, locale }: { product: ProductDetail; loca
               offers: offerLd,
             },
           }),
-    ...(product.ratingCount > 0
+    // Only when approved reviews exist (ADR-0008).
+    ...(reviewSummary.count > 0
       ? {
           aggregateRating: {
             '@type': 'AggregateRating',
-            ratingValue: product.ratingAvg,
-            reviewCount: product.ratingCount,
+            ratingValue: reviewSummary.average,
+            reviewCount: reviewSummary.count,
+            bestRating: 5,
+            worstRating: 1,
           },
         }
       : {}),
@@ -299,6 +319,24 @@ async function PurchasePanel({ product, locale }: { product: ProductDetail; loca
       </div>
       <JsonLd data={jsonLd} />
     </>
+  );
+}
+
+/** Approved reviews (cached per product, refreshed by moderation). */
+async function ProductReviews({ productId, locale }: { productId: string; locale: Locale }) {
+  const [summary, page] = await Promise.all([
+    getProductReviewSummary(productId),
+    getProductReviews(productId, locale, 1),
+  ]);
+  return <ReviewsSection productId={productId} locale={locale} summary={summary} page={page} />;
+}
+
+function ReviewsSkeleton() {
+  return (
+    <div className="flex flex-col gap-4" aria-hidden>
+      <Skeleton className="h-9 w-48" />
+      <Skeleton className="h-32 w-full" />
+    </div>
   );
 }
 

@@ -88,6 +88,11 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/payments/events', labelKey: 'paymentEvents', permission: 'payments.refund' },
     ],
   },
+  // M3 reviews & wishlist stream: review moderation.
+  {
+    labelKey: 'reviewsSection',
+    items: [{ href: '/admin/reviews', labelKey: 'reviews', permission: 'reviews.moderate' }],
+  },
   {
     labelKey: 'content',
     items: [
