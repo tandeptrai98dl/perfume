@@ -211,3 +211,11 @@ export async function listMovements(
     .where(where);
   return { rows, total: totalRow?.total ?? 0, page: query.page, pageSize: query.pageSize };
 }
+
+/** One variant's stock (low-stock alert details); null when the variant or product is gone. */
+export async function getVariantStock(db: Reader, variantId: string): Promise<StockRow | null> {
+  const [row] = await stockBase(db)
+    .where(and(eq(productVariants.id, variantId), isNull(products.deletedAt)))
+    .limit(1);
+  return row ?? null;
+}

@@ -31,7 +31,7 @@ import { nextSessionAmount } from '@/server/modules/payment';
 import { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';
 import { deliverLogged, logSkipped } from './log';
 import { EMAIL_SENT_EVENT, sendOnce, STAFF_ALERT_EVENT } from './once';
-import { buildStaffAlert, type StaffAlertKind } from './staff-alerts';
+import { buildStaffAlert, type StaffAlertDetails, type StaffAlertKind } from './staff-alerts';
 
 /**
  * Customer e-mails in the order's locale (§10.5, §3.6) and internal alerts (ADR-0019), sent
@@ -352,13 +352,20 @@ export async function sendPaymentLink(deps: NotificationDeps, input: { orderId: 
  */
 export async function sendStaffAlert(
   deps: NotificationDeps,
-  input: { kind: StaffAlertKind; orderId?: string; message?: string },
+  input: {
+    kind: StaffAlertKind;
+    orderId?: string;
+    message?: string;
+    /** M3 wave 2: low stock / pending reviews / dead-lettered job, resolved by the caller. */
+    details?: StaffAlertDetails | null;
+  },
 ): Promise<string[]> {
   const view = input.orderId ? await getOrderViewById(deps.db, input.orderId) : null;
   const alert = buildStaffAlert({
     kind: input.kind,
     appUrl: deps.appUrl,
     message: input.message,
+    details: input.details,
     order: view
       ? {
           id: view.id,
@@ -375,8 +382,12 @@ export async function sendStaffAlert(
   const logRef = {
     template: `staff_alert:${input.kind}`,
     locale: 'vi' as const,
-    refType: input.orderId ? ('order' as const) : null,
-    refId: input.orderId ?? null,
+    refType: input.orderId
+      ? ('order' as const)
+      : input.details?.kind === 'low_stock'
+        ? ('product_variant' as const)
+        : null,
+    refId: input.orderId ?? (input.details?.kind === 'low_stock' ? input.details.variantId : null),
   };
   const staffEmail = deps.staffAlertEmail;
   if (staffEmail) {

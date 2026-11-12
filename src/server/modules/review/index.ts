@@ -48,6 +48,8 @@ export {
   anonymizeReviewsForSubject,
   moderateReview,
   replyToReview,
+  REVIEW_ALERT_KEY,
+  REVIEW_ALERT_THROTTLE_SECONDS,
   reviewTags,
   submitGuestReview,
   submitMemberReview,

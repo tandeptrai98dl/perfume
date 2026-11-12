@@ -21,7 +21,7 @@ export type NotificationRef = {
   /** Template / message kind, e.g. `order_confirmation`, `shipped`, `staff_alert:new_order`. */
   template: string;
   locale?: 'vi' | 'en' | null;
-  refType?: 'order' | 'user' | null;
+  refType?: 'order' | 'user' | 'product_variant' | null;
   refId?: string | null;
 };
 

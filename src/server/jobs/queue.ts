@@ -74,6 +74,29 @@ export async function enqueue<N extends JobName>(
   return id;
 }
 
+/**
+ * Throttled outbox enqueue (M3 alerts): at most one `name` job per `key` per `seconds` slot
+ * (pg-boss singleton slots, `ON CONFLICT DO NOTHING`, so a duplicate never aborts the caller's
+ * transaction). With `nextSlot`, a duplicate in the current slot is queued once at the start of
+ * the next slot instead of being dropped, so the last event of a burst is still reported.
+ * Returns the job id, or null when the slot (and the next one) already holds a job.
+ */
+export async function enqueueThrottled<N extends JobName>(
+  boss: PgBoss,
+  tx: Executor,
+  name: N,
+  data: JobInput<N>,
+  throttle: { key: string; seconds: number; nextSlot?: boolean },
+): Promise<string | null> {
+  const payload = JOBS[name].schema.parse(data);
+  return boss.send(name, payload, {
+    db: fromDrizzle(tx, sql),
+    singletonKey: throttle.key,
+    singletonSeconds: throttle.seconds,
+    singletonNextSlot: throttle.nextSlot ?? false,
+  });
+}
+
 /** Registers the recurring jobs (worker only; pg-boss runs one schedule per name cluster-wide). */
 export async function scheduleCronJobs(boss: PgBoss): Promise<void> {
   for (const [name, cron] of Object.entries(CRON_JOBS)) {

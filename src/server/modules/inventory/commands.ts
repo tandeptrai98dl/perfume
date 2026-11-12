@@ -14,6 +14,7 @@ import { catalogTags } from '@/server/modules/catalog/cache-tags';
 
 import { computeAdjustment } from './adjustment';
 import type { LowStockThresholdInput, StockAdjustInput } from './admin-schemas';
+import { enqueueLowStockAlerts } from './low-stock';
 
 /*
  * Inventory write side (ADR-0006, ADR-0022). Every stock change locks the inventory row with
@@ -116,6 +117,14 @@ export async function adjustStock(
       },
       ip: ctx.ip,
     });
+    await enqueueLowStockAlerts(ctx.boss, tx, [
+      {
+        variantId: variant.id,
+        before: item.onHand - item.reserved,
+        after: outcome.available,
+        threshold: item.lowStockThreshold,
+      },
+    ]);
     const tags = await enqueueRevalidation(ctx.boss, tx, [
       catalogTags.inventory(variant.id),
       catalogTags.product(variant.productId),
