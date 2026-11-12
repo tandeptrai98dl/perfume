@@ -156,7 +156,7 @@ export {
 } from './admin-edit-schemas';
 // ---------- End order edits ----------
 // ---------- E-invoice (M3 e-invoicing stream, D13) ----------
-export { recordEinvoiceIssued } from './einvoice-record';
+export { recordEinvoiceIssued, recordEinvoiceReplaced } from './einvoice-record';
 // ---------- Privacy requests (M3 privacy stream): data export + anonymisation ----------
 export {
   ANONYMIZED_TEXT,
@@ -169,3 +169,24 @@ export {
   type OrderSubject,
 } from './privacy';
 // ---------- End privacy ----------
+// ---------- Customer returns (M3 wave 2 returns stream, ADR-0017) ----------
+export {
+  FAULT_REASONS,
+  parseReturnReceived,
+  parseReturnRequested,
+  RETURN_EVENT_TYPES,
+  RETURN_EVENTS,
+  RETURN_OUTCOMES,
+  RETURN_REASONS,
+  RETURN_RESOLUTIONS,
+  returnReceivedMetadata,
+  returnRefundBreakdown,
+  returnRequestedMetadata,
+  type ReturnOutcome,
+  type ReturnReason,
+  type ReturnReceivedMetadata,
+  type ReturnRefundBreakdown,
+  type ReturnRequestedMetadata,
+  type ReturnResolution,
+} from './return-events';
+// ---------- End returns ----------
