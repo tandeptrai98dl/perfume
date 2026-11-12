@@ -28,7 +28,7 @@ export const SYSTEM_ACTOR: OrderActor = { type: 'system', id: null };
 /** Statuses in which incoming money is unexpected and goes back to the customer. */
 const REFUND_ON_PAYMENT: readonly string[] = ['cancelled', 'returned'];
 
-export type StaffAlertKind = 'suspicious_ipn' | 'late_payment_refund';
+export type StaffAlertKind = 'suspicious_ipn' | 'late_payment_refund' | 'edit_refund';
 
 /** Internal alert (ADR-0019). `message` must never contain PII. */
 export async function alertStaff(
