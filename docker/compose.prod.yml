@@ -1,0 +1,62 @@
+# Production / staging stack on one VM (ARCHITECTURE.md §4.2, docs/ops/runbook.md):
+# Caddy (TLS, reverse proxy) → web (Next.js standalone) + worker (pg-boss). PostgreSQL is the
+# provider's managed instance; object storage is the provider's S3. Images are built by CI and
+# pulled by tag:
+#
+#   WEB_IMAGE=registry.example.vn/perfume-web:<sha> WORKER_IMAGE=registry.example.vn/perfume-worker:<sha> \
+#   SITE_DOMAIN=shop.example.vn docker compose -f docker/compose.prod.yml --env-file .env.production up -d
+name: perfume
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?set SITE_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+
+  web:
+    image: ${WEB_IMAGE:?set WEB_IMAGE}
+    restart: unless-stopped
+    env_file: ../.env.production
+    environment:
+      # Caddy overwrites X-Client-IP with the visitor IP (Cloudflare-aware), see Caddyfile.
+      TRUSTED_IP_HEADER: x-client-ip
+    expose:
+      - '3000'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  worker:
+    image: ${WORKER_IMAGE:?set WORKER_IMAGE}
+    restart: unless-stopped
+    env_file: ../.env.production
+    environment:
+      INTERNAL_APP_URL: http://web:3000
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  caddy-data:
+  caddy-config:

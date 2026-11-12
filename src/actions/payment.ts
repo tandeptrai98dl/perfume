@@ -2,12 +2,10 @@
 
 import 'server-only';
 
-import { isIP } from 'node:net';
-
-import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { getDb } from '@/server/db/client';
+import { getClientIp } from '@/server/request-ip';
 import { DomainError } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
 import {
@@ -59,12 +57,6 @@ const KNOWN = new Set([
   'gatewayError',
 ]);
 
-async function clientIp(): Promise<string | null> {
-  const list = await headers();
-  const forwarded = list.get('x-forwarded-for')?.split(',')[0]?.trim() ?? list.get('x-real-ip');
-  return forwarded && isIP(forwarded) ? forwarded : null;
-}
-
 export async function startPaymentAction(raw: unknown): Promise<StartPaymentResult> {
   const parsed = startSchema.safeParse(raw);
   const code = parsed.success ? pickOrderCode(parsed.data.code) : null;
@@ -80,7 +72,7 @@ export async function startPaymentAction(raw: unknown): Promise<StartPaymentResu
     const session = await createPaymentSession(await paymentDeps(), {
       orderId: order.id,
       provider: parsed.data.provider,
-      ipAddress: await clientIp(),
+      ipAddress: await getClientIp(),
       returnUrl,
     });
     return { ok: true, provider: session.provider, checkoutUrl: session.checkoutUrl };

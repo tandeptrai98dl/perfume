@@ -9,6 +9,7 @@ import type { JobName, JobPayload } from '../definitions';
 import { createEinvoiceHandlers } from './einvoice';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
+import { createPruneRateLimitsHandler } from './prune-rate-limits';
 import { createRevalidateHandler } from './revalidate';
 import { createReviewInvitationHandlers } from './review-invitations';
 import { createTestEmailHandler } from './test-email';
@@ -61,5 +62,6 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
       await reviewInvitations.onStatusChanged(payload);
     },
     'review.invite': reviewInvitations['review.invite'],
+    'system.prune-rate-limits': createPruneRateLimitsHandler(deps.db),
   };
 }

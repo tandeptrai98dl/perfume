@@ -515,6 +515,7 @@ describe('provider from env', () => {
     NODE_ENV: 'production',
     BETTER_AUTH_SECRET: 'a'.repeat(32),
     INTERNAL_API_SECRET: 'b'.repeat(32),
+    TRUSTED_IP_HEADER: 'cf-connecting-ip',
   };
 
   it('defaults to the sandbox outside production and to none in production', () => {

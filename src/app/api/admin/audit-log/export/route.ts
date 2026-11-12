@@ -1,5 +1,3 @@
-import { isIP } from 'node:net';
-
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { AuthorizationError, requirePermission } from '@/server/auth/guards';
@@ -9,6 +7,7 @@ import { DomainError } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
 import { auditFilterSchema, exportAuditLogCsv } from '@/server/modules/audit';
 import { vietnamDate } from '@/server/modules/reporting';
+import { getClientIp } from '@/server/request-ip';
 
 /**
  * CSV export of the audit log (§11.2) with the viewer's filters. Read-only download (GET, so
@@ -40,13 +39,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 403 });
   }
 
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  const ip = await getClientIp();
   try {
     const { csv } = await exportAuditLogCsv(
       {
         db: getDb(),
         actor: { id: session.user.id, role },
-        ip: forwarded && isIP(forwarded) ? forwarded : null,
+        ip,
       },
       parsed.data,
     );

@@ -9,8 +9,8 @@ import { getCustomerSession } from '@/server/auth/customer';
 import { getDb } from '@/server/db/client';
 import { DomainError } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
-import { createRateLimiter } from '@/server/lib/rate-limit';
 import { setWishlisted } from '@/server/modules/customer';
+import { guardRequest } from '@/server/request-guard';
 
 /**
  * Wishlist heart (§8.3 ProductCard, PDP; §10.6). Members only: guests get `unauthorized` and
@@ -18,7 +18,8 @@ import { setWishlisted } from '@/server/modules/customer';
  * the layout's wishlist seed so every heart on the page shows the new state.
  */
 
-const limiter = createRateLimiter({ limit: 60, windowMs: 60 * 1000 });
+/** 60 toggles per minute per account (shared limiter, §12). */
+const WISHLIST_RULE = { limit: 60, windowMs: 60 * 1000 };
 
 const toggleSchema = z.object({ productId: z.uuid(), wishlisted: z.boolean() });
 
@@ -33,7 +34,12 @@ export async function setWishlistedAction(raw: unknown): Promise<WishlistActionR
   if (!parsed.success) return { ok: false, error: 'validation' };
   const session = await getCustomerSession();
   if (!session) return { ok: false, error: 'unauthorized' };
-  if (!limiter.hit(`wishlist:${session.user.id}`).ok) return { ok: false, error: 'rateLimited' };
+  const guard = await guardRequest({
+    scope: 'wishlistToggle',
+    rule: WISHLIST_RULE,
+    subject: session.user.id,
+  });
+  if (!guard.ok) return { ok: false, error: 'rateLimited' };
   try {
     const result = await setWishlisted(getDb(), { userId: session.user.id, ...parsed.data });
     refresh();

@@ -65,3 +65,42 @@ describe('AUTH_RATE_LIMIT', () => {
     expect(parseServerEnv(prod).AUTH_RATE_LIMIT).toBe('on');
   });
 });
+
+describe('M3 hardening variables', () => {
+  const prod = {
+    NODE_ENV: 'production',
+    BETTER_AUTH_SECRET: 'a'.repeat(32),
+    INTERNAL_API_SECRET: 'b'.repeat(32),
+  };
+
+  it('requires TRUSTED_IP_HEADER in production (except localhost builds) and lower-cases it', () => {
+    expect(() => parseServerEnv({ ...prod, APP_URL: 'https://shop.example.vn' })).toThrow(
+      /TRUSTED_IP_HEADER/,
+    );
+    expect(
+      parseServerEnv({
+        ...prod,
+        APP_URL: 'https://shop.example.vn',
+        TRUSTED_IP_HEADER: 'CF-Connecting-IP',
+      }).TRUSTED_IP_HEADER,
+    ).toBe('cf-connecting-ip');
+    expect(parseServerEnv(prod).TRUSTED_IP_HEADER).toBeUndefined();
+    expect(() => parseServerEnv({ TRUSTED_IP_HEADER: 'x forwarded' })).toThrow(/TRUSTED_IP_HEADER/);
+  });
+
+  it('validates the webhook IP allowlists', () => {
+    const env = parseServerEnv({
+      VNPAY_IPN_ALLOWED_IPS: '113.160.92.202, 203.171.19.0/24',
+      PAYOS_WEBHOOK_ALLOWED_IPS: '2001:db8::/32',
+    });
+    expect(env.VNPAY_IPN_ALLOWED_IPS).toContain('113.160.92.202');
+    expect(() => parseServerEnv({ VNPAY_IPN_ALLOWED_IPS: '113.160.92.999' })).toThrow(
+      /VNPAY_IPN_ALLOWED_IPS: invalid IP or CIDR range: 113\.160\.92\.999/,
+    );
+  });
+
+  it('defaults CSP to enforcing', () => {
+    expect(parseServerEnv({}).CSP_REPORT_ONLY).toBe(false);
+    expect(parseServerEnv({ CSP_REPORT_ONLY: 'true' }).CSP_REPORT_ONLY).toBe(true);
+  });
+});

@@ -2,23 +2,20 @@
 
 import 'server-only';
 
-import { isIP } from 'node:net';
-
 import { refresh } from 'next/cache';
-import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { getCustomerSession } from '@/server/auth/customer';
 import { getDb } from '@/server/db/client';
 import { DomainError, type FieldIssue } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
-import { createRateLimiter } from '@/server/lib/rate-limit';
 import {
   guestReviewSchema,
   memberReviewSchema,
   submitGuestReview,
   submitMemberReview,
 } from '@/server/modules/review';
+import { guardRequest } from '@/server/request-guard';
 
 /**
  * Review Server Actions (ADR-0008). Zod first, then the permission: members need their session
@@ -27,8 +24,8 @@ import {
  * per IP. Results carry translation codes (`reviews.errors.*`).
  */
 
-const memberLimiter = createRateLimiter({ limit: 10, windowMs: 60 * 60 * 1000 });
-const guestLimiter = createRateLimiter({ limit: 10, windowMs: 10 * 60 * 1000 });
+/** Members: 10 reviews per hour per account (shared limiter, §12); guests: `reviewSubmit` per IP. */
+const MEMBER_REVIEW_RULE = { limit: 10, windowMs: 60 * 60 * 1000 };
 
 export type ReviewErrorCode =
   | 'validation'
@@ -72,15 +69,6 @@ function domainFailure(error: unknown, scope: string): ReviewActionResult {
   return { ok: false, error: 'unexpected', fieldErrors: [] };
 }
 
-async function clientIp(): Promise<string> {
-  const list = await headers();
-  const candidate =
-    list.get('cf-connecting-ip') ??
-    list.get('x-real-ip') ??
-    list.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return candidate && isIP(candidate) ? candidate : 'unknown';
-}
-
 const memberInput = z.object({ locale: localeSchema, review: memberReviewSchema });
 const guestInput = z.object({ locale: localeSchema, review: guestReviewSchema });
 
@@ -90,9 +78,12 @@ export async function submitMemberReviewAction(raw: unknown): Promise<ReviewActi
   if (!parsed.success) return validationFailure(parsed.error);
   const session = await getCustomerSession();
   if (!session) return { ok: false, error: 'unauthorized', fieldErrors: [] };
-  if (!memberLimiter.hit(`review:user:${session.user.id}`).ok) {
-    return { ok: false, error: 'rateLimited', fieldErrors: [] };
-  }
+  const guard = await guardRequest({
+    scope: 'reviewSubmitMember',
+    rule: MEMBER_REVIEW_RULE,
+    subject: session.user.id,
+  });
+  if (!guard.ok) return { ok: false, error: 'rateLimited', fieldErrors: [] };
   try {
     const { orderItemId, ...values } = parsed.data.review;
     await submitMemberReview(getDb(), {
@@ -112,9 +103,8 @@ export async function submitMemberReviewAction(raw: unknown): Promise<ReviewActi
 export async function submitGuestReviewAction(raw: unknown): Promise<ReviewActionResult> {
   const parsed = guestInput.safeParse(raw);
   if (!parsed.success) return validationFailure(parsed.error);
-  if (!guestLimiter.hit(`review:ip:${await clientIp()}`).ok) {
-    return { ok: false, error: 'rateLimited', fieldErrors: [] };
-  }
+  const guard = await guardRequest({ scope: 'reviewSubmit' });
+  if (!guard.ok) return { ok: false, error: 'rateLimited', fieldErrors: [] };
   try {
     const { token, ...values } = parsed.data.review;
     await submitGuestReview(getDb(), { token, locale: parsed.data.locale, values });

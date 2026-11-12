@@ -20,7 +20,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | Admin Server Actions | 64 |
 | Admin Server Actions without a permission | 0 |
 | Storefront Server Actions | 20 |
-| Route Handlers | 16 |
+| Route Handlers | 17 |
 | Admin pages | 57 |
 
 ## Admin Server Actions
@@ -102,6 +102,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/auth/[...all]` | POST | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
 | `/api/checkout/payment-status` | GET | — | order access (owner session or signed order token) | Polled by the result page; owner session or signed order token; 404 otherwise. |
 | `/api/geo/wards` | GET | — | — | Public reference data (administrative units). |
+| `/api/health/live` | GET | — | — |  |
 | `/api/health` | GET | — | — | Liveness probe; no data. |
 | `/api/internal/revalidate` | POST | — | HMAC signature | Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session. |
 | `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only). |

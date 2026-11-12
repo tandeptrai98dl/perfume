@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { APIError } from 'better-auth/api';
+import { APIError, createAuthMiddleware } from 'better-auth/api';
 import { twoFactor } from 'better-auth/plugins/two-factor';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
@@ -10,9 +10,13 @@ import { parseVietnamesePhone } from '@/lib/phone';
 import { localizedPath } from '@/lib/seo/paths';
 import type { Database } from '@/server/db/client';
 import * as schema from '@/server/db/schema';
+import type { TurnstileVerifier } from '@/server/integrations/turnstile';
 import type { JobInput } from '@/server/jobs/definitions';
+import { resolveClientIp } from '@/server/lib/client-ip';
 import { newId } from '@/server/lib/ids';
 import { errorFields, logger } from '@/server/lib/logger';
+import { consumeRateLimit } from '@/server/lib/rate-limit';
+import { TURNSTILE_ACTIONS, TURNSTILE_TOKEN_HEADER, type TurnstileAction } from '@/lib/turnstile';
 import { CART_COOKIE, mergeGuestCartFromCookieHeader } from '@/server/modules/cart';
 
 import { isStaffRole } from './permissions';
@@ -35,13 +39,21 @@ function isOAuthCallback(path: string | undefined): boolean {
 export const AUTH_ERROR_CODES = {
   ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
   STAFF_OAUTH_FORBIDDEN: 'STAFF_OAUTH_FORBIDDEN',
+  CAPTCHA_FAILED: 'CAPTCHA_FAILED',
 } as const;
+
+/** Endpoints behind Cloudflare Turnstile (§12) and the widget action each token must carry. */
+export const TURNSTILE_AUTH_PATHS: Record<string, TurnstileAction> = {
+  '/sign-up/email': TURNSTILE_ACTIONS.signUp,
+  '/sign-in/email': TURNSTILE_ACTIONS.signIn,
+  '/request-password-reset': TURNSTILE_ACTIONS.forgotPassword,
+};
 
 export type AuthEnv = Pick<
   ServerEnv,
   'APP_URL' | 'BETTER_AUTH_SECRET' | 'GOOGLE_CLIENT_ID' | 'GOOGLE_CLIENT_SECRET' | 'NODE_ENV'
 > &
-  Partial<Pick<ServerEnv, 'AUTH_RATE_LIMIT'>>;
+  Partial<Pick<ServerEnv, 'AUTH_RATE_LIMIT' | 'TRUSTED_IP_HEADER'>>;
 
 /** Password reset links are single-use and expire after 30 minutes (§10.6). */
 export const RESET_PASSWORD_TTL_SECONDS = 30 * 60;
@@ -56,6 +68,10 @@ export type AuthEmailJob = JobInput<'auth.email'>;
  */
 export type AuthDeps = {
   enqueueAuthEmail?: (job: AuthEmailJob) => Promise<void>;
+  /** Cloudflare Turnstile for sign-up, sign-in and password reset; null/absent = off. */
+  turnstile?: TurnstileVerifier | null;
+  /** Forces Better Auth's rate limiter on (tests); default: production unless turned off. */
+  rateLimitEnabled?: boolean;
 };
 
 type Locale = 'vi' | 'en';
@@ -121,6 +137,9 @@ export function createAuth(db: Database, env: AuthEnv, deps: AuthDeps = {}) {
     advanced: {
       // UUIDv7 from the app, never DB-generated (ADR-0010).
       database: { generateId: () => newId() },
+      // Only the proxy-set header is trusted for rate limits and session IPs (§12); never the
+      // default x-forwarded-for, which clients can forge.
+      ipAddress: { ipAddressHeaders: env.TRUSTED_IP_HEADER ? [env.TRUSTED_IP_HEADER] : [] },
       useSecureCookies: env.NODE_ENV === 'production',
       defaultCookieAttributes: { httpOnly: true, sameSite: 'lax' },
     },
@@ -199,7 +218,23 @@ export function createAuth(db: Database, env: AuthEnv, deps: AuthDeps = {}) {
       },
     },
     rateLimit: {
-      enabled: env.NODE_ENV === 'production' && env.AUTH_RATE_LIMIT !== 'off',
+      enabled:
+        deps.rateLimitEnabled ?? (env.NODE_ENV === 'production' && env.AUTH_RATE_LIMIT !== 'off'),
+      // Shared `rate_limits` table (atomic upsert) instead of per-process memory, so limits hold
+      // across web instances and restarts.
+      customStorage: {
+        consume: async (key, rule) => {
+          const result = await consumeRateLimit(db, {
+            scope: 'auth',
+            subject: key,
+            rule: { limit: rule.max, windowMs: rule.window * 1000 },
+          });
+          return {
+            allowed: result.ok,
+            retryAfter: result.ok ? null : Math.ceil(result.retryAfterMs / 1000),
+          };
+        },
+      },
       window: 60,
       max: 100,
       customRules: {
@@ -209,6 +244,26 @@ export function createAuth(db: Database, env: AuthEnv, deps: AuthDeps = {}) {
         '/two-factor/verify-backup-code': { window: 60, max: 5 },
         '/request-password-reset': { window: 600, max: 5 },
       },
+    },
+    hooks: {
+      // Cloudflare Turnstile (§12): the widget token travels in a request header.
+      before: createAuthMiddleware(async (ctx) => {
+        const action = ctx.path ? TURNSTILE_AUTH_PATHS[ctx.path] : undefined;
+        if (!action || !deps.turnstile) return;
+        const headers = ctx.headers ?? ctx.request?.headers ?? new Headers();
+        const result = await deps.turnstile.verify({
+          token: headers.get(TURNSTILE_TOKEN_HEADER),
+          remoteIp: resolveClientIp(headers, env.TRUSTED_IP_HEADER),
+          expectedAction: action,
+        });
+        if (!result.success) {
+          logger.warn('turnstile.rejected', { scope: `auth:${action}`, codes: result.errorCodes });
+          throw new APIError('FORBIDDEN', {
+            message: 'Captcha verification failed',
+            code: AUTH_ERROR_CODES.CAPTCHA_FAILED,
+          });
+        }
+      }),
     },
     plugins: [
       twoFactor({

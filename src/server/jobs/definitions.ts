@@ -125,6 +125,13 @@ export const JOBS = {
     schema: z.object({ orderId: z.uuid() }),
     queue: retryPolicy,
   },
+
+  // ---------- M3 hardening ----------
+  /** Cron: delete expired `rate_limits` counters (shared limiter, §12). */
+  'system.prune-rate-limits': {
+    schema: z.object({}).default({}),
+    queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 120 },
+  },
 } as const;
 
 /** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */
@@ -132,6 +139,7 @@ export const CRON_JOBS: Partial<Record<keyof typeof JOBS, string>> = {
   'orders.expire-unpaid': '* * * * *',
   'orders.cancel-unconfirmed-cod': '*/5 * * * *',
   'orders.complete-delivered': '17 * * * *',
+  'system.prune-rate-limits': '41 * * * *',
 };
 
 export type JobName = keyof typeof JOBS;

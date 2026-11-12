@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server';
 
 import { getDb } from '@/server/db/client';
 
-/** Liveness + DB readiness for Docker/Caddy health checks. No details are exposed. */
+/**
+ * Readiness (database reachable) for Docker/Caddy health checks and deploys; also served as
+ * `/api/health/ready`. Liveness without dependencies is `/api/health/live`. No details exposed.
+ */
 export async function GET() {
   try {
     await getDb().execute(sql`select 1`);
