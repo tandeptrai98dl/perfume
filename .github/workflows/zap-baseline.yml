@@ -1,0 +1,36 @@
+name: OWASP ZAP baseline
+
+# Passive ZAP baseline scan (ARCHITECTURE.md §12 "Before go-live"). Manual: point it at
+# staging (never production during business hours). Rules: .zap/rules.tsv.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Base URL to scan (staging)
+        required: true
+        default: https://staging.example.vn
+      fail_on_alerts:
+        description: Fail the run when ZAP reports FAIL or WARN alerts (see .zap/rules.tsv)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    name: ZAP baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: ${{ inputs.target }}
+          rules_file_name: .zap/rules.tsv
+          # -j: AJAX spider for client-side navigation; -a: include alpha passive rules.
+          cmd_options: '-j -a'
+          allow_issue_writing: false
+          fail_action: ${{ inputs.fail_on_alerts }}
+          artifact_name: zap-baseline-report
