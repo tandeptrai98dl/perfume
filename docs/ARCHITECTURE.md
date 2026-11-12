@@ -402,7 +402,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 
 - `/sitemap.xml` (index, split by content type, each URL with vi/en alternates), `/robots.txt`, per-locale dynamic `opengraph-image`.
 - `/api/auth/[...all]` (Better Auth), `/api/webhooks/vnpay`, `/api/webhooks/payos`, `/api/webhooks/shipping/[carrier]` (Phase 2).
-- `/api/internal/revalidate` (called by the worker, HMAC-signed), `/api/health`, `/feeds/google-merchant.xml` (Phase 2).
+- `/api/internal/revalidate` (called by the worker, HMAC-signed), `/api/health` (readiness: database; alias `/api/health/ready`), `/api/health/live` (liveness), `/feeds/google-merchant.xml` (Phase 2).
 
 ---
 
@@ -1044,7 +1044,7 @@ Google Search Console (one property, both locales, sitemaps submitted), Bing Web
 - **JavaScript:** Server Components by default; React Compiler on; `next/dynamic` for gallery zoom, Tiptap, charts; PDP JS budget < 150 KB gzip (bundle analyzer in CI).
 - **Third-party scripts:** GTM after consent with `strategy="lazyOnload"`; no heavy chat widgets (Zalo/Messenger as plain links).
 - **Database:** indexes per 6.3; no N+1 (joins/`with`); connection pooling (pgBouncer or the provider's pool); `EXPLAIN ANALYZE` for filter/search queries.
-- **Measurement:** Lighthouse CI on every PR (Performance ≥ 90 for home, listing, PDP in both locales); RUM via `useReportWebVitals` → GA4; Sentry performance for the server.
+- **Measurement:** Lighthouse CI (`lighthouserc.cjs`, `.github/workflows/lighthouse.yml`: Performance ≥ 90 for home, listing, PDP in both locales; LCP/CLS/TBT budgets also on cart and checkout) — manual until the runner baseline is stable, then on every PR; k6 load test in `load/k6/`; RUM via `useReportWebVitals` → GA4; Sentry performance for the server.
 
 ### 14.2 Scale on signals (only when a threshold is hit)
 

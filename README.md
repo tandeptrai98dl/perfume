@@ -3,7 +3,8 @@
 Bilingual (Vietnamese / English) e-commerce website for authentic perfumes, built for the Vietnamese market.
 
 - **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- **Decisions:** [docs/adr/](docs/adr/README.md) (ADR-0001 … ADR-0022)
+- **Decisions:** [docs/adr/](docs/adr/README.md) (ADR-0001 … ADR-0024)
+- **Operations:** [runbook](docs/ops/runbook.md) · [production checklist](docs/ops/production-checklist.md) · [backups and restore drill](docs/ops/backup-restore.md) · [k6 load test](load/k6/README.md)
 - **Rules for Claude Code:** [CLAUDE.md](CLAUDE.md)
 
 ## Stack
@@ -48,6 +49,8 @@ Local services: Mailpit UI http://localhost:8025, MinIO console http://localhost
 unit tests, i18n parity, worker bundle, dependency audit; integration tests against
 PostgreSQL 17; Playwright E2E (desktop 1280 px and mobile 375 px, vi and en, axe WCAG 2.2 AA);
 Docker image builds; Gitleaks secret scan. Dependabot opens weekly update PRs.
+Manual workflows: Lighthouse CI (`lighthouse.yml`, §14 budgets on the production build) and the
+OWASP ZAP baseline scan (`zap-baseline.yml`, against staging).
 
 ## Docker images
 
