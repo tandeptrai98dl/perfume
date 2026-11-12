@@ -1,6 +1,32 @@
 @import 'tailwindcss';
 
 /*
+ * Metric-matched fallbacks (§14.1, CLS): text set in a local font sized to the web font's
+ * metrics until the self-hosted font has loaded, so the swap does not re-wrap lines and move
+ * the page. Values computed from the Fontsource files the way next/font does (Be Vietnam Pro
+ * 400 against Arial, Cormorant Garamond 500 against Times New Roman); Liberation fonts are
+ * metric-compatible with Arial/Times on Linux. Recompute when the brand fonts change.
+ */
+@font-face {
+  font-family: 'Be Vietnam Pro Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans');
+  size-adjust: 111.01%;
+  ascent-override: 90.08%;
+  descent-override: 23.87%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Cormorant Garamond Fallback';
+  src:
+    local('Times New Roman'), local('TimesNewRomanPSMT'), local('Liberation Serif'),
+    local('LiberationSerif');
+  size-adjust: 96.44%;
+  ascent-override: 95.81%;
+  descent-override: 29.76%;
+  line-gap-override: 0%;
+}
+
+/*
  * Design tokens (docs/ARCHITECTURE.md §7). Provisional until the brand identity is delivered:
  * change token values here, never hard-code colours, font sizes or radii in components.
  */
@@ -26,8 +52,10 @@
   --color-overlay: rgb(14 14 14 / 0.4);
 
   /* §7.2 Typography (self-hosted via Fontsource, see src/app/fonts.ts) */
-  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display:
+    'Cormorant Garamond', 'Cormorant Garamond Fallback', Georgia, 'Times New Roman', serif;
+  --font-sans:
+    'Be Vietnam Pro', 'Be Vietnam Pro Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --text-body-lg: 1.125rem;
   --text-body-lg--line-height: 1.875rem;
@@ -218,5 +246,10 @@
  * answered; the attribute is set by cookieConsentPaintScript() in the locale layout.
  */
 html[data-cookie-consent='answered'] [data-cookie-banner] {
+  display: none;
+}
+
+/* Announcement strip placeholder (shop layout): no reserved space after a dismissal. */
+html[data-announcement-dismissed] [data-announcement-placeholder] {
   display: none;
 }

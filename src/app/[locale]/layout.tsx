@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import { CookieConsent } from '@/components/privacy/cookie-consent';
+import { announcementPaintScript } from '@/components/shop/announcement-cookie';
 import { Toaster } from '@/components/ui/toaster';
 import { routing } from '@/i18n/routing';
 import { cookieConsentPaintScript } from '@/lib/privacy/cookie-consent';
@@ -40,11 +41,16 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   if (!hasLocale(routing.locales, locale)) notFound();
 
   return (
-    // suppressHydrationWarning: the pre-paint script below may set an attribute on <html>.
+    // suppressHydrationWarning: the pre-paint script below may set attributes on <html>.
     <html lang={locale} suppressHydrationWarning>
       <head>
-        {/* Before first paint: hides the static-shell cookie banner for returning visitors. */}
-        <script dangerouslySetInnerHTML={{ __html: cookieConsentPaintScript() }} />
+        {/* Before first paint: hides the static-shell cookie banner for returning visitors and
+            the announcement placeholder after a dismissal (see globals.css). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: cookieConsentPaintScript() + announcementPaintScript(),
+          }}
+        />
       </head>
       <body>
         <NextIntlClientProvider>
