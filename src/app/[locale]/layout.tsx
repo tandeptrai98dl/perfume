@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import { CookieConsent } from '@/components/privacy/cookie-consent';
@@ -12,6 +12,14 @@ import { OG_LOCALES } from '@/lib/seo/content-metadata';
 
 import '../fonts';
 import '../globals.css';
+
+/**
+ * Namespaces never read by storefront client components: the admin UI has its own provider
+ * (app/admin/layout.tsx) and e-mails render on the server. Leaving them out keeps ~70 KB of
+ * Vietnamese strings (sent twice: static shell + streamed payload) out of every storefront
+ * page's HTML (§14.1). Server Components still read every namespace via getTranslations.
+ */
+const SERVER_ONLY_NAMESPACES = new Set(['admin', 'email']);
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -39,6 +47,11 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
 export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
+  const messages = Object.fromEntries(
+    Object.entries(await getMessages({ locale })).filter(
+      ([namespace]) => !SERVER_ONLY_NAMESPACES.has(namespace),
+    ),
+  );
 
   return (
     // suppressHydrationWarning: the pre-paint script below may set attributes on <html>.
@@ -53,7 +66,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
         />
       </head>
       <body>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
           {children}
           {/* M3 privacy: cookie banner + preferences and the consent-gated tag loader. */}
           <CookieConsent locale={locale} />
