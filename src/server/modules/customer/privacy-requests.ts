@@ -798,7 +798,10 @@ export async function rerunPrivacyExport(
   });
 }
 
-/** Steps contributed by other modules (reviews, notification logs) to the anonymisation. */
+/**
+ * Steps contributed by other modules (reviews, notification logs, return photos) to the
+ * anonymisation; they run first, inside the same transaction.
+ */
 export type ErasureStep = (tx: Tx, subject: PrivacySubject) => Promise<void>;
 
 export type AnonymizeResult = {
@@ -856,10 +859,12 @@ export async function anonymizePrivacySubject(
       throw new DomainError('conflict', [{ path: 'id', code: 'openOrders' }]);
     }
 
+    // Other modules' steps first: they still find the subject's orders by e-mail, which the
+    // order anonymisation replaces (return photos, M3 wave 3).
+    for (const step of steps) await step(tx, subject);
     const ordersAnonymized = await anonymizeOrdersForSubject(tx, subject);
     if (userId) await deleteCartsForUser(tx, userId);
     const erased = await eraseCustomerData(tx, subject, { locale });
-    for (const step of steps) await step(tx, subject);
 
     const note = input.note?.trim() || null;
     await tx

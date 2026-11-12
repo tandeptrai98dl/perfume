@@ -9,6 +9,7 @@ import {
   planReturnRefund,
   resolutionsFor,
   returnEligibility,
+  type ReturnStatus,
   validateReturnLines,
   type ReturnEventRow,
   type ReturnOrderLine,
@@ -22,13 +23,19 @@ const items: ReturnOrderLine[] = [
 ];
 
 describe('returnEligibility', () => {
-  const base = { status: 'delivered', deliveredAt: delivered, windowDays: 7, hasRequest: false };
+  const base = {
+    status: 'delivered',
+    deliveredAt: delivered,
+    windowDays: 7,
+    latest: null as ReturnStatus | null,
+  };
 
   it('is open until the end of the window, counted from delivery', () => {
     const deadline = new Date(delivered.getTime() + 7 * DAY_MS);
     expect(returnEligibility({ ...base, now: new Date(delivered.getTime() + DAY_MS) })).toEqual({
       eligible: true,
       deadline,
+      windowOverride: false,
     });
     expect(returnEligibility({ ...base, now: deadline }).eligible).toBe(true);
     expect(returnEligibility({ ...base, now: new Date(deadline.getTime() + 1) })).toEqual({
@@ -58,9 +65,48 @@ describe('returnEligibility', () => {
     expect(returnEligibility({ ...base, status: 'completed', now })).toMatchObject({
       reason: 'windowExpired',
     });
-    expect(returnEligibility({ ...base, hasRequest: true, now })).toMatchObject({
-      reason: 'alreadyRequested',
+    for (const latest of ['requested', 'approved', 'received'] as const) {
+      expect(returnEligibility({ ...base, latest, now })).toMatchObject({
+        reason: 'alreadyRequested',
+      });
+    }
+  });
+
+  it('accepts a new request after a rejection, still within the window', () => {
+    const now = new Date(delivered.getTime() + DAY_MS);
+    expect(returnEligibility({ ...base, latest: 'rejected', now }).eligible).toBe(true);
+    expect(
+      returnEligibility({
+        ...base,
+        latest: 'rejected',
+        now: new Date(delivered.getTime() + 8 * DAY_MS),
+      }),
+    ).toMatchObject({ reason: 'windowExpired' });
+  });
+
+  it('lets a manager override the window, also on a completed order, but never the rest', () => {
+    const late = new Date(delivered.getTime() + 20 * DAY_MS);
+    expect(returnEligibility({ ...base, now: late, overrideWindow: true })).toMatchObject({
+      eligible: true,
+      windowOverride: true,
     });
+    expect(
+      returnEligibility({ ...base, status: 'completed', now: late, overrideWindow: true }),
+    ).toMatchObject({ eligible: true, windowOverride: true });
+    // Within the window the override changes nothing.
+    expect(
+      returnEligibility({
+        ...base,
+        now: new Date(delivered.getTime() + DAY_MS),
+        overrideWindow: true,
+      }),
+    ).toMatchObject({ eligible: true, windowOverride: false });
+    expect(
+      returnEligibility({ ...base, latest: 'approved', now: late, overrideWindow: true }),
+    ).toMatchObject({ reason: 'alreadyRequested' });
+    expect(
+      returnEligibility({ ...base, status: 'returned', now: late, overrideWindow: true }),
+    ).toMatchObject({ reason: 'notDelivered' });
   });
 });
 
@@ -280,7 +326,12 @@ describe('foldReturnEvents', () => {
       approvalNote: 'GHN lấy hàng ngày mai',
       outcome: 'partial',
       restocked: false,
-      refund: { total: 100, queued: 60, shortfall: 40 },
+      // Events written before deferred refunds existed parse with zero defaults.
+      refund: { total: 100, queued: 60, deferred: 0, payout: 0, shortfall: 40 },
+      openedBy: 'customer',
+      openedFrom: 'delivered',
+      windowOverride: null,
+      photos: [],
     });
   });
 
@@ -321,5 +372,49 @@ describe('foldReturnEvents', () => {
       },
     ]);
     expect(state?.status).toBe('requested');
+  });
+
+  it('starts over with a request filed after a rejection', () => {
+    const state = foldReturnEvents([
+      requested,
+      {
+        id: '2',
+        type: 'return_rejected',
+        message: 'Thiếu ảnh',
+        metadata: { requestId: 'r1' },
+        createdAt: at(2),
+      },
+      {
+        id: '3',
+        type: 'return_requested',
+        message: 'Gửi lại kèm ảnh',
+        metadata: {
+          requestId: 'r2',
+          reason: 'damaged',
+          resolution: 'replacement',
+          lines: [{ orderItemId: 'a', quantity: 1 }],
+          openedBy: 'staff',
+          photos: [
+            {
+              id: 'p1',
+              key: 'private/returns/o/p1.webp',
+              mime: 'image/webp',
+              width: 10,
+              height: 10,
+              sizeBytes: 99,
+            },
+          ],
+        },
+        createdAt: at(3),
+      },
+    ]);
+    expect(state).toMatchObject({
+      requestId: 'r2',
+      status: 'requested',
+      rejectedAt: null,
+      reason: 'damaged',
+      openedBy: 'staff',
+      photos: [{ id: 'p1' }],
+    });
   });
 });

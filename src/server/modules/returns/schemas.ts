@@ -13,39 +13,72 @@ const MAX_LINES = 50;
 /** Return shipping reimbursed to the customer, VND (sanity cap; the money cap is the ledger). */
 export const MAX_RETURN_SHIPPING_FEE = 2_000_000;
 
-export const returnRequestSchema = z
+const requestFields = {
+  lines: z
+    .array(
+      z.object({
+        orderItemId: z.uuid({ error: 'invalid' }),
+        quantity: z
+          .number({ error: 'required' })
+          .int({ error: 'integer' })
+          .min(1, { error: 'tooSmall' })
+          .max(99, { error: 'tooLarge' }),
+      }),
+    )
+    .min(1, { error: 'noLines' })
+    .max(MAX_LINES, { error: 'tooMany' }),
+  reason: z.enum(RETURN_REASONS, { error: 'reasonRequired' }),
+  resolution: z.enum(RETURN_RESOLUTIONS, { error: 'invalid' }).default('refund'),
+  description: z.string().trim().max(RETURN_DESCRIPTION_MAX, { error: 'tooLong' }).default(''),
+  sealIntact: z.boolean().default(false),
+};
+
+type RequestValues = {
+  reason: (typeof RETURN_REASONS)[number];
+  resolution: (typeof RETURN_RESOLUTIONS)[number];
+  description: string;
+  sealIntact: boolean;
+};
+
+function refineRequest(value: RequestValues, ctx: z.RefinementCtx) {
+  if (value.reason === 'unopened') {
+    if (!value.sealIntact)
+      ctx.addIssue({ code: 'custom', path: ['sealIntact'], message: 'sealRequired' });
+    if (value.resolution !== 'refund') {
+      ctx.addIssue({ code: 'custom', path: ['resolution'], message: 'refundOnly' });
+    }
+  }
+  if (isFaultReason(value.reason) && value.description.length < RETURN_DESCRIPTION_MIN_FAULT) {
+    ctx.addIssue({ code: 'custom', path: ['description'], message: 'describeProblem' });
+  }
+}
+
+export const returnRequestSchema = z.object(requestFields).superRefine(refineRequest);
+export type ReturnRequestInput = z.output<typeof returnRequestSchema>;
+
+/**
+ * Staff open a return on the customer's behalf (e.g. by phone) from the admin order page
+ * (`orders.process`). A manager (`payments.refund`) may lift the return window with a reason,
+ * which is audited (ADR-0027).
+ */
+export const staffReturnSchema = z
   .object({
-    lines: z
-      .array(
-        z.object({
-          orderItemId: z.uuid({ error: 'invalid' }),
-          quantity: z
-            .number({ error: 'required' })
-            .int({ error: 'integer' })
-            .min(1, { error: 'tooSmall' })
-            .max(99, { error: 'tooLarge' }),
-        }),
-      )
-      .min(1, { error: 'noLines' })
-      .max(MAX_LINES, { error: 'tooMany' }),
-    reason: z.enum(RETURN_REASONS, { error: 'reasonRequired' }),
-    resolution: z.enum(RETURN_RESOLUTIONS, { error: 'invalid' }).default('refund'),
-    description: z.string().trim().max(RETURN_DESCRIPTION_MAX, { error: 'tooLong' }).default(''),
-    sealIntact: z.boolean().default(false),
+    ...requestFields,
+    orderId: z.uuid(),
+    overrideReason: z
+      .string()
+      .trim()
+      .max(500, { error: 'tooLong' })
+      .nullish()
+      .transform((value) => value || null),
   })
   .superRefine((value, ctx) => {
-    if (value.reason === 'unopened') {
-      if (!value.sealIntact)
-        ctx.addIssue({ code: 'custom', path: ['sealIntact'], message: 'sealRequired' });
-      if (value.resolution !== 'refund') {
-        ctx.addIssue({ code: 'custom', path: ['resolution'], message: 'refundOnly' });
-      }
-    }
-    if (isFaultReason(value.reason) && value.description.length < RETURN_DESCRIPTION_MIN_FAULT) {
-      ctx.addIssue({ code: 'custom', path: ['description'], message: 'describeProblem' });
+    refineRequest(value, ctx);
+    if (value.overrideReason !== null && value.overrideReason.length < 5) {
+      ctx.addIssue({ code: 'custom', path: ['overrideReason'], message: 'tooShort' });
     }
   });
-export type ReturnRequestInput = z.output<typeof returnRequestSchema>;
+export type StaffReturnInput = z.output<typeof staffReturnSchema>;
 
 const target = { orderId: z.uuid(), requestId: z.uuid() };
 
