@@ -83,3 +83,27 @@ describe('webhook IP allowlist', () => {
     expect(processGatewayNotification).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('webhook body limit', () => {
+  it('refuses a streamed payOS body over 64 KB without processing it', async () => {
+    const { payos } = await loadRoutes();
+    const chunk = new TextEncoder().encode('x'.repeat(16 * 1024));
+    let sent = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (sent++ < 64) controller.enqueue(chunk);
+        else controller.close();
+      },
+    });
+    const request = new Request('http://localhost/api/webhooks/payos', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body,
+      duplex: 'half',
+    } as RequestInit);
+    expect((await payos.POST(request)).status).toBe(413);
+    // Reading stopped right after the limit (not the whole 1 MB).
+    expect(sent).toBeLessThan(10);
+    expect(processGatewayNotification).not.toHaveBeenCalled();
+  });
+});

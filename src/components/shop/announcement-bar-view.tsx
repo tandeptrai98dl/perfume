@@ -28,7 +28,8 @@ export function AnnouncementBarView({
 
   function dismiss() {
     // 30 days; SameSite=Lax, not httpOnly (written by the browser, holds no secret).
-    document.cookie = `${ANNOUNCEMENT_COOKIE}=${encodeURIComponent(id)}; Max-Age=2592000; Path=/; SameSite=Lax`;
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${ANNOUNCEMENT_COOKIE}=${encodeURIComponent(id)}; Max-Age=2592000; Path=/; SameSite=Lax${secure}`;
     setOpen(false);
   }
 

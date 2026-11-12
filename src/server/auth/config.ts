@@ -31,6 +31,8 @@ import { isStaffRole } from './permissions';
 /** Endpoints that create a session only after a successful second factor. */
 const SECOND_FACTOR_PATHS = new Set(['/two-factor/verify-totp', '/two-factor/verify-backup-code']);
 
+const CHANGE_PASSWORD_PATH = '/change-password';
+
 /** OAuth callbacks (social providers and generic OAuth). Staff may never sign in this way. */
 function isOAuthCallback(path: string | undefined): boolean {
   return !!path && (path.startsWith('/callback/') || path.startsWith('/oauth2/callback'));
@@ -248,6 +250,11 @@ export function createAuth(db: Database, env: AuthEnv, deps: AuthDeps = {}) {
     hooks: {
       // Cloudflare Turnstile (§12): the widget token travels in a request header.
       before: createAuthMiddleware(async (ctx) => {
+        // §12 Sessions: a password change always signs out every other session, whatever the
+        // client sends (Better Auth keeps them unless `revokeOtherSessions` is true).
+        if (ctx.path === CHANGE_PASSWORD_PATH) {
+          return { context: { body: { ...(ctx.body ?? {}), revokeOtherSessions: true } } };
+        }
         const action = ctx.path ? TURNSTILE_AUTH_PATHS[ctx.path] : undefined;
         if (!action || !deps.turnstile) return;
         const headers = ctx.headers ?? ctx.request?.headers ?? new Headers();

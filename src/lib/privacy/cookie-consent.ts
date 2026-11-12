@@ -169,3 +169,20 @@ export function truncateIp(ip: string | null | undefined): string | null {
   }
   return null;
 }
+
+/** Query parameters of signed links (order access, newsletter, privacy, password reset). */
+const SECRET_QUERY_PARAMS = ['t', 'token', 's'] as const;
+/** Review invitation links carry their token in the path (`/danh-gia/<token>`, `/en/review/…`). */
+const SECRET_PATH = /^(?:\/en)?\/(?:danh-gia|review)\/[^/]+\/?$/;
+
+/**
+ * True when the address carries a secret (§12 Data access: order-access, review, newsletter,
+ * privacy and reset tokens). Tag Manager is not started on such a page view: GA4 and the Meta
+ * Pixel record the full page URL (and later the referrer), which would hand the token to a
+ * third party. Signed links always arrive as full page loads; in-app navigations carry none.
+ */
+export function urlCarriesSecret(location: { pathname: string; search: string }): boolean {
+  if (SECRET_PATH.test(location.pathname)) return true;
+  const params = new URLSearchParams(location.search);
+  return SECRET_QUERY_PARAMS.some((name) => params.has(name));
+}

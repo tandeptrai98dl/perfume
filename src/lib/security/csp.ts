@@ -163,6 +163,28 @@ export function reportingEndpoints(options: CspOptions): string | null {
   return uri ? `csp="${uri}"` : null;
 }
 
+/**
+ * Policy for responses the proxy never sees: its matcher skips `/_next/*` and file-like paths
+ * (`/robots.txt`, images), yet a miss there (`/wp-login.php`, `/_next/missing`) renders the
+ * HTML not-found page. Same first-party rules as pages (ADR-0024) without the third-party
+ * hosts; static files ignore it. Set from next.config.ts `headers()`.
+ */
+export const FALLBACK_CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+
+/** next.config.ts `headers()` sources outside the proxy matcher (see src/proxy.ts `config`). */
+export const FALLBACK_CSP_SOURCES = ['/_next/:path*', '/:path(.*\\..*)'] as const;
+
 /** Strict policy for API/JSON/file responses, which never render HTML. */
 export const API_CONTENT_SECURITY_POLICY = "default-src 'none'; frame-ancestors 'none'; sandbox";
 

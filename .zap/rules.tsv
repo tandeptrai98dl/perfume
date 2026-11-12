@@ -4,6 +4,7 @@
 # Every IGNORE / downgrade carries its reason. Review this file when a rule starts firing.
 # HTTPS-only rules (10011 Secure cookie flag, 10035 HSTS) never fire over http://localhost;
 # they stay FAIL for a staging scan and are asserted by tests/e2e/security-headers.spec.ts.
+2	WARN	(Private IP Disclosure — fired on the privacy policy pages for rich-text React keys such as "10.1.0.0" in the RSC payload; fixed (sibling-index keys), kept as WARN to catch regressions, docs/security/review-2026-11.md F-01)
 10003	FAIL	(Vulnerable JS Library — a known-vulnerable bundled library blocks go-live)
 10010	WARN	(Cookie No HttpOnly Flag — NEXT_LOCALE, cookie_consent and announcement_dismissed must be readable by browser code and hold no secret; session and cart cookies are HttpOnly)
 10011	FAIL	(Cookie Without Secure Flag — https only; cookies are Secure when APP_URL is https)

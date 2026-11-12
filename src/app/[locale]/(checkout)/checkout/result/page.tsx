@@ -17,6 +17,7 @@ import { getDb } from '@/server/db/client';
 import { getClientIp } from '@/server/request-ip';
 import { getPaymentGateways } from '@/server/integrations/payments';
 import { errorFields, logger } from '@/server/lib/logger';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 import {
   createPaymentSession,
   findOrderByCode,
@@ -43,13 +44,13 @@ import {
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/checkout/result'>): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'checkoutResult' });
   return { title: t('metaTitle'), robots: { index: false, follow: false } };
 }
 
 export default async function CheckoutResultPage(props: PageProps<'/[locale]/checkout/result'>) {
-  const locale = (await props.params).locale as Locale;
+  const locale = await resolveLocale(props.params);
   return (
     <div className="container-content flex flex-col gap-8 py-10 lg:py-16">
       <Suspense fallback={<ResultSkeleton />}>

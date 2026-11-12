@@ -11,12 +11,13 @@ import { getListing } from '@/server/catalog-cache';
 import { ListingResults, ListingSkeleton, readListingParams } from '../_lib/listing-results';
 import { NOINDEX } from '../_lib/seo';
 import { toListingFilters } from '@/lib/listing-params';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 
 export async function generateMetadata({
   params,
   searchParams,
 }: PageProps<'/[locale]/search'>): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'search' });
   const { q } = await readListingParams(searchParams);
   return {
@@ -28,7 +29,7 @@ export async function generateMetadata({
 
 /** Search results (§5.1: dynamic, noindex). Works without JavaScript through a GET form. */
 export default async function SearchPage({ params, searchParams }: PageProps<'/[locale]/search'>) {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'search' });
   return (
     <div className="container-content flex flex-col gap-10 py-10 lg:py-16">

@@ -4,7 +4,12 @@ import type { PgBoss } from 'pg-boss';
 import { orders, payments, refunds } from '@/server/db/schema';
 import { enqueue } from '@/server/jobs/queue';
 import type { Tx } from '@/server/lib/command-context';
-import { recordOrderEvent, transitionOrder, type OrderActor } from '@/server/modules/order';
+import {
+  recordOrderEvent,
+  refreshBestSellersOnChange,
+  transitionOrder,
+  type OrderActor,
+} from '@/server/modules/order';
 
 import {
   computePaymentStatus,
@@ -149,6 +154,13 @@ export async function applySucceededPayment(
     amountPaid,
     amountRefunded: order.amountRefunded,
   });
+  // A paid order starts counting for the storefront best sellers (throttled outbox refresh).
+  await refreshBestSellersOnChange(
+    boss,
+    tx,
+    { status: order.status, paymentStatus: change.from },
+    { status: order.status, paymentStatus: change.to },
+  );
   await recordOrderEvent(tx, {
     orderId: order.id,
     type: 'payment_received',

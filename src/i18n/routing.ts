@@ -11,6 +11,9 @@ export const routing = defineRouting({
   defaultLocale: 'vi',
   localePrefix: 'as-needed',
   localeDetection: false,
+  // §12 cookie flags: Secure in production builds (always served over https; browsers also
+  // accept Secure cookies from http://localhost). SameSite stays next-intl's `lax`.
+  localeCookie: { secure: process.env.NODE_ENV === 'production' },
   pathnames: {
     '/': '/',
     '/perfumes': { vi: '/nuoc-hoa', en: '/perfumes' },
