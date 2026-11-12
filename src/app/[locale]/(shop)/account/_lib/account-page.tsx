@@ -18,7 +18,12 @@ export async function accountLocale(params: Promise<{ locale: string }>): Promis
 
 export async function accountMetadata(
   params: Promise<{ locale: string }>,
-  key: 'metaTitle' | 'orders.metaTitle' | 'addresses.metaTitle' | 'profile.metaTitle',
+  key:
+    | 'metaTitle'
+    | 'orders.metaTitle'
+    | 'addresses.metaTitle'
+    | 'profile.metaTitle'
+    | 'privacy.metaTitle',
 ): Promise<Metadata> {
   const locale = await accountLocale(params);
   const t = await getTranslations({ locale, namespace: 'account' });
