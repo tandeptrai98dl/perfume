@@ -17,11 +17,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 67 |
+| Admin Server Actions | 68 |
 | Admin Server Actions without a permission | 0 |
 | Storefront Server Actions | 25 |
 | Route Handlers | 18 |
-| Admin pages | 59 |
+| Admin pages | 60 |
 
 ## Admin Server Actions
 
@@ -83,6 +83,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `promotions.ts` | `setCouponActiveAction` | `coupons.manage` | owner, manager | yes |
 | `reviews.ts` | `moderateReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
 | `reviews.ts` | `replyReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
+| `settings.ts` | `saveSettingsSectionAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `deleteShippingRateAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `deleteShippingZoneAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `saveShippingRateAction` | `settings.manage` | owner | yes |
@@ -208,6 +209,7 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/promotions/coupons/new` | `coupons.manage` | owner, manager | — |  |
 | `/admin/promotions/coupons` | `coupons.manage` | owner, manager | — |  |
 | `/admin/reviews` | `reviews.moderate` | owner, manager, editor | — |  |
+| `/admin/settings` | `settings.manage` | owner | — |  |
 | `/admin/shipping` | `settings.manage` | owner | — |  |
 | `/admin/staff/[id]` | `staff.manage` | owner | — |  |
 | `/admin/staff` | `staff.manage` | owner | — |  |

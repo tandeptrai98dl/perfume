@@ -21,7 +21,7 @@ pnpm install
 cp .env.example .env.local
 docker compose -f docker/compose.yml up -d   # PostgreSQL 17, Mailpit, MinIO
 pnpm db:migrate
-pnpm db:seed                                  # admin units + fictional demo catalogue
+pnpm db:seed                                  # base data + fictional demo data (docs/ops/seed.md)
 pnpm dev                                      # http://localhost:3000 (vi), /en (English)
 ```
 
