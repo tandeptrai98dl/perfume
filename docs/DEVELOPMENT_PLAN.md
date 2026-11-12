@@ -38,8 +38,8 @@ The streams below run in parallel and are integrated together.
 
 ### Remaining before go-live (code)
 
-- Return photo upload (needs private storage); staff-opened returns.
-- COD orders fully returned before the carrier remits: reconcile them in COD remittances instead of a manual refund.
+- ~~Return photo upload (needs private storage); staff-opened returns.~~ Done in M3 wave 3 (ADR-0027).
+- ~~COD orders fully returned before the carrier remits: reconcile them in COD remittances instead of a manual refund.~~ Done in M3 wave 3 (deferred refunds).
 - Review the ZAP "Private IP Disclosure" warning on the privacy policy pages (likely a false positive).
 - Re-measure Lighthouse with real product images once content exists.
 

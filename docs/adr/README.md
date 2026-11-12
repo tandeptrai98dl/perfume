@@ -33,3 +33,4 @@ Template for new ADRs: copy `0000-template.md`, take the next number.
 | [0024](./0024-csp-without-nonces.md) | Content Security Policy without nonces under Cache Components | Accepted |
 | [0025](./0025-customer-notes-table.md) | Customer notes in their own table, erased on deletion requests | Accepted |
 | [0026](./0026-first-load-js-budget.md) | First-load JavaScript budget for the PDP | Accepted |
+| [0027](./0027-staff-opened-returns-and-window-override.md) | Staff-opened returns, return-window override, COD returns before remittance | Proposed |
