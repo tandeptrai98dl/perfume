@@ -173,6 +173,11 @@ export const clientEnvSchema = z.object({
   NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
   /** Public base URL of the media bucket/CDN, e.g. https://cdn.example.vn/media. */
   NEXT_PUBLIC_MEDIA_BASE_URL: z.url().optional(),
+  /** M3 privacy: Google Tag Manager container (GA4 + Meta Pixel), loaded only after consent. */
+  NEXT_PUBLIC_GTM_ID: z
+    .string()
+    .regex(/^GTM-[A-Z0-9]{4,12}$/, 'must look like GTM-XXXXXXX')
+    .optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -221,4 +226,5 @@ export const clientEnv: ClientEnv = parseClientEnv({
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   NEXT_PUBLIC_MEDIA_BASE_URL: process.env.NEXT_PUBLIC_MEDIA_BASE_URL,
+  NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
 });
