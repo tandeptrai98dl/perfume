@@ -12,6 +12,7 @@ import {
   checkoutQuoteSchema,
   type CheckoutFormOutput,
 } from '@/lib/checkout/form-schema';
+import { allowCouponAttempt } from '@/server/cart-session';
 import { getCheckoutCart, requestContext } from '@/server/checkout-request';
 import { getDb } from '@/server/db/client';
 import { getProducer } from '@/server/jobs/producer';
@@ -19,8 +20,10 @@ import { DomainError, type DomainErrorCode, type FieldIssue } from '@/server/lib
 import { errorFields, logger } from '@/server/lib/logger';
 import {
   findOrderByCheckoutKey,
+  isCouponAttempt,
   placeOrder,
   quoteCheckout,
+  withCouponRateLimited,
   type CheckoutQuote,
   type PlacedOrder,
 } from '@/server/modules/checkout';
@@ -179,20 +182,27 @@ export async function quoteCheckoutAction(raw: unknown): Promise<QuoteResult> {
   try {
     const { cart, shopper } = await getCheckoutCart();
     if (!cart) return { ok: false, error: 'cartUnavailable', fieldErrors: [] };
+    // Same per-cart coupon limit as the cart's "Apply" (§12): no brute-force oracle here.
+    const couponLimited =
+      isCouponAttempt(input.couponCode, cart.couponCode) && !(await allowCouponAttempt(cart.id));
     const quote = await quoteCheckout(getDb(), {
       cart,
       locale: input.locale,
       provinceCode: input.provinceCode || null,
       shippingRateId: input.shippingRateId || null,
       paymentMethod: input.paymentMethod || null,
-      couponCode: input.couponCode || null,
+      couponCode: couponLimited ? null : input.couponCode || null,
       customer: {
         phone: input.phone || undefined,
         email: input.email || undefined,
         userId: shopper.userId,
       },
     });
-    return { ok: true, quote };
+    return {
+      ok: true,
+      quote:
+        couponLimited && input.couponCode ? withCouponRateLimited(quote, input.couponCode) : quote,
+    };
   } catch (error) {
     logger.error('checkout.quote_failed', errorFields(error));
     return { ok: false, error: 'unexpected', fieldErrors: [] };

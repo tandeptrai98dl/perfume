@@ -7,6 +7,7 @@ export {
   canTransition,
   customerCanCancel,
   DEDUCTED_STATUSES,
+  CLOSED_STATUSES,
   isTerminal,
   nextStatuses,
   ORDER_STATUSES,
@@ -165,6 +166,7 @@ export {
   countOpenOrdersForSubject,
   listOrdersForDataExport,
   scrubEventDiff,
+  takeReturnPhotosForSubject,
   type OrderDataExport,
   type OrderSubject,
 } from './privacy';
@@ -174,7 +176,9 @@ export {
   BEST_SELLER_RANK_LIMIT,
   BEST_SELLER_WINDOW_DAYS,
   bestSellerWindowStart,
+  countsAsBestSeller,
   listBestSellingProductIds,
+  refreshBestSellersOnChange,
 } from './best-sellers';
 // ---------- Customer returns (M3 wave 2 returns stream, ADR-0017) ----------
 export {
@@ -188,8 +192,11 @@ export {
   RETURN_RESOLUTIONS,
   returnReceivedMetadata,
   returnRefundBreakdown,
+  returnPhotoSchema,
   returnRequestedMetadata,
   type ReturnOutcome,
+  type ReturnPhoto,
+  type ReturnRequestedMetadataInput,
   type ReturnReason,
   type ReturnReceivedMetadata,
   type ReturnRefundBreakdown,

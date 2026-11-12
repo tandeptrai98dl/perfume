@@ -2,7 +2,7 @@
 
 > Living status of the MVP delivery plan. The plan itself (scope, exit criteria, go-live gate)
 > is [ARCHITECTURE.md §15](./ARCHITECTURE.md#15-delivery-plan); this file tracks progress against it.
-> Last updated: 2026-11-12 (M3 wave 2 integrated).
+> Last updated: 2026-11-12 (M3 wave 3 integrated, MVP code complete).
 
 ## Milestones
 
@@ -11,7 +11,7 @@
 | M0 Foundations | Scaffold, i18n, DB + seed, Better Auth + 2FA, design system, worker + outbox, CI, Sentry | **Done** | #1, #2, #3 | Met. Staging deploy is still open and is tracked in M3. |
 | M1 Bilingual catalogue & storefront | Admin catalogue/inventory/media, storefront pages, search, CMS, redirects, SEO | **Done** | #4, #5 | Met. Lighthouse and Rich Results checks are carried into M3 hardening. |
 | M2 Checkout & orders | Cart, checkout, VNPay/payOS/COD, admin orders (manual orders, edits), account, notifications | **Done** (E5 partial) | #6, #7, #8, #9 | [m2-exit.md](./milestones/m2-exit.md). Only E5 is open: a manual order on staging, which needs the staging environment. |
-| M3 Completion, hardening, go-live | See below | **In progress**: code waves 1–2 done | #10 (foundation), wave 1 PR | Go-live gate in §15 |
+| M3 Completion, hardening, go-live | See below | **Code complete** (waves 1–3); go-live steps pending | #10 (foundation), wave 1 PR | Go-live gate in §15 |
 
 ## M3 work streams
 
@@ -36,12 +36,17 @@ The streams below run in parallel and are integrated together.
 | Quality gates | Lighthouse CI on every PR (mobile + desktop, Performance ≥ 0.9), PDP JS budget (ADR-0026), weekly ZAP baseline, performance fixes (LCP ~1 s, CLS ≤ 0.01) | **Done** |
 | Returns & e-invoice adjustments | Customer return requests (D17), admin return flow with restock/refund/replacement, e-invoice cancel/replace | **Done** |
 
-### Remaining before go-live (code)
+### M3 wave 3: final code follow-ups (done)
 
-- Return photo upload (needs private storage); staff-opened returns.
-- COD orders fully returned before the carrier remits: reconcile them in COD remittances instead of a manual refund.
-- Review the ZAP "Private IP Disclosure" warning on the privacy policy pages (likely a false positive).
-- Re-measure Lighthouse with real product images once content exists.
+- Returns: COD returns settled by the remittance (deferred refunds), manual payouts for return shipping, staff-opened returns with an audited Owner/Manager window override (ADR-0027), private return photos (EXIF stripped, staff-only, erased on deletion requests).
+- Security review (`docs/security/review-2026-11.md`): 11 findings fixed. The ZAP "Private IP Disclosure" warning was React keys, now fixed.
+- Best-seller rails refresh when orders are paid, delivered, cancelled or returned.
+
+**The MVP code is complete.** Open items that need real accounts or content:
+
+- Re-measure Lighthouse with real product images.
+- GTM container: strip token parameters from `page_location`/`page_referrer`, exclude review links (security review F-07).
+- Residual risks accepted in the security review (R-01 guest cart rate limit and cart pruning job after go-live, order-access tokens without expiry).
 
 After the streams are merged, these items need production accounts:
 - production infrastructure and staging

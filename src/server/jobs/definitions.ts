@@ -208,6 +208,20 @@ export const JOBS = {
     schema: z.object({ orderId: z.uuid(), adjustmentId: z.uuid() }),
     queue: { retryLimit: 5, retryDelay: 120, retryBackoff: true, expireInSeconds: 180 },
   },
+  // ---------- M3 wave 3 returns follow-ups ----------
+  /**
+   * Delete private return photos after the privacy anonymisation committed (outbox). Keys only
+   * (`private/returns/…`), never personal data; deleting a missing object is a no-op.
+   */
+  'returns.delete-photos': {
+    schema: z.object({
+      keys: z
+        .array(z.string().regex(/^private\/returns\/[a-z0-9._/-]+$/))
+        .min(1)
+        .max(50),
+    }),
+    queue: retryPolicy,
+  },
 } as const;
 
 /** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */

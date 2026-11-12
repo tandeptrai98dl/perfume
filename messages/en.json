@@ -840,6 +840,7 @@
       "couponPerCustomerLimit": "You have already used this code.",
       "couponMinSubtotal": "Your order does not reach this code's minimum amount.",
       "couponNoEligibleItems": "This code does not apply to the items in your cart.",
+      "couponRateLimited": "Too many codes tried. Please wait a minute and try again.",
       "itemUnavailable": "{name} is no longer available.",
       "itemQuantityLimit": "{name}: the quantity is above the limit per order.",
       "itemInsufficientStock": "{name}: not enough stock left.",
@@ -979,6 +980,7 @@
         "reservationExpired": "The hold time for this order is over.",
         "providerUnavailable": "This method is temporarily unavailable. Please choose another one.",
         "gatewayError": "We could not reach the payment gateway. Please try again.",
+        "rateLimited": "Too many payment attempts. Please wait a minute and try again.",
         "notPayable": "This order no longer needs a payment.",
         "nothingDue": "Nothing is left to pay on this order.",
         "notFound": "Order not found.",
@@ -1693,11 +1695,15 @@
       "descriptionFault": "Describe the defect or the condition of the product (at least 10 characters).",
       "descriptionOptional": "Optional.",
       "sealIntact": "I confirm the product is unopened and the seal is intact.",
-      "photos": "If we need photos of the product or packaging, we will contact you by e-mail or phone after receiving your request.",
+      "photos": "Photos of the product or packaging (optional)",
       "estimate": "The refund amount is confirmed when we receive the items.",
       "submit": "Send request",
       "cancel": "Close",
-      "done": "Your return request has been sent. We will reply by e-mail."
+      "done": "Your return request has been sent. We will reply by e-mail.",
+      "photosHint": "Up to {max} JPEG, PNG or WebP photos, 8 MB each. Only the shop’s staff can see them; location data is removed.",
+      "photosSelected": "Selected photos",
+      "removePhoto": "Remove",
+      "removePhotoLabel": "Remove photo {name}"
     },
     "reasons": {
       "unopened": "Changed my mind (unopened, seal intact)",
@@ -1728,7 +1734,8 @@
       "note": "Note from the shop: {note}",
       "rejection": "Reason: {reason}",
       "refund": "Refund: {amount}",
-      "replacement": "A replacement will be sent to you."
+      "replacement": "A replacement will be sent to you.",
+      "photos": "{count, plural, one {# photo} other {# photos}} attached"
     },
     "errors": {
       "validation": "Please correct the highlighted fields.",
@@ -1748,7 +1755,15 @@
       "notFound": "Order not found.",
       "rateLimited": "Too many requests. Please try again later.",
       "conflict": "The order was just updated. Please reload the page.",
-      "unexpected": "Something went wrong. Please try again."
-    }
+      "unexpected": "Something went wrong. Please try again.",
+      "photoType": "Only JPEG, PNG or WebP photos are accepted.",
+      "photoTooLarge": "Each photo can be up to 8 MB.",
+      "photoEmpty": "The photo file is empty.",
+      "photoCorrupt": "The photo could not be read. Please choose another one.",
+      "tooManyPhotos": "Up to 3 photos.",
+      "photosUnavailable": "Photos cannot be uploaded right now. You can send the request without photos.",
+      "payloadTooLarge": "The photos are too large. Each photo can be up to 8 MB."
+    },
+    "again": "You can send a new request until {deadline}."
   }
 }

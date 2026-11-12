@@ -4,7 +4,13 @@ import { join } from 'node:path';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { createLocalStorage, createMemoryStorage, storageFromEnv } from '.';
+import {
+  createLocalStorage,
+  createMemoryStorage,
+  createPrivateStorage,
+  isPrivateKey,
+  storageFromEnv,
+} from '.';
 
 const dirs: string[] = [];
 afterAll(async () => {
@@ -61,5 +67,21 @@ describe('storage adapters', () => {
         S3_FORCE_PATH_STYLE: true,
       })?.kind,
     ).toBe('s3');
+  });
+});
+
+describe('private storage', () => {
+  it('only takes private/ keys and stores them uncacheable', async () => {
+    const base = createMemoryStorage();
+    const storage = createPrivateStorage(base);
+    await storage.put('private/returns/o/p.webp', Buffer.from('x'), 'image/webp');
+    expect((await storage.get('private/returns/o/p.webp'))?.body.toString()).toBe('x');
+    await expect(storage.put('media/p.webp', Buffer.from('x'), 'image/webp')).rejects.toThrow();
+    await expect(storage.get('media/p.webp')).rejects.toThrow();
+    await expect(storage.get('private/../media/p.webp')).rejects.toThrow();
+    await storage.delete('private/returns/o/p.webp');
+    expect(base.objects.size).toBe(0);
+    expect(isPrivateKey('private/returns/o/p.webp')).toBe(true);
+    expect(isPrivateKey('media/2026/11/p.webp')).toBe(false);
   });
 });

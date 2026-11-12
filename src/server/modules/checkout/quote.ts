@@ -55,6 +55,25 @@ export type CheckoutQuote = {
   cod: { maxOrderWithoutDeposit: number; depositPercent: number };
 };
 
+/**
+ * Coupon guesses through the live quote count against the same per-cart limit as the cart's
+ * "Apply" (§12 coupon attempts: 10/min/cart), or the quote would be a free brute-force
+ * oracle. Only a code other than the one already applied to the cart is an attempt; codes
+ * are compared like the coupon lookup does (case-insensitive).
+ */
+export function isCouponAttempt(
+  code: string | null | undefined,
+  cartCouponCode: string | null | undefined,
+): boolean {
+  const next = code?.trim().toUpperCase();
+  return !!next && next !== cartCouponCode?.trim().toUpperCase();
+}
+
+/** The quote answered without evaluating `code` (limit reached): nothing about it leaks. */
+export function withCouponRateLimited(quote: CheckoutQuote, code: string): CheckoutQuote {
+  return { ...quote, coupon: { code: code.trim(), applied: false, issue: 'couponRateLimited' } };
+}
+
 export async function quoteCheckout(
   db: Pick<Database, 'select' | 'execute'>,
   input: {

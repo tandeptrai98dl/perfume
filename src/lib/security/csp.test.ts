@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildContentSecurityPolicy,
   cspHeaderName,
+  FALLBACK_CONTENT_SECURITY_POLICY,
+  FALLBACK_CSP_SOURCES,
   reportingEndpoints,
   sentrySecurityEndpoint,
   STATIC_SECURITY_HEADERS,
@@ -113,5 +115,21 @@ describe('helpers', () => {
     expect(byKey['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
     expect(byKey['Permissions-Policy']).toContain('camera=()');
     expect(byKey['X-Frame-Options']).toBe('DENY');
+  });
+
+  it('gives paths outside the proxy matcher a first-party fallback policy', () => {
+    const policy = directives(FALLBACK_CONTENT_SECURITY_POLICY);
+    expect(policy['frame-ancestors']).toEqual(["'none'"]);
+    expect(policy['object-src']).toEqual(["'none'"]);
+    expect(policy['base-uri']).toEqual(["'self'"]);
+    expect(policy['script-src']).toEqual(["'self'", "'unsafe-inline'"]);
+    expect(FALLBACK_CONTENT_SECURITY_POLICY).not.toContain('https://');
+    // The custom-regex source covers every file-like path the proxy matcher skips.
+    const fileLike = new RegExp(`^/${FALLBACK_CSP_SOURCES[1].slice('/:path'.length)}$`);
+    for (const path of ['/wp-login.php', '/en/a.html', '/robots.txt']) {
+      expect(path).toMatch(fileLike);
+    }
+    expect('/en/perfumes').not.toMatch(fileLike);
+    expect(FALLBACK_CSP_SOURCES[0]).toBe('/_next/:path*');
   });
 });

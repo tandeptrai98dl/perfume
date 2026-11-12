@@ -9,6 +9,7 @@ import type { Locale } from '@/i18n/routing';
 import { foldVietnamese } from '@/lib/text';
 import { getBrands } from '@/server/catalog-cache';
 import type { BrandListItem } from '@/server/modules/catalog';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 
 import { ListingHeader } from '../_lib/page-header';
 import { alternates, truncate } from '../_lib/seo';
@@ -16,7 +17,7 @@ import { alternates, truncate } from '../_lib/seo';
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/brands'>): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   await connection();
   const t = await getTranslations({ locale, namespace: 'listing' });
   return {
@@ -27,7 +28,7 @@ export async function generateMetadata({
 }
 
 export default async function BrandsPage({ params }: PageProps<'/[locale]/brands'>) {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'listing' });
   return (
     <div className="container-content flex flex-col gap-12 py-10 lg:py-16">

@@ -68,7 +68,10 @@ export function CookieConsentRoot({
 
   return (
     <>
-      <TagManager gtmId={gtmId} consent={consent} />
+      {/* Reads the pathname (signed-link pages defer GTM), so it streams after the shell. */}
+      <Suspense fallback={null}>
+        <TagManager gtmId={gtmId} consent={consent} />
+      </Suspense>
       {showBanner && (
         <section
           aria-labelledby="cookie-banner-title"

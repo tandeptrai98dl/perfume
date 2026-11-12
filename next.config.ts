@@ -2,7 +2,12 @@ import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
-import { API_CONTENT_SECURITY_POLICY, STATIC_SECURITY_HEADERS } from './src/lib/security/csp';
+import {
+  API_CONTENT_SECURITY_POLICY,
+  FALLBACK_CONTENT_SECURITY_POLICY,
+  FALLBACK_CSP_SOURCES,
+  STATIC_SECURITY_HEADERS,
+} from './src/lib/security/csp';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
@@ -25,11 +30,16 @@ const nextConfig: NextConfig = {
   // rel=canonical and hreflang in <head> (§13.1). Shoppers keep the streamed response.
   htmlLimitedBots:
     /Googlebot|[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight/i,
-  // Security headers on every response (§12). Pages get their nonce-based CSP from the proxy
-  // (src/proxy.ts); API and file responses never render HTML and get a deny-all policy.
+  // Security headers on every response (§12). Pages get their CSP from the proxy
+  // (src/proxy.ts); paths outside its matcher get a first-party fallback (their 404 is HTML);
+  // API responses never render HTML and get a deny-all policy (listed last: it wins).
   async headers() {
     return [
       { source: '/:path*', headers: STATIC_SECURITY_HEADERS },
+      ...FALLBACK_CSP_SOURCES.map((source) => ({
+        source,
+        headers: [{ key: 'Content-Security-Policy', value: FALLBACK_CONTENT_SECURITY_POLICY }],
+      })),
       {
         source: '/api/:path*',
         headers: [{ key: 'Content-Security-Policy', value: API_CONTENT_SECURITY_POLICY }],

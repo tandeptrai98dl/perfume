@@ -2,6 +2,7 @@ import type { ServerEnv } from '@/lib/env';
 import { serverEnv } from '@/lib/env';
 
 import { createLocalStorage } from './local';
+import { createPrivateStorage, type PrivateStorage } from './private';
 import { createS3Storage } from './s3';
 import type { StorageAdapter } from './types';
 
@@ -9,6 +10,13 @@ export { createLocalStorage } from './local';
 export { createMemoryStorage } from './memory';
 export { createS3Storage, type S3StorageConfig } from './s3';
 export { assertSafeKey, IMMUTABLE_CACHE_CONTROL, type StorageAdapter } from './types';
+export {
+  createPrivateStorage,
+  isPrivateKey,
+  PRIVATE_CACHE_CONTROL,
+  PRIVATE_PREFIX,
+  type PrivateStorage,
+} from './private';
 
 type StorageEnv = Pick<
   ServerEnv,
@@ -51,4 +59,10 @@ let cached: StorageAdapter | null | undefined;
 export function getStorage(): StorageAdapter | null {
   if (cached === undefined) cached = storageFromEnv(serverEnv());
   return cached;
+}
+
+/** Private objects (`private/…`) through the same adapter; `null` when storage is not configured. */
+export function getPrivateStorage(): PrivateStorage | null {
+  const storage = getStorage();
+  return storage ? createPrivateStorage(storage) : null;
 }

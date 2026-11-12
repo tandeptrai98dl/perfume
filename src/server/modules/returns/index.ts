@@ -1,10 +1,12 @@
 /**
- * Returns module (ADR-0017, M3 wave 2): customer return requests, staff approval/rejection and
- * receipt (refund, restock, replacement, e-invoice adjustment). Owns no table: the request and
- * its decisions are `order_events`, written through the order module's public API; stock,
- * money and invoices go through the inventory, payment and einvoice modules.
+ * Returns module (ADR-0017, M3 wave 2 + wave 3): customer and staff-opened return requests,
+ * staff approval/rejection and receipt (refund, restock, replacement, e-invoice adjustment),
+ * private return photos. Owns no table: the request and its decisions are `order_events`,
+ * written through the order module's public API; stock, money and invoices go through the
+ * inventory, payment and einvoice modules; photos through the private storage adapter.
  */
 export {
+  blocksNewRequest,
   DAY_MS,
   defaultResellable,
   foldReturnEvents,
@@ -34,6 +36,8 @@ export {
   receiveReturnSchema,
   rejectReturnSchema,
   returnRequestSchema,
+  staffReturnSchema,
+  type StaffReturnInput,
   type ApproveReturnInput,
   type ReceiveReturnInput,
   type RejectReturnInput,
@@ -41,6 +45,7 @@ export {
 } from './schemas';
 export {
   approveReturn,
+  openReturnForCustomer,
   receiveReturn,
   rejectReturn,
   requestReturn,
@@ -50,11 +55,16 @@ export {
   type ReturnRequestResult,
 } from './service';
 export {
+  adminReturnPhotoUrl,
   countReturnQueue,
   findOrderForReturn,
+  findReturnPhoto,
   getAdminReturn,
   getCustomerReturnView,
+  getStaffReturnOptions,
   listReturnQueue,
+  type AdminReturnPhoto,
+  type StaffReturnOptions,
   type AdminReturnLine,
   type AdminReturnView,
   type CustomerReturnView,
@@ -68,3 +78,15 @@ export {
   type ReturnReason,
   type ReturnResolution,
 } from '@/server/modules/order';
+export {
+  deleteReturnPhotos,
+  MAX_RETURN_PHOTO_BYTES,
+  MAX_RETURN_PHOTOS,
+  processReturnPhoto,
+  RETURN_PHOTO_TYPES,
+  ReturnPhotoError,
+  returnPhotoKey,
+  storeReturnPhotos,
+  type ReturnPhotoIssue,
+} from './photos';
+export { eraseReturnPhotosForSubject } from './erasure';

@@ -9,9 +9,14 @@ function session(overrides: {
   twoFactorEnabled?: boolean;
   twoFactorVerified?: boolean;
   ageMs?: number;
+  banned?: boolean;
 }): AdminSessionLike {
   return {
-    user: { role: overrides.role ?? 'owner', twoFactorEnabled: overrides.twoFactorEnabled ?? true },
+    user: {
+      role: overrides.role ?? 'owner',
+      twoFactorEnabled: overrides.twoFactorEnabled ?? true,
+      banned: overrides.banned ?? false,
+    },
     session: {
       twoFactorVerified: overrides.twoFactorVerified ?? true,
       createdAt: new Date(NOW - (overrides.ageMs ?? 0)),
@@ -27,6 +32,13 @@ describe('checkAdminSession', () => {
   it('rejects anonymous visitors and customers', () => {
     expect(checkAdminSession(null, undefined, NOW)).toBe('unauthenticated');
     expect(checkAdminSession(session({ role: 'customer' }), undefined, NOW)).toBe('notStaff');
+  });
+
+  it('rejects a deactivated (banned) staff account even with a verified session', () => {
+    expect(checkAdminSession(session({ banned: true }), undefined, NOW)).toBe('unauthenticated');
+    expect(checkAdminSession(session({ banned: true }), 'settings.manage', NOW)).toBe(
+      'unauthenticated',
+    );
   });
 
   it('sends staff without TOTP to enrolment', () => {

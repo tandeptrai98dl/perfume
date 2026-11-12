@@ -9,7 +9,7 @@ restore drill every quarter (go-live gate: one passed drill).
 | --- | --- | --- | --- |
 | Provider PITR | Managed PostgreSQL snapshots + WAL | 14 days | any second in the window, new instance |
 | `scripts/backup/pg-backup.sh` | `pg_dump -Fc`, encrypted with `age`, uploaded to a **separate** S3 bucket (other account/region of the provider, versioning + object lock if offered) | 14 daily + 12 monthly (1st of month) | any PostgreSQL 17 |
-| Media bucket | Product images (re-creatable from originals) | bucket versioning 30 days | same bucket |
+| Media bucket | Product images (re-creatable from originals); customer return photos under `private/` (deleted on privacy anonymisation — keep versioning short) | bucket versioning 30 days | same bucket |
 
 Dumps contain personal data: encrypt with `BACKUP_AGE_RECIPIENT`; the private key is kept
 offline by the owner (password manager + printed copy), never on the VM.

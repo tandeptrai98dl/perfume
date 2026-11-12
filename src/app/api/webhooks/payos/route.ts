@@ -11,6 +11,7 @@ import {
 import { getProducer } from '@/server/jobs/producer';
 import { resolveClientIp } from '@/server/lib/client-ip';
 import { errorFields, logger } from '@/server/lib/logger';
+import { BodyTooLargeError, readTextWithLimit } from '@/server/lib/read-body';
 import { processGatewayNotification } from '@/server/modules/payment';
 
 /**
@@ -38,9 +39,14 @@ export async function POST(request: Request) {
     logger.warn('payment.webhook.ip_rejected', { provider: 'payos', sourceIp });
     return NextResponse.json({ success: false, error: 'forbidden' }, { status: 403 });
   }
-  const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: 'payload_too_large' }, { status: 413 });
+  let text: string;
+  try {
+    text = await readTextWithLimit(request, MAX_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof BodyTooLargeError) {
+      return NextResponse.json({ error: 'payload_too_large' }, { status: 413 });
+    }
+    throw error;
   }
   let json: unknown;
   try {

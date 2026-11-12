@@ -15,6 +15,7 @@ import {
   serializeCookieConsent,
   trackingCookieNames,
   truncateIp,
+  urlCarriesSecret,
 } from './cookie-consent';
 
 const consent = {
@@ -124,4 +125,30 @@ describe('pre-paint script', () => {
       expect(isCurrentConsent(readCookieConsent(cookie))).toBe(false);
     }
   });
+});
+
+describe('urlCarriesSecret (no tags on signed-link pages)', () => {
+  const at = (url: string) => {
+    const parsed = new URL(url, 'https://shop.example.vn');
+    return { pathname: parsed.pathname, search: parsed.search };
+  };
+
+  it.each([
+    '/thanh-toan/ket-qua?code=PF-1&t=abc',
+    '/en/checkout/result?code=PF-1&t=abc',
+    '/tra-cuu-don-hang?code=PF-1&t=abc',
+    '/ban-tin/huy-dang-ky?s=019a&t=sig',
+    '/dat-lai-mat-khau?token=reset',
+    '/danh-gia/0123456789abcdef',
+    '/en/review/0123456789abcdef',
+  ])('flags %s', (url) => {
+    expect(urlCarriesSecret(at(url))).toBe(true);
+  });
+
+  it.each(['/', '/en/perfumes?sort=price', '/thanh-toan/ket-qua?code=PF-1', '/tai-khoan/danh-gia'])(
+    'leaves %s alone',
+    (url) => {
+      expect(urlCarriesSecret(at(url))).toBe(false);
+    },
+  );
 });

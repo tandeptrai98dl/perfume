@@ -13,7 +13,7 @@ export type AuthFailure =
 
 /** The subset of a Better Auth session that the admin rules look at. */
 export type AdminSessionLike = {
-  user: { role?: string | null; twoFactorEnabled?: boolean | null };
+  user: { role?: string | null; twoFactorEnabled?: boolean | null; banned?: boolean | null };
   session: { createdAt: Date | string; twoFactorVerified?: boolean | null };
 };
 
@@ -28,6 +28,9 @@ export function checkAdminSession(
 ): AuthFailure | null {
   if (!current) return 'unauthenticated';
   const { user, session } = current;
+  // Deactivation also deletes the sessions; this keeps a deactivated account out even if a
+  // session row survived (defence in depth, §12 Admin).
+  if (user.banned) return 'unauthenticated';
   const role = user.role ?? 'customer';
   if (!isStaffRole(role)) return 'notStaff';
   if (!user.twoFactorEnabled) return 'twoFactorSetupRequired';

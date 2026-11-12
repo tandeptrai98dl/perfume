@@ -18,6 +18,7 @@ describe('RATE_LIMITS', () => {
     expect(RATE_LIMITS.placeOrder).toEqual({ limit: 5, windowMs: 60_000 });
     expect(RATE_LIMITS.orderLookup).toEqual({ limit: 5, windowMs: 600_000 });
     expect(RATE_LIMITS.couponAttempt).toEqual({ limit: 10, windowMs: 60_000 });
+    expect(RATE_LIMITS.paymentStart).toEqual({ limit: 10, windowMs: 60_000 });
   });
 });
 

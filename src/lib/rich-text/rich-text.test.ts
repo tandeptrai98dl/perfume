@@ -232,3 +232,35 @@ describe('text helpers', () => {
     ]);
   });
 });
+
+describe('RichText React keys', () => {
+  /** ZAP passive rule 2 (Private IP Disclosure), IPv4 part. */
+  const PRIVATE_IP =
+    /(?<!\d\.)\b(10\.(\d{1,3}\.){2}\d{1,3}|172\.(3[01]|2\d|1[6-9])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b(?!\.\d)/;
+
+  function collectKeys(node: unknown, keys: string[] = []): string[] {
+    if (Array.isArray(node)) {
+      for (const child of node) collectKeys(child, keys);
+    } else if (node && typeof node === 'object' && 'props' in node) {
+      const element = node as { key: string | null; props: { children?: unknown } };
+      if (element.key !== null) keys.push(element.key);
+      collectKeys(element.props.children, keys);
+    }
+    return keys;
+  }
+
+  it('uses sibling indexes, never dotted tree paths that look like private IPs', () => {
+    // The privacy policy has more than ten blocks with nested lists: index 10 → "10.1.0.0".
+    const blocks = Array.from({ length: 12 }, (_, i) =>
+      i === 10 ? { ul: ['first item', 'second item', 'third item'] } : { p: `Paragraph ${i + 1}` },
+    );
+    const element = RichText({ value: docFromBlocks(blocks) });
+    const keys = collectKeys(element);
+    expect(keys.length).toBeGreaterThan(12);
+    for (const key of keys) {
+      expect(key).toMatch(/^\d+$/);
+      expect(key).not.toMatch(PRIVATE_IP);
+    }
+    expect(renderToStaticMarkup(element)).toContain('<li class="my-1 [&amp;&gt;p]:my-0">');
+  });
+});

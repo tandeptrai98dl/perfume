@@ -12,8 +12,12 @@ import {
   type ErasureStep,
 } from '@/server/modules/customer';
 
-import { runAdminAction } from './run';
+import type { PgBoss } from 'pg-boss';
+
+import { eraseReturnPhotosForSubject } from '@/server/modules/returns';
 import { anonymizeReviewsForSubject } from '@/server/modules/review';
+
+import { runAdminAction } from './run';
 
 /**
  * Privacy request queue (§11.2). Permission `privacyRequests.handle` (Owner only, §11.1
@@ -26,11 +30,17 @@ import { anonymizeReviewsForSubject } from '@/server/modules/review';
  * them; the customer, auth, cart and order data is handled by the command itself.
  */
 /** Erasure steps owned by other modules (each runs inside the anonymisation transaction). */
-const ERASURE_STEPS: readonly ErasureStep[] = [
-  async (tx, subject) => {
-    await anonymizeReviewsForSubject(tx, subject);
-  },
-];
+function erasureSteps(boss: PgBoss): readonly ErasureStep[] {
+  return [
+    async (tx, subject) => {
+      await anonymizeReviewsForSubject(tx, subject);
+    },
+    // Return photos (M3 wave 3): unlinked now, objects deleted by an outbox job.
+    async (tx, subject) => {
+      await eraseReturnPhotosForSubject(tx, boss, subject);
+    },
+  ];
+}
 
 export async function setPrivacyRequestStatusAction(raw: unknown) {
   return runAdminAction(privacyRequestStatusSchema, raw, 'privacyRequests.handle', (ctx, input) =>
@@ -46,6 +56,6 @@ export async function rerunPrivacyExportAction(raw: unknown) {
 
 export async function anonymizePrivacySubjectAction(raw: unknown) {
   return runAdminAction(anonymizeSubjectSchema, raw, 'privacyRequests.handle', (ctx, input) =>
-    anonymizePrivacySubject(ctx, input, ERASURE_STEPS),
+    anonymizePrivacySubject(ctx, input, erasureSteps(ctx.boss)),
   );
 }

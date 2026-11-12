@@ -53,7 +53,8 @@ services:
       /bin/sh -c "
       mc alias set local http://minio:9000 minioadmin minioadmin &&
       mc mb --ignore-existing local/perfume-media &&
-      mc anonymous set download local/perfume-media
+      mc anonymous set none local/perfume-media &&
+      mc anonymous set download local/perfume-media/media
       "
 
 volumes:

@@ -61,6 +61,8 @@ export const RATE_LIMITS = {
   newsletterSignup: { limit: 5, windowMs: 10 * MINUTE },
   /** Customer return requests (account and guest order pages): 5 per hour per IP. */
   returnRequest: { limit: 5, windowMs: 60 * MINUTE },
+  /** Start/retry an online payment (each one calls the gateway API): 10/min/IP. */
+  paymentStart: { limit: 10, windowMs: MINUTE },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateLimitScope = keyof typeof RATE_LIMITS;

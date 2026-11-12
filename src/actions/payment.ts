@@ -5,6 +5,7 @@ import 'server-only';
 import { z } from 'zod';
 
 import { getDb } from '@/server/db/client';
+import { guardRequest } from '@/server/request-guard';
 import { getClientIp } from '@/server/request-ip';
 import { DomainError } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
@@ -46,6 +47,7 @@ export type StartPaymentResult =
         | 'providerUnavailable'
         | 'reservationExpired'
         | 'gatewayError'
+        | 'rateLimited'
         | 'unexpected';
     };
 
@@ -61,6 +63,9 @@ export async function startPaymentAction(raw: unknown): Promise<StartPaymentResu
   const parsed = startSchema.safeParse(raw);
   const code = parsed.success ? pickOrderCode(parsed.data.code) : null;
   if (!parsed.success || !code) return { ok: false, error: 'validation' };
+  // Each start creates a payment attempt and calls the gateway API (§12 rate limiting).
+  if (!(await guardRequest({ scope: 'paymentStart' })).ok)
+    return { ok: false, error: 'rateLimited' };
 
   const db = getDb();
   const order = await findOrderByCode(db, code);

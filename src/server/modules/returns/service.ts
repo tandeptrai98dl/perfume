@@ -30,7 +30,9 @@ import {
   staffOrderActor,
   transitionOrder,
   type OrderActor,
+  type ReturnPhoto,
   type ReturnReceivedMetadata,
+  type ReturnRequestedMetadataInput,
 } from '@/server/modules/order';
 import { queueReturnRefund } from '@/server/modules/payment';
 import { getCommerceSettings } from '@/server/modules/settings';
@@ -50,6 +52,7 @@ import type {
   ReceiveReturnInput,
   RejectReturnInput,
   ReturnRequestInput,
+  StaffReturnInput,
 } from './schemas';
 
 /*
@@ -115,13 +118,108 @@ async function tagsFor(boss: PgBoss, tx: Tx, orderId: string) {
   return enqueueRevalidation(boss, tx, [orderTags.order(orderId), orderTags.list]);
 }
 
-// ---------- Customer request ----------
+// ---------- Request (customer, or staff on the customer's behalf) ----------
 
 export type ReturnRequestResult = { requestId: string; orderId: string };
 
+type OpenReturnInput = {
+  orderId: string;
+  actor: OrderActor;
+  values: ReturnRequestInput;
+  photos: readonly ReturnPhoto[];
+  /** Manager's reason for lifting the window (staff-opened only). */
+  overrideReason: string | null;
+  now: Date;
+};
+
+/**
+ * Opens a request under the order row lock: status, window (or the manager's override), at
+ * most one open request (a rejected one may be followed by a new one), lines, resolution.
+ */
+async function openReturn(
+  tx: Tx,
+  boss: PgBoss,
+  input: OpenReturnInput,
+): Promise<ReturnRequestResult & { windowOverride: boolean; from: string }> {
+  const { values } = input;
+  const order = await lockOrder(tx, input.orderId);
+  // One connection inside a transaction: sequential reads.
+  const settings = await getCommerceSettings(tx);
+  const events = await returnEvents(tx, order.id);
+  const items = await orderLines(tx, order.id);
+  const eligibility = returnEligibility({
+    status: order.status,
+    deliveredAt: order.deliveredAt,
+    windowDays: settings.returnsWindowDays,
+    now: input.now,
+    latest: foldReturnEvents(events)?.status ?? null,
+    overrideWindow: input.overrideReason !== null,
+  });
+  if (!eligibility.eligible) throw invalid(eligibility.reason);
+  const issues = validateReturnLines(items, values.lines);
+  if (issues.length > 0) throw new DomainError('invalid', issues);
+  if (!resolutionsFor(values.reason).includes(values.resolution)) {
+    throw invalid('refundOnly', 'resolution');
+  }
+
+  const requestId = newId();
+  const from = order.status as 'delivered' | 'completed';
+  const windowOverride =
+    eligibility.windowOverride && input.overrideReason ? { reason: input.overrideReason } : null;
+  await transitionOrder(tx, boss, {
+    orderId: order.id,
+    to: 'return_requested',
+    actor: input.actor,
+    reason: values.reason,
+    metadata: { requestId },
+  });
+  const estimate = planReturnRefund({
+    items,
+    lines: values.lines,
+    reason: values.reason,
+    resolution: values.resolution,
+    shippingFee: order.shippingFee,
+    giftWrapFee: order.giftWrapFee,
+  });
+  const openedBy = input.actor.type === 'staff' ? 'staff' : 'customer';
+  const metadata: ReturnRequestedMetadataInput & { estimatedRefund: number } = {
+    requestId,
+    reason: values.reason,
+    resolution: values.resolution,
+    lines: values.lines,
+    sealIntact: values.sealIntact,
+    openedBy,
+    openedFrom: from,
+    windowOverride,
+    photos: [...input.photos],
+    estimatedRefund: estimate.total,
+  };
+  await recordOrderEvent(tx, {
+    orderId: order.id,
+    type: RETURN_EVENTS.requested,
+    // The customer's own words (free text; removed when the customer is anonymised).
+    message: values.description || null,
+    actor: input.actor,
+    metadata,
+  });
+  await enqueue(boss, tx, 'return.notify', { orderId: order.id, requestId, kind: 'requested' });
+  const units = values.lines.reduce((sum, line) => sum + line.quantity, 0);
+  await enqueue(boss, tx, 'staff.alert', {
+    kind: 'return_requested',
+    orderId: order.id,
+    message: `Return requested${openedBy === 'staff' ? ' by staff for the customer' : ''}${
+      windowOverride ? ' (window override)' : ''
+    }: ${units} unit(s), reason ${values.reason}, resolution ${values.resolution}, ${
+      input.photos.length
+    } photo(s). Estimated refund ${estimate.total} VND.`,
+  });
+  await tagsFor(boss, tx, order.id);
+  return { requestId, orderId: order.id, windowOverride: windowOverride !== null, from };
+}
+
 /**
  * A customer (member or guest with order access — checked by the caller) asks for a return.
- * Re-checks everything under the order row lock: status, window, one request per order, lines.
+ * `photos` were validated and stored privately by the caller (`storeReturnPhotos`).
  */
 export async function requestReturn(
   db: Database,
@@ -131,72 +229,66 @@ export async function requestReturn(
     /** Member id, or null for a guest with the signed order link / lookup cookie. */
     userId: string | null;
     values: ReturnRequestInput;
+    photos?: readonly ReturnPhoto[];
     now?: Date;
   },
 ): Promise<ReturnRequestResult> {
-  const now = input.now ?? new Date();
-  const { values } = input;
   return db.transaction(async (tx) => {
-    const order = await lockOrder(tx, input.orderId);
-    // One connection inside a transaction: sequential reads.
-    const settings = await getCommerceSettings(tx);
-    const events = await returnEvents(tx, order.id);
-    const items = await orderLines(tx, order.id);
-    const eligibility = returnEligibility({
-      status: order.status,
-      deliveredAt: order.deliveredAt,
-      windowDays: settings.returnsWindowDays,
-      now,
-      hasRequest: foldReturnEvents(events) !== null,
+    const result = await openReturn(tx, boss, {
+      orderId: input.orderId,
+      actor: { type: 'customer', id: input.userId },
+      values: input.values,
+      photos: input.photos ?? [],
+      overrideReason: null,
+      now: input.now ?? new Date(),
     });
-    if (!eligibility.eligible) throw invalid(eligibility.reason);
-    const issues = validateReturnLines(items, values.lines);
-    if (issues.length > 0) throw new DomainError('invalid', issues);
-    if (!resolutionsFor(values.reason).includes(values.resolution)) {
-      throw invalid('refundOnly', 'resolution');
-    }
+    return { requestId: result.requestId, orderId: result.orderId };
+  });
+}
 
-    const actor: OrderActor = { type: 'customer', id: input.userId };
-    const requestId = newId();
-    await transitionOrder(tx, boss, {
-      orderId: order.id,
-      to: 'return_requested',
-      actor,
-      reason: values.reason,
-      metadata: { requestId },
+/**
+ * Staff open a return on the customer's behalf (phone, chat) from the admin order page
+ * (`orders.process`): same rules and window. A manager (`payments.refund`) may lift the
+ * window — also for a `completed` order (ADR-0027) — with a reason; both are audited.
+ */
+export async function openReturnForCustomer(
+  ctx: CommandContext,
+  input: StaffReturnInput,
+  options: { now?: Date } = {},
+): Promise<CommandResult<ReturnRequestResult>> {
+  assertCan(ctx.actor, 'orders.process');
+  if (input.overrideReason !== null && !can(ctx.actor, MANAGE_PERMISSION)) {
+    throw new DomainError('forbidden', [
+      { path: 'overrideReason', code: 'windowOverrideForbidden' },
+    ]);
+  }
+  const { orderId, overrideReason, ...values } = input;
+  return ctx.db.transaction(async (tx) => {
+    const result = await openReturn(tx, ctx.boss, {
+      orderId,
+      actor: staffOrderActor(ctx.actor),
+      values,
+      photos: [],
+      overrideReason,
+      now: options.now ?? new Date(),
     });
-    const estimate = planReturnRefund({
-      items,
-      lines: values.lines,
-      reason: values.reason,
-      resolution: values.resolution,
-      shippingFee: order.shippingFee,
-      giftWrapFee: order.giftWrapFee,
-    });
-    await recordOrderEvent(tx, {
-      orderId: order.id,
-      type: RETURN_EVENTS.requested,
-      // The customer's own words (free text; removed when the customer is anonymised).
-      message: values.description || null,
-      actor,
-      metadata: {
-        requestId,
+    await recordAudit(tx, {
+      actorId: ctx.actor.id,
+      action: 'order.return_open',
+      entityType: 'order',
+      entityId: orderId,
+      diff: {
+        returnStatus: { from: null, to: 'requested' },
+        requestId: result.requestId,
+        status: { from: result.from, to: 'return_requested' },
         reason: values.reason,
         resolution: values.resolution,
-        lines: values.lines,
-        sealIntact: values.sealIntact,
-        estimatedRefund: estimate.total,
+        ...(result.windowOverride ? { windowOverride: { from: null, to: overrideReason } } : {}),
       },
+      ip: ctx.ip,
     });
-    await enqueue(boss, tx, 'return.notify', { orderId: order.id, requestId, kind: 'requested' });
-    const units = values.lines.reduce((sum, line) => sum + line.quantity, 0);
-    await enqueue(boss, tx, 'staff.alert', {
-      kind: 'return_requested',
-      orderId: order.id,
-      message: `Return requested: ${units} unit(s), reason ${values.reason}, resolution ${values.resolution}. Estimated refund ${estimate.total} VND.`,
-    });
-    await tagsFor(boss, tx, order.id);
-    return { requestId, orderId: order.id };
+    const tags = [orderTags.order(orderId), orderTags.list];
+    return { data: { requestId: result.requestId, orderId: result.orderId }, tags };
   });
 }
 
@@ -268,7 +360,8 @@ export async function rejectReturn(
     const actor = staffOrderActor(ctx.actor);
     await transitionOrder(tx, ctx.boss, {
       orderId: order.id,
-      to: 'delivered',
+      // A return a manager reopened on a completed order closes back to `completed`.
+      to: state.openedFrom,
       actor,
       reason: 'return_rejected',
       metadata: { requestId: state.requestId },
@@ -382,7 +475,7 @@ export async function receiveReturn(
     if (plan.outcome !== 'full') {
       await transitionOrder(tx, ctx.boss, {
         orderId: order.id,
-        to: 'delivered',
+        to: state.openedFrom,
         actor,
         reason: plan.outcome === 'replacement' ? 'return_replaced' : 'return_partial',
         metadata: { requestId: state.requestId },
@@ -394,6 +487,8 @@ export async function receiveReturn(
       amount: plan.total,
       actorId: ctx.actor.id,
       reason: `return:${state.reason}`,
+      returnShipping: plan.returnShipping,
+      requestId: state.requestId,
     });
     const refund: ReturnReceivedMetadata['refund'] = {
       merchandise: plan.merchandise,
@@ -403,6 +498,9 @@ export async function receiveReturn(
       total: plan.total,
       refundId: money.refundId,
       queued: money.queued,
+      deferred: money.deferred,
+      payout: money.payout,
+      payoutRefundId: money.payoutRefundId,
       shortfall: money.shortfall,
     };
     const metadata: ReturnReceivedMetadata = {
@@ -440,7 +538,13 @@ export async function receiveReturn(
         returnStatus: { from: 'approved', to: 'received' },
         requestId: state.requestId,
         outcome: plan.outcome,
-        refund: { total: plan.total, queued: money.queued, shortfall: money.shortfall },
+        refund: {
+          total: plan.total,
+          queued: money.queued,
+          deferred: money.deferred,
+          payout: money.payout,
+          shortfall: money.shortfall,
+        },
         resellable: input.resellable,
         einvoice: einvoice?.action ?? null,
       },

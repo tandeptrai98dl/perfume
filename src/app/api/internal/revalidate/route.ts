@@ -5,6 +5,7 @@ import { serverEnv } from '@/lib/env';
 import { JOBS } from '@/server/jobs/definitions';
 import { SIGNATURE_HEADER, TIMESTAMP_HEADER, verify } from '@/server/lib/hmac';
 import { logger } from '@/server/lib/logger';
+import { BodyTooLargeError, readTextWithLimit } from '@/server/lib/read-body';
 import { contentTags } from '@/server/modules/catalog/cache-tags';
 import { invalidateRouteTable } from '@/server/modules/content';
 
@@ -16,9 +17,15 @@ const MAX_BODY_BYTES = 16 * 1024;
  * signature replaces `requirePermission`.
  */
 export async function POST(request: Request) {
-  const body = await request.text();
-  if (body.length > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: 'payload_too_large' }, { status: 413 });
+  let body: string;
+  try {
+    // Bounded while reading: the signature is checked only after the body is in memory.
+    body = await readTextWithLimit(request, MAX_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof BodyTooLargeError) {
+      return NextResponse.json({ error: 'payload_too_large' }, { status: 413 });
+    }
+    throw error;
   }
 
   const check = verify(

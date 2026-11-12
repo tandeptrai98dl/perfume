@@ -18,6 +18,7 @@ import {
   codRemittanceOrders,
   codRemittances,
   media,
+  orderEvents,
   orderItems,
   orders,
   paymentEvents,
@@ -27,6 +28,7 @@ import {
   users,
 } from '@/server/db/schema';
 
+import { DEFERRED_REFUND_EVENT } from './ledger';
 import { toSessionView, reservationExpiry } from './sessions';
 import { nextSessionAmount, type PaymentStatus } from './status';
 import type { PaymentSessionView } from './types';
@@ -421,9 +423,14 @@ export type CodCandidateRow = {
   trackingCode: string | null;
   amountDue: number;
   deliveredAt: Date | null;
+  /** Customer-return refund owed once this money is recorded (queued automatically). */
+  deferredRefund: number;
 };
 
-/** Delivered COD orders not yet in a remittance, optionally for one carrier. */
+/**
+ * Delivered COD orders not yet in a remittance, optionally for one carrier — including orders
+ * the customer returned after delivery (the carrier collected them all the same).
+ */
 export async function listCodRemittanceCandidates(
   db: Reader,
   query: { carrier?: string | null; limit?: number } = {},
@@ -437,6 +444,11 @@ export async function listCodRemittanceCandidates(
       trackingCode: shipments.trackingCode,
       amountDue: orders.amountDue,
       deliveredAt: orders.deliveredAt,
+      deferredRefund: sql<string>`(select coalesce(sum(case
+          when ${orderEvents.type} = ${DEFERRED_REFUND_EVENT} then (${orderEvents.metadata}->>'amount')::bigint
+          else -coalesce((${orderEvents.metadata}->>'deferred')::bigint, 0) end), 0)
+        from ${orderEvents} where ${orderEvents.orderId} = ${orders.id}
+          and ${orderEvents.type} in (${DEFERRED_REFUND_EVENT}, 'refund_requested'))`,
     })
     .from(orders)
     .leftJoin(shipments, eq(shipments.orderId, orders.id))
@@ -444,7 +456,10 @@ export async function listCodRemittanceCandidates(
     .where(
       and(
         eq(orders.paymentMethod, 'cod'),
-        inArray(orders.status, ['delivered', 'completed', 'return_requested']),
+        or(
+          inArray(orders.status, ['delivered', 'completed', 'return_requested']),
+          and(eq(orders.status, 'returned'), isNotNull(orders.deliveredAt)),
+        ),
         sql`${orders.amountDue} > 0`,
         isNull(codRemittanceOrders.orderId),
         query.carrier ? eq(shipments.carrier, query.carrier as 'ghn') : undefined,
@@ -454,7 +469,9 @@ export async function listCodRemittanceCandidates(
     .limit(query.limit ?? 200);
   // One row per order (several shipments: keep the first).
   const seen = new Set<string>();
-  return rows.filter((row) => !seen.has(row.orderId) && seen.add(row.orderId));
+  return rows
+    .filter((row) => !seen.has(row.orderId) && seen.add(row.orderId))
+    .map((row) => ({ ...row, deferredRefund: Math.max(0, Number(row.deferredRefund)) }));
 }
 
 export type CodRemittanceRow = {
