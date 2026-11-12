@@ -6,6 +6,7 @@ import { enqueue } from '@/server/jobs/queue';
 import { DomainError, type Tx } from '@/server/lib/command-context';
 import { commitReservations, releaseReservations, restockOrder } from '@/server/modules/inventory';
 
+import { refreshBestSellersOnChange } from './best-sellers';
 import {
   canTransition,
   DEDUCTED_STATUSES,
@@ -129,6 +130,13 @@ export async function transitionOrder(
     metadata: input.metadata,
   });
   await enqueue(boss, tx, 'order.status-changed', { orderId: order.id, from, to: input.to });
+  // Delivered / cancelled / returned can move the order in or out of the best sellers.
+  await refreshBestSellersOnChange(
+    boss,
+    tx,
+    { status: from, paymentStatus: order.paymentStatus },
+    { status: input.to, paymentStatus: order.paymentStatus },
+  );
   // D13: the real delivery issues the e-invoice (outbox, same transaction). A rejected return
   // (`return_requested → delivered`) does not; the job itself is idempotent anyway.
   if (input.to === 'delivered' && from === 'shipped' && !order.einvoiceRef) {

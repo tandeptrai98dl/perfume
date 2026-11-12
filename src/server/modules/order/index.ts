@@ -174,7 +174,9 @@ export {
   BEST_SELLER_RANK_LIMIT,
   BEST_SELLER_WINDOW_DAYS,
   bestSellerWindowStart,
+  countsAsBestSeller,
   listBestSellingProductIds,
+  refreshBestSellersOnChange,
 } from './best-sellers';
 // ---------- Customer returns (M3 wave 2 returns stream, ADR-0017) ----------
 export {

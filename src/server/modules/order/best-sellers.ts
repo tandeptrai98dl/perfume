@@ -1,7 +1,11 @@
 import { and, desc, eq, gte, inArray, notInArray, or, sql } from 'drizzle-orm';
+import type { PgBoss } from 'pg-boss';
 
 import type { Database } from '@/server/db/client';
 import { orderItems, orders } from '@/server/db/schema';
+import { enqueueThrottled } from '@/server/jobs/queue';
+import type { Tx } from '@/server/lib/command-context';
+import { catalogTags } from '@/server/modules/catalog/cache-tags';
 
 /*
  * Storefront best sellers (§2 Discovery, §10.1 "best selling" sort). Read-only ranking of
@@ -63,4 +67,43 @@ export async function listBestSellingProductIds(
     .orderBy(desc(units), desc(revenue), orderItems.productId)
     .limit(Math.min(input.limit ?? BEST_SELLER_RANK_LIMIT, BEST_SELLER_RANK_LIMIT));
   return rows.map((row) => row.productId);
+}
+
+/** Whether an order with this status / payment status is counted by the ranking above. */
+export function countsAsBestSeller(order: { status: string; paymentStatus: string }): boolean {
+  if ((EXCLUDED_STATUS as readonly string[]).includes(order.status)) return false;
+  return (
+    (COUNTED_PAYMENT as readonly string[]).includes(order.paymentStatus) ||
+    (COUNTED_STATUS as readonly string[]).includes(order.status)
+  );
+}
+
+/**
+ * At most one best-seller refresh per slot: a burst of payments or deliveries expires the tag
+ * once now and once at the start of the next slot (pg-boss singleton slot, outbox).
+ */
+export const BEST_SELLER_REFRESH_SECONDS = 5 * 60;
+
+/**
+ * Refreshes the home rail and the "best selling" sort (`catalogTags.bestSellers`) when an
+ * order starts or stops counting — paid, delivered, cancelled or returned (§2 Discovery).
+ * Called inside the business transaction by `transitionOrder` and the payment ledger; the
+ * worker's `cache.revalidate` job then calls the web app. Without it the ranking would only
+ * refresh with its hourly cache life.
+ */
+export async function refreshBestSellersOnChange(
+  boss: PgBoss,
+  tx: Tx,
+  before: { status: string; paymentStatus: string },
+  after: { status: string; paymentStatus: string },
+): Promise<boolean> {
+  if (countsAsBestSeller(before) === countsAsBestSeller(after)) return false;
+  await enqueueThrottled(
+    boss,
+    tx,
+    'cache.revalidate',
+    { tags: [catalogTags.bestSellers], expire: 'max' },
+    { key: catalogTags.bestSellers, seconds: BEST_SELLER_REFRESH_SECONDS, nextSlot: true },
+  );
+  return true;
 }
