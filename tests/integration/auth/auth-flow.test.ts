@@ -174,6 +174,40 @@ describe('Better Auth integration', () => {
     expect((await currentSession(third))?.session.twoFactorVerified).toBe(true);
   });
 
+  it('revokes every other session on a password change, even when asked not to', async () => {
+    const email = 'change-password@example.com';
+    const first = await signUp(email);
+    const second = new Browser();
+    expect((await second.post('/sign-in/email', { email, password: PASSWORD })).status).toBe(200);
+    expect(await currentSession(second)).not.toBeNull();
+
+    const changed = await first.post('/change-password', {
+      currentPassword: PASSWORD,
+      newPassword: 'another-horse-battery',
+      revokeOtherSessions: false,
+    });
+    expect(changed.status).toBe(200);
+    expect(await currentSession(second)).toBeNull();
+    // The browser that changed it gets a fresh session.
+    expect(await currentSession(first)).not.toBeNull();
+  });
+
+  it('rotates the session token on sign-in and deletes it on sign-out', async () => {
+    const email = 'rotation@example.com';
+    const browser = await signUp(email);
+    const before = await currentSession(browser);
+    expect((await browser.post('/sign-in/email', { email, password: PASSWORD })).status).toBe(200);
+    const after = await currentSession(browser);
+    // No session fixation: a new sign-in never adopts the token the browser already had.
+    expect(after!.session.token).not.toBe(before!.session.token);
+
+    const stolenCookie = browser.cookieHeader;
+    expect((await browser.post('/sign-out', {})).status).toBe(200);
+    expect(await auth.api.getSession({ headers: stolenCookie })).toBeNull();
+    const rows = await db.select().from(sessions).where(eq(sessions.token, after!.session.token));
+    expect(rows).toHaveLength(0);
+  });
+
   it('refuses sessions for locked accounts', async () => {
     const email = 'locked@example.com';
     await signUp(email);
