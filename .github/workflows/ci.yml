@@ -90,6 +90,10 @@ jobs:
       - run: pnpm db:migrate
       - run: pnpm db:seed
       - run: pnpm build
+      # First-load JS per storefront route (ARCHITECTURE.md §14.1, ADR-0025): fails over the
+      # PDP limit; the table goes to the job summary.
+      - name: JS budget
+        run: node scripts/js-budget.mjs
       # GitHub's Ubuntu runners ship Google Chrome: no browser download or apt step
       # (avoids flaky apt mirrors and saves ~5 minutes).
       - run: pnpm test:e2e
