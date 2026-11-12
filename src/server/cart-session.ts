@@ -8,6 +8,7 @@ import { serverEnv } from '@/lib/env';
 import { getSession } from '@/server/auth/guards';
 import { getDb } from '@/server/db/client';
 import { errorFields, logger } from '@/server/lib/logger';
+import { consumeRateLimit } from '@/server/lib/rate-limit';
 import {
   CART_COOKIE,
   CART_TTL_DAYS,
@@ -121,26 +122,16 @@ export async function getCurrentCartCount(): Promise<number> {
   return countCartItems(getDb(), cart?.id ?? null);
 }
 
-/*
- * Coupon attempts: 10 per minute per cart (§12 rate limiting), so codes cannot be guessed
- * by brute force. In memory: one web instance in MVP; move to the DB/Redis with scale-out.
+/**
+ * Coupon attempts: 10 per minute per cart (§12 rate limiting), so codes cannot be guessed by
+ * brute force. Shared Postgres limiter (`RATE_LIMITS.couponAttempt`); fails open on a DB error.
  */
-const COUPON_ATTEMPTS = 10;
-const COUPON_WINDOW_MS = 60_000;
-const couponAttempts = new Map<string, number[]>();
-
-export function allowCouponAttempt(key: string, now = Date.now()): boolean {
-  const recent = (couponAttempts.get(key) ?? []).filter((at) => now - at < COUPON_WINDOW_MS);
-  if (recent.length >= COUPON_ATTEMPTS) {
-    couponAttempts.set(key, recent);
-    return false;
+export async function allowCouponAttempt(cartId: string): Promise<boolean> {
+  try {
+    const result = await consumeRateLimit(getDb(), { scope: 'couponAttempt', subject: cartId });
+    return result.ok;
+  } catch (error) {
+    logger.error('rate_limit.failed', { scope: 'couponAttempt', ...errorFields(error) });
+    return true;
   }
-  recent.push(now);
-  couponAttempts.set(key, recent);
-  if (couponAttempts.size > 10_000) {
-    for (const [k, times] of couponAttempts) {
-      if (times.every((at) => now - at >= COUPON_WINDOW_MS)) couponAttempts.delete(k);
-    }
-  }
-  return true;
 }

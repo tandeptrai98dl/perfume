@@ -2,14 +2,13 @@
 
 import 'server-only';
 
-import { isIP } from 'node:net';
-
 import { refresh } from 'next/cache';
 import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { getCustomerSession } from '@/server/auth/customer';
 import { getDb } from '@/server/db/client';
+import { getClientIp } from '@/server/request-ip';
 import { getProducer } from '@/server/jobs/producer';
 import { DomainError, type FieldIssue } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
@@ -47,15 +46,8 @@ function fieldErrors(error: z.ZodError): FieldIssue[] {
 }
 
 async function requestContext() {
-  const list = await headers();
-  const forwarded =
-    list.get('cf-connecting-ip') ??
-    list.get('x-real-ip') ??
-    list.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return {
-    ip: forwarded && isIP(forwarded) ? forwarded : null,
-    userAgent: list.get('user-agent'),
-  };
+  const [list, ip] = await Promise.all([headers(), getClientIp()]);
+  return { ip, userAgent: list.get('user-agent') };
 }
 
 async function runCustomerAction<S extends z.ZodType, T>(

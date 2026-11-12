@@ -29,7 +29,6 @@ export {
   type CheckoutQuoteShipping,
 } from './quote';
 export {
-  countRecentOrdersByIp,
   findOrderByCheckoutKey,
   placeOrder,
   placeOrderInTx,

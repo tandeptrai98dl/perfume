@@ -151,7 +151,7 @@ export async function applyCoupon(
     const current = await loadCurrentCart();
     const { cart, userId } = current;
     if (!cart) return { ok: false, error: 'coupon', coupon: { reason: 'empty_cart' } };
-    if (!allowCouponAttempt(cart.id)) return { ok: false, error: 'rate_limited' };
+    if (!(await allowCouponAttempt(cart.id))) return { ok: false, error: 'rate_limited' };
     await refreshCartCookie(current);
     const outcome = await applyCartCoupon(getDb(), {
       cartId: cart.id,

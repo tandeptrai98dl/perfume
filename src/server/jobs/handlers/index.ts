@@ -7,6 +7,7 @@ import type { EmailSender } from '@/server/integrations/email/send';
 import type { JobName, JobPayload } from '../definitions';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
+import { createPruneRateLimitsHandler } from './prune-rate-limits';
 import { createRevalidateHandler } from './revalidate';
 import { createTestEmailHandler } from './test-email';
 
@@ -46,5 +47,6 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
     }),
     ...createOrderNotificationHandlers(deps),
     ...createOrderTimeoutHandlers(deps),
+    'system.prune-rate-limits': createPruneRateLimitsHandler(deps.db),
   };
 }
