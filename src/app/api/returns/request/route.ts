@@ -55,7 +55,12 @@ function respond(body: ReturnRequestResponse, status = 200) {
   return NextResponse.json(body, { status, headers: { 'cache-control': 'no-store' } });
 }
 
-function fail(status: number, error: ReturnErrorCode, fieldErrors: FieldIssue[] = []) {
+/**
+ * Refusals the form explains (validation, eligibility, not found, rate limit) answer 200 with
+ * `ok: false`, like a Server Action result; only a cross-site post, an oversized body and an
+ * unexpected failure use an error status.
+ */
+function fail(error: ReturnErrorCode, fieldErrors: FieldIssue[] = [], status = 200) {
   return respond({ ok: false, error, fieldErrors }, status);
 }
 
@@ -74,9 +79,9 @@ function zodIssues(error: z.ZodError, prefix: string[] = []): FieldIssue[] {
 }
 
 export async function POST(request: Request) {
-  if (!sameOrigin(request)) return fail(403, 'unexpected');
+  if (!sameOrigin(request)) return fail('unexpected', [], 403);
   if (Number(request.headers.get('content-length') ?? 0) > MAX_REQUEST_BYTES) {
-    return fail(413, 'payloadTooLarge', [{ path: 'photos', code: 'photoTooLarge' }]);
+    return fail('payloadTooLarge', [{ path: 'request.photos', code: 'photoTooLarge' }], 413);
   }
 
   let form: FormData;
@@ -85,30 +90,30 @@ export async function POST(request: Request) {
     form = await request.formData();
     json = JSON.parse(String(form.get('payload') ?? ''));
   } catch {
-    return fail(400, 'validation');
+    return fail('validation');
   }
   const parsed = payloadSchema.safeParse(json);
   const photos = photosSchema.safeParse(form.getAll('photos'));
   if (!parsed.success || !photos.success) {
-    return fail(400, 'validation', [
+    return fail('validation', [
       ...(parsed.success ? [] : zodIssues(parsed.error)),
       ...(photos.success ? [] : zodIssues(photos.error, ['request', 'photos'])),
     ]);
   }
 
   const guard = await guardRequest({ scope: 'returnRequest' });
-  if (!guard.ok) return fail(429, 'rateLimited');
+  if (!guard.ok) return fail('rateLimited');
 
   let storedKeys: string[] = [];
   const storage = getPrivateStorage();
   try {
     const db = getDb();
     const order = await findOrderForReturn(db, parsed.data.code);
-    if (!order) return fail(404, 'notFound');
+    if (!order) return fail('notFound');
     const session = await getCustomerSession();
     const owner = !!session && !!order.userId && order.userId === session.user.id;
     if (!owner && !(await hasOrderAccess(order.code, parsed.data.token))) {
-      return fail(404, 'notFound');
+      return fail('notFound');
     }
     const buffers = await Promise.all(
       photos.data.map(async (file) => Buffer.from(await file.arrayBuffer())),
@@ -126,19 +131,18 @@ export async function POST(request: Request) {
     await deleteReturnPhotos(storage, storedKeys);
     if (error instanceof DomainError) {
       const first = error.fieldErrors[0]?.code;
-      if (first && ELIGIBILITY_CODES.has(first)) return fail(409, first as ReturnErrorCode);
-      if (first === 'photosUnavailable') return fail(503, 'photosUnavailable');
+      if (first && ELIGIBILITY_CODES.has(first)) return fail(first as ReturnErrorCode);
+      if (first === 'photosUnavailable') return fail('photosUnavailable');
       if (error.code === 'invalid') {
         return fail(
-          422,
           'validation',
           error.fieldErrors.map((issue) => ({ path: `request.${issue.path}`, code: issue.code })),
         );
       }
-      if (error.code === 'notFound') return fail(404, 'notFound');
-      if (error.code === 'conflict') return fail(409, 'conflict');
+      if (error.code === 'notFound') return fail('notFound');
+      if (error.code === 'conflict') return fail('conflict');
     }
     logger.error('returns.request_failed', errorFields(error));
-    return fail(500, 'unexpected');
+    return fail('unexpected', [], 500);
   }
 }
