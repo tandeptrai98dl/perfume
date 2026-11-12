@@ -87,11 +87,21 @@ After a suspected leak also: revoke all sessions (`delete from sessions;`), revi
 
 ## 5. Quality gates (before go-live and before big campaigns)
 
-- **Lighthouse CI** (`.github/workflows/lighthouse.yml`, manual): budgets of §14 on home,
-  listing, PDP, cart, checkout in vi + en. Switch the trigger to `pull_request` once the
-  runner baseline is stable.
-- **OWASP ZAP baseline** (`.github/workflows/zap-baseline.yml`, manual, target = staging):
-  rules in `.zap/rules.tsv`; any FAIL blocks go-live.
+- **Lighthouse CI** (`.github/workflows/lighthouse.yml`, every pull request + manual):
+  budgets of §14 on home, listing, PDP, cart, checkout in vi + en, mobile and desktop
+  presets, median of 3 runs (`lighthouserc.cjs` documents each budget and the TBT
+  relaxation). Reports: the job summary and the `lighthouse-<preset>` artifact. Locally:
+  `pnpm build`, start the standalone server, then
+  `LH_BASE_URL=http://localhost:3200 CHROME_PATH=$(which google-chrome) pnpm exec lhci autorun`
+  and `node scripts/lighthouse-summary.mjs`.
+- **First-load JS budget** (`scripts/js-budget.mjs`, CI E2E job after the build): fails when
+  the PDP exceeds its ceiling; prints framework vs app KB per storefront route (ADR-0025).
+  New client code in the layout, header or footer counts against every page: load dialogs
+  and other on-demand widgets with `React.lazy` on first use.
+- **OWASP ZAP baseline** (`.github/workflows/zap-baseline.yml`, weekly + manual): scans the
+  production build started inside the job (no external target). Rules and the reason for
+  each ignored or downgraded rule in `.zap/rules.tsv`; any FAIL blocks go-live. Before
+  go-live also run ZAP once against staging (https) for the HTTPS-only rules.
 - **k6** (`load/k6/`): 200 browsing users + 20 checkouts/min on staging.
 - **CSP:** deploy with `CSP_REPORT_ONLY=true` first, watch Sentry "CSP" events for a few days
   (GTM tags may need a host in `src/lib/security/csp.ts`), then enforce (`false`).
