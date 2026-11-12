@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useId, useState, useTransition } from 'react';
+import { useId, useState, useTransition, type FormEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +42,11 @@ export function SetPasswordForm({ token }: { token: string | null }) {
     );
   }
 
-  function submit(form: FormData) {
+  // onSubmit rather than a form action: an action resets the fields, and a typo in the
+  // confirmation would wipe the password too.
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
     const password = String(form.get('password') ?? '');
     const confirm = String(form.get('confirm') ?? '');
     if (password.length < MIN_LENGTH) return setError('tooShort');
@@ -59,7 +63,7 @@ export function SetPasswordForm({ token }: { token: string | null }) {
   }
 
   return (
-    <form action={submit} className="flex flex-col gap-4" noValidate>
+    <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
       <label htmlFor={`${id}-password`} className="text-small flex flex-col gap-2 font-medium">
         {t('password')}
         <Input

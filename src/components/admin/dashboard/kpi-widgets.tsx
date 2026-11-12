@@ -182,7 +182,7 @@ export function DailyRevenueChart({ points }: { points: DailyPoint[] }) {
         <summary className="text-small cursor-pointer underline-offset-4 hover:underline">
           {t('showTable')}
         </summary>
-        <div className="mt-2 max-h-64 overflow-auto">
+        <div className="mt-2">
           <table className="text-small w-full text-left">
             <caption className="sr-only">{t('dailyTitle')}</caption>
             <thead>
@@ -335,8 +335,10 @@ export function AttentionList({ items }: { items: AttentionItem[] }) {
       <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <li key={item.key}>
+            {/* No prefetch: these are secondary links to other work screens. */}
             <Link
               href={item.href as Route}
+              prefetch={false}
               className={cn(
                 'hover:border-ink-950 flex h-full flex-col gap-1 border bg-white p-4',
                 item.alert ? 'border-warning' : 'border-line-200',

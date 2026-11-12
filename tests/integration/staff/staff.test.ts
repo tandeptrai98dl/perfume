@@ -143,7 +143,7 @@ describe('invitations', () => {
   it('refuses an e-mail that already has an account (no silent customer promotion)', async () => {
     await expectDomainError(
       inviteStaff(ctx('owner'), { email: 'owner@example.com', name: 'X', role: 'staff' }),
-      'conflict',
+      'invalid',
       'emailTaken',
     );
   });

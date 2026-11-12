@@ -103,7 +103,7 @@ export async function inviteStaff(
         .from(users)
         .where(eq(users.email, input.email))
         .limit(1);
-      if (existing) throw new DomainError('conflict', [{ path: 'email', code: 'emailTaken' }]);
+      if (existing) throw new DomainError('invalid', [{ path: 'email', code: 'emailTaken' }]);
       await tx.insert(users).values({
         id,
         name: input.name,
@@ -124,7 +124,7 @@ export async function inviteStaff(
     });
   } catch (error) {
     if (isUniqueViolation(error)) {
-      throw new DomainError('conflict', [{ path: 'email', code: 'emailTaken' }]);
+      throw new DomainError('invalid', [{ path: 'email', code: 'emailTaken' }]);
     }
     throw error;
   }
