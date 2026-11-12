@@ -85,3 +85,5 @@ export type {
   PaymentSessionView,
   TimeoutRunResult,
 } from './types';
+// Customer returns (M3 wave 2 returns stream, ADR-0017): refund of a received return.
+export { queueReturnRefund, type ReturnRefundResult } from './returns';

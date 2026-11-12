@@ -29,6 +29,8 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' },
       // M3 e-invoicing (D13): invoices that failed after every retry.
       { href: '/admin/orders/einvoices', labelKey: 'einvoices', permission: 'orders.view' },
+      // M3 wave 2 returns (ADR-0017): return requests waiting for staff.
+      { href: '/admin/orders/returns', labelKey: 'returns', permission: 'orders.view' },
     ],
   },
   // M3 wave 2 (customers & alerts stream): customers, Owner + Manager (§11.1).

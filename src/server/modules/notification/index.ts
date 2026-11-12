@@ -11,6 +11,7 @@ export {
   sendOrderUpdate,
   sendPaymentLink,
   sendPaymentReceived,
+  sendReturnUpdate,
   sendStaffAlert,
   sendStatusChangeEmail,
   type NotificationDeps,

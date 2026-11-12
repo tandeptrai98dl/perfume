@@ -4,6 +4,7 @@ import type { Database } from '@/server/db/client';
 import { orderAddresses, orderEvents, orderItems, orders } from '@/server/db/schema';
 import type { Tx } from '@/server/lib/command-context';
 
+import { RETURN_EVENTS } from './return-events';
 import { ORDER_STATUSES, isTerminal, type OrderStatus } from './state-machine';
 
 /*
@@ -204,6 +205,12 @@ export async function anonymizeOrdersForSubject(tx: Tx, subject: OrderSubject): 
     .update(orderAddresses)
     .set({ fullName: ANONYMIZED_TEXT, phone: '', street: ANONYMIZED_TEXT, legacyDistrict: null })
     .where(inArray(orderAddresses.orderId, ids));
+
+  // Return requests keep the customer's free-text description (M3 returns): remove it.
+  await tx
+    .update(orderEvents)
+    .set({ message: null })
+    .where(and(inArray(orderEvents.orderId, ids), eq(orderEvents.type, RETURN_EVENTS.requested)));
 
   // Order edits keep a before/after address diff (M2): scrub it as well.
   const events = await tx

@@ -21,6 +21,7 @@ import { countFlaggedCustomers } from '@/server/modules/customer';
 import { listLowStock } from '@/server/modules/inventory';
 import { countOrdersByStatus, tabCounts } from '@/server/modules/order';
 import { DEFAULT_RANGE, getDashboard, RANGE_PRESETS } from '@/server/modules/reporting';
+import { countReturnQueue } from '@/server/modules/returns';
 
 const loadRange = createLoader({
   range: parseAsStringLiteral(RANGE_PRESETS).withDefault(DEFAULT_RANGE),
@@ -49,11 +50,12 @@ async function Dashboard({ searchParams }: PageProps<'/admin'>) {
   const canOrders = hasPermission(role, 'orders.view');
   const canStock = hasPermission(role, 'inventory.adjust');
   const canCustomers = hasPermission(role, 'customers.view');
-  const [dashboard, counts, lowStock, flaggedCustomers] = await Promise.all([
+  const [dashboard, counts, lowStock, flaggedCustomers, returnQueue] = await Promise.all([
     getDashboard(db, role, preset),
     canOrders ? countOrdersByStatus(db) : null,
     canStock ? listLowStock(db, 10) : null,
     canCustomers ? countFlaggedCustomers(db) : null,
+    canOrders ? countReturnQueue(db) : null,
   ]);
   const vnd = (amount: number) =>
     format.number(amount, { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
@@ -108,6 +110,16 @@ async function Dashboard({ searchParams }: PageProps<'/admin'>) {
       value: t('dashboard.privacyValue', dashboard.privacy),
       href: '/admin/privacy-requests',
       alert: dashboard.privacy.overdue > 0,
+    });
+  }
+  // M3 wave 2 (returns stream): return requests waiting for a decision or the goods (ADR-0017).
+  if (returnQueue !== null) {
+    attention.push({
+      key: 'returns',
+      label: t('dashboard.returnQueue'),
+      value: format.number(returnQueue),
+      href: '/admin/orders/returns',
+      alert: returnQueue > 0,
     });
   }
   // M3 wave 2 (customers stream): accounts flagged after a failed COD delivery (D16).

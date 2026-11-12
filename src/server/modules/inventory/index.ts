@@ -62,3 +62,5 @@ export {
 
 // M3 wave 2 (customers & alerts stream): low-stock alerts on downward threshold crossings.
 export { enqueueLowStockAlerts, lowStockCrossings, type StockLevelChange } from './low-stock';
+// Customer returns (M3 wave 2 returns stream, ADR-0017): partial restock and write-offs.
+export { restockReturnedLines, writeOffReturnedStock, type ReturnedStockLine } from './returns';

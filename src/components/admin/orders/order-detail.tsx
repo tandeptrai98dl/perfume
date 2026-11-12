@@ -78,6 +78,7 @@ export function OrderDetailView({
   einvoice,
   notifications,
   customerHref,
+  returns,
 }: {
   order: AdminOrderDetail;
   canCancelPaid: boolean;
@@ -89,6 +90,8 @@ export function OrderDetailView({
   notifications?: ReactNode;
   /** M3 wave 2: the customer's admin page, for roles with `customers.view`. */
   customerHref?: string | null;
+  /** Return request panel (M3 wave 2, ADR-0017), shown first when the order has one. */
+  returns?: ReactNode;
 }) {
   const t = useTranslations('admin.orders');
   const format = useOrderFormat();
@@ -112,6 +115,12 @@ export function OrderDetailView({
               <p>{t('detail.risk.advice')}</p>
             </div>
           </div>
+        )}
+
+        {returns && (
+          <Section id="order-returns" title={t('detail.returns')}>
+            {returns}
+          </Section>
         )}
 
         <Section id="order-items" title={t('detail.items')}>

@@ -59,6 +59,8 @@ export const RATE_LIMITS = {
   privacyRequest: { limit: 3, windowMs: 60 * MINUTE },
   /** Newsletter sign-up / consent changes from public forms: 5 per 10 min per IP. */
   newsletterSignup: { limit: 5, windowMs: 10 * MINUTE },
+  /** Customer return requests (account and guest order pages): 5 per hour per IP. */
+  returnRequest: { limit: 5, windowMs: 60 * MINUTE },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateLimitScope = keyof typeof RATE_LIMITS;

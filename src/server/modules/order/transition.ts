@@ -102,7 +102,12 @@ export async function transitionOrder(
     });
   }
 
-  const column = TIMESTAMP_COLUMN[input.to];
+  // A rejected or partly accepted return goes back to `delivered`: keep the real delivery time,
+  // so the return window (and `orders.complete-delivered`) still counts from it (ADR-0017).
+  const column =
+    input.to === 'delivered' && from === 'return_requested' && order.deliveredAt
+      ? undefined
+      : TIMESTAMP_COLUMN[input.to];
   const [updated] = await tx
     .update(orders)
     .set({

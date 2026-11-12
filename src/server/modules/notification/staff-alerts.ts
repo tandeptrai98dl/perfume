@@ -22,6 +22,9 @@ export const STAFF_ALERT_KINDS = [
   'edit_refund',
   // M3 wave 2: reviews awaiting moderation (at most one alert per hour).
   'review_pending',
+  // M3 wave 2 returns stream.
+  'return_requested',
+  'einvoice_adjustment_failed',
 ] as const;
 export type StaffAlertKind = (typeof STAFF_ALERT_KINDS)[number];
 

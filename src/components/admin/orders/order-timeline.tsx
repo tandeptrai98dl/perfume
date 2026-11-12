@@ -53,6 +53,30 @@ export function OrderTimeline({ events }: { events: AdminOrderEvent[] }) {
         return t('timeline.einvoice_failed');
       case 'einvoice_retry_requested':
         return t('timeline.einvoice_retry_requested');
+      // M3 wave 2: customer returns (ADR-0017) and e-invoice cancel / replace
+      case 'return_requested':
+      case 'return_approved':
+      case 'return_rejected':
+      case 'return_received':
+        return t(`timeline.${event.type}`);
+      case 'einvoice_adjust_requested':
+        return t('timeline.einvoice_adjust_requested', {
+          action: t(
+            event.metadata?.action === 'cancel'
+              ? 'timeline.adjustActions.cancel'
+              : 'timeline.adjustActions.replace',
+          ),
+        });
+      case 'einvoice_adjust_attempt_failed':
+        return t('timeline.einvoice_adjust_attempt_failed', {
+          attempt: Number(event.metadata?.attempt ?? 0),
+        });
+      case 'einvoice_adjust_failed':
+        return t('timeline.einvoice_adjust_failed');
+      case 'einvoice_cancelled':
+        return t('timeline.einvoice_cancelled', { number: String(event.metadata?.ref ?? '') });
+      case 'einvoice_replaced':
+        return t('timeline.einvoice_replaced', { number: String(event.metadata?.ref ?? '') });
       default:
         return t('timeline.other', { type: event.type });
     }
