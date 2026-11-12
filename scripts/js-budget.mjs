@@ -11,7 +11,7 @@
  * §14.1 targets 150 KB gzip for the PDP. Next.js 16 + React 19's runtime alone is ~136 KB
  * gzip, so that total is out of reach without leaving the stack; the enforced limit is a
  * regression ceiling just above the measured size (224 KB after the M3 performance pass)
- * until docs/adr/0025-first-load-js-budget.md (Proposed) is decided. The target is still
+ * per docs/adr/0026-first-load-js-budget.md (Accepted). The 150 KB target is still
  * reported.
  *
  * Usage: node scripts/js-budget.mjs [--dist .next]
@@ -28,7 +28,7 @@ export const BUDGETS = {
   '/[locale]/products/[slug]': 240,
 };
 
-/** §14.1 targets, reported (not enforced) until ADR-0025 is decided. */
+/** §14.1 long-term targets, reported as warnings (not enforced; ADR-0026). */
 export const TARGETS = {
   '/[locale]/products/[slug]': 150,
 };
@@ -153,9 +153,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   for (const [route, target] of Object.entries(TARGETS)) {
     const measured = routes.find((r) => r.route === route);
     if (measured && measured.gzipBytes > target * KB) {
-      // GitHub annotation (warning), not a failure: see ADR-0025.
+      // GitHub annotation (warning), not a failure: see ADR-0026.
       console.log(
-        `::warning title=JS budget target::${route} ${kb(measured.gzipBytes)} KB gzip > §14.1 target ${target} KB (limit ${BUDGETS[route]} KB, ADR-0025)`,
+        `::warning title=JS budget target::${route} ${kb(measured.gzipBytes)} KB gzip > §14.1 target ${target} KB (limit ${BUDGETS[route]} KB, ADR-0026)`,
       );
     }
   }

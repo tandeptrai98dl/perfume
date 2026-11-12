@@ -1,8 +1,8 @@
-# ADR-0025: First-load JavaScript budget for the PDP
+# ADR-0026: First-load JavaScript budget for the PDP
 
-- Status: Proposed
+- Status: Accepted (2026-11-12, recommended option taken under the project owner's standing instruction)
 - Date: 2026-11-12
-- Decision ID: D25 (M3 quality gates; would refine the "JavaScript" row of ARCHITECTURE.md §14.1)
+- Decision ID: D26 (M3 quality gates; refines the "JavaScript" row of ARCHITECTURE.md §14.1)
 
 ## Context
 
@@ -23,14 +23,14 @@ The framework alone is ~136 KB, so 150 KB total would leave ~14 KB for the whole
 (next-intl's client runtime alone is ~12 KB). Lighthouse Performance ≥ 90 (the user-facing
 §14 goal) is reachable at the current size: LCP and CLS are now dominated by HTML/CSS, not JS.
 
-## Decision (proposed)
+## Decision
 
 1. Keep the §14.1 intent but measure it in two parts:
    - **App JS** (first-load JS minus the framework runtime): PDP < 100 KB gzip.
    - **Total** first-load JS: PDP ≤ 240 KB gzip as a regression ceiling, lowered whenever a
      change reduces it by more than 10 KB.
 2. CI (`.github/workflows/ci.yml`, E2E job after `pnpm build`) enforces the ceiling now and
-   reports the 150 KB figure as a warning annotation until this ADR is decided.
+   reports the 150 KB figure as a warning annotation as the long-term target.
 3. Lighthouse Performance ≥ 0.9 (mobile, median of 3) on home, listing and PDP in vi + en stays
    the primary gate (`lighthouserc.cjs`).
 

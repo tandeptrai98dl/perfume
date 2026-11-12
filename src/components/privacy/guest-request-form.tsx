@@ -57,6 +57,7 @@ export function GuestRequestForm() {
 
   return (
     <form
+      method="post"
       noValidate
       className="flex flex-col gap-6"
       onSubmit={(event) => {

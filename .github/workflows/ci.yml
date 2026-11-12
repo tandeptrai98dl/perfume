@@ -90,7 +90,7 @@ jobs:
       - run: pnpm db:migrate
       - run: pnpm db:seed
       - run: pnpm build
-      # First-load JS per storefront route (ARCHITECTURE.md §14.1, ADR-0025): fails over the
+      # First-load JS per storefront route (ARCHITECTURE.md §14.1, ADR-0026): fails over the
       # PDP limit; the table goes to the job summary.
       - name: JS budget
         run: node scripts/js-budget.mjs

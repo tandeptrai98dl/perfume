@@ -58,6 +58,7 @@ All decisions below are final. Items marked *external review* are implemented as
 | D22 | Online-only, single warehouse in MVP; physical store / POS in Phase 3 via `locations` | Avoid multi-channel stock sync until needed | [0022](./adr/0022-online-only-single-warehouse.md) |
 | D24 | CSP without nonces: `'self'` + inline + documented host allowlist for scripts, everything else strict | Prerendered/cached shells (Cache Components) cannot carry a per-request nonce; measured | [0024](./adr/0024-csp-without-nonces.md) |
 | D25 | Staff notes and COD risk reasons live in `customer_notes`, deleted by privacy anonymisation; the audit log only references them | `audit_logs` is append-only and must not keep personal text after a deletion request (PDPL 91/2025) | [0025](./adr/0025-customer-notes-table.md) |
+| D26 | First-load JS budget for the PDP: app JS < 100 KB gzip, total ≤ 240 KB ceiling lowered as it shrinks; Lighthouse ≥ 0.9 stays the primary gate | The Next/React runtime alone is ~136 KB, so 150 KB total needs a stack change | [0026](./adr/0026-first-load-js-budget.md) |
 
 ---
 
@@ -1078,7 +1079,7 @@ Google Search Console (one property, both locales, sitemaps submitted), Bing Web
 - **Build without data:** `next build` never reads the database (Docker images must not bake in data): catalogue/content sections stream at request time from the `'use cache'` layer (`src/server/catalog-cache.ts`, `src/data/content.ts`) and are cached after the first request. Filter + sort + facets is one SQL statement per listing (p95 33 ms at 3,000 SKUs, uncached).
 - **Images:** `next/image` with AVIF/WebP, correct `sizes`, `priority` only for the hero/first PDP image, blur placeholders stored in `media`; source images ≤ 2400px; CDN cache 1 year (hashed names).
 - **Fonts:** self-hosted (Fontsource), only the weights used (serif 400/500, sans 300–600).
-- **JavaScript:** Server Components by default; React Compiler on; `next/dynamic` for gallery zoom, Tiptap, charts; PDP JS budget < 150 KB gzip (bundle analyzer in CI: `scripts/js-budget.mjs`; interim ceiling and the framework/app split proposed in ADR-0025). Dialogs (search, mini-cart, mobile menu, cookie preferences, gallery zoom) load on first use.
+- **JavaScript:** Server Components by default; React Compiler on; `next/dynamic` for gallery zoom, Tiptap, charts; PDP JS budget < 150 KB gzip (bundle analyzer in CI: `scripts/js-budget.mjs`; interim ceiling and the framework/app split accepted in ADR-0026). Dialogs (search, mini-cart, mobile menu, cookie preferences, gallery zoom) load on first use.
 - **Third-party scripts:** GTM after consent with `strategy="lazyOnload"`; no heavy chat widgets (Zalo/Messenger as plain links).
 - **Database:** indexes per 6.3; no N+1 (joins/`with`); connection pooling (pgBouncer or the provider's pool); `EXPLAIN ANALYZE` for filter/search queries.
 - **Measurement:** Lighthouse CI (`lighthouserc.cjs`, `.github/workflows/lighthouse.yml`: Performance ≥ 90 for home, listing, PDP in both locales; LCP/CLS/TBT budgets also on cart and checkout; TBT is a warning on CI runners, whose noise the Performance score absorbs) — on every PR, mobile + desktop, median of 3 runs; ZAP baseline weekly against the production build inside CI (`.github/workflows/zap-baseline.yml`); k6 load test in `load/k6/`; RUM via `useReportWebVitals` → GA4; Sentry performance for the server.

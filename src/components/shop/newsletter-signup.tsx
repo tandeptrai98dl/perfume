@@ -63,6 +63,7 @@ export function NewsletterSignup({
 
   return (
     <form
+      method="post"
       noValidate
       data-testid={`newsletter-${source}`}
       className={cn('flex flex-col gap-4', className)}

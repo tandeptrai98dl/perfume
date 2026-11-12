@@ -59,7 +59,12 @@ export function GiftOptions({
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4" aria-labelledby={`${ids.wrap}-title`}>
+    <form
+      method="post"
+      onSubmit={submit}
+      className="flex flex-col gap-4"
+      aria-labelledby={`${ids.wrap}-title`}
+    >
       <h2 id={`${ids.wrap}-title`} className="eyebrow text-taupe-600">
         {t('title')}
       </h2>

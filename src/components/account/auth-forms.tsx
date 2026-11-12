@@ -129,7 +129,12 @@ export function SignInForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+      <form
+        method="post"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         {noticeText && (
           <FormNotice tone={notice === 'notVerified' ? 'info' : 'error'}>{noticeText}</FormNotice>
         )}
@@ -226,7 +231,12 @@ export function SignUpForm({ verifyCallback }: { verifyCallback: string }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+      <form
+        method="post"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         {notice && (
           <FormNotice tone="error">
             {notice === 'captchaFailed' ? tSecurity(notice) : t(notice)}
@@ -328,7 +338,12 @@ export function ForgotPasswordForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+      <form
+        method="post"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         {notice && (
           <FormNotice tone="error">
             {notice === 'captchaFailed' ? tSecurity(notice) : t(notice)}
@@ -398,7 +413,12 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+      <form
+        method="post"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         <FormField
           control={form.control}
           name="password"

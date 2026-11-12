@@ -114,6 +114,7 @@ export function ReturnRequestForm({
 
   return (
     <form
+      method="post"
       id={`${id}-form`}
       onSubmit={submit}
       noValidate

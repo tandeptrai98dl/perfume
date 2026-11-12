@@ -63,7 +63,7 @@ export function SetPasswordForm({ token }: { token: string | null }) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
+    <form method="post" onSubmit={submit} className="flex flex-col gap-4" noValidate>
       <label htmlFor={`${id}-password`} className="text-small flex flex-col gap-2 font-medium">
         {t('password')}
         <Input

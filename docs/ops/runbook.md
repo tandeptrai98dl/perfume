@@ -95,7 +95,7 @@ After a suspected leak also: revoke all sessions (`delete from sessions;`), revi
   `LH_BASE_URL=http://localhost:3200 CHROME_PATH=$(which google-chrome) pnpm exec lhci autorun`
   and `node scripts/lighthouse-summary.mjs`.
 - **First-load JS budget** (`scripts/js-budget.mjs`, CI E2E job after the build): fails when
-  the PDP exceeds its ceiling; prints framework vs app KB per storefront route (ADR-0025).
+  the PDP exceeds its ceiling; prints framework vs app KB per storefront route (ADR-0026).
   New client code in the layout, header or footer counts against every page: load dialogs
   and other on-demand widgets with `React.lazy` on first use.
 - **OWASP ZAP baseline** (`.github/workflows/zap-baseline.yml`, weekly + manual): scans the
