@@ -115,6 +115,16 @@ export const JOBS = {
     schema: z.object({ orderId: z.uuid() }),
     queue: retryPolicy,
   },
+
+  // ---------- M3: reviews (ADR-0008) ----------
+  /**
+   * Review invitation a few days after delivery: guest one-time links per line (hashed
+   * tokens, 30 days) or, for members, a link to the account's "Reviews to write".
+   */
+  'review.invite': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: retryPolicy,
+  },
 } as const;
 
 /** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */

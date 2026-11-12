@@ -17,11 +17,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 62 |
+| Admin Server Actions | 64 |
 | Admin Server Actions without a permission | 0 |
-| Storefront Server Actions | 17 |
-| Route Handlers | 15 |
-| Admin pages | 56 |
+| Storefront Server Actions | 20 |
+| Route Handlers | 16 |
+| Admin pages | 57 |
 
 ## Admin Server Actions
 
@@ -78,6 +78,8 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `promotions.ts` | `saveCouponAction` | `coupons.manage` | owner, manager | yes |
 | `promotions.ts` | `searchCouponProductsAction` | `coupons.manage` | owner, manager | yes |
 | `promotions.ts` | `setCouponActiveAction` | `coupons.manage` | owner, manager | yes |
+| `reviews.ts` | `moderateReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
+| `reviews.ts` | `replyReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
 | `shipping.ts` | `deleteShippingRateAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `deleteShippingZoneAction` | `settings.manage` | owner | yes |
 | `shipping.ts` | `saveShippingRateAction` | `settings.manage` | owner | yes |
@@ -104,6 +106,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/internal/revalidate` | POST | — | HMAC signature | Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session. |
 | `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only). |
 | `/api/payments/simulator/vnpay` | GET | — | simulator signature (non-production only); gateway signature + amount/txn_ref match + idempotency | Payment simulator: 404 unless the gateway runs in simulator mode (never in production). |
+| `/api/reviews` | GET | — | — |  |
 | `/api/search/suggestions` | GET | — | — | Public catalogue search suggestions (published data). |
 | `/api/webhooks/payos` | POST | — | gateway signature + amount/txn_ref match + idempotency | Gateway webhook: signature, amount + txn_ref match and idempotency key (no session by design). |
 | `/api/webhooks/vnpay` | GET | — | gateway signature + amount/txn_ref match + idempotency | Gateway IPN: signature, amount + txn_ref match and idempotency key (no session by design). |
@@ -133,6 +136,9 @@ No staff permission by design; the guard is ownership, a signed token or a rate 
 | `checkout.ts` | `quoteCheckoutAction` | — | yes | Anonymous allowed. Read-only price quote of the caller’s own cart; no PII returned. |
 | `order-lookup.ts` | `lookupOrderAction` | issues a signed order-access token | yes | Guest order lookup: order code + phone, rate-limited, generic failure (no enumeration). |
 | `payment.ts` | `startPaymentAction` | order access (owner session or signed order token) | yes | Owner session or signed order token; unknown and foreign orders answer the same. |
+| `review.ts` | `submitGuestReviewAction` | — | yes |  |
+| `review.ts` | `submitMemberReviewAction` | customer session (own data only) | yes |  |
+| `wishlist.ts` | `setWishlistedAction` | customer session (own data only) | yes |  |
 
 ## Admin pages
 
@@ -189,6 +195,7 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/promotions/coupons/[id]` | `coupons.manage` | owner, manager | — |  |
 | `/admin/promotions/coupons/new` | `coupons.manage` | owner, manager | — |  |
 | `/admin/promotions/coupons` | `coupons.manage` | owner, manager | — |  |
+| `/admin/reviews` | `reviews.moderate` | owner, manager, editor | — |  |
 | `/admin/shipping` | `settings.manage` | owner | — |  |
 | `/admin/staff/[id]` | `staff.manage` | owner | — |  |
 | `/admin/staff` | `staff.manage` | owner | — |  |

@@ -49,3 +49,6 @@ export {
   type CustomerRef,
   type ResolvedCustomer,
 } from './lookup';
+
+// ---------- M3 reviews & wishlist stream: member wishlist ----------
+export { listWishlistProductIds, MAX_WISHLIST_ITEMS, setWishlisted } from './wishlist';

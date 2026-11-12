@@ -126,6 +126,8 @@ export function entityHref(entityType: string, entityId: string | null): string 
       return '/admin/payments/cod-remittances';
     case 'staff':
       return `/admin/staff/${id}`;
+    case 'review':
+      return '/admin/reviews?status=all';
     default:
       return null;
   }

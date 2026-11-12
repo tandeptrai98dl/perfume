@@ -370,6 +370,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 | `(shop)/account` | `/tai-khoan` | `/en/account` | Account overview | Dynamic | MVP |
 | `account/orders`, `account/orders/[code]` | `/tai-khoan/don-hang/…` | `/en/account/orders/…` | Order history + detail | Dynamic | MVP |
 | `account/addresses`, `account/wishlist`, `account/profile`, `account/privacy` | `/tai-khoan/dia-chi`, `/yeu-thich`, `/ho-so`, `/quyen-rieng-tu` | `/en/account/addresses`, … | Addresses, wishlist, profile, privacy centre | Dynamic | MVP |
+| `account/reviews` | `/tai-khoan/danh-gia` | `/en/account/reviews` | Purchases to review + own reviews (D08) | Dynamic | MVP |
 | `account/rewards` | `/tai-khoan/diem-thuong` | `/en/account/rewards` | Loyalty | Dynamic | Phase 2 |
 | `(shop)/journal`, `journal/[slug]`, `journal/topics/[slug]` | `/tap-chi/…` | `/en/journal/…` | Journal | ISR | MVP |
 | `(shop)/about`, `authenticity`, `contact`, `faq` | `/gioi-thieu`, `/cam-ket-chinh-hang`, `/lien-he`, `/cau-hoi-thuong-gap` | `/en/about`, `/en/authenticity`, `/en/contact`, `/en/faq` | Information pages | ISR | MVP |
@@ -904,12 +905,14 @@ perfume-store/
 - *M3:* every send also writes a `notification_logs` row (channel, masked recipient, template, locale, `ref_type = 'order'`): `queued` → `sent` / `failed` (PII-free error summary), or `skipped` (no customer e-mail on a manual order, no alert channel). The admin order detail shows the log. Manual orders paid online e-mail the signed payment page to the customer automatically when an e-mail exists (`order.payment-link`, order locale). An order edit that queues a refund alerts staff (`edit_refund`). Concurrent first-session creation is safe across instances: `createPaymentSession` waits for a just-created session without URL/QR (≤ 30 s) instead of cancelling it.
 - Customers can cancel before `processing`; return requests within 7 days of delivery per D17 (form + reason + photos).
 - Reviews after `delivered`, marked "Verified purchase", moderated. Guests receive a review invitation email with a one-time token link (30 days; one review per purchased item) (D08).
+  *As implemented (M3, `server/modules/review`):* the `order.status-changed` handler schedules `review.invite` 3 days after the first `shipped → delivered` (a rejected return moving back to `delivered` does not). The job re-checks the order (still `delivered`/`completed`, has an e-mail), then in one transaction under an advisory lock: guest orders get one `review_invitations` row per line without a review (SHA-256 of a 32-byte token, `expires_at` = send + 30 days) and one e-mail with a link per line; member orders get an e-mail pointing to `/tai-khoan/danh-gia`. The send is recorded once per order (`order_events` `email_sent`, key `review_invitation`); a failed send rolls the rows back, so a retry issues fresh tokens. Members review their own delivered/completed lines from the account; guests through the link (used once; the item's other links are closed too). Each review stores the language it was written in; the product page lists approved reviews newest first with the visitor's language first, plus averages of rating, longevity and sillage. Submissions are rate limited (members 10/h, guest links 10/10 min per IP). Members' display name defaults to their given name; it is shown publicly.
 
 ### 10.6 Account (MVP)
 
 - Sign up / sign in with email + password (email verification) or Google; password reset by email (30-minute single-use token). Email/password accounts must confirm their address before the first sign-in (the link signs them in); sign-up therefore answers the same for new and existing emails (no account enumeration). Account emails use `users.locale`: the sign-up page's language, changeable in the profile.
 - After a guest order: one-step account creation; past orders with the same verified email are attached.
 - Preferred language (used for emails), order history, one-tap reorder, address book (max 10), wishlist, profile.
+  *Wishlist as implemented (M3):* members only, max 60 products (`customer` module). The heart on ProductCard and the product page is seeded by a dynamic hole of the shop layout (session + wishlisted ids), so cached listing pages stay identical for everyone; guests pressing it go to sign-in with `?next=` back to the product.
 - **Privacy centre:** view/withdraw consents, download personal data (JSON), request account deletion (personal data anonymized; orders retained for accounting).
 
 ### 10.7 Bilingual behaviour (MVP)
@@ -965,6 +968,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 - **Customers:** profile, order history, lifetime spend, notes, failed-delivery risk flag (warns on the next COD order); phone/email partially masked without permission.
 - **Coupons:** percent / fixed / free shipping; conditions (minimum subtotal, brands, categories, usage limits, dates); usage statistics.
 - **Reviews:** approve/reject/reply; approval updates `rating_avg`.
+  *As implemented (M3, `/admin/reviews`, `reviews.moderate`):* status tabs (pending queue oldest first, approved, rejected, all), search by product/reviewer/order code; approve, reject (or unpublish an approved review) and a public reply (shown under approved reviews). Every decision is audited, recomputes `products.rating_avg/rating_count` from approved reviews under a per-product advisory lock (catalogue `setProductRating`) and revalidates `product:<id>` + `reviews:product:<id>` (immediately and through the outbox). The Product JSON-LD `AggregateRating` comes from the approved-review aggregate.
 - **Content:** banners per placement with schedule, journal posts (Tiptap, linked products), static pages, header/footer menus, redirects — bilingual.
 - **Shipping:** zones (province groups) + weight-based rates, free-shipping threshold, delivery estimates. Rates change checkout prices, so managing them needs `settings.manage` (Owner); a province in several zones uses the zone with the lowest priority number.
 - **Payments:** transactions by gateway, unmatched payments, refund queue (including IPNs received after cancellation), webhook log.

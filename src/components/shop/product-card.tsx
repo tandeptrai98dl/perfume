@@ -6,11 +6,15 @@ import { cn } from '@/lib/utils';
 import type { ProductSummary } from '@/server/modules/catalog';
 
 import { ProductImage } from './product-image';
+import { WishlistButton } from './wishlist-button';
 
 const CARD_SIZES =
   '(min-width: 1280px) 280px, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw';
 
-/** Listing card (§8.3): 4:5 image (second image on hover), brand, name, concentration, price. */
+/**
+ * Listing card (§8.3): 4:5 image (second image on hover), wishlist heart, brand, name,
+ * concentration, price.
+ */
 export function ProductCard({
   product,
   priority = false,
@@ -39,6 +43,13 @@ export function ProductCard({
             <ProductImage image={second} alt="" sizes={CARD_SIZES} />
           </div>
         )}
+        {/* Above the card's full-size link overlay (z-10). */}
+        <WishlistButton
+          productId={product.id}
+          productName={product.name}
+          productSlug={product.slug}
+          className="absolute top-2 right-2 z-10"
+        />
       </div>
       <div className="flex flex-col gap-1">
         <p className="eyebrow text-taupe-600">{product.brand.name}</p>

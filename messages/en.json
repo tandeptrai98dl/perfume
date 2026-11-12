@@ -168,6 +168,19 @@
         "expiry": "This link is valid for 72 hours and can be used once.",
         "ignore": "If you were not expecting this invitation, you can ignore this email."
       }
+    },
+    "review": {
+      "subject": "How is the scent from order {code}?",
+      "preview": "Share your impressions of the scent you received.",
+      "heading": "Share your impressions",
+      "greeting": "Hello {name},",
+      "body": "We hope you have enjoyed a few days with the scent from order {code}. Your review helps other perfume lovers choose with confidence.",
+      "items": "In your order",
+      "writeFor": "Review {product}",
+      "cta": "Write a review",
+      "guestNote": "Each link can be used once and is valid for {days} days.",
+      "memberNote": "You can review your purchases at any time under Reviews in your account.",
+      "moderation": "Reviews are moderated before publication and labelled \"Verified purchase\"."
     }
   },
   "ui": {
@@ -919,7 +932,9 @@
       "orders": "Orders",
       "addresses": "Addresses",
       "profile": "Profile",
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "wishlist": "Wishlist",
+      "reviews": "Reviews"
     },
     "overview": {
       "intro": "Follow your orders, manage your addresses and choose how we contact you.",
@@ -1127,5 +1142,140 @@
     "signInHint": "Have an account?",
     "signIn": "Sign in to see all your orders",
     "resultTitle": "Order {code}"
+  },
+  "wishlist": {
+    "toggle": "Save {name} to your wishlist",
+    "signInToSave": "Sign in to save {name} to your wishlist",
+    "added": "{name} saved to your wishlist.",
+    "removed": "{name} removed from your wishlist.",
+    "errors": {
+      "full": "Your wishlist is full. Remove a few products and try again.",
+      "generic": "We could not update your wishlist. Please try again."
+    },
+    "page": {
+      "metaTitle": "Wishlist",
+      "title": "Wishlist",
+      "intro": "The scents you saved to come back to.",
+      "count": "{count, plural, one {# product} other {# products}}",
+      "emptyTitle": "Your wishlist is empty",
+      "emptyDescription": "Tap the heart on a product to save the scents you want to try.",
+      "browse": "Explore perfumes"
+    }
+  },
+  "reviews": {
+    "title": "Customer reviews",
+    "intro": "Only customers who bought and received this product can review it. Every review is moderated before it is published.",
+    "verified": "Verified purchase",
+    "byline": "{name} · {date}",
+    "purchased": "Bought: {variant}",
+    "longevityValue": "Longevity: {value}/5",
+    "sillageValue": "Sillage: {value}/5",
+    "reply": "Reply from the shop",
+    "listLabel": "Reviews",
+    "showing": "Showing {shown} of {total} reviews",
+    "loadFailed": "We could not load more reviews. Please try again.",
+    "showMore": "Show more reviews",
+    "empty": {
+      "title": "No reviews yet",
+      "description": "After delivery, buyers are invited to share how this scent wears."
+    },
+    "summary": {
+      "average": "{value, number, ::.0}",
+      "scale": "{value, number, ::.0}/5",
+      "stars": "{count, plural, one {# star} other {# stars}}",
+      "starsCount": "{stars, plural, one {# star} other {# stars}}: {count, plural, one {# review} other {# reviews}}",
+      "longevity": "Longevity",
+      "sillage": "Sillage"
+    },
+    "form": {
+      "rating": "Overall rating",
+      "longevity": "Longevity (optional)",
+      "sillage": "Sillage (optional)",
+      "skip": "Skip",
+      "longevityScale": {
+        "1": "Very short",
+        "2": "Short",
+        "3": "Moderate",
+        "4": "Long",
+        "5": "Very long"
+      },
+      "sillageScale": {
+        "1": "Very soft",
+        "2": "Soft",
+        "3": "Moderate",
+        "4": "Strong",
+        "5": "Very strong"
+      },
+      "title": "Title (optional)",
+      "body": "Your review",
+      "bodyHint": "At least {min} characters · {count}/{max}",
+      "name": "Display name",
+      "nameHint": "This name is shown publicly with your review.",
+      "moderation": "Reviews are moderated before they appear on the product page.",
+      "submit": "Submit review",
+      "thanksTitle": "Thank you for your review",
+      "thanksBody": "Your review is awaiting moderation and will appear on the product page soon."
+    },
+    "errors": {
+      "required": "Please fill in this field.",
+      "tooLong": "This is too long.",
+      "bodyTooShort": "Please write a little more (at least 20 characters).",
+      "ratingRequired": "Please choose a star rating.",
+      "invalid": "This value is not valid.",
+      "validation": "Please check the highlighted fields.",
+      "unauthorized": "Your session has expired. Please sign in again.",
+      "notFound": "We could not find the product to review.",
+      "alreadyReviewed": "This product has already been reviewed for this order.",
+      "linkExpired": "This review link has expired.",
+      "notReviewable": "Products in this order cannot be reviewed at the moment.",
+      "rateLimited": "Too many attempts. Please try again in a few minutes.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "link": {
+      "metaTitle": "Review your purchase",
+      "eyebrow": "Order {code}",
+      "title": "Review {product}",
+      "intro": "You bought {variant}. Share how it wears to help other perfume lovers choose.",
+      "viewProduct": "View the product",
+      "account": "Reviews in your account",
+      "contact": "Contact us",
+      "states": {
+        "used": {
+          "title": "You have already reviewed this product",
+          "body": "Each link can be used once. Thank you for sharing your impressions."
+        },
+        "expired": {
+          "title": "This link has expired",
+          "body": "Review links are valid for 30 days. If you would still like to leave a review, please contact us."
+        },
+        "unavailable": {
+          "title": "This order cannot be reviewed",
+          "body": "The order was returned or a return is in progress, so it cannot be reviewed."
+        },
+        "notFound": {
+          "title": "This link is not valid",
+          "body": "Please open the link from your review invitation e-mail again, or sign in to review from your account."
+        }
+      }
+    },
+    "account": {
+      "metaTitle": "My reviews",
+      "title": "Reviews",
+      "intro": "Share your impressions of the scents you received.",
+      "toWrite": "Waiting for your review",
+      "nothingToWrite": "Nothing to review yet. You can review products once your order has been delivered.",
+      "viewOrders": "View orders",
+      "itemMeta": "{variant} · Order {code}",
+      "write": "Write a review",
+      "dialogTitle": "Review {product}",
+      "submitted": "Review sent. It will appear once it has been moderated.",
+      "written": "Reviews you wrote",
+      "noneWritten": "You have not written any reviews yet.",
+      "status": {
+        "pending": "Awaiting moderation",
+        "approved": "Published",
+        "rejected": "Not published"
+      }
+    }
   }
 }
