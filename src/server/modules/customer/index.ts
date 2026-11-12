@@ -143,3 +143,39 @@ export {
   type PrivacyMailDeps,
 } from './privacy-emails';
 // ---------- End privacy ----------
+// ---------- Newsletter (M3 wave 2 storefront): double opt-in, unsubscribe, account sync ----------
+export {
+  confirmNewsletterSubscription,
+  getNewsletterUnsubscribe,
+  newsletterOneClickUrl,
+  newsletterUnsubscribeUrl,
+  readNewsletterSignupToken,
+  startNewsletterSignup,
+  unsubscribeNewsletter,
+  type NewsletterConfirmResult,
+  type UnsubscribeView,
+} from './newsletter';
+export {
+  NEWSLETTER_CONFIRM_HOURS,
+  NEWSLETTER_SOURCES,
+  signNewsletterSignup,
+  signNewsletterUnsubscribe,
+  verifyNewsletterSignup,
+  verifyNewsletterUnsubscribe,
+  type NewsletterSignup,
+  type NewsletterSource,
+} from './newsletter-rules';
+export {
+  newsletterConfirmSchema,
+  newsletterSignupSchema,
+  newsletterUnsubscribeSchema,
+  type NewsletterSignupInput,
+  type NewsletterSignupValues,
+  type NewsletterUnsubscribeInput,
+} from './newsletter-schemas';
+export {
+  sendNewsletterConfirmation,
+  sendNewsletterWelcome,
+  type NewsletterMailDeps,
+} from './newsletter-emails';
+// ---------- End newsletter ----------

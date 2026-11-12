@@ -12,6 +12,8 @@ export type EmailMessage = {
   to: string;
   subject: string;
   template: ReactElement;
+  /** Extra headers, e.g. `List-Unsubscribe` / `List-Unsubscribe-Post` (RFC 8058). */
+  headers?: Record<string, string>;
 };
 
 export type EmailSender = {
@@ -25,7 +27,7 @@ export function createEmailSender(
   const transport =
     'transport' in options ? options.transport : nodemailer.createTransport(options.smtpUrl);
   return {
-    async send({ to, subject, template }) {
+    async send({ to, subject, template, headers }) {
       const html = await render(template);
       const info = await transport.sendMail({
         from: options.from,
@@ -33,6 +35,7 @@ export function createEmailSender(
         subject,
         html,
         text: toPlainText(html),
+        ...(headers ? { headers } : {}),
       });
       return { messageId: String(info.messageId) };
     },
