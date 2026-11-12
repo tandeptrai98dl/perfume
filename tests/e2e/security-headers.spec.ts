@@ -127,6 +127,18 @@ test('admin login: headers present, noindex, no CSP violations', async ({ page }
   expect(await violations()).toEqual([]);
 });
 
+test('first-party cookies are Lax and, in production builds, Secure', async ({ request }) => {
+  const response = await request.get('/en');
+  const cookie = response
+    .headersArray()
+    .filter((header) => header.name.toLowerCase() === 'set-cookie')
+    .map((header) => header.value)
+    .find((value) => value.startsWith('NEXT_LOCALE='));
+  expect(cookie).toBeTruthy();
+  expect(cookie).toMatch(/;\s*Secure/i);
+  expect(cookie).toMatch(/SameSite=lax/i);
+});
+
 test('not-found pages outside the proxy matcher still get a policy', async ({ request }) => {
   // The proxy skips `/_next/*` and file-like paths; their 404 is HTML (next.config.ts fallback).
   for (const path of ['/wp-login.php', '/en/missing.html', '/_next/missing']) {
