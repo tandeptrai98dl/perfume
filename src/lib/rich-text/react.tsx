@@ -37,9 +37,14 @@ function renderText(text: string, marks: SafeMark[], key: string, siteOrigin?: s
   return <Fragment key={key}>{node}</Fragment>;
 }
 
-function renderNodes(nodes: SafeNode[], siteOrigin: string | undefined, path = ''): ReactNode[] {
+/**
+ * Keys only need to be unique among siblings, so they are the sibling index. Never a dotted
+ * tree path ("10.1.0.0"): keys are serialised into the RSC payload, where such paths read as
+ * private IPv4 addresses to scanners (ZAP 2 "Private IP Disclosure" on long policy pages).
+ */
+function renderNodes(nodes: SafeNode[], siteOrigin: string | undefined): ReactNode[] {
   return nodes.map((node, index) => {
-    const key = `${path}${index}`;
+    const key = String(index);
     switch (node.type) {
       case 'text':
         return renderText(node.text, node.marks, key, siteOrigin);
@@ -51,32 +56,32 @@ function renderNodes(nodes: SafeNode[], siteOrigin: string | undefined, path = '
         const Tag = node.level === 2 ? 'h2' : 'h3';
         return (
           <Tag key={key} className={node.level === 2 ? 'text-h2 mt-10 mb-4' : 'text-h3 mt-8 mb-3'}>
-            {renderNodes(node.content, siteOrigin, `${key}.`)}
+            {renderNodes(node.content, siteOrigin)}
           </Tag>
         );
       }
       case 'paragraph':
         return (
           <p key={key} className="my-4">
-            {renderNodes(node.content, siteOrigin, `${key}.`)}
+            {renderNodes(node.content, siteOrigin)}
           </p>
         );
       case 'bulletList':
         return (
           <ul key={key} className="my-4 list-disc ps-6">
-            {renderNodes(node.content, siteOrigin, `${key}.`)}
+            {renderNodes(node.content, siteOrigin)}
           </ul>
         );
       case 'orderedList':
         return (
           <ol key={key} className="my-4 list-decimal ps-6">
-            {renderNodes(node.content, siteOrigin, `${key}.`)}
+            {renderNodes(node.content, siteOrigin)}
           </ol>
         );
       case 'listItem':
         return (
           <li key={key} className="my-1 [&>p]:my-0">
-            {renderNodes(node.content, siteOrigin, `${key}.`)}
+            {renderNodes(node.content, siteOrigin)}
           </li>
         );
       case 'blockquote':
@@ -85,7 +90,7 @@ function renderNodes(nodes: SafeNode[], siteOrigin: string | undefined, path = '
             key={key}
             className="border-gold-500 font-display text-body-lg my-6 border-s-2 ps-5 italic"
           >
-            {renderNodes(node.content, siteOrigin, `${key}.`)}
+            {renderNodes(node.content, siteOrigin)}
           </blockquote>
         );
     }
