@@ -67,9 +67,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
-          {/* M3 privacy: cookie banner + preferences and the consent-gated tag loader. */}
+          {/* M3 privacy: cookie banner + preferences and the consent-gated tag loader. First in
+              <body> (GOV.UK cookie banner pattern: announced before the skip link and the
+              page) and so parsed before the async page scripts run, which lets the banner
+              paint with the first frame instead of after script evaluation (LCP, §14.1). It is
+              fixed to the bottom of the viewport, so the visual order is unchanged. */}
           <CookieConsent locale={locale} />
+          {children}
           <Toaster />
         </NextIntlClientProvider>
       </body>
