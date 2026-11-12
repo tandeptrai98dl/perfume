@@ -127,6 +127,19 @@ test('admin login: headers present, noindex, no CSP violations', async ({ page }
   expect(await violations()).toEqual([]);
 });
 
+test('not-found pages outside the proxy matcher still get a policy', async ({ request }) => {
+  // The proxy skips `/_next/*` and file-like paths; their 404 is HTML (next.config.ts fallback).
+  for (const path of ['/wp-login.php', '/en/missing.html', '/_next/missing']) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(404);
+    const headers = response.headers();
+    expect(headers['content-security-policy'], path).toContain("frame-ancestors 'none'");
+    expect(headers['content-security-policy'], path).toContain("object-src 'none'");
+    expect(headers['x-frame-options'], path).toBe('DENY');
+    expect(headers['x-content-type-options'], path).toBe('nosniff');
+  }
+});
+
 test('API responses get the deny-all policy and the static headers', async ({ request }) => {
   const response = await request.get('/api/health');
   const headers = response.headers();
