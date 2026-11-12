@@ -1,5 +1,6 @@
 import { and, asc, eq, sql } from 'drizzle-orm';
 import nodemailer from 'nodemailer';
+import sharp from 'sharp';
 import type { PgBoss } from 'pg-boss';
 import { render, toPlainText } from 'react-email';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -23,8 +24,10 @@ import {
 } from '@/server/db/schema';
 import { seed } from '@/server/db/seed';
 import { createSandboxEinvoiceProvider, EinvoiceError } from '@/server/integrations/einvoice';
+import { createMemoryStorage, createPrivateStorage } from '@/server/integrations/storage';
 import { createEmailSender, type EmailSender } from '@/server/integrations/email/send';
-import { createHandlers, type JobHandlers } from '@/server/jobs/handlers';
+import { createHandlers, type HandlerDeps, type JobHandlers } from '@/server/jobs/handlers';
+import { createReturnPhotoHandlers } from '@/server/jobs/handlers/return-photos';
 import { createBoss, ensureQueues, PGBOSS_SCHEMA } from '@/server/jobs/queue';
 import type { CommandContext } from '@/server/lib/command-context';
 import { DomainError } from '@/server/lib/command-context';
@@ -47,16 +50,29 @@ import {
 } from '@/server/modules/order';
 import {
   approveReturn,
+  eraseReturnPhotosForSubject,
+  findReturnPhoto,
   getAdminReturn,
   getCustomerReturnView,
+  getStaffReturnOptions,
   listReturnQueue,
+  openReturnForCustomer,
   receiveReturn,
   rejectReturn,
   requestReturn,
   returnRequestSchema,
+  staffReturnSchema,
+  storeReturnPhotos,
   type ReturnRequestInput,
 } from '@/server/modules/returns';
-import { completeDeliveredOrders } from '@/server/modules/payment';
+import {
+  completeDeliveredOrders,
+  completeRefund,
+  createCodRemittance,
+  listCodRemittanceCandidates,
+  openRefundTotal,
+  requestRefund,
+} from '@/server/modules/payment';
 
 import { startTestDatabase, type TestDatabase } from '../helpers/database';
 
@@ -77,6 +93,20 @@ const actorIds = {} as Record<StaffRole, string>;
 let customerId: string;
 let variants: { id: string; productId: string; sku: string; price: number }[];
 let sent: { to: string; subject: string; text: string }[] = [];
+
+function handlerDeps(): HandlerDeps {
+  return {
+    db,
+    boss,
+    email: captureSender(),
+    appUrl: 'https://shop.test',
+    internalBaseUrl: 'http://web.internal',
+    internalSecret: 'x'.repeat(32),
+    orderLinkSecret: 'order-link-secret-order-link-secret-00',
+    chat: null,
+    einvoice: provider,
+  };
+}
 
 const ctx = (role: StaffRole): CommandContext => ({
   db,
@@ -264,17 +294,7 @@ beforeAll(async () => {
   boss = createBoss(testDb.url, { role: 'producer' });
   await boss.start();
   await ensureQueues(boss);
-  handlers = createHandlers({
-    db,
-    boss,
-    email: captureSender(),
-    appUrl: 'https://shop.test',
-    internalBaseUrl: 'http://web.internal',
-    internalSecret: 'x'.repeat(32),
-    orderLinkSecret: 'order-link-secret-order-link-secret-00',
-    chat: null,
-    einvoice: provider,
-  });
+  handlers = createHandlers(handlerDeps());
   for (const role of ['owner', 'manager', 'staff', 'editor'] as const) {
     actorIds[role] = newId();
     await db
@@ -420,7 +440,7 @@ describe('customer request', () => {
 });
 
 describe('staff decisions', () => {
-  it('rejection: back to delivered with the original delivery time, reason e-mailed, no second request', async () => {
+  it('rejection: back to delivered with the original delivery time, reason e-mailed, a new request allowed', async () => {
     const order = await deliveredOrder({ locale: 'en' });
     const { requestId } = await requestReturn(db, boss, {
       orderId: order.id,
@@ -452,6 +472,21 @@ describe('staff decisions', () => {
     expect(sent[0]!.subject).toBe(`Return request for order ${order.code} declined`);
     expect(sent[0]!.text).toContain('The bottle was opened and used.');
 
+    // A rejected request may be followed by a new one (one open request at a time).
+    const view = await getCustomerReturnView(db, after);
+    expect(view).toMatchObject({ canRequest: true, request: { status: 'rejected' } });
+    const second = await requestReturn(db, boss, {
+      orderId: order.id,
+      userId: null,
+      values: request({
+        lines: [{ orderItemId: order.items[0]!.id, quantity: 1 }],
+        description: 'Gửi lại: vòi xịt vẫn bị kẹt, có video.',
+      }),
+    });
+    expect(second.requestId).not.toBe(requestId);
+    expect((await getCustomerReturnView(db, await reload(order.id))).request?.status).toBe(
+      'requested',
+    );
     await expect(
       requestReturn(db, boss, {
         orderId: order.id,
@@ -459,7 +494,6 @@ describe('staff decisions', () => {
         values: request({ lines: [{ orderItemId: order.items[0]!.id, quantity: 1 }] }),
       }),
     ).rejects.toMatchObject({ fieldErrors: [{ code: 'alreadyRequested' }] });
-    expect((await getCustomerReturnView(db, after)).request?.status).toBe('rejected');
   });
 
   it('needs approval before receipt, and a manager for return-shipping reimbursement', async () => {
@@ -542,13 +576,24 @@ describe('goods received', () => {
       .where(and(eq(stockMovements.refId, order.id), eq(stockMovements.reason, 'return')));
     expect(movements.reduce((sum, m) => sum + m.delta, 0)).toBe(3);
 
-    // Refund: the paid total (goods, shipping, gift wrap) is capped by the money held, so the
-    // return-shipping reimbursement beyond it is owed separately (alert).
-    const queued = await db.select().from(refunds).where(eq(refunds.orderId, order.id));
+    // Refund: the paid total (goods, shipping, gift wrap) from the money held; the return
+    // shipping beyond it is a manual payout (bank transfer) that never consumes order money.
+    const queued = await db
+      .select()
+      .from(refunds)
+      .where(eq(refunds.orderId, order.id))
+      .orderBy(asc(refunds.amount));
     expect(
       await db.select().from(orderEvents).where(eq(orderEvents.orderId, order.id)),
     ).toContainEqual(expect.objectContaining({ type: 'refund_requested' }));
     expect(queued).toEqual([
+      expect.objectContaining({
+        amount: 35_000,
+        status: 'requested',
+        method: 'bank_transfer',
+        paymentId: null,
+        reason: 'return_shipping_payout',
+      }),
       expect.objectContaining({
         amount: order.total,
         status: 'requested',
@@ -559,9 +604,46 @@ describe('goods received', () => {
     expect(result.data.refund).toMatchObject({
       total: order.total + 35_000,
       queued: order.total,
-      shortfall: 35_000,
+      deferred: 0,
+      payout: 35_000,
+      payoutRefundId: queued[0]!.id,
+      shortfall: 0,
     });
     expect(after.paymentStatus).toBe('paid');
+    expect(await openRefundTotal(db, order.id)).toBe(order.total);
+
+    // Staff cannot create a payout by hand; completing it leaves the order's money alone.
+    await expect(
+      requestRefund(ctx('manager'), {
+        orderId: order.id,
+        amount: 1_000,
+        reason: 'return_shipping_payout',
+        method: 'bank_transfer',
+      }),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'reservedReason' }] });
+    const gateways = {} as Parameters<typeof completeRefund>[0]['gateways'];
+    await expect(
+      completeRefund(
+        { ...ctx('manager'), gateways },
+        { refundId: queued[0]!.id, mode: 'gateway', providerRef: null },
+      ),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'gatewayUnsupported' }] });
+    await completeRefund(
+      { ...ctx('manager'), gateways },
+      { refundId: queued[0]!.id, mode: 'manual', providerRef: 'FT-PAYOUT-1' },
+    );
+    expect(await reload(order.id)).toMatchObject({ amountRefunded: 0, paymentStatus: 'paid' });
+    expect(await eventsOf(order.id, 'refund_completed')).toEqual([
+      expect.objectContaining({ metadata: expect.objectContaining({ payout: true }) }),
+    ]);
+    await completeRefund(
+      { ...ctx('manager'), gateways },
+      { refundId: queued[1]!.id, mode: 'manual', providerRef: 'FT-REFUND-1' },
+    );
+    expect(await reload(order.id)).toMatchObject({
+      amountRefunded: order.total,
+      paymentStatus: 'refunded',
+    });
 
     // E-invoice: cancel through the outbox job; the provider confirms.
     expect(await jobs('einvoice.adjust')).toHaveLength(1);
@@ -717,9 +799,16 @@ describe('goods received', () => {
     expect(result.data.refund).toMatchObject({
       total: order.total,
       queued: 0,
-      shortfall: order.total,
+      deferred: order.total,
+      payout: 0,
+      shortfall: 0,
       refundId: null,
     });
+    expect(await eventsOf(order.id, 'refund_deferred')).toEqual([
+      expect.objectContaining({
+        metadata: { amount: order.total, reason: 'return:defective', requestId },
+      }),
+    ]);
     expect(await jobs('staff.alert')).toContainEqual(
       expect.objectContaining({ kind: 'late_payment_refund', orderId: order.id }),
     );
@@ -803,5 +892,306 @@ describe('staff e-invoice adjustments', () => {
     expect(actions.map((a) => a.action)).toEqual(
       expect.arrayContaining(['order.einvoice_replace', 'order.einvoice_cancel']),
     );
+  });
+});
+
+// ---------- M3 wave 3: COD returns, staff-opened returns, photos ----------
+
+function remittance(orders: { orderId: string; amount: number }[]) {
+  const totalAmount = orders.reduce((sum, o) => sum + o.amount, 0);
+  return {
+    carrier: 'ghn' as const,
+    periodStart: '2026-11-01',
+    periodEnd: '2026-11-12',
+    receivedAt: '2026-11-12',
+    bankReference: null,
+    carrierFee: 0,
+    totalAmount,
+    orders,
+  };
+}
+
+async function receiveFor(
+  order: { id: string },
+  values: ReturnRequestInput,
+  options: { returnShippingFee?: number; resellable?: boolean } = {},
+) {
+  const { requestId } = await requestReturn(db, boss, { orderId: order.id, userId: null, values });
+  await approveReturn(ctx('manager'), { orderId: order.id, requestId, note: null });
+  const result = await receiveReturn(ctx('manager'), {
+    orderId: order.id,
+    requestId,
+    resellable: options.resellable ?? false,
+    returnShippingFee: options.returnShippingFee ?? 0,
+    note: null,
+  });
+  return { requestId, result };
+}
+
+describe('COD returns before the carrier remits', () => {
+  it('full change-of-mind return: the remittance records the money and queues what is owed', async () => {
+    const order = await deliveredOrder({ cod: true, shippingFee: 30_000 });
+    const owed = order.items[0]!.lineTotal; // the goods; shipping is not refunded (no fault)
+    const { result } = await receiveFor(
+      order,
+      request({
+        reason: 'unopened',
+        sealIntact: true,
+        description: '',
+        lines: [{ orderItemId: order.items[0]!.id, quantity: 1 }],
+      }),
+      { resellable: true },
+    );
+    expect(result.data.refund).toMatchObject({ total: owed, queued: 0, deferred: owed });
+    expect((await reload(order.id)).status).toBe('returned');
+    expect(await db.select().from(refunds).where(eq(refunds.orderId, order.id))).toHaveLength(0);
+
+    // The returned order is offered for reconciliation, with the refund it will queue.
+    const candidate = (await listCodRemittanceCandidates(db)).find((c) => c.orderId === order.id);
+    expect(candidate).toMatchObject({
+      status: 'returned',
+      amountDue: order.total,
+      deferredRefund: owed,
+    });
+
+    await createCodRemittance(
+      ctx('manager'),
+      remittance([{ orderId: order.id, amount: order.total }]),
+    );
+    const after = await reload(order.id);
+    expect(after).toMatchObject({ amountPaid: order.total, paymentStatus: 'paid' });
+    // Only what the return owes goes back (not the whole remittance as for a cancellation).
+    expect(await db.select().from(refunds).where(eq(refunds.orderId, order.id))).toEqual([
+      expect.objectContaining({
+        amount: owed,
+        method: 'bank_transfer',
+        paymentId: null,
+        status: 'requested',
+        reason: 'return:unopened',
+      }),
+    ]);
+    expect(await eventsOf(order.id, 'refund_requested')).toEqual([
+      expect.objectContaining({ metadata: expect.objectContaining({ deferred: owed }) }),
+    ]);
+    expect(
+      (await listCodRemittanceCandidates(db)).find((c) => c.orderId === order.id),
+    ).toBeUndefined();
+    await expect(
+      createCodRemittance(ctx('manager'), remittance([{ orderId: order.id, amount: 1 }])),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'alreadyRemitted' }] });
+  });
+
+  it('partial fault return: the order stays delivered and the remittance queues the part owed', async () => {
+    const order = await deliveredOrder({ cod: true, lines: [{ variant: 0, quantity: 2 }] });
+    const owed = Math.floor(order.items[0]!.lineTotal / 2) + 25_000;
+    const { result } = await receiveFor(
+      order,
+      request({ lines: [{ orderItemId: order.items[0]!.id, quantity: 1 }] }),
+      { returnShippingFee: 25_000 },
+    );
+    // Nothing held yet: goods and return shipping are both owed once the money arrives.
+    expect(result.data.refund).toMatchObject({
+      total: owed,
+      queued: 0,
+      deferred: owed,
+      payout: 0,
+    });
+    expect((await reload(order.id)).status).toBe('delivered');
+
+    // The carrier remitted only part of it (e.g. a split statement): queue what is held.
+    await createCodRemittance(ctx('manager'), remittance([{ orderId: order.id, amount: 100_000 }]));
+    const firstRefunds = await db.select().from(refunds).where(eq(refunds.orderId, order.id));
+    expect(firstRefunds).toEqual([expect.objectContaining({ amount: Math.min(owed, 100_000) })]);
+  });
+
+  it('a parcel that failed delivery collected nothing and cannot be remitted', async () => {
+    const order = await deliveredOrder({ cod: true });
+    await db
+      .update(orders)
+      .set({ status: 'returned', deliveredAt: null })
+      .where(eq(orders.id, order.id));
+    await expect(
+      createCodRemittance(ctx('manager'), remittance([{ orderId: order.id, amount: 1_000 }])),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'notRemittable' }] });
+  });
+});
+
+describe('staff-opened returns', () => {
+  const staffRequest = (orderId: string, itemId: string, overrideReason: string | null = null) =>
+    staffReturnSchema.parse({
+      orderId,
+      lines: [{ orderItemId: itemId, quantity: 1 }],
+      reason: 'defective',
+      description: 'Khách gọi điện: vòi xịt bị kẹt.',
+      overrideReason,
+    });
+
+  it('opens a request for the customer within the window (orders.process), audited', async () => {
+    const order = await deliveredOrder({ userId: customerId });
+    await expect(
+      openReturnForCustomer(ctx('editor'), staffRequest(order.id, order.items[0]!.id)),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    const result = await openReturnForCustomer(
+      ctx('staff'),
+      staffRequest(order.id, order.items[0]!.id),
+    );
+    expect((await reload(order.id)).status).toBe('return_requested');
+    const [event] = await eventsOf(order.id, 'return_requested');
+    expect(event).toMatchObject({ actorType: 'staff', actorId: actorIds.staff });
+    expect(event!.metadata).toMatchObject({
+      requestId: result.data.requestId,
+      openedBy: 'staff',
+      openedFrom: 'delivered',
+      windowOverride: null,
+    });
+    const [audit] = await db
+      .select()
+      .from(auditLogs)
+      .where(and(eq(auditLogs.entityId, order.id), eq(auditLogs.action, 'order.return_open')));
+    expect(audit).toBeDefined();
+    expect(await jobs('return.notify')).toContainEqual(
+      expect.objectContaining({ orderId: order.id, kind: 'requested' }),
+    );
+    expect((await getAdminReturn(db, order.id))?.openedBy).toBe('staff');
+    // One open request at a time, whoever opened it.
+    await expect(
+      openReturnForCustomer(ctx('staff'), staffRequest(order.id, order.items[0]!.id)),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'alreadyRequested' }] });
+  });
+
+  it('after the window only a manager may open it, with a reason — also on a completed order', async () => {
+    const order = await deliveredOrder({ deliveredDaysAgo: 10 });
+    const itemId = order.items[0]!.id;
+    await expect(
+      openReturnForCustomer(ctx('staff'), staffRequest(order.id, itemId)),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'windowExpired' }] });
+    await expect(
+      openReturnForCustomer(ctx('staff'), staffRequest(order.id, itemId, 'Khách ở nước ngoài')),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    // The hourly job completes it first: the manager reopens the completed order.
+    await db.transaction((tx) =>
+      transitionOrder(tx, boss, {
+        orderId: order.id,
+        to: 'completed',
+        actor: { type: 'system', id: null },
+      }),
+    );
+    const completedAt = (await reload(order.id)).completedAt;
+    expect((await getStaffReturnOptions(db, order.id))?.needsOverride).toBe(true);
+    await expect(
+      requestReturn(db, boss, {
+        orderId: order.id,
+        userId: null,
+        values: request({ lines: [{ orderItemId: itemId, quantity: 1 }] }),
+      }),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'windowExpired' }] });
+
+    const { data } = await openReturnForCustomer(
+      ctx('manager'),
+      staffRequest(order.id, itemId, 'Khách ở nước ngoài, báo lỗi ngày thứ 6'),
+    );
+    expect((await reload(order.id)).status).toBe('return_requested');
+    const [event] = await eventsOf(order.id, 'return_requested');
+    expect(event!.metadata).toMatchObject({
+      openedFrom: 'completed',
+      windowOverride: { reason: 'Khách ở nước ngoài, báo lỗi ngày thứ 6' },
+    });
+    const [audit] = await db
+      .select()
+      .from(auditLogs)
+      .where(and(eq(auditLogs.entityId, order.id), eq(auditLogs.action, 'order.return_open')));
+    expect(audit!.diff).toMatchObject({
+      windowOverride: { from: null, to: 'Khách ở nước ngoài, báo lỗi ngày thứ 6' },
+      status: { from: 'completed', to: 'return_requested' },
+    });
+
+    // Rejected: back to completed, completion time unchanged.
+    await rejectReturn(ctx('manager'), {
+      orderId: order.id,
+      requestId: data.requestId,
+      reason: 'Sản phẩm đã dùng gần hết.',
+    });
+    const after = await reload(order.id);
+    expect(after.status).toBe('completed');
+    expect(after.completedAt?.getTime()).toBe(completedAt?.getTime());
+  });
+});
+
+describe('return photos', () => {
+  const memory = createMemoryStorage();
+  const storage = createPrivateStorage(memory);
+
+  async function jpegWithExif() {
+    return sharp({
+      create: { width: 3000, height: 1500, channels: 3, background: { r: 200, g: 120, b: 80 } },
+    })
+      .jpeg()
+      .withExif({ IFD0: { Copyright: 'Khach hang', ImageDescription: 'GPS 21.03,105.85' } })
+      .toBuffer();
+  }
+
+  it('re-encodes valid photos without metadata, refuses others, and stores them privately', async () => {
+    const original = await jpegWithExif();
+    expect((await sharp(original).metadata()).exif).toBeDefined();
+    const orderId = newId();
+    const [photo] = await storeReturnPhotos(storage, orderId, [original]);
+    expect(photo).toMatchObject({ mime: 'image/webp', width: 2000, height: 1000 });
+    expect(photo!.key).toBe(`private/returns/${orderId}/${photo!.id}.webp`);
+    const stored = memory.objects.get(photo!.key)!;
+    const meta = await sharp(stored.body).metadata();
+    expect(meta.format).toBe('webp');
+    expect(meta.exif).toBeUndefined();
+
+    await expect(
+      storeReturnPhotos(storage, orderId, [original, Buffer.from('%PDF-1.7 not an image')]),
+    ).rejects.toMatchObject({ fieldErrors: [{ path: 'photos.1', code: 'photoType' }] });
+    // The first photo of the failed batch was removed again.
+    expect(memory.objects.size).toBe(1);
+    await expect(
+      storeReturnPhotos(storage, orderId, [original, original, original, original]),
+    ).rejects.toMatchObject({ fieldErrors: [{ code: 'tooManyPhotos' }] });
+    await expect(storeReturnPhotos(null, orderId, [original])).rejects.toMatchObject({
+      fieldErrors: [{ code: 'photosUnavailable' }],
+    });
+    await expect(storage.put('media/public.webp', original, 'image/webp')).rejects.toThrow();
+  });
+
+  it('attaches photos to the request, serves them to staff by id, erases them on anonymisation', async () => {
+    const order = await deliveredOrder({ userId: customerId });
+    const photos = await storeReturnPhotos(storage, order.id, [await jpegWithExif()]);
+    await requestReturn(db, boss, {
+      orderId: order.id,
+      userId: customerId,
+      values: request({ lines: [{ orderItemId: order.items[0]!.id, quantity: 1 }] }),
+      photos,
+    });
+    const view = await getAdminReturn(db, order.id);
+    expect(view?.photos).toEqual([
+      {
+        id: photos[0]!.id,
+        width: 2000,
+        height: 1000,
+        url: `/api/admin/orders/${order.id}/return-photos/${photos[0]!.id}`,
+      },
+    ]);
+    expect((await getCustomerReturnView(db, order)).request?.photoCount).toBe(1);
+    expect(await findReturnPhoto(db, order.id, photos[0]!.id)).toEqual({
+      key: photos[0]!.key,
+      mime: 'image/webp',
+    });
+    // Another order's id never resolves the photo.
+    expect(await findReturnPhoto(db, newId(), photos[0]!.id)).toBeNull();
+
+    const removed = await db.transaction((tx) =>
+      eraseReturnPhotosForSubject(tx, boss, { userId: customerId, email: 'huong@example.com' }),
+    );
+    expect(removed).toBeGreaterThanOrEqual(1);
+    expect(await findReturnPhoto(db, order.id, photos[0]!.id)).toBeNull();
+    const [job] = (await jobs('returns.delete-photos')) as { keys: string[] }[];
+    expect(job!.keys).toContain(photos[0]!.key);
+    await createReturnPhotoHandlers({ ...handlerDeps(), privateStorage: storage })[
+      'returns.delete-photos'
+    ](job as { keys: string[] });
+    expect(memory.objects.has(photos[0]!.key)).toBe(false);
   });
 });
