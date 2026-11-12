@@ -6,8 +6,10 @@ import { z } from 'zod';
  * reads the accepted returns to invoice only what the customer kept. The order module owns
  * `order_events`, so the event names and the metadata contract are declared here.
  *
- * - `return_requested` — customer request (message = the customer's description; metadata:
- *   request id, reason, preferred resolution, lines, seal confirmation).
+ * - `return_requested` — customer request, or a request staff opened on the customer's behalf
+ *   (message = the customer's description; metadata: request id, reason, preferred resolution,
+ *   lines, seal confirmation, who opened it, the status it was opened from, the manager's
+ *   window override, private photo keys). A rejected request may be followed by a new one.
  * - `return_approved` — staff accepted the request (message = note to the customer).
  * - `return_rejected` — staff refused it (message = reason, e-mailed); the order goes back to
  *   `delivered`.
@@ -35,12 +37,31 @@ export type ReturnOutcome = (typeof RETURN_OUTCOMES)[number];
 
 const lineSchema = z.object({ orderItemId: z.string(), quantity: z.number().int().positive() });
 
+/** Customer photo of a return, stored privately (`private/returns/…`, staff-only route). */
+export const returnPhotoSchema = z.object({
+  id: z.string(),
+  key: z.string(),
+  mime: z.string(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  sizeBytes: z.number().int().positive(),
+});
+export type ReturnPhoto = z.output<typeof returnPhotoSchema>;
+
 export const returnRequestedMetadata = z.object({
   requestId: z.string(),
   reason: z.enum(RETURN_REASONS),
   resolution: z.enum(RETURN_RESOLUTIONS),
   lines: z.array(lineSchema).min(1),
   sealIntact: z.boolean().default(false),
+  // ---------- M3 wave 3 ----------
+  /** `staff`: opened from the admin order page on the customer's behalf (e.g. by phone). */
+  openedBy: z.enum(['customer', 'staff']).default('customer'),
+  /** Status the order left (`completed` only with the manager's window override). */
+  openedFrom: z.enum(['delivered', 'completed']).default('delivered'),
+  /** A manager opened it after the return window (reason audited). */
+  windowOverride: z.object({ reason: z.string() }).nullable().default(null),
+  photos: z.array(returnPhotoSchema).max(3).default([]),
 });
 export type ReturnRequestedMetadata = z.output<typeof returnRequestedMetadata>;
 
@@ -71,11 +92,17 @@ export const returnReceivedMetadata = z.object({
     /** Refund queued now (≤ money held); null when nothing was queued. */
     refundId: z.string().nullable(),
     queued: z.number().int().nonnegative(),
-    /** Owed but not yet held (COD not remitted yet): staff were alerted. */
+    /** Owed once the money arrives (COD remittance): queued automatically then. */
+    deferred: z.number().int().nonnegative().default(0),
+    /** Return shipping paid out manually beyond the order's money (bank transfer / cash). */
+    payout: z.number().int().nonnegative().default(0),
+    payoutRefundId: z.string().nullable().default(null),
+    /** Owed but neither held, expected nor payable as return shipping: staff were alerted. */
     shortfall: z.number().int().nonnegative(),
   }),
 });
 export type ReturnReceivedMetadata = z.output<typeof returnReceivedMetadata>;
+export type ReturnRequestedMetadataInput = z.input<typeof returnRequestedMetadata>;
 
 export function parseReturnRequested(metadata: unknown): ReturnRequestedMetadata | null {
   const parsed = returnRequestedMetadata.safeParse(metadata);

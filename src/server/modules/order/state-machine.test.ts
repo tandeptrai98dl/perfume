@@ -39,10 +39,22 @@ describe('order state machine (ARCHITECTURE §3.5)', () => {
   });
 
   it('has terminal states with no exits', () => {
-    for (const status of ['completed', 'cancelled', 'returned'] as const) {
+    for (const status of ['cancelled', 'returned'] as const) {
       expect(isTerminal(status)).toBe(true);
       for (const to of ORDER_STATUSES) expect(canTransition(status, to, 'manager')).toBe(false);
     }
+  });
+
+  it('lets only a manager reopen a completed order for a return, which closes back (ADR-0027)', () => {
+    expect(isTerminal('completed')).toBe(false);
+    expect(canTransition('completed', 'return_requested', 'manager')).toBe(true);
+    expect(canTransition('completed', 'return_requested', 'staff')).toBe(false);
+    expect(canTransition('completed', 'return_requested', 'customer')).toBe(false);
+    for (const to of ORDER_STATUSES.filter((s) => s !== 'return_requested')) {
+      expect(canTransition('completed', to, 'manager')).toBe(false);
+    }
+    expect(canTransition('return_requested', 'completed', 'staff')).toBe(true);
+    expect(canTransition('return_requested', 'completed', 'customer')).toBe(false);
   });
 
   it('lists the buttons a role may press', () => {
