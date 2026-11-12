@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   typedRoutes: true,
   poweredByHeader: false,
+  // Pages with a prerendered shell stream their request-time metadata (APP_URL is read at
+  // runtime, §14.1), which puts <title>, description, canonical and hreflang in <body>.
+  // Crawlers matching this list get blocking metadata in <head> instead. Next's default list
+  // (next/dist/shared/lib/router/utils/html-bots) plus Googlebot: Google only honours
+  // rel=canonical and hreflang in <head> (§13.1). Shoppers keep the streamed response.
+  htmlLimitedBots:
+    /Googlebot|[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight/i,
   // Security headers on every response (§12). Pages get their nonce-based CSP from the proxy
   // (src/proxy.ts); API and file responses never render HTML and get a deny-all policy.
   async headers() {
