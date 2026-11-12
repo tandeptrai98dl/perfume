@@ -1061,7 +1061,7 @@ Google Search Console (one property, both locales, sitemaps submitted), Bing Web
 - **JavaScript:** Server Components by default; React Compiler on; `next/dynamic` for gallery zoom, Tiptap, charts; PDP JS budget < 150 KB gzip (bundle analyzer in CI: `scripts/js-budget.mjs`; interim ceiling and the framework/app split proposed in ADR-0025). Dialogs (search, mini-cart, mobile menu, cookie preferences, gallery zoom) load on first use.
 - **Third-party scripts:** GTM after consent with `strategy="lazyOnload"`; no heavy chat widgets (Zalo/Messenger as plain links).
 - **Database:** indexes per 6.3; no N+1 (joins/`with`); connection pooling (pgBouncer or the provider's pool); `EXPLAIN ANALYZE` for filter/search queries.
-- **Measurement:** Lighthouse CI (`lighthouserc.cjs`, `.github/workflows/lighthouse.yml`: Performance ≥ 90 for home, listing, PDP in both locales; LCP/CLS/TBT budgets also on cart and checkout) — on every PR, mobile + desktop, median of 3 runs; ZAP baseline weekly against the production build inside CI (`.github/workflows/zap-baseline.yml`); k6 load test in `load/k6/`; RUM via `useReportWebVitals` → GA4; Sentry performance for the server.
+- **Measurement:** Lighthouse CI (`lighthouserc.cjs`, `.github/workflows/lighthouse.yml`: Performance ≥ 90 for home, listing, PDP in both locales; LCP/CLS/TBT budgets also on cart and checkout; TBT is a warning on CI runners, whose noise the Performance score absorbs) — on every PR, mobile + desktop, median of 3 runs; ZAP baseline weekly against the production build inside CI (`.github/workflows/zap-baseline.yml`); k6 load test in `load/k6/`; RUM via `useReportWebVitals` → GA4; Sentry performance for the server.
 
 ### 14.2 Scale on signals (only when a threshold is hit)
 
