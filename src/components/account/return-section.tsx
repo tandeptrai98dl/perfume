@@ -31,7 +31,7 @@ export function ReturnSection({
   const policyLink = (
     <Link
       href={{ pathname: '/policies/[slug]', params: { slug: t('policySlug') } }}
-      className="text-gold-700 hover:underline"
+      className="text-gold-700 underline underline-offset-2"
     >
       {t('policyLink')}
     </Link>
