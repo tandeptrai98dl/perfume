@@ -54,9 +54,9 @@ test.describe.serial('admin orders', () => {
     const gift = await order({ hidePrices: true, giftMessage: 'Chúc mừng sinh nhật!' });
     await signIn(page, owner);
 
-    // Dashboard: work queues, and revenue for the owner.
+    // Dashboard: work queues, and revenue for the owner (M3 KPI dashboard).
     await expect(page.getByRole('heading', { name: 'Đơn cần xử lý' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Doanh thu (đã trừ hoàn tiền)' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Doanh thu thuần theo ngày' })).toBeVisible();
     await expectNoAxeViolations(page);
 
     // Orders list → "awaiting confirmation" queue → search by code.
