@@ -13,6 +13,7 @@ export {
   getFamilyBySlug,
   getFeaturedBrands,
   getFeaturedProducts,
+  getNewestProducts,
   getProductDetail,
   getProductListing,
   getProductSummariesByIds,

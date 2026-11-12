@@ -169,3 +169,10 @@ export {
   type OrderSubject,
 } from './privacy';
 // ---------- End privacy ----------
+// ---------- M3 wave 2 storefront: best sellers (home rail, "best selling" sort) ----------
+export {
+  BEST_SELLER_RANK_LIMIT,
+  BEST_SELLER_WINDOW_DAYS,
+  bestSellerWindowStart,
+  listBestSellingProductIds,
+} from './best-sellers';
