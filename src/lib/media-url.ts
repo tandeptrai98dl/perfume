@@ -1,4 +1,4 @@
-import { clientEnv } from './env';
+import { publicEnv } from './public-env';
 
 /** Local development fallback, served by `src/app/api/media/[...key]/route.ts`. */
 export const LOCAL_MEDIA_BASE_PATH = '/api/media';
@@ -11,7 +11,7 @@ export const LOCAL_MEDIA_BASE_PATH = '/api/media';
 export function mediaUrl(
   storageKey: string,
   fallback: string | null = null,
-  baseUrl: string | undefined = clientEnv.NEXT_PUBLIC_MEDIA_BASE_URL,
+  baseUrl: string | undefined = publicEnv.NEXT_PUBLIC_MEDIA_BASE_URL,
 ): string {
   if (!baseUrl && fallback) return fallback;
   const base = (baseUrl ?? LOCAL_MEDIA_BASE_PATH).replace(/\/+$/, '');
