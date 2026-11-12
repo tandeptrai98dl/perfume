@@ -105,6 +105,10 @@ export type SellerInfo = {
   phone: string | null;
   email: string | null;
   businessRegistration: string | null;
+  /** M3: record of the website notification on online.gov.vn (badge hidden until set). */
+  moitNotificationUrl: string | null;
+  /** M3: official "Đã thông báo Bộ Công Thương" badge image (optional; text badge otherwise). */
+  moitBadgeImageUrl: string | null;
 };
 
 export type RedirectRule = {

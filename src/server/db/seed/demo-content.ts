@@ -5,6 +5,7 @@ import { localizedPath } from '@/lib/seo/paths';
 import { newId } from '@/server/lib/ids';
 
 import type { Database } from '../client';
+import { LEGAL_PAGES } from './legal-drafts';
 import {
   bannerTranslations,
   banners,
@@ -160,142 +161,8 @@ const PAGES: PageSeed[] = [
       ],
     },
   },
-  {
-    key: 'returns',
-    vi: {
-      title: 'Chính sách đổi trả',
-      slug: 'doi-tra',
-      description: 'Điều kiện và cách thức đổi trả sản phẩm trong 7 ngày.',
-      blocks: [
-        { p: 'Bạn có thể yêu cầu đổi trả trong vòng 7 ngày kể từ ngày nhận hàng.' },
-        { h2: 'Điều kiện' },
-        { ul: ['Sản phẩm còn nguyên seal và bao bì.', 'Có mã đơn hàng hoặc hoá đơn mua hàng.'] },
-      ],
-    },
-    en: {
-      title: 'Returns policy',
-      slug: 'returns',
-      description: 'How returns work within 7 days of delivery.',
-      published: true,
-      blocks: [
-        { p: 'You can request a return within 7 days of receiving your order.' },
-        { h2: 'Conditions' },
-        {
-          ul: [
-            'The product is still sealed and in its packaging.',
-            'You have the order code or invoice.',
-          ],
-        },
-      ],
-    },
-  },
-  {
-    key: 'shipping',
-    vi: {
-      title: 'Chính sách giao hàng',
-      slug: 'giao-hang',
-      description: 'Phạm vi, thời gian và phí giao hàng.',
-      blocks: [
-        { p: 'Chúng tôi giao hàng trên toàn quốc. Phí giao hàng được tính khi thanh toán.' },
-      ],
-    },
-    en: {
-      title: 'Shipping policy',
-      slug: 'shipping',
-      description: 'Where we deliver, how long it takes and what it costs.',
-      published: true,
-      blocks: [{ p: 'We deliver nationwide within Vietnam. Shipping fees are shown at checkout.' }],
-    },
-  },
-  {
-    key: 'payment',
-    vi: {
-      title: 'Phương thức thanh toán',
-      slug: 'thanh-toan',
-      description: 'Các phương thức thanh toán được chấp nhận.',
-      blocks: [
-        {
-          p: 'Bạn có thể thanh toán khi nhận hàng, chuyển khoản qua VietQR hoặc thanh toán qua VNPay.',
-        },
-      ],
-    },
-    en: {
-      title: 'Payment methods',
-      slug: 'payment',
-      description: 'The payment methods we accept.',
-      published: true,
-      blocks: [
-        { p: 'You can pay cash on delivery, by bank transfer with VietQR, or through VNPay.' },
-      ],
-    },
-  },
-  {
-    key: 'privacy',
-    vi: {
-      title: 'Chính sách bảo mật',
-      slug: 'bao-mat',
-      description: 'Cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn.',
-      blocks: [
-        { p: 'Chúng tôi chỉ thu thập dữ liệu cần thiết để xử lý đơn hàng và chăm sóc khách hàng.' },
-        { p: 'Bạn có quyền yêu cầu xem, chỉnh sửa hoặc xoá dữ liệu cá nhân của mình.' },
-      ],
-    },
-    en: {
-      title: 'Privacy policy',
-      slug: 'privacy',
-      description: 'How we collect, use and protect your personal data.',
-      published: true,
-      blocks: [
-        { p: 'We only collect the data needed to process orders and look after our customers.' },
-        { p: 'You may ask to view, correct or delete your personal data at any time.' },
-      ],
-    },
-  },
-  {
-    key: 'terms',
-    vi: {
-      title: 'Điều khoản sử dụng',
-      slug: 'dieu-khoan',
-      description: 'Điều khoản khi mua sắm tại Perfume Store.',
-      blocks: [
-        { p: 'Khi đặt hàng, bạn đồng ý với các điều khoản dưới đây.' },
-        {
-          p: 'Trong trường hợp có khác biệt giữa bản tiếng Việt và bản tiếng Anh, bản tiếng Việt được ưu tiên áp dụng.',
-        },
-      ],
-    },
-    en: {
-      title: 'Terms of use',
-      slug: 'terms',
-      description: 'The terms that apply when you shop with Perfume Store.',
-      published: true,
-      blocks: [
-        { p: 'By placing an order you agree to the terms below.' },
-        { p: 'If the Vietnamese and English versions differ, the Vietnamese version prevails.' },
-      ],
-    },
-  },
-  {
-    key: 'cookies',
-    vi: {
-      title: 'Chính sách cookie',
-      slug: 'chinh-sach-cookie',
-      description: 'Cách chúng tôi sử dụng cookie trên website.',
-      blocks: [
-        {
-          p: 'Chúng tôi dùng cookie cần thiết để giỏ hàng hoạt động và cookie phân tích khi bạn đồng ý.',
-        },
-      ],
-    },
-    en: {
-      title: 'Cookie policy',
-      slug: 'cookie-policy',
-      description: 'How we use cookies on this website.',
-      // Draft awaiting the English editor: must stay hidden on /en.
-      published: false,
-      blocks: [{ p: 'Draft.' }],
-    },
-  },
+  // Legal pages: draft texts pending lawyer review (M3 privacy stream).
+  ...LEGAL_PAGES,
 ];
 
 const TOPICS = [
