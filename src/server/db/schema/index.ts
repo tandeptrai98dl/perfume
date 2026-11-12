@@ -8,5 +8,6 @@ export * from './inventory';
 export * from './orders';
 export * from './payments';
 export * from './promotions';
+export * from './reviews';
 export * from './shipping';
 export * from './system';
