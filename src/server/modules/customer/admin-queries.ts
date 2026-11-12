@@ -276,7 +276,8 @@ export type CustomerDetail = {
 
 export const CUSTOMER_ORDER_LIMIT = 100;
 
-const failedDelivery = sql<boolean>`exists (select 1 from order_events e where e.order_id = ${orders.id} and e.to_status = 'delivery_failed')`;
+// Qualified by hand: Drizzle leaves columns unqualified in a single-table select list.
+const failedDelivery = sql<boolean>`exists (select 1 from order_events e where e.order_id = ${sql.raw('"orders"."id"')} and e.to_status = 'delivery_failed')`;
 
 async function customerOrders(db: Reader, where: SQL | undefined) {
   const rows = await db
