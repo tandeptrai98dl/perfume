@@ -23,7 +23,9 @@ export {
   type EvaluatedLine,
 } from './evaluate';
 export {
+  isCouponAttempt,
   quoteCheckout,
+  withCouponRateLimited,
   type CheckoutQuote,
   type CheckoutQuoteLine,
   type CheckoutQuoteShipping,

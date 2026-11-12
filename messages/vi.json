@@ -840,6 +840,7 @@
       "couponPerCustomerLimit": "Bạn đã sử dụng mã này.",
       "couponMinSubtotal": "Đơn hàng chưa đạt giá trị tối thiểu của mã.",
       "couponNoEligibleItems": "Mã này không áp dụng cho sản phẩm trong giỏ hàng.",
+      "couponRateLimited": "Bạn đã thử quá nhiều mã. Vui lòng đợi một phút rồi thử lại.",
       "itemUnavailable": "{name} hiện không còn bán.",
       "itemQuantityLimit": "{name}: số lượng vượt quá giới hạn mỗi đơn.",
       "itemInsufficientStock": "{name}: không đủ hàng trong kho.",

@@ -32,7 +32,9 @@ export type CouponIssueCode =
   | 'couponUsageLimit'
   | 'couponPerCustomerLimit'
   | 'couponMinSubtotal'
-  | 'couponNoEligibleItems';
+  | 'couponNoEligibleItems'
+  /** Too many different codes tried on this cart (§12 coupon attempts); set by the caller. */
+  | 'couponRateLimited';
 
 const COUPON_ISSUES: Record<CouponRejectionReason | CouponRejection, CouponIssueCode> = {
   not_found: 'couponNotFound',

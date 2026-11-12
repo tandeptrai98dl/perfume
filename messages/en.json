@@ -840,6 +840,7 @@
       "couponPerCustomerLimit": "You have already used this code.",
       "couponMinSubtotal": "Your order does not reach this code's minimum amount.",
       "couponNoEligibleItems": "This code does not apply to the items in your cart.",
+      "couponRateLimited": "Too many codes tried. Please wait a minute and try again.",
       "itemUnavailable": "{name} is no longer available.",
       "itemQuantityLimit": "{name}: the quantity is above the limit per order.",
       "itemInsufficientStock": "{name}: not enough stock left.",
