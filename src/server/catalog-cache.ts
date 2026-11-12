@@ -126,8 +126,8 @@ export async function getFeatured(locale: CatalogLocale, limit = 8) {
 
 /**
  * Product ids ranked by units sold over the last 90 days (order module). Shared by the home
- * rail and the "best selling" sort; refreshed hourly (orders do not expire catalogue tags),
- * or at once by expiring `catalogTags.bestSellers`.
+ * rail and the "best selling" sort; refreshed hourly, and when an order starts or stops
+ * counting (`refreshBestSellersOnChange`: throttled `catalogTags.bestSellers` expiry).
  */
 async function getBestSellerRanking(): Promise<string[]> {
   'use cache';

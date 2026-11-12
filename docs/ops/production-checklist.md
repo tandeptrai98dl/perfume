@@ -81,6 +81,9 @@ go-live gate). Owner signs off in the go-live notes.
 - [ ] Bing Webmaster Tools (import from Search Console).
 - [ ] GA4 + Meta Pixel via GTM loaded only after consent; GTM has no Custom HTML tags loading
       other hosts (CSP, ADR-0024); test purchase event recorded with the `locale` dimension.
+- [ ] GTM/GA4: query parameters `t`, `token`, `s`, `e` redacted from `page_location` and
+      `page_referrer`, and `/danh-gia/*`, `/en/review/*` excluded (signed-link tokens,
+      docs/security/review-2026-11.md F-07).
 - [ ] `robots.txt` allows the storefront and blocks `/admin`, `/api`, cart, checkout, account.
 
 ## Security sign-off
@@ -88,5 +91,6 @@ go-live gate). Owner signs off in the go-live notes.
 - [ ] ZAP baseline on staging: no FAIL (`.github/workflows/zap-baseline.yml`).
 - [ ] CSP enforced without violations on key pages (E2E `security-headers.spec.ts`, Sentry).
 - [ ] Every admin Server Action reviewed for `requirePermission` (§12).
+- [ ] Open items of docs/security/review-2026-11.md closed or accepted by the owner.
 - [ ] Lighthouse budgets met (`.github/workflows/lighthouse.yml`); k6 run recorded.
 - [ ] Restore drill passed; runbook read by the on-call people.
