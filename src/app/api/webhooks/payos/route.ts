@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { serverEnv } from '@/lib/env';
 import { getDb } from '@/server/db/client';
-import { getPaymentGateways } from '@/server/integrations/payments';
+import {
+  getPaymentGateways,
+  getWebhookAllowlists,
+  isWebhookSourceAllowed,
+} from '@/server/integrations/payments';
 import { getProducer } from '@/server/jobs/producer';
+import { resolveClientIp } from '@/server/lib/client-ip';
 import { errorFields, logger } from '@/server/lib/logger';
 import { processGatewayNotification } from '@/server/modules/payment';
 
@@ -11,7 +17,8 @@ import { processGatewayNotification } from '@/server/modules/payment';
  * payOS webhook (POST JSON, ARCHITECTURE.md §5.3, §12 Payments). No session: the HMAC-SHA256
  * signature over `data` replaces `requirePermission`. Every call is stored in
  * `payment_events`; replays and unmatched/mismatched events are acknowledged (2xx) so payOS
- * stops retrying — they changed nothing and staff are alerted.
+ * stops retrying — they changed nothing and staff are alerted. Calls from outside the optional
+ * gateway IP allowlist (`PAYOS_WEBHOOK_ALLOWED_IPS`) get 403 before the body is read.
  */
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -25,6 +32,12 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const sourceIp = resolveClientIp(request.headers, serverEnv().TRUSTED_IP_HEADER);
+  if (!isWebhookSourceAllowed(getWebhookAllowlists(), 'payos', sourceIp)) {
+    // Gateway servers, not customers: the source IP is not personal data.
+    logger.warn('payment.webhook.ip_rejected', { provider: 'payos', sourceIp });
+    return NextResponse.json({ success: false, error: 'forbidden' }, { status: 403 });
+  }
   const text = await request.text();
   if (text.length > MAX_BODY_BYTES) {
     return NextResponse.json({ error: 'payload_too_large' }, { status: 413 });
