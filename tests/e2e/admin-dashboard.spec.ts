@@ -93,7 +93,11 @@ test.describe.serial('admin KPI dashboard', () => {
     await expect(daily.locator('tbody > tr')).toHaveCount(7);
     const top = page.getByRole('region', { name: 'Sản phẩm bán chạy' });
     await expect(top.locator('tbody > tr').first()).toContainText(productName);
-    await expect(top.locator('tbody > tr').first()).toContainText('100');
+    // Units sold: this spec's order (100) plus whatever other specs bought of the same product.
+    const unitsCell = top.locator('tbody > tr').first().locator('td').first();
+    await expect
+      .poll(async () => Number((await unitsCell.innerText()).replace(/\D/g, '')))
+      .toBeGreaterThanOrEqual(100);
     await expect(page.getByRole('region', { name: 'Đơn theo trạng thái' })).toContainText(
       'Đã xác nhận',
     );
