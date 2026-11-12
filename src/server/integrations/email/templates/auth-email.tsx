@@ -3,15 +3,21 @@ import { Text } from 'react-email';
 import { emailTranslator, type EmailLocale } from './i18n';
 import { EmailButton, EmailLayout, mutedTextStyle, textStyle } from './layout';
 
-export type AuthEmailKind = 'verify_email' | 'reset_password';
+export type AuthEmailKind = 'verify_email' | 'reset_password' | 'staff_invite';
 
-const KEY = { verify_email: 'verify', reset_password: 'reset' } as const;
+const KEY = {
+  verify_email: 'verify',
+  reset_password: 'reset',
+  staff_invite: 'staffInvite',
+} as const;
 
 export function authEmailSubject(locale: EmailLocale, kind: AuthEmailKind): string {
   return emailTranslator(locale)(`email.auth.${KEY[kind]}.subject`);
 }
 
-/** Account e-mails (verification, password reset) in the user's locale (§10.6). */
+/**
+ * Account e-mails (verification, password reset, staff invitation) in the user's locale (§10.6).
+ */
 export function AuthEmail({
   locale,
   kind,

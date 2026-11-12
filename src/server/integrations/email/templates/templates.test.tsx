@@ -132,7 +132,9 @@ describe('order e-mail templates', () => {
 describe('auth e-mail templates', () => {
   it.each(
     LOCALES.flatMap((locale) =>
-      (['verify_email', 'reset_password'] as const).map((kind) => [locale, kind] as const),
+      (['verify_email', 'reset_password', 'staff_invite'] as const).map(
+        (kind) => [locale, kind] as const,
+      ),
     ),
   )('renders %s %s with the action link', async (locale, kind) => {
     const html = await render(

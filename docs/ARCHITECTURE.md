@@ -211,7 +211,8 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 | `review` | Reviews, review invitations, moderation | reviews, review_invitations |
 | `content` | Banners, journal posts, static pages, menus, redirects | posts, pages, banners, navigation_menus, redirects, *_translations |
 | `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs (M3: one row per e-mail / Telegram send, masked recipient; `order_events` keeps the at-most-once keys, see §10.5) |
-| `admin` | Permissions, audit, settings | audit_logs, settings |
+| `admin` | Permissions, audit, settings (M3 code: `staff` = staff accounts, roles, invitations, locks, 2FA resets on the auth tables; `audit` = audit log read side + CSV export) | audit_logs, settings |
+| `reporting` | Read-only KPI aggregates for the dashboard (owns no table, never writes) | — |
 
 **Module communication rules:** module A calls only module B's public `index.ts`, never B's `repo.ts`. Side effects (emails, alerts, e-invoices, stats) go through the job queue using a **transactional outbox**: the job is enqueued in the same database transaction as the business change.
 
@@ -381,6 +382,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 | Route | Purpose | Phase |
 | --- | --- | --- |
 | `/admin/login` | Staff sign-in (email + password + TOTP; no OAuth) | MVP |
+| `/admin/set-password` | Invited staff set their password from the e-mailed link (no session; single-use token, 72 h) | MVP |
 | `/admin` | Dashboard: revenue, orders awaiting action, low stock, missing translations | MVP |
 | `/admin/orders`, `/admin/orders/new`, `/admin/orders/[id]` | List, manual order, detail, edit, transitions, printing | MVP |
 | `/admin/products`, `/new`, `/[id]` | Products + variants + media + vi/en translations + SEO + cosmetics compliance | MVP |
@@ -394,7 +396,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 | `/admin/payments`, `/admin/payments/cod-remittances` | Transactions, refunds, COD reconciliation | MVP |
 | `/admin/privacy-requests` | Data export/deletion requests with due dates (minimal) | MVP |
 | `/admin/settings` | Company info, COD threshold/deposit, gift-wrap fee, alert channels, SEO defaults (no payment secrets — D07) | MVP |
-| `/admin/staff`, `/admin/audit-log` | Staff, roles, audit trail | MVP |
+| `/admin/staff`, `/admin/staff/[id]`, `/admin/audit-log` | Staff, roles, audit trail (CSV export: `/api/admin/audit-log/export`) | MVP |
 | `/admin/reports` | Advanced reports | Phase 2 |
 | `/admin/loyalty`, `/admin/flash-sales` | Advanced marketing | Phase 2 |
 
@@ -952,6 +954,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 ### 11.2 Screens (MVP)
 
 - **Dashboard:** revenue today/7/30 days, orders by status (awaiting confirmation, to pack, in transit), average order value, top 10 products, low stock, reviews awaiting moderation, content missing English translations, e-invoices failed.
+  As built (M3): date range presets today / 7 days / 30 days / this month in Vietnam time (`?range=`); net revenue = `total − amount_refunded` of orders placed in the range that count as sales (not `pending`, `awaiting_confirmation`, `cancelled`, `returned`); cash collected = payments received minus refunds completed in the range; AOV = gross sales ÷ sales orders; conversion proxy = storefront orders ÷ carts created; live counters for COD awaiting remittance, open refunds, privacy requests (open/overdue), pending reviews and active products without published English. Every widget follows the permission of the screen it summarizes (money: `dashboard.viewRevenue`). Charts are plain CSS bars with a data table. E-invoice failures are added by the e-invoicing stream.
 - **Orders:** filter by status/payment method/date/province; search by code/phone/email; detail with timeline, payments, internal notes, e-invoice status; only valid transition buttons; carrier + tracking entry; packing slip (prices hidden for gifts) and delivery slip; cancel/refund with reason; bulk confirm/print.
   Work queues: "awaiting confirmation" = `awaiting_confirmation`, "to pack" = `confirmed` + `processing`, "in transit" = `shipped`. Confirming a COD order is refused until `amount_paid >= deposit_required`; entering `shipped` creates the `shipments` row (carrier + tracking code, COD amount = balance due); `delivery_failed` sets `users.cod_risk_flag` and the phone's failed deliveries warn on later COD orders (derived from `order_events`, no extra table); an order holding money is cancelled only with `orders.cancelPaid` and the amount owed appears in the payments refund queue. Notes are `order_events` of type `note`; every action writes `audit_logs`.
 - **Manual orders** (`/admin/orders/new`): find customer by phone/email or create; pick variants; apply coupon; choose email language; payment = COD, manually confirmed bank transfer, or a payment link sent by email/Zalo.
@@ -970,6 +973,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 - **Privacy requests:** list from the privacy centre with due dates; actions: export JSON, anonymize account; audited.
 - **Settings:** company details (name, tax code, address, legal representative — shown in the footer), COD threshold and deposit %, gift-wrap fee, alert channels, SEO defaults, sender email. Payment secrets are not here (D07).
 - **Staff & audit:** invite by email, assign role, enforce 2FA, lock accounts; audit log filterable by actor/entity/date with before/after diff.
+  As built (M3): an invitation creates the account (role set, e-mail treated as verified, no password) and e-mails a set-password link (Better Auth reset token, 72 h, `auth.email` outbox job `staff_invite`); TOTP enrolment is forced at first sign-in. Role changes, deactivation and 2FA resets revoke the account's sessions; nobody changes their own account and the last active Owner cannot be demoted or locked (Owner rows locked `FOR UPDATE`). Existing e-mails (customers included) cannot be invited. The audit log (`auditLog.view`) filters by actor, entity type/id, action prefix and dates, pages by keyset on the UUIDv7 id, redacts contact data and truncates IPs; CSV export needs `customers.export` and is itself audited. Per-action permission review: `docs/security/permission-review.md`.
 
 ### 11.3 Phase 2–3
 
