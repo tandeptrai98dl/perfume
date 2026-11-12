@@ -42,6 +42,9 @@ test.describe.serial('admin returns', () => {
   let full: ReturnOrder;
   let rejected: ReturnOrder;
   let invoiced: ReturnOrder;
+  let phoned: ReturnOrder;
+  let late: ReturnOrder;
+  let cod: ReturnOrder;
   let rejectedRequest: string;
 
   test.beforeAll(async ({}, testInfo) => {
@@ -58,7 +61,13 @@ test.describe.serial('admin returns', () => {
       reason: 'defective',
       quantity: 2,
       description: 'Vòi xịt bị kẹt, không xịt được.',
+      photo: true,
     });
+    phoned = await insertReturnOrder({ locale: 'vi', email: email('phone') });
+    late = await insertReturnOrder({ locale: 'vi', email: email('late'), deliveredDaysAgo: 10 });
+    cod = await insertReturnOrder({ locale: 'vi', email: email('cod'), cod: true });
+    ids.push(phoned.id, late.id, cod.id);
+    await insertReturnRequest(cod, { reason: 'unopened', quantity: 2, description: '' });
     rejectedRequest = await insertReturnRequest(rejected, {
       reason: 'unopened',
       quantity: 1,
@@ -94,6 +103,23 @@ test.describe.serial('admin returns', () => {
     const section = await returnSection(page);
     await expect(section).toContainText('Vòi xịt bị kẹt, không xịt được.');
     await expect(section).toContainText('trả 2/2');
+    // The customer's photo: shown to staff through the authenticated route only.
+    const photo = section.getByTestId('return-photo');
+    await expect(photo).toBeVisible();
+    await expect(photo).toHaveAttribute(
+      'alt',
+      `Ảnh 1 khách gửi cho yêu cầu trả hàng đơn ${full.code}`,
+    );
+    expect(await photo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(320);
+    const src = (await photo.getAttribute('src'))!;
+    expect(src).toMatch(new RegExp(`^/api/admin/orders/${full.id}/return-photos/[0-9a-f-]+$`));
+    const response = await page.request.get(src);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toBe('image/webp');
+    expect(response.headers()['cache-control']).toContain('no-store');
+    const anonymous = await page.context().browser()!.newContext();
+    expect((await anonymous.request.get(new URL(src, page.url()).href)).status()).toBe(403);
+    await anonymous.close();
     // The generic status buttons never close a return.
     await expect(
       page.getByRole('region', { name: 'Xử lý đơn' }).getByRole('button', { name: /hoàn hàng/i }),
@@ -133,13 +159,24 @@ test.describe.serial('admin returns', () => {
 
     const state = await orderState(full.id);
     expect(state.status).toBe('returned');
-    expect(state.refunds).toEqual([{ amount: full.total, status: 'requested' }]);
+    // The order's money goes back via the gateway; the return shipping beyond it is a manual
+    // payout (bank transfer).
+    expect(state.refunds).toEqual([
+      { amount: full.total, status: 'requested', method: 'gateway', reason: 'return:defective' },
+      {
+        amount: 30_000,
+        status: 'requested',
+        method: 'bank_transfer',
+        reason: 'return_shipping_payout',
+      },
+    ]);
+    await expect(section).toContainText('vượt số tiền đơn đang giữ');
     const received = state.events.find((e) => e.type === 'return_received');
     expect(received?.metadata).toMatchObject({
       outcome: 'full',
       restocked: false,
       feesRefunded: true,
-      refund: { total: full.total + 30_000, queued: full.total, shortfall: 30_000 },
+      refund: { total: full.total + 30_000, queued: full.total, payout: 30_000, shortfall: 0 },
     });
     const names = state.jobs.map((job) => job.name);
     expect(names).toEqual(expect.arrayContaining(['einvoice.adjust', 'return.notify']));
@@ -216,6 +253,115 @@ test.describe.serial('admin returns', () => {
     expect(request).toMatchObject({ message: 'Sai tên người mua' });
     expect(request?.metadata).toMatchObject({ action: 'replace', source: 'staff' });
     expect(state.jobs.map((job) => job.name)).toContain('einvoice.adjust');
+    expect(errors).toEqual([]);
+  });
+
+  test('staff open a return for a customer who called; late returns need a manager', async ({
+    page,
+  }) => {
+    test.setTimeout(150_000);
+    const errors = collectConsoleErrors(page);
+    await signIn(page, staff);
+    await page.goto(`/admin/orders/${late.id}`);
+    let section = await returnSection(page);
+    await expect(page.getByTestId('open-return-expired')).toContainText(
+      'Chỉ Quản lý hoặc Chủ shop được tạo yêu cầu trả hàng ngoại lệ.',
+    );
+
+    await page.goto(`/admin/orders/${phoned.id}`);
+    section = await returnSection(page);
+    await section.getByRole('button', { name: 'Tạo yêu cầu trả hàng thay khách' }).click();
+    const dialog = page.getByRole('dialog', {
+      name: `Tạo yêu cầu trả hàng cho đơn ${phoned.code}`,
+    });
+    const confirm = dialog.getByRole('button', { name: 'Tạo yêu cầu' });
+    await expect(confirm).toBeDisabled();
+    await dialog.getByRole('radio', { name: 'Sản phẩm lỗi' }).check();
+    await dialog.getByLabel('Số lượng trả: ').fill('1');
+    await dialog.getByLabel('Mô tả của khách').fill('Khách gọi: nắp chai bị nứt.');
+    await expectNoAxeViolations(page);
+    await confirm.click();
+    await expect(toast(page, `Đã tạo yêu cầu trả hàng cho đơn ${phoned.code}.`)).toBeVisible();
+    await expect(page.getByTestId('return-panel')).toHaveAttribute('data-status', 'requested');
+    await expect(section).toContainText('Nhân viên tạo yêu cầu thay khách');
+    await expect(section).toContainText('trả 1/2');
+    await expectNoAxeViolations(page);
+    const state = await orderState(phoned.id);
+    expect(state.status).toBe('return_requested');
+    expect(state.events.find((e) => e.type === 'return_requested')?.metadata).toMatchObject({
+      openedBy: 'staff',
+      reason: 'defective',
+      lines: [{ orderItemId: phoned.itemId, quantity: 1 }],
+    });
+    await page.context().clearCookies();
+
+    // A manager may lift the window, with a reason.
+    await signIn(page, manager);
+    await page.goto(`/admin/orders/${late.id}`);
+    section = await returnSection(page);
+    await section.getByRole('button', { name: 'Tạo yêu cầu trả hàng thay khách' }).click();
+    const override = page.getByRole('dialog', {
+      name: `Tạo yêu cầu trả hàng cho đơn ${late.code}`,
+    });
+    await expect(override).toContainText('Đã quá thời hạn trả hàng');
+    await override.getByRole('radio', { name: 'Vỡ / hư hỏng' }).check();
+    await override.getByLabel('Mô tả của khách').fill('Khách đi công tác, chai vỡ trong hộp.');
+    await override
+      .getByLabel('Lý do cho phép trả sau thời hạn')
+      .fill('Khách báo lỗi trong hạn qua Zalo');
+    await override.getByRole('button', { name: 'Tạo yêu cầu' }).click();
+    await expect(toast(page, `Đã tạo yêu cầu trả hàng cho đơn ${late.code}.`)).toBeVisible();
+    await expect(section).toContainText(
+      'Quản lý cho phép trả hàng sau thời hạn: Khách báo lỗi trong hạn qua Zalo',
+    );
+    expect(errors).toEqual([]);
+  });
+
+  test('COD returned before remittance: reconciling it queues the refund owed', async ({
+    page,
+  }) => {
+    test.setTimeout(150_000);
+    const errors = collectConsoleErrors(page);
+    await signIn(page, manager);
+    await page.goto(`/admin/orders/${cod.id}`);
+    const section = await returnSection(page);
+    await section.getByRole('button', { name: 'Chấp nhận' }).click();
+    await page
+      .getByRole('dialog', { name: `Chấp nhận yêu cầu trả hàng đơn ${cod.code}?` })
+      .getByRole('button', { name: 'Chấp nhận' })
+      .click();
+    await expect(page.getByTestId('return-panel')).toHaveAttribute('data-status', 'approved');
+    await section.getByRole('button', { name: 'Đã nhận lại hàng' }).click();
+    await page
+      .getByRole('dialog', { name: `Xác nhận đã nhận hàng trả của đơn ${cod.code}?` })
+      .getByRole('button', { name: 'Xác nhận đã nhận hàng' })
+      .click();
+    await expect(page.getByTestId('return-panel')).toHaveAttribute('data-status', 'received');
+    const owed = cod.unitPrice * 2; // change of mind: the goods, not the delivery fee
+    await expect(section).toContainText(`Còn phải hoàn ${vnd(owed)}`);
+    expect((await orderState(cod.id)).refunds).toEqual([]);
+
+    await page.goto('/admin/payments/cod-remittances');
+    const row = page.getByRole('row').filter({ hasText: cod.code });
+    await expect(row).toContainText('Khách đã trả hàng');
+    await expect(row.getByTestId('cod-deferred-refund')).toContainText(vnd(owed));
+    await expectNoAxeViolations(page);
+    await page.getByRole('combobox', { name: 'Đơn vị vận chuyển', exact: true }).click();
+    await page.getByRole('option', { name: 'GHN', exact: true }).click();
+    await page.getByRole('checkbox', { name: `Chọn đơn ${cod.code}` }).check();
+    await page.getByLabel('Số tiền thực nhận (₫)', { exact: true }).fill(String(cod.total));
+    await page.getByRole('button', { name: 'Lưu đối soát' }).click();
+    await expect(toast(page, 'Đã đối soát 1 đơn')).toBeVisible();
+
+    const state = await orderState(cod.id);
+    expect(state.status).toBe('returned');
+    expect(state.refunds).toEqual([
+      { amount: owed, status: 'requested', method: 'bank_transfer', reason: 'return:unopened' },
+    ]);
+    await page.goto('/admin/payments/refunds');
+    await expect(page.getByRole('row').filter({ hasText: cod.code })).toContainText(
+      'Khách trả hàng: Đổi ý (còn seal)',
+    );
     expect(errors).toEqual([]);
   });
 });

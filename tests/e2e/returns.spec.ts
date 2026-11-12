@@ -3,7 +3,16 @@ import { expect as baseExpect, test, type Page } from '@playwright/test';
 
 import { authEmailLink, testIp, uniqueEmail } from './helpers/account';
 import { accessToken } from './helpers/payment-orders';
-import { deleteReturnOrders, insertReturnOrder, orderState } from './helpers/returns';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+import {
+  deleteReturnOrders,
+  E2E_MEDIA_DIR,
+  insertReturnOrder,
+  orderState,
+  testPhoto,
+} from './helpers/returns';
 
 /*
  * Customer return requests (ADR-0017, §10.5): Vietnamese guest through the signed order link
@@ -93,6 +102,22 @@ test('guest returns part of an order through the e-mail link (vi)', async ({ pag
   await form
     .getByRole('checkbox', { name: 'Tôi xác nhận sản phẩm chưa mở và còn nguyên seal.' })
     .check();
+
+  // Photos: a non-image is refused in the browser; a real photo is attached.
+  const photos = form.getByLabel('Ảnh sản phẩm hoặc bao bì (không bắt buộc)');
+  await photos.setInputFiles({
+    name: 'ghi-chu.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('not an image'),
+  });
+  await expect(form.getByText('Chỉ nhận ảnh JPEG, PNG hoặc WebP.')).toBeVisible();
+  await photos.setInputFiles({
+    name: 'hop-con-seal.png',
+    mimeType: 'image/png',
+    buffer: await testPhoto(),
+  });
+  await expect(form.getByRole('list', { name: 'Ảnh đã chọn' })).toContainText('hop-con-seal.png');
+  await expectNoAxeViolations(page);
   await form.getByRole('button', { name: 'Gửi yêu cầu' }).click();
 
   await expect(
@@ -105,12 +130,25 @@ test('guest returns part of an order through the e-mail link (vi)', async ({ pag
 
   const state = await orderState(order.id);
   expect(state.status).toBe('return_requested');
-  expect(state.events.find((e) => e.type === 'return_requested')?.metadata).toMatchObject({
+  const requested = state.events.find((e) => e.type === 'return_requested')?.metadata as {
+    photos: { key: string; mime: string }[];
+  };
+  expect(requested).toMatchObject({
     reason: 'unopened',
     resolution: 'refund',
     sealIntact: true,
     lines: [{ orderItemId: order.itemId, quantity: 1 }],
+    photos: [{ mime: 'image/webp' }],
   });
+  // Stored privately, re-encoded, and never served by the public media route.
+  const key = requested.photos[0]!.key;
+  expect(key).toMatch(new RegExp(`^private/returns/${order.id}/[0-9a-f-]+\\.webp$`));
+  expect(existsSync(join(E2E_MEDIA_DIR, key))).toBe(true);
+  expect((await page.request.get(`/api/media/${key}`)).status()).toBe(404);
+  expect((await page.request.get(`/api/admin/orders/${order.id}/return-photos/x`)).status()).toBe(
+    404,
+  );
+  await expect(section).toContainText('Đã gửi kèm 1 ảnh');
   expect(state.jobs.map((job) => job.name)).toEqual(
     expect.arrayContaining(['return.notify', 'staff.alert']),
   );
@@ -148,6 +186,13 @@ test('member requests a refund for a defective item from the account (en)', asyn
     form.getByText('Please describe the problem (at least 10 characters).'),
   ).toBeVisible();
   await form.getByLabel('Description').fill('The atomiser leaks when spraying.');
+  const photos = form.getByLabel('Photos of the product or packaging (optional)');
+  await photos.setInputFiles([
+    { name: 'leak-1.png', mimeType: 'image/png', buffer: await testPhoto() },
+    { name: 'leak-2.png', mimeType: 'image/png', buffer: await testPhoto(200, 400) },
+  ]);
+  await form.getByRole('button', { name: 'Remove photo leak-2.png' }).click();
+  await expect(form.getByRole('list', { name: 'Selected photos' })).not.toContainText('leak-2.png');
   await expectNoAxeViolations(page);
   await expectNoHorizontalOverflow(page);
   await form.getByRole('button', { name: 'Send request' }).click();
@@ -162,12 +207,17 @@ test('member requests a refund for a defective item from the account (en)', asyn
   expect(state.status).toBe('return_requested');
   const request = state.events.find((e) => e.type === 'return_requested');
   expect(request?.message).toBe('The atomiser leaks when spraying.');
-  expect(request?.metadata).toMatchObject({ reason: 'defective', resolution: 'refund' });
+  expect(request?.metadata).toMatchObject({
+    reason: 'defective',
+    resolution: 'refund',
+    photos: [{ mime: 'image/webp' }],
+  });
+  await expect(section).toContainText('1 photo attached');
   expect(state.jobs.find((job) => job.name === 'return.notify')?.data).toMatchObject({
     kind: 'requested',
   });
 
-  // One request per order: the form does not come back.
+  // One open request at a time: the form does not come back while it is pending.
   await page.reload();
   await expect(section.getByRole('button', { name: 'Request a return' })).toHaveCount(0);
   expect(errors).toEqual([]);

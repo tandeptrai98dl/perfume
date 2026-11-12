@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+
 import { defineConfig, devices } from '@playwright/test';
 
 import {
@@ -96,6 +98,10 @@ export default defineConfig({
           // Specs give each shopper its own IP via x-forwarded-for (place-order limit 5/min/IP).
           // Only acceptable because nothing but the test runner can reach this server.
           TRUSTED_IP_HEADER: 'x-forwarded-for',
+          // Return photos (private storage) on the local filesystem; absolute because the
+          // standalone server runs from .next/standalone.
+          MEDIA_STORAGE: process.env.MEDIA_STORAGE ?? 'local',
+          MEDIA_LOCAL_DIR: process.env.MEDIA_LOCAL_DIR ?? resolve('.data/e2e-media'),
         },
       },
 });

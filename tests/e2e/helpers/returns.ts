@@ -1,7 +1,22 @@
 import { randomInt } from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 
 import { Client } from 'pg';
+import sharp from 'sharp';
 import { uuidv7 } from 'uuidv7';
+
+/** Local private storage of the E2E server (playwright.config.ts `MEDIA_LOCAL_DIR`). */
+export const E2E_MEDIA_DIR = process.env.MEDIA_LOCAL_DIR ?? resolve('.data/e2e-media');
+
+/** A small real PNG for upload tests (re-encoded by the server). */
+export function testPhoto(width = 320, height = 240): Promise<Buffer> {
+  return sharp({
+    create: { width, height, channels: 3, background: { r: 196, g: 160, b: 112 } },
+  })
+    .png()
+    .toBuffer();
+}
 
 /*
  * Fixtures for the return specs (ADR-0017), inserted straight into the app database: a
@@ -49,6 +64,10 @@ export async function insertReturnOrder(input: {
   userEmail?: string;
   /** Issued sandbox e-invoice (admin spec). */
   einvoice?: boolean;
+  /** Cash on delivery the carrier has not remitted yet (nothing paid). */
+  cod?: boolean;
+  /** Delivered this many days ago (default 1, inside the 7-day window). */
+  deliveredDaysAgo?: number;
 }): Promise<ReturnOrder> {
   return withDb(async (db) => {
     const user = input.userEmail
@@ -79,9 +98,10 @@ export async function insertReturnOrder(input: {
         `insert into orders (id, code, user_id, email, phone, customer_name, locale, status,
            payment_method, payment_status, subtotal, shipping_fee, total, amount_paid,
            confirmed_at, shipped_at, delivered_at, einvoice_ref, einvoice_issued_at)
-         values ($1, $2, $3, $4, $5, 'E2E Return Hương', $6, 'delivered', 'vnpay', 'paid', $7,
-           30000, $8, $8, now() - interval '3 days', now() - interval '2 days',
-           now() - interval '1 day', $9, case when $9::text is null then null else now() end)`,
+         values ($1, $2, $3, $4, $5, 'E2E Return Hương', $6, 'delivered', $10, $11, $7,
+           30000, $8, $12, now() - interval '3 days', now() - interval '2 days',
+           now() - make_interval(days => $13::int), $9,
+           case when $9::text is null then null else now() end)`,
         [
           id,
           code,
@@ -92,6 +112,10 @@ export async function insertReturnOrder(input: {
           unitPrice * 2,
           total,
           input.einvoice ? `C26SBX-E2E${code.slice(-4)}` : null,
+          input.cod ? 'cod' : 'vnpay',
+          input.cod ? 'unpaid' : 'paid',
+          input.cod ? 0 : total,
+          input.deliveredDaysAgo ?? 1,
         ],
       );
       await db.query(
@@ -116,11 +140,13 @@ export async function insertReturnOrder(input: {
            'Phường Bến Thành', '12 Lê Lợi')`,
         [id, phone],
       );
-      await db.query(
-        `insert into payments (id, order_id, provider, kind, amount, status, txn_ref, paid_at)
-         values ($1, $2, 'vnpay', 'full', $3, 'succeeded', $4, now() - interval '3 days')`,
-        [uuidv7(), id, total, `${Date.now()}${randomInt(1000, 9999)}`.slice(-16)],
-      );
+      if (!input.cod) {
+        await db.query(
+          `insert into payments (id, order_id, provider, kind, amount, status, txn_ref, paid_at)
+           values ($1, $2, 'vnpay', 'full', $3, 'succeeded', $4, now() - interval '3 days')`,
+          [uuidv7(), id, total, `${Date.now()}${randomInt(1000, 9999)}`.slice(-16)],
+        );
+      }
       for (const [from, to, ago] of [
         [null, 'pending', '4 days'],
         ['pending', 'confirmed', '3 days'],
@@ -165,12 +191,46 @@ export async function insertReturnOrder(input: {
   });
 }
 
-/** An open return request, as the storefront form writes it (admin spec). */
+/**
+ * An open return request, as the storefront form writes it (admin spec), optionally with one
+ * photo stored like the upload route does (`private/returns/<order>/<photo>.webp`).
+ */
 export async function insertReturnRequest(
   order: ReturnOrder,
-  input: { reason: 'defective' | 'unopened'; quantity: number; description: string },
+  input: {
+    reason: 'defective' | 'unopened';
+    quantity: number;
+    description: string;
+    photo?: boolean;
+  },
 ): Promise<string> {
   const requestId = uuidv7();
+  const photos: Array<{
+    id: string;
+    key: string;
+    mime: string;
+    width: number;
+    height: number;
+    sizeBytes: number;
+  }> = [];
+  if (input.photo) {
+    const photoId = uuidv7();
+    const key = `private/returns/${order.id}/${photoId}.webp`;
+    const body = await sharp(await testPhoto())
+      .webp()
+      .toBuffer();
+    const path = join(E2E_MEDIA_DIR, key);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, body);
+    photos.push({
+      id: photoId,
+      key,
+      mime: 'image/webp',
+      width: 320,
+      height: 240,
+      sizeBytes: body.length,
+    });
+  }
   await withDb(async (db) => {
     await db.query(
       `update orders set status = 'return_requested', version = version + 1 where id = $1`,
@@ -194,6 +254,7 @@ export async function insertReturnRequest(
           resolution: 'refund',
           lines: [{ orderItemId: order.itemId, quantity: input.quantity }],
           sealIntact: input.reason === 'unopened',
+          photos,
         },
       ],
     );
@@ -216,11 +277,16 @@ export async function orderState(orderId: string) {
       )
     ).rows;
     const refunds = (
-      await db.query<{ amount: string; status: string }>(
-        'select amount, status from refunds where order_id = $1',
+      await db.query<{ amount: string; status: string; method: string; reason: string }>(
+        'select amount, status, method, reason from refunds where order_id = $1 order by amount desc',
         [orderId],
       )
-    ).rows.map((row) => ({ amount: Number(row.amount), status: row.status }));
+    ).rows.map((row) => ({
+      amount: Number(row.amount),
+      status: row.status,
+      method: row.method,
+      reason: row.reason,
+    }));
     const jobs = (
       await db
         .query<{ name: string; data: Record<string, unknown> }>(
@@ -240,6 +306,11 @@ export async function deleteReturnOrders(ids: readonly string[]): Promise<void> 
       .query(`delete from pgboss.job where data->>'orderId' = any($1)`, [ids])
       .catch(() => undefined);
     await db.query('delete from notification_logs where ref_id = any($1::text[])', [ids]);
+    await db.query(
+      `delete from cod_remittances where id in
+         (select remittance_id from cod_remittance_orders where order_id = any($1::uuid[]))`,
+      [ids],
+    );
     await db.query('delete from orders where id = any($1::uuid[])', [ids]);
   });
 }
