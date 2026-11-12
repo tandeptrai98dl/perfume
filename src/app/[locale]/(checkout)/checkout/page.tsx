@@ -15,18 +15,19 @@ import { getDb } from '@/server/db/client';
 import { quoteCheckout } from '@/server/modules/checkout';
 import { pagePath } from '@/server/modules/content';
 import { listProvinces, listSavedAddresses, listWards } from '@/server/modules/customer';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 
 type Props = PageProps<'/[locale]/checkout'>;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'checkout' });
   return { title: t('metaTitle'), robots: { index: false, follow: false } };
 }
 
 /** One-page checkout (§10.4, §5.1: dynamic, noindex). */
 export default async function CheckoutPage({ params }: Props) {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'checkout' });
   return (
     <div className="container-content flex flex-col gap-8 py-8 lg:py-12">

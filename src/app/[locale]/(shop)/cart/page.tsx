@@ -13,18 +13,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
 import { getCurrentCartView } from '@/server/cart-session';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 
 import { NOINDEX } from '../_lib/seo';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/cart'>): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'cart' });
   return { title: t('title'), description: t('metaDescription'), robots: NOINDEX };
 }
 
 /** Cart page (§5.1: dynamic, noindex). The cart follows the visitor across languages. */
 export default async function CartPage({ params }: PageProps<'/[locale]/cart'>) {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'cart' });
   return (
     <div className="container-content flex flex-col gap-10 py-10 lg:py-16">

@@ -18,11 +18,12 @@ import { getPathname, Link } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
 import { localizedPath } from '@/lib/seo/paths';
 import { getBestSellers, getFeatured, getHomeBrands, getNewArrivals } from '@/server/catalog-cache';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 
 import { absoluteUrl, alternates, siteUrl } from './_lib/seo';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   // APP_URL is read at request time (the build machine's URL must never be baked in).
   await connection();
   const t = await getTranslations({ locale, namespace: 'metadata' });
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: PageProps<'/[locale]'>): Prom
  * at request time from the cached catalogue/content reads (`'use cache'` + tags).
  */
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'home' });
   return (
     <>

@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getPathname } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
+import { resolveLocale } from '@/app/[locale]/(shop)/_content/shared';
 
 import { ListingHeader } from '../_lib/page-header';
 import {
@@ -20,7 +21,7 @@ export async function generateMetadata({
   params,
   searchParams,
 }: PageProps<'/[locale]/perfumes'>): Promise<Metadata> {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'listing' });
   const listing = await readListingParams(searchParams);
   const title =
@@ -38,7 +39,7 @@ export default async function PerfumesPage({
   params,
   searchParams,
 }: PageProps<'/[locale]/perfumes'>) {
-  const locale = (await params).locale as Locale;
+  const locale = await resolveLocale(params);
   const t = await getTranslations({ locale, namespace: 'listing' });
   return (
     <div className="container-content flex flex-col gap-10 py-10 lg:py-16">
