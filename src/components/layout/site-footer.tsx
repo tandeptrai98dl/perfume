@@ -5,7 +5,7 @@ import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { CookieSettingsButton } from '@/components/privacy/cookie-settings-button';
-import { NewsletterSignup } from '@/components/shop/newsletter-signup';
+import { NewsletterSignup } from '@/components/shop/newsletter-signup-lazy';
 import { getMenu, getPolicyPath, getSellerInfo } from '@/data/content';
 import type { Locale } from '@/i18n/routing';
 import { localizedPath } from '@/lib/seo/paths';

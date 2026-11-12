@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import { HomeBannerSlot } from '@/components/shop/home-banner-slot';
 import { JournalTeaser } from '@/components/shop/journal-teaser';
 import { JsonLd } from '@/components/shop/json-ld';
-import { NewsletterSignup } from '@/components/shop/newsletter-signup';
+import { NewsletterSignup } from '@/components/shop/newsletter-signup-lazy';
 import { ProductGrid } from '@/components/shop/product-card';
 import { ProductRail } from '@/components/shop/product-rail';
 import { TrustStrip } from '@/components/shop/trust-strip';
