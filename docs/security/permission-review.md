@@ -17,11 +17,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 61 |
+| Admin Server Actions | 62 |
 | Admin Server Actions without a permission | 0 |
 | Storefront Server Actions | 17 |
 | Route Handlers | 15 |
-| Admin pages | 55 |
+| Admin pages | 56 |
 
 ## Admin Server Actions
 
@@ -49,6 +49,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `content.ts` | `savePageAction` | `content.manage` | owner, manager, editor | yes |
 | `content.ts` | `savePostAction` | `content.manage` | owner, manager, editor | yes |
 | `content.ts` | `saveTopicAction` | `content.manage` | owner, manager, editor | yes |
+| `einvoices.ts` | `retryEinvoiceAction` | `orders.process` | owner, manager, staff | yes |
 | `inventory.ts` | `adjustStockAction` | `inventory.adjust` | owner, manager, staff | yes |
 | `inventory.ts` | `setLowStockThresholdAction` | `inventory.adjust` | owner, manager, staff | yes |
 | `manual-orders.ts` | `listManualOrderWardsAction` | `orders.createManual` | owner, manager, staff | yes |
@@ -172,7 +173,8 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/inventory/movements` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/inventory` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/orders/[id]/edit` | `orders.editBeforeShipping` | owner, manager, staff | `orders.cancelPaid` |  |
-| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping` |  |
+| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping`, `orders.process` |  |
+| `/admin/orders/einvoices` | `orders.view` | owner, manager, staff | `orders.process` |  |
 | `/admin/orders/new` | `orders.createManual` | owner, manager, staff | `orders.process`, `payments.confirmBankTransfer` |  |
 | `/admin/orders` | `orders.view` | owner, manager, staff | `orders.createManual` |  |
 | `/admin` | `admin.access` | owner, manager, staff, editor | `orders.view`, `inventory.adjust` |  |

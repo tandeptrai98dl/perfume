@@ -89,6 +89,15 @@ async function Dashboard({ searchParams }: PageProps<'/admin'>) {
       href: '/admin/reviews',
     });
   }
+  if (dashboard.failedEinvoices !== null) {
+    attention.push({
+      key: 'einvoices',
+      label: t('dashboard.failedEinvoices'),
+      value: format.number(dashboard.failedEinvoices),
+      href: '/admin/orders/einvoices',
+      alert: dashboard.failedEinvoices > 0,
+    });
+  }
   if (dashboard.privacy) {
     attention.push({
       key: 'privacy',

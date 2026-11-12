@@ -1226,7 +1226,8 @@
       "privacyValue": "{open} đang mở · {overdue} quá hạn",
       "missingEnglish": "Sản phẩm thiếu bản tiếng Anh",
       "missingEnglishValue": "{missing}/{total} sản phẩm đang bán · {coverage}% đã có tiếng Anh",
-      "open": "Mở"
+      "open": "Mở",
+      "failedEinvoices": "Hoá đơn điện tử lỗi"
     },
     "roles": {
       "owner": "Chủ cửa hàng",

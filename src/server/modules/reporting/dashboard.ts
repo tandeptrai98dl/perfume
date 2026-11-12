@@ -1,5 +1,6 @@
 import { hasPermission } from '@/server/auth/permissions';
 import type { Database } from '@/server/db/client';
+import { countFailedEinvoices } from '@/server/modules/einvoice';
 
 import {
   cashSummary,
@@ -44,6 +45,8 @@ export type Dashboard = {
   refunds: OpenRefunds | null;
   privacy: OpenPrivacyRequests | null;
   translations: TranslationCoverage | null;
+  /** Delivered orders whose e-invoice failed after all retries (D13). */
+  failedEinvoices: number | null;
 };
 
 function withoutMoney(sales: SalesSummary): SalesSummary {
@@ -51,7 +54,7 @@ function withoutMoney(sales: SalesSummary): SalesSummary {
 }
 
 export async function getDashboard(
-  db: Pick<Database, 'select'>,
+  db: Pick<Database, 'select' | 'selectDistinctOn'>,
   role: string,
   preset: RangePreset,
   now: Date = new Date(),
@@ -62,19 +65,31 @@ export async function getDashboard(
   const orders = can('orders.view');
   const skip = Promise.resolve(null);
 
-  const [sales, cash, daily, byStatus, top, cod, reviews, refunds, privacy, translations] =
-    await Promise.all([
-      orders || revenue ? salesSummary(db, range) : skip,
-      revenue ? cashSummary(db, range) : skip,
-      revenue ? dailyRevenue(db, range) : skip,
-      orders ? ordersByStatus(db, range) : skip,
-      revenue ? topProducts(db, range) : skip,
-      can('payments.reconcileCod') ? codPendingRemittance(db) : skip,
-      can('reviews.moderate') ? pendingReviewCount(db) : skip,
-      can('payments.refund') ? openRefunds(db) : skip,
-      can('privacyRequests.handle') ? openPrivacyRequests(db, now) : skip,
-      can('translations.edit') ? englishCoverage(db) : skip,
-    ]);
+  const [
+    sales,
+    cash,
+    daily,
+    byStatus,
+    top,
+    cod,
+    reviews,
+    refunds,
+    privacy,
+    translations,
+    einvoices,
+  ] = await Promise.all([
+    orders || revenue ? salesSummary(db, range) : skip,
+    revenue ? cashSummary(db, range) : skip,
+    revenue ? dailyRevenue(db, range) : skip,
+    orders ? ordersByStatus(db, range) : skip,
+    revenue ? topProducts(db, range) : skip,
+    can('payments.reconcileCod') ? codPendingRemittance(db) : skip,
+    can('reviews.moderate') ? pendingReviewCount(db) : skip,
+    can('payments.refund') ? openRefunds(db) : skip,
+    can('privacyRequests.handle') ? openPrivacyRequests(db, now) : skip,
+    can('translations.edit') ? englishCoverage(db) : skip,
+    can('orders.process') ? countFailedEinvoices(db) : skip,
+  ]);
 
   return {
     range,
@@ -89,5 +104,6 @@ export async function getDashboard(
     refunds,
     privacy,
     translations,
+    failedEinvoices: einvoices,
   };
 }
