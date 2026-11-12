@@ -37,6 +37,8 @@ export const routing = defineRouting({
     '/account/wishlist': { vi: '/tai-khoan/yeu-thich', en: '/account/wishlist' },
     '/account/profile': { vi: '/tai-khoan/ho-so', en: '/account/profile' },
     '/account/privacy': { vi: '/tai-khoan/quyen-rieng-tu', en: '/account/privacy' },
+    // M3 reviews stream: purchases to review + own reviews (ADR-0008).
+    '/account/reviews': { vi: '/tai-khoan/danh-gia', en: '/account/reviews' },
     '/journal': { vi: '/tap-chi', en: '/journal' },
     '/journal/[slug]': { vi: '/tap-chi/[slug]', en: '/journal/[slug]' },
     '/journal/topics/[slug]': { vi: '/tap-chi/chu-de/[slug]', en: '/journal/topics/[slug]' },

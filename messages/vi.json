@@ -150,6 +150,19 @@
         "expiry": "Đường dẫn có hiệu lực trong 30 phút và chỉ dùng được một lần.",
         "ignore": "Nếu bạn không yêu cầu, hãy bỏ qua email này: mật khẩu của bạn vẫn giữ nguyên."
       }
+    },
+    "review": {
+      "subject": "Bạn thấy mùi hương của đơn {code} thế nào?",
+      "preview": "Chia sẻ cảm nhận của bạn về mùi hương vừa nhận.",
+      "heading": "Chia sẻ cảm nhận của bạn",
+      "greeting": "Chào {name},",
+      "body": "Hy vọng bạn đã có vài ngày trải nghiệm mùi hương từ đơn hàng {code}. Đánh giá của bạn giúp những người yêu nước hoa khác lựa chọn dễ dàng hơn.",
+      "items": "Sản phẩm trong đơn",
+      "writeFor": "Đánh giá {product}",
+      "cta": "Viết đánh giá",
+      "guestNote": "Mỗi liên kết chỉ dùng một lần và có hiệu lực trong {days} ngày.",
+      "memberNote": "Bạn có thể đánh giá bất cứ lúc nào trong mục Đánh giá của tài khoản.",
+      "moderation": "Đánh giá được kiểm duyệt trước khi hiển thị và được gắn nhãn \"Đã mua hàng\"."
     }
   },
   "ui": {
@@ -901,7 +914,9 @@
       "orders": "Đơn hàng",
       "addresses": "Địa chỉ",
       "profile": "Hồ sơ",
-      "signOut": "Đăng xuất"
+      "signOut": "Đăng xuất",
+      "wishlist": "Yêu thích",
+      "reviews": "Đánh giá"
     },
     "overview": {
       "intro": "Theo dõi đơn hàng, quản lý địa chỉ và chọn cách chúng tôi liên hệ với bạn.",
@@ -1148,7 +1163,9 @@
       "paymentEvents": "Nhật ký webhook",
       "refunds": "Hoàn tiền",
       "bankTransfers": "Xác nhận chuyển khoản",
-      "codRemittances": "Đối soát COD"
+      "codRemittances": "Đối soát COD",
+      "reviewsSection": "Đánh giá",
+      "reviews": "Kiểm duyệt đánh giá"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -2935,6 +2952,194 @@
       "order": "Đơn {code}: {amount} · {method} · {province}",
       "orderNoProvince": "Đơn {code}: {amount} · {method}",
       "noDetails": "Không có thêm thông tin."
+    },
+    "reviews": {
+      "title": "Kiểm duyệt đánh giá",
+      "description": "Duyệt đánh giá của khách đã mua hàng trước khi hiển thị. Khi duyệt hoặc ẩn, điểm trung bình của sản phẩm được cập nhật.",
+      "search": "Tìm theo sản phẩm, người đánh giá, mã đơn",
+      "empty": "Không có đánh giá nào.",
+      "tabs": {
+        "label": "Lọc theo trạng thái",
+        "pending": "Chờ duyệt",
+        "approved": "Đã đăng",
+        "rejected": "Đã từ chối",
+        "all": "Tất cả"
+      },
+      "status": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã đăng",
+        "rejected": "Đã từ chối"
+      },
+      "columns": {
+        "review": "Đánh giá",
+        "product": "Sản phẩm",
+        "reviewer": "Người đánh giá",
+        "createdAt": "Ngày gửi",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "locales": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "language": "Ngôn ngữ: {locale}",
+      "scores": "Lưu hương {longevity}/5 · Toả hương {sillage}/5",
+      "member": "Thành viên",
+      "guest": "Khách (liên kết email)",
+      "currentReply": "Phản hồi của cửa hàng",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "unpublish": "Ẩn",
+      "approveFor": "Duyệt đánh giá của {name}",
+      "rejectFor": "Từ chối đánh giá của {name}",
+      "approvedToast": "Đã duyệt và đăng đánh giá.",
+      "rejectedToast": "Đã từ chối đánh giá.",
+      "reply": "Phản hồi",
+      "editReply": "Sửa phản hồi",
+      "replyFor": "Phản hồi đánh giá của {name}",
+      "replyTitle": "Phản hồi đánh giá",
+      "replyHint": "Phản hồi hiển thị công khai dưới đánh giá khi đánh giá được đăng. Để trống để xoá.",
+      "replyLabel": "Nội dung phản hồi",
+      "replyCount": "{count}/{max} ký tự",
+      "saveReply": "Lưu phản hồi",
+      "cancel": "Huỷ",
+      "replySaved": "Đã lưu phản hồi.",
+      "replyRemoved": "Đã xoá phản hồi."
+    }
+  },
+  "wishlist": {
+    "toggle": "Lưu {name} vào danh sách yêu thích",
+    "signInToSave": "Đăng nhập để lưu {name} vào danh sách yêu thích",
+    "added": "Đã thêm {name} vào danh sách yêu thích.",
+    "removed": "Đã bỏ {name} khỏi danh sách yêu thích.",
+    "errors": {
+      "full": "Danh sách yêu thích đã đầy. Hãy bỏ bớt vài sản phẩm rồi thử lại.",
+      "generic": "Chưa cập nhật được danh sách yêu thích. Vui lòng thử lại."
+    },
+    "page": {
+      "metaTitle": "Danh sách yêu thích",
+      "title": "Danh sách yêu thích",
+      "intro": "Những mùi hương bạn đã lưu lại để quay lại sau.",
+      "count": "{count, plural, other {# sản phẩm}}",
+      "emptyTitle": "Chưa có sản phẩm yêu thích",
+      "emptyDescription": "Nhấn biểu tượng trái tim trên sản phẩm để lưu mùi hương bạn muốn thử.",
+      "browse": "Khám phá nước hoa"
+    }
+  },
+  "reviews": {
+    "title": "Đánh giá của khách hàng",
+    "intro": "Chỉ khách đã mua và nhận hàng mới có thể đánh giá. Mọi đánh giá đều được kiểm duyệt trước khi hiển thị.",
+    "verified": "Đã mua hàng",
+    "byline": "{name} · {date}",
+    "purchased": "Đã mua: {variant}",
+    "longevityValue": "Độ lưu hương: {value}/5",
+    "sillageValue": "Độ toả hương: {value}/5",
+    "reply": "Phản hồi từ cửa hàng",
+    "listLabel": "Danh sách đánh giá",
+    "showing": "Đang hiển thị {shown} trên {total} đánh giá",
+    "loadFailed": "Chưa tải được thêm đánh giá. Vui lòng thử lại.",
+    "showMore": "Xem thêm đánh giá",
+    "empty": {
+      "title": "Chưa có đánh giá",
+      "description": "Sau khi nhận hàng, bạn sẽ được mời chia sẻ cảm nhận về mùi hương này."
+    },
+    "summary": {
+      "average": "{value, number, ::.0}",
+      "scale": "{value, number, ::.0}/5",
+      "stars": "{count} sao",
+      "starsCount": "{stars} sao: {count, plural, other {# đánh giá}}",
+      "longevity": "Độ lưu hương",
+      "sillage": "Độ toả hương"
+    },
+    "form": {
+      "rating": "Đánh giá chung",
+      "longevity": "Độ lưu hương (không bắt buộc)",
+      "sillage": "Độ toả hương (không bắt buộc)",
+      "skip": "Bỏ qua",
+      "longevityScale": {
+        "1": "Rất ngắn",
+        "2": "Ngắn",
+        "3": "Vừa",
+        "4": "Lâu",
+        "5": "Rất lâu"
+      },
+      "sillageScale": {
+        "1": "Rất nhẹ",
+        "2": "Nhẹ",
+        "3": "Vừa",
+        "4": "Rõ",
+        "5": "Rất mạnh"
+      },
+      "title": "Tiêu đề (không bắt buộc)",
+      "body": "Cảm nhận của bạn",
+      "bodyHint": "Tối thiểu {min} ký tự · {count}/{max}",
+      "name": "Tên hiển thị",
+      "nameHint": "Tên này sẽ hiển thị công khai cùng đánh giá.",
+      "moderation": "Đánh giá sẽ được kiểm duyệt trước khi hiển thị trên trang sản phẩm.",
+      "submit": "Gửi đánh giá",
+      "thanksTitle": "Cảm ơn bạn đã đánh giá",
+      "thanksBody": "Đánh giá của bạn đang chờ kiểm duyệt và sẽ sớm xuất hiện trên trang sản phẩm."
+    },
+    "errors": {
+      "required": "Vui lòng nhập thông tin này.",
+      "tooLong": "Nội dung quá dài.",
+      "bodyTooShort": "Hãy viết thêm một chút (tối thiểu 20 ký tự).",
+      "ratingRequired": "Vui lòng chọn số sao.",
+      "invalid": "Giá trị chưa hợp lệ.",
+      "validation": "Vui lòng kiểm tra lại các trường được đánh dấu.",
+      "unauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "notFound": "Không tìm thấy sản phẩm cần đánh giá.",
+      "alreadyReviewed": "Sản phẩm này đã được đánh giá cho đơn hàng này.",
+      "linkExpired": "Liên kết đánh giá đã hết hạn.",
+      "notReviewable": "Sản phẩm trong đơn hàng này hiện không thể đánh giá.",
+      "rateLimited": "Bạn gửi quá nhiều lần. Vui lòng thử lại sau ít phút.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "link": {
+      "metaTitle": "Đánh giá sản phẩm",
+      "eyebrow": "Đơn hàng {code}",
+      "title": "Đánh giá {product}",
+      "intro": "Bạn đã mua {variant}. Hãy chia sẻ cảm nhận để giúp những người yêu nước hoa khác lựa chọn.",
+      "viewProduct": "Xem sản phẩm",
+      "account": "Đánh giá trong tài khoản",
+      "contact": "Liên hệ cửa hàng",
+      "states": {
+        "used": {
+          "title": "Bạn đã đánh giá sản phẩm này",
+          "body": "Liên kết chỉ dùng được một lần. Cảm ơn bạn đã chia sẻ cảm nhận."
+        },
+        "expired": {
+          "title": "Liên kết đã hết hạn",
+          "body": "Liên kết đánh giá có hiệu lực 30 ngày. Nếu bạn vẫn muốn đánh giá, hãy liên hệ cửa hàng."
+        },
+        "unavailable": {
+          "title": "Không thể đánh giá đơn hàng này",
+          "body": "Đơn hàng đã được trả lại hoặc đang xử lý đổi trả nên không thể đánh giá."
+        },
+        "notFound": {
+          "title": "Liên kết không hợp lệ",
+          "body": "Vui lòng mở lại liên kết trong email mời đánh giá, hoặc đăng nhập để đánh giá từ tài khoản."
+        }
+      }
+    },
+    "account": {
+      "metaTitle": "Đánh giá của tôi",
+      "title": "Đánh giá",
+      "intro": "Chia sẻ cảm nhận về những mùi hương bạn đã nhận.",
+      "toWrite": "Sản phẩm chờ đánh giá",
+      "nothingToWrite": "Chưa có sản phẩm nào cần đánh giá. Bạn có thể đánh giá sau khi đơn hàng được giao.",
+      "viewOrders": "Xem đơn hàng",
+      "itemMeta": "{variant} · Đơn {code}",
+      "write": "Viết đánh giá",
+      "dialogTitle": "Đánh giá {product}",
+      "submitted": "Đã gửi đánh giá. Đánh giá sẽ hiển thị sau khi được kiểm duyệt.",
+      "written": "Đánh giá đã viết",
+      "noneWritten": "Bạn chưa viết đánh giá nào.",
+      "status": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã đăng",
+        "rejected": "Không được đăng"
+      }
     }
   }
 }

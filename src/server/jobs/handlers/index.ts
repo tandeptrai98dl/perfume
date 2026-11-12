@@ -8,6 +8,7 @@ import type { JobName, JobPayload } from '../definitions';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
 import { createRevalidateHandler } from './revalidate';
+import { createReviewInvitationHandlers } from './review-invitations';
 import { createTestEmailHandler } from './test-email';
 
 export type JobHandlers = { [N in JobName]: (payload: JobPayload<N>) => Promise<void> };
@@ -37,6 +38,8 @@ export type HandlerDeps = {
 
 /** One handler per job; the map type guarantees every job in JOBS is handled. */
 export function createHandlers(deps: HandlerDeps): JobHandlers {
+  const orderNotifications = createOrderNotificationHandlers(deps);
+  const reviewInvitations = createReviewInvitationHandlers(deps);
   return {
     'system.test-email': createTestEmailHandler(deps.email),
     'cache.revalidate': createRevalidateHandler({
@@ -44,7 +47,13 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
       secret: deps.internalSecret,
       fetch: deps.fetch,
     }),
-    ...createOrderNotificationHandlers(deps),
+    ...orderNotifications,
     ...createOrderTimeoutHandlers(deps),
+    // M3 reviews: the status e-mail first, then the review invitation on first delivery.
+    'order.status-changed': async (payload) => {
+      await orderNotifications['order.status-changed'](payload);
+      await reviewInvitations.onStatusChanged(payload);
+    },
+    'review.invite': reviewInvitations['review.invite'],
   };
 }
