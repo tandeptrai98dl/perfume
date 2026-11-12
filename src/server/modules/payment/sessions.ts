@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, isNotNull, min, or } from 'drizzle-orm';
+import { and, desc, eq, gt, isNotNull, isNull, min, or, sql } from 'drizzle-orm';
 
 import { orders, payments, stockReservations } from '@/server/db/schema';
 import { GatewayError, type BankAccount } from '@/server/integrations/payments';
@@ -25,6 +25,13 @@ import type { OnlineProvider, PaymentDeps, PaymentSessionView } from './types';
 const REUSE_MARGIN_MS = 60_000;
 /** A new session must give the customer at least this long. */
 const MIN_SESSION_MS = 2 * 60_000;
+/**
+ * A pending session without checkout URL / QR younger than this is being opened by another
+ * request (gateway call in flight, possibly on another instance): wait for it instead of
+ * cancelling it. Longer than the gateway timeouts; an older one is a crashed attempt.
+ */
+export const IN_FLIGHT_MS = 30_000;
+const IN_FLIGHT_POLL_MS = 200;
 
 const PAYABLE_STATUSES = ['pending', 'awaiting_confirmation'];
 /**
@@ -110,6 +117,23 @@ export type CreatePaymentSessionInput = {
 };
 
 /**
+ * Waits for a session another request is opening (multi-instance safe, ARCHITECTURE §3.4
+ * step 3): returns it once its URL/QR is stored, or null when it failed / stayed empty past
+ * IN_FLIGHT_MS from its creation (stale).
+ */
+async function awaitInFlight(deps: PaymentDeps, payment: PaymentRow): Promise<PaymentRow | null> {
+  const deadline = payment.createdAt.getTime() + IN_FLIGHT_MS;
+  for (;;) {
+    const [row] = await deps.db.select().from(payments).where(eq(payments.id, payment.id)).limit(1);
+    if (!row || row.status !== 'pending') return null;
+    if (row.checkoutUrl || row.qrCode) return row;
+    // createdAt is the DB clock; compare against wall time with a small margin.
+    if (Date.now() >= deadline + IN_FLIGHT_POLL_MS) return null;
+    await new Promise((resolve) => setTimeout(resolve, IN_FLIGHT_POLL_MS));
+  }
+}
+
+/**
  * Creates (or reuses) the online payment session of an order. Errors (`DomainError('invalid')`
  * with field code): `notPayable`, `nothingDue`, `providerUnavailable`, `reservationExpired`,
  * `gatewayError`.
@@ -117,6 +141,7 @@ export type CreatePaymentSessionInput = {
 export async function createPaymentSession(
   deps: PaymentDeps,
   input: CreatePaymentSessionInput,
+  options: { ignoreInFlight?: boolean } = {},
 ): Promise<PaymentSessionView & { reused: boolean }> {
   const now = deps.now?.() ?? new Date();
   const gateway = deps.gateways[input.provider];
@@ -146,6 +171,26 @@ export async function createPaymentSession(
       .orderBy(desc(payments.createdAt))
       .limit(1);
     if (reusable) return { order, payment: reusable, reused: true };
+
+    if (!options.ignoreInFlight) {
+      const [inFlight] = await tx
+        .select()
+        .from(payments)
+        .where(
+          and(
+            eq(payments.orderId, order.id),
+            eq(payments.status, 'pending'),
+            eq(payments.provider, input.provider),
+            eq(payments.amount, amount),
+            isNull(payments.checkoutUrl),
+            isNull(payments.qrCode),
+            gt(payments.createdAt, sql`now() - make_interval(secs => ${IN_FLIGHT_MS / 1000})`),
+          ),
+        )
+        .orderBy(desc(payments.createdAt))
+        .limit(1);
+      if (inFlight) return { order, payment: inFlight, reused: true, inFlight: true };
+    }
 
     const settings = await getCommerceSettings(tx);
     const sessionMinutes = settings.checkout.paymentSessionMinutes;
@@ -193,8 +238,15 @@ export async function createPaymentSession(
       actor: SYSTEM_ACTOR,
       metadata: { paymentId: payment.id, provider: input.provider, kind, amount },
     });
-    return { order, payment, reused: false };
+    return { order, payment, reused: false, inFlight: false };
   });
+
+  if ('inFlight' in prepared && prepared.inFlight) {
+    const ready = await awaitInFlight(deps, prepared.payment);
+    if (ready) return { ...toSessionView(ready, prepared.order.code), reused: true };
+    // The other request crashed or failed: open a fresh session (cancels the stale one).
+    return createPaymentSession(deps, input, { ignoreInFlight: true });
+  }
 
   if (prepared.reused) {
     return { ...toSessionView(prepared.payment, prepared.order.code), reused: true };

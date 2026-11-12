@@ -129,6 +129,15 @@
         "pay": "Thanh toán phần chênh lệch",
         "refund": "Bạn đã thanh toán nhiều hơn tổng tiền mới. Chúng tôi sẽ hoàn lại {amount} cho bạn.",
         "help": "Nếu thay đổi này chưa đúng, vui lòng trả lời email này hoặc liên hệ với chúng tôi."
+      },
+      "paymentLink": {
+        "subject": "Thanh toán đơn hàng {code}",
+        "preview": "Đường dẫn thanh toán đơn hàng của bạn.",
+        "heading": "Thanh toán đơn hàng",
+        "body": "Cảm ơn bạn đã đặt hàng qua điện thoại. Đơn hàng {code} đang chờ thanh toán.",
+        "amount": "Số tiền cần thanh toán: {amount}.",
+        "pay": "Thanh toán ngay",
+        "help": "Đường dẫn có hiệu lực trong thời gian chúng tôi giữ hàng cho bạn. Nếu cần hỗ trợ, vui lòng trả lời email này."
       }
     },
     "auth": {
@@ -1148,7 +1157,8 @@
       "paymentEvents": "Nhật ký webhook",
       "refunds": "Hoàn tiền",
       "bankTransfers": "Xác nhận chuyển khoản",
-      "codRemittances": "Đối soát COD"
+      "codRemittances": "Đối soát COD",
+      "einvoices": "Hoá đơn điện tử lỗi"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -1605,7 +1615,8 @@
       "depositNoLongerRequired": "Đơn COD đang chờ đặt cọc sẽ không còn cần cọc sau khi sửa. Hãy huỷ và tạo đơn thủ công mới.",
       "editNoChange": "Chưa có thay đổi nào để lưu.",
       "reservationExpired": "Thời gian giữ hàng của đơn đã hết nên không thêm sản phẩm được.",
-      "stockNotHeld": "Tồn kho của đơn không khớp. Tải lại trang."
+      "stockNotHeld": "Tồn kho của đơn không khớp. Tải lại trang.",
+      "notRetryable": "Hoá đơn của đơn này không thể xuất lại (đã xuất hoặc đơn chưa giao)."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -2235,6 +2246,43 @@
           "account": "Tài khoản của khách đã bị đánh dấu sau một lần giao thất bại.",
           "phone": "Số điện thoại này có {count, plural, other {# đơn}} giao thất bại trước đây.",
           "advice": "Gọi xác nhận kỹ hoặc đề nghị khách chuyển khoản trước."
+        },
+        "notifications": {
+          "title": "Nhật ký thông báo",
+          "empty": "Chưa có email hay tin nhắn nào cho đơn này.",
+          "columns": {
+            "time": "Thời gian",
+            "channel": "Kênh",
+            "template": "Nội dung",
+            "recipient": "Người nhận",
+            "status": "Trạng thái"
+          },
+          "channels": {
+            "email": "Email",
+            "telegram": "Telegram",
+            "zalo": "Zalo"
+          },
+          "statuses": {
+            "queued": "Đang gửi",
+            "sent": "Đã gửi",
+            "failed": "Lỗi",
+            "skipped": "Bỏ qua"
+          },
+          "templates": {
+            "order_confirmation": "Xác nhận đơn hàng",
+            "paymentReceived": "Đã nhận thanh toán",
+            "shipped": "Đã giao cho hãng vận chuyển",
+            "delivered": "Đã giao hàng",
+            "cancelled": "Đơn đã huỷ",
+            "refunded": "Hoàn tiền",
+            "updated": "Đơn được cập nhật",
+            "paymentLink": "Link thanh toán",
+            "staff_alert": "Thông báo nội bộ"
+          },
+          "reasons": {
+            "no_recipient": "Khách không có email",
+            "no_channel": "Chưa cấu hình kênh nhận"
+          }
         }
       },
       "timeline": {
@@ -2252,7 +2300,11 @@
         "editedTotal": "Tổng tiền {from} → {to}",
         "editedItems": "{count} dòng sản phẩm thay đổi",
         "editedAddress": "Đổi địa chỉ giao hàng",
-        "editedOverride": "Ghi đè phí giao hàng: {reason}"
+        "editedOverride": "Ghi đè phí giao hàng: {reason}",
+        "einvoice_issued": "Đã xuất hoá đơn điện tử {number}",
+        "einvoice_attempt_failed": "Xuất hoá đơn điện tử lỗi (lần {attempt}), sẽ thử lại",
+        "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
+        "einvoice_retry_requested": "Yêu cầu xuất lại hoá đơn điện tử"
       },
       "print": {
         "packing-slip": "Phiếu đóng gói",
@@ -2427,7 +2479,8 @@
           "linkHint": "Gửi link này cho khách. Phiên thanh toán hiện tại hết hạn lúc {time}; khách có thể thử lại trên trang này khi hàng còn được giữ.",
           "linkSessionFailed": "Chưa mở được phiên thanh toán; khách mở link sẽ được tạo phiên mới.",
           "view": "Xem đơn hàng",
-          "another": "Tạo đơn khác"
+          "another": "Tạo đơn khác",
+          "linkEmailed": "Link thanh toán cũng được gửi tới email của khách."
         }
       },
       "edit": {
@@ -2930,11 +2983,101 @@
         "suspicious_ipn": "IPN đáng ngờ",
         "late_payment_refund": "Thanh toán sau khi huỷ cần hoàn tiền",
         "low_stock": "Sắp hết hàng",
-        "job_failed": "Tác vụ nền thất bại"
+        "job_failed": "Tác vụ nền thất bại",
+        "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
+        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền"
       },
       "order": "Đơn {code}: {amount} · {method} · {province}",
       "orderNoProvince": "Đơn {code}: {amount} · {method}",
       "noDetails": "Không có thêm thông tin."
+    },
+    "einvoices": {
+      "title": "Hoá đơn điện tử lỗi",
+      "description": "Đơn đã giao nhưng chưa xuất được hoá đơn điện tử sau nhiều lần thử. Kiểm tra lỗi, sửa cấu hình hoặc thông tin rồi bấm Xuất lại; nếu cần, xuất thủ công trên cổng của nhà cung cấp.",
+      "empty": "Không có hoá đơn lỗi.",
+      "caption": "Đơn có hoá đơn điện tử lỗi",
+      "columns": {
+        "order": "Đơn hàng",
+        "status": "Trạng thái đơn",
+        "total": "Tổng tiền",
+        "deliveredAt": "Giao lúc",
+        "reason": "Lỗi",
+        "attempts": "Số lần thử",
+        "failedAt": "Lỗi lúc",
+        "actions": "Thao tác"
+      },
+      "retry": "Xuất lại",
+      "retryNamed": "Xuất lại hoá đơn đơn {code}",
+      "retryDone": "Đã xếp lịch xuất lại hoá đơn điện tử.",
+      "view": "Xem hoá đơn",
+      "panel": {
+        "title": "Hoá đơn điện tử",
+        "state": {
+          "not_applicable": "Chưa đến lúc xuất (hoá đơn được xuất khi đơn chuyển sang Đã giao).",
+          "pending": "Đang chờ xuất hoá đơn.",
+          "retrying": "Đang thử lại: lần {attempts} bị lỗi ({reason}).",
+          "issued": "Đã xuất hoá đơn.",
+          "failed": "Xuất hoá đơn thất bại sau {attempts} lần thử: {reason}."
+        },
+        "badge": {
+          "not_applicable": "Chưa xuất",
+          "pending": "Đang chờ",
+          "retrying": "Đang thử lại",
+          "issued": "Đã xuất",
+          "failed": "Lỗi"
+        },
+        "buyerCompany": "Hoá đơn công ty (theo mã số thuế khách cung cấp).",
+        "buyerIndividual": "Hoá đơn cá nhân (khách không yêu cầu hoá đơn công ty).",
+        "retryHint": "Xuất lại an toàn: hệ thống kiểm tra với nhà cung cấp trước, không bao giờ xuất trùng hoá đơn."
+      },
+      "details": {
+        "title": "Hoá đơn {number}",
+        "description": "Thông tin hoá đơn điện tử của đơn {code}.",
+        "invoiceNo": "Số hoá đơn",
+        "series": "Ký hiệu",
+        "template": "Mẫu số",
+        "issuedAt": "Ngày xuất",
+        "provider": "Nhà cung cấp",
+        "transactionId": "Mã giao dịch",
+        "lookupCode": "Mã tra cứu",
+        "lookup": "Tra cứu trên cổng nhà cung cấp",
+        "sandbox": "Hoá đơn thử nghiệm (sandbox), không có giá trị pháp lý.",
+        "close": "Đóng"
+      },
+      "providers": {
+        "sandbox": "Sandbox (thử nghiệm)",
+        "misa": "MISA meInvoice",
+        "viettel": "Viettel S-Invoice"
+      },
+      "reasons": {
+        "not_configured": "chưa cấu hình nhà cung cấp hoá đơn",
+        "totals_mismatch": "tổng các dòng không khớp tổng đơn",
+        "timeout": "nhà cung cấp không phản hồi",
+        "network_error": "lỗi kết nối",
+        "unexpected": "lỗi không xác định"
+      },
+      "document": {
+        "unitGoods": "Chai",
+        "unitService": "Lần",
+        "shipping": "Phí vận chuyển",
+        "giftWrap": "Phí gói quà",
+        "paymentMethod": "TM/CK",
+        "note": "Đơn hàng {code}"
+      },
+      "words": {
+        "digits": "không|một|hai|ba|bốn|năm|sáu|bảy|tám|chín",
+        "hundred": "trăm",
+        "ten": "mười",
+        "tens": "mươi",
+        "odd": "linh",
+        "oneAfterTens": "mốt",
+        "fourAfterTens": "tư",
+        "five": "lăm",
+        "thousand": "nghìn",
+        "million": "triệu",
+        "billion": "tỷ",
+        "currency": "đồng"
+      }
     }
   }
 }

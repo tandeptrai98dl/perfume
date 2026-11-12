@@ -2,9 +2,11 @@ import type { PgBoss } from 'pg-boss';
 
 import type { Database } from '@/server/db/client';
 import type { ChatNotifier } from '@/server/integrations/chat/telegram';
+import type { EinvoiceProvider } from '@/server/integrations/einvoice';
 import type { EmailSender } from '@/server/integrations/email/send';
 
 import type { JobName, JobPayload } from '../definitions';
+import { createEinvoiceHandlers } from './einvoice';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
 import { createRevalidateHandler } from './revalidate';
@@ -33,6 +35,9 @@ export type HandlerDeps = {
   telegramChatId?: string;
   /** Injected chat channel (tests); `null` disables Telegram. */
   chat?: ChatNotifier | null;
+  // ---------- M3 e-invoicing ----------
+  /** E-invoice provider from env (`createEinvoiceProvider`); null = not configured. */
+  einvoice?: EinvoiceProvider | null;
 };
 
 /** One handler per job; the map type guarantees every job in JOBS is handled. */
@@ -46,5 +51,6 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
     }),
     ...createOrderNotificationHandlers(deps),
     ...createOrderTimeoutHandlers(deps),
+    ...createEinvoiceHandlers(deps),
   };
 }

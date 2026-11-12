@@ -29,6 +29,7 @@ import { getCommerceSettings } from '@/server/modules/settings';
 import { nextSessionAmount } from '@/server/modules/payment';
 
 import { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';
+import { deliverLogged, logSkipped } from './log';
 import { EMAIL_SENT_EVENT, sendOnce, STAFF_ALERT_EVENT } from './once';
 import { buildStaffAlert, type StaffAlertKind } from './staff-alerts';
 
@@ -83,19 +84,55 @@ async function loadOrder(db: Database, orderId: string): Promise<OrderView | nul
   return order;
 }
 
-/** Manual (phone/Zalo) orders may have no e-mail: nothing to send, the job succeeds. */
-async function loadMailableOrder(db: Database, orderId: string): Promise<OrderView | null> {
+/**
+ * Manual (phone/Zalo) orders may have no e-mail: nothing to send, the job succeeds and the
+ * notification log records the skipped message.
+ */
+async function loadMailableOrder(
+  db: Database,
+  orderId: string,
+  template: string,
+): Promise<OrderView | null> {
   const order = await loadOrder(db, orderId);
   if (order && !order.email) {
     logger.info('notification.no_customer_email', { orderId });
+    await logSkipped(db, {
+      channel: 'email',
+      template,
+      locale: order.locale,
+      refType: 'order',
+      refId: orderId,
+      reason: 'no_recipient',
+    });
     return null;
   }
   return order;
 }
 
+/** Customer e-mail of an order, with its notification log row. */
+function sendCustomerEmail(
+  deps: NotificationDeps,
+  order: OrderView,
+  template: string,
+  message: Parameters<EmailSender['send']>[0],
+) {
+  return deliverLogged(
+    deps.db,
+    {
+      channel: 'email',
+      recipient: message.to,
+      template,
+      locale: order.locale,
+      refType: 'order',
+      refId: order.id,
+    },
+    () => deps.email.send(message),
+  );
+}
+
 /** Order confirmation (`order.placed`). Returns false when it was already sent. */
 export async function sendOrderConfirmation(deps: NotificationDeps, orderId: string) {
-  const order = await loadMailableOrder(deps.db, orderId);
+  const order = await loadMailableOrder(deps.db, orderId, 'order_confirmation');
   if (!order) return false;
   const locale = order.locale;
   return sendOnce(
@@ -108,7 +145,7 @@ export async function sendOrderConfirmation(deps: NotificationDeps, orderId: str
       metadata: { template: 'order_confirmation', locale },
     },
     async () => {
-      await deps.email.send({
+      await sendCustomerEmail(deps, order, 'order_confirmation', {
         to: order.email,
         subject: orderConfirmationSubject(locale, order.code),
         template: createElement(OrderConfirmationEmail, {
@@ -154,7 +191,7 @@ export async function sendOrderUpdate(
     payUrl?: string | null;
   },
 ) {
-  const order = await loadMailableOrder(deps.db, input.orderId);
+  const order = await loadMailableOrder(deps.db, input.orderId, input.kind);
   if (!order) return false;
   const locale = order.locale;
   const latest = order.shipments.at(-1);
@@ -168,7 +205,7 @@ export async function sendOrderUpdate(
       metadata: { template: input.kind, locale },
     },
     async () => {
-      await deps.email.send({
+      await sendCustomerEmail(deps, order, input.kind, {
         to: order.email,
         subject: orderUpdateSubject(locale, input.kind, order.code),
         template: createElement(OrderUpdateEmail, {
@@ -259,13 +296,52 @@ export async function sendPaymentReceived(
 }
 
 export async function sendAuthEmail(
-  deps: Pick<NotificationDeps, 'email'>,
+  deps: Pick<NotificationDeps, 'email'> & { db?: Database },
   input: { to: string; locale: 'vi' | 'en'; kind: AuthEmailKind; url: string },
 ) {
-  await deps.email.send({
-    to: input.to,
-    subject: authEmailSubject(input.locale, input.kind),
-    template: createElement(AuthEmail, { locale: input.locale, kind: input.kind, url: input.url }),
+  const send = () =>
+    deps.email.send({
+      to: input.to,
+      subject: authEmailSubject(input.locale, input.kind),
+      template: createElement(AuthEmail, {
+        locale: input.locale,
+        kind: input.kind,
+        url: input.url,
+      }),
+    });
+  if (!deps.db) {
+    await send();
+    return;
+  }
+  // The job payload has no user id: logged without a reference (masked recipient only).
+  await deliverLogged(
+    deps.db,
+    { channel: 'email', recipient: input.to, template: `auth:${input.kind}`, locale: input.locale },
+    send,
+  );
+}
+
+/**
+ * Manual order paid online (`order.payment-link`, §3.4 step 7): e-mails the signed payment page
+ * (QR / VNPay, retry) in the customer's language, once. Nothing when the order no longer needs
+ * money online (paid, cancelled) or has no e-mail.
+ */
+export async function sendPaymentLink(deps: NotificationDeps, input: { orderId: string }) {
+  const order = await loadOrder(deps.db, input.orderId);
+  if (!order) return false;
+  const amountDueOnline = ['pending', 'awaiting_confirmation'].includes(order.status)
+    ? nextSessionAmount(order)
+    : 0;
+  if (amountDueOnline <= 0) {
+    logger.info('notification.payment_link_not_needed', { orderId: input.orderId });
+    return false;
+  }
+  return sendOrderUpdate(deps, {
+    orderId: input.orderId,
+    kind: 'paymentLink',
+    key: 'payment_link',
+    amountDueOnline,
+    payUrl: orderPaymentUrl({ ...linkOptions(deps), locale: order.locale, code: order.code }),
   });
 }
 
@@ -296,28 +372,47 @@ export async function sendStaffAlert(
   const t = staffTranslator();
 
   const channels: Array<[string, () => Promise<unknown>]> = [];
+  const logRef = {
+    template: `staff_alert:${input.kind}`,
+    locale: 'vi' as const,
+    refType: input.orderId ? ('order' as const) : null,
+    refId: input.orderId ?? null,
+  };
   const staffEmail = deps.staffAlertEmail;
   if (staffEmail) {
     channels.push([
       'email',
       () =>
-        deps.email.send({
-          to: staffEmail,
-          subject: t('subject', { title: alert.title }),
-          template: createElement(StaffAlertEmail, {
-            heading: t('heading'),
-            title: alert.title,
-            lines: alert.lines,
-            adminUrl: alert.adminUrl,
-            adminLabel: t('openAdmin'),
+        deliverLogged(deps.db, { ...logRef, channel: 'email', recipient: staffEmail }, () =>
+          deps.email.send({
+            to: staffEmail,
+            subject: t('subject', { title: alert.title }),
+            template: createElement(StaffAlertEmail, {
+              heading: t('heading'),
+              title: alert.title,
+              lines: alert.lines,
+              adminUrl: alert.adminUrl,
+              adminLabel: t('openAdmin'),
+            }),
           }),
-        }),
+        ),
     ]);
   }
   const chat = deps.chat;
-  if (chat) channels.push(['telegram', () => chat.send(alert.text)]);
+  if (chat) {
+    channels.push([
+      'telegram',
+      () =>
+        deliverLogged(
+          deps.db,
+          { ...logRef, channel: 'telegram', recipient: chat.recipient ?? 'telegram' },
+          () => chat.send(alert.text),
+        ),
+    ]);
+  }
   if (channels.length === 0) {
     logger.info('staff_alert.no_channel', { kind: input.kind });
+    await logSkipped(deps.db, { ...logRef, channel: 'email', reason: 'no_channel' });
     return [];
   }
 

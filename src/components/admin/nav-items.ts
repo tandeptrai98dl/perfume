@@ -25,7 +25,11 @@ export const ADMIN_NAV: AdminNavSection[] = [
   // Admin orders stream (M2): orders, coupons, shipping.
   {
     labelKey: 'orders',
-    items: [{ href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' }],
+    items: [
+      { href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' },
+      // M3 e-invoicing (D13): invoices that failed after every retry.
+      { href: '/admin/orders/einvoices', labelKey: 'einvoices', permission: 'orders.view' },
+    ],
   },
   {
     labelKey: 'promotions',

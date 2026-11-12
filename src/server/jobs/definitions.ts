@@ -62,6 +62,9 @@ export const JOBS = {
         'late_payment_refund',
         'low_stock',
         'job_failed',
+        // M3: e-invoice failed for good; staff edit queued a refund.
+        'einvoice_failed',
+        'edit_refund',
       ]),
       orderId: z.uuid().optional(),
       message: z.string().max(500).optional(),
@@ -92,6 +95,22 @@ export const JOBS = {
   'orders.complete-delivered': {
     schema: z.object({}).default({}),
     queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 300 },
+  },
+
+  // ---------- M3: e-invoicing (D13) and manual-order payment links ----------
+  /**
+   * Issue the e-invoice of a delivered order (enqueued by `transitionOrder`, or by a staff
+   * retry). The handler counts its own attempts (timeline events) and stops after
+   * EINVOICE_MAX_ATTEMPTS = retryLimit + 1 with a `staff.alert`; backoff 2, 4, 8, 16, 32 min.
+   */
+  'einvoice.issue': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: { retryLimit: 5, retryDelay: 120, retryBackoff: true, expireInSeconds: 180 },
+  },
+  /** Manual order paid online: e-mail the payment page link to the customer (order locale). */
+  'order.payment-link': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: retryPolicy,
   },
 } as const;
 

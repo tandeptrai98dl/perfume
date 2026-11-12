@@ -74,11 +74,17 @@ export function OrderDetailView({
   order,
   canCancelPaid,
   canEdit = false,
+  einvoice,
+  notifications,
 }: {
   order: AdminOrderDetail;
   canCancelPaid: boolean;
   /** Edit before shipment (§3.4 step 8): permission + editable status, decided by the page. */
   canEdit?: boolean;
+  /** EInvoiceStatus panel (M3, D13), rendered in the VAT section. */
+  einvoice?: ReactNode;
+  /** Notification log (M3, `notification_logs`), its own section above the timeline. */
+  notifications?: ReactNode;
 }) {
   const t = useTranslations('admin.orders');
   const format = useOrderFormat();
@@ -305,6 +311,12 @@ export function OrderDetailView({
           )}
         </Section>
 
+        {notifications && (
+          <Section id="order-notifications" title={t('detail.notifications.title')}>
+            {notifications}
+          </Section>
+        )}
+
         <Section id="order-timeline" title={t('detail.timeline')}>
           <OrderNoteForm orderId={order.id} />
           <OrderTimeline events={order.events} />
@@ -422,8 +434,12 @@ export function OrderDetailView({
           ) : (
             <p className="text-small text-taupe-600">{t('detail.vatNone')}</p>
           )}
-          {order.einvoiceRef && (
-            <p className="text-small">{t('detail.einvoice', { ref: order.einvoiceRef })}</p>
+          {einvoice ? (
+            <div className="border-line-200 border-t pt-4">{einvoice}</div>
+          ) : (
+            order.einvoiceRef && (
+              <p className="text-small">{t('detail.einvoice', { ref: order.einvoiceRef })}</p>
+            )
           )}
         </Section>
       </div>

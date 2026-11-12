@@ -124,6 +124,11 @@ export async function transitionOrder(
     metadata: input.metadata,
   });
   await enqueue(boss, tx, 'order.status-changed', { orderId: order.id, from, to: input.to });
+  // D13: the real delivery issues the e-invoice (outbox, same transaction). A rejected return
+  // (`return_requested → delivered`) does not; the job itself is idempotent anyway.
+  if (input.to === 'delivered' && from === 'shipped' && !order.einvoiceRef) {
+    await enqueue(boss, tx, 'einvoice.issue', { orderId: order.id });
+  }
 
   return { orderId: order.id, from, to: input.to, version: updated!.version };
 }

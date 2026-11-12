@@ -81,7 +81,9 @@ async function clientIp(): Promise<string | null> {
 /**
  * Session creations in flight in this process, per order. Next.js can render this page twice
  * for one request (e.g. the place-order redirect); both renders must share one session instead
- * of the second cancelling the first while its gateway call is still running.
+ * of the second cancelling the first while its gateway call is still running. Across instances
+ * `createPaymentSession` itself waits for an in-flight session (M3); this map only saves the
+ * second render from polling the database.
  */
 const firstSessions = new Map<string, Promise<boolean>>();
 

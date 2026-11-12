@@ -3,6 +3,7 @@ import {
   handleOrderPlaced,
   sendOrderEdited,
   sendAuthEmail,
+  sendPaymentLink,
   sendPaymentReceived,
   sendStaffAlert,
   sendStatusChangeEmail,
@@ -48,6 +49,9 @@ export function createOrderNotificationHandlers(deps: HandlerDeps) {
     },
     'staff.alert': async (payload: JobPayload<'staff.alert'>) => {
       await sendStaffAlert(notify, payload);
+    },
+    'order.payment-link': async (payload: JobPayload<'order.payment-link'>) => {
+      await sendPaymentLink(notify, payload);
     },
     'auth.email': async (payload: JobPayload<'auth.email'>) => {
       await sendAuthEmail(notify, payload);

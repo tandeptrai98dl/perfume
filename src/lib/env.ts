@@ -85,6 +85,26 @@ export const serverEnvSchema = z
     /** Telegram bot for internal alerts (ADR-0019). Both or neither; skipped when unset. */
     TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
     TELEGRAM_CHAT_ID: z.string().min(1).optional(),
+    // ---------- M3 e-invoicing (D13, ADR-0013; credentials only here, ADR-0007) ----------
+    /**
+     * E-invoice provider. Defaults to `sandbox` (no network, fake invoice numbers) outside
+     * production; production builds need `misa` or `viettel` with credentials (`sandbox` only
+     * on localhost, for E2E). Unset in production = invoices are not issued (job fails + alert).
+     */
+    EINVOICE_PROVIDER: z.enum(['sandbox', 'misa', 'viettel']).optional(),
+    /** Invoice template ("mẫu số", e.g. `1/001`) and series ("ký hiệu", e.g. `C26TAA`). */
+    EINVOICE_TEMPLATE_CODE: z.string().min(1).max(20).optional(),
+    EINVOICE_SERIES: z.string().min(1).max(20).optional(),
+    /** MISA meInvoice integration API (test host by default) and account. */
+    EINVOICE_MISA_BASE_URL: z.url().default('https://testapi.meinvoice.vn/api/integration'),
+    EINVOICE_MISA_APP_ID: z.string().min(1).optional(),
+    EINVOICE_MISA_TAX_CODE: z.string().min(1).optional(),
+    EINVOICE_MISA_USERNAME: z.string().min(1).optional(),
+    EINVOICE_MISA_PASSWORD: z.string().min(1).optional(),
+    /** Viettel S-Invoice API; the username is the seller's tax code. */
+    EINVOICE_VIETTEL_BASE_URL: z.url().default('https://api-vinvoice.viettel.vn'),
+    EINVOICE_VIETTEL_USERNAME: z.string().min(1).optional(),
+    EINVOICE_VIETTEL_PASSWORD: z.string().min(1).optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -165,7 +185,60 @@ export const serverEnvSchema = z
         message: 'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set together',
       });
     }
+    // M3 e-invoicing: a real provider needs its full account and the invoice series.
+    for (const issue of einvoiceEnvIssues(env)) ctx.addIssue({ code: 'custom', ...issue });
   });
+
+function einvoiceEnvIssues(env: {
+  NODE_ENV: string;
+  APP_URL: string;
+  EINVOICE_PROVIDER?: string;
+  EINVOICE_TEMPLATE_CODE?: string;
+  EINVOICE_SERIES?: string;
+  EINVOICE_MISA_APP_ID?: string;
+  EINVOICE_MISA_TAX_CODE?: string;
+  EINVOICE_MISA_USERNAME?: string;
+  EINVOICE_MISA_PASSWORD?: string;
+  EINVOICE_VIETTEL_USERNAME?: string;
+  EINVOICE_VIETTEL_PASSWORD?: string;
+}): { path: string[]; message: string }[] {
+  const issues: { path: string[]; message: string }[] = [];
+  const required = (keys: (keyof typeof env)[]) => {
+    for (const key of keys) {
+      if (!env[key]) {
+        issues.push({
+          path: [key],
+          message: `${key} is required when EINVOICE_PROVIDER=${env.EINVOICE_PROVIDER}`,
+        });
+      }
+    }
+  };
+  if (env.EINVOICE_PROVIDER === 'misa') {
+    required([
+      'EINVOICE_MISA_APP_ID',
+      'EINVOICE_MISA_TAX_CODE',
+      'EINVOICE_MISA_USERNAME',
+      'EINVOICE_MISA_PASSWORD',
+      'EINVOICE_SERIES',
+    ]);
+  } else if (env.EINVOICE_PROVIDER === 'viettel') {
+    required([
+      'EINVOICE_VIETTEL_USERNAME',
+      'EINVOICE_VIETTEL_PASSWORD',
+      'EINVOICE_TEMPLATE_CODE',
+      'EINVOICE_SERIES',
+    ]);
+  } else if (env.EINVOICE_PROVIDER === 'sandbox' && env.NODE_ENV === 'production') {
+    const host = new URL(env.APP_URL).hostname;
+    if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+      issues.push({
+        path: ['EINVOICE_PROVIDER'],
+        message: 'the e-invoice sandbox is only allowed on localhost in production builds',
+      });
+    }
+  }
+  return issues;
+}
 
 /** Client-exposed variables must be prefixed with NEXT_PUBLIC_. */
 export const clientEnvSchema = z.object({
