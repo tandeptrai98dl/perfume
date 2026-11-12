@@ -359,6 +359,35 @@ describe('placeManualOrder: payment link, customers, coupons', () => {
     expect(item!.variantLabel).toBe('Travel 10 ml');
   });
 
+  it('e-mails the payment link to the customer when an e-mail exists (M3 outbox)', async () => {
+    const { data } = await placeManualOrder(
+      ctx('staff'),
+      await form([{ sku: SKU.travel, quantity: 1 }], {
+        paymentOption: 'payment_link',
+        linkProvider: 'vnpay',
+        customer: {
+          fullName: 'Khách Mail',
+          phone: '0935555555',
+          email: 'mail@example.com',
+          locale: 'vi',
+        },
+      }),
+    );
+    expect(data.linkEmailed).toBe(true);
+    expect(await jobs('order.payment-link', data.orderId)).toEqual([{ orderId: data.orderId }]);
+
+    // No e-mail (phone-only customer) or no link: nothing to send.
+    const phoneOnly = await placeManualOrder(
+      ctx('staff'),
+      await form([{ sku: SKU.travel, quantity: 1 }], {
+        paymentOption: 'payment_link',
+        linkProvider: 'payos',
+      }),
+    );
+    expect(phoneOnly.data.linkEmailed).toBe(false);
+    expect(await jobs('order.payment-link', phoneOnly.data.orderId)).toEqual([]);
+  });
+
   it('links a registered customer found by lookup; contact comes from the account', async () => {
     const userId = newId();
     await db.insert(users).values({
