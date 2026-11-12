@@ -43,8 +43,8 @@ jobs:
       DATABASE_URL: postgres://perfume:perfume@localhost:5432/perfume
       BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere-else
       INTERNAL_API_SECRET: ci-only-internal-api-secret-not-used-anywhere-else
-      LHCI_BASE_URL: http://localhost:3200
-      LHCI_PRESET: ${{ matrix.preset }}
+      LH_BASE_URL: http://localhost:3200
+      LH_PRESET: ${{ matrix.preset }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -66,7 +66,7 @@ jobs:
       - name: Start the production server
         run: |
           node scripts/start-standalone.mjs > server.log 2>&1 &
-          for i in $(seq 1 60); do curl -fs "$LHCI_BASE_URL/api/health" && exit 0; sleep 2; done
+          for i in $(seq 1 60); do curl -fs "$LH_BASE_URL/api/health" && exit 0; sleep 2; done
           cat server.log; exit 1
         env:
           PORT: 3200
@@ -74,12 +74,12 @@ jobs:
           APP_URL: http://localhost:3200
           PAYMENT_SIMULATOR: 'true'
       - name: Seed a guest cart for cart/checkout
-        run: echo "LHCI_CART_TOKEN=$(node load/lighthouse/seed-cart.mjs)" >> "$GITHUB_ENV"
+        run: echo "LH_CART_TOKEN=$(node load/lighthouse/seed-cart.mjs)" >> "$GITHUB_ENV"
       - name: Warm the caches (first request renders and caches each page)
         run: |
           for path in / /en /nuoc-hoa /en/perfumes /san-pham/maison-lumiere-cedre-nocturne-edt \
             /en/products/maison-lumiere-cedre-nocturne-edt /gio-hang /en/cart /thanh-toan /en/checkout; do
-            curl -fs -o /dev/null -H "Cookie: cart_token=$LHCI_CART_TOKEN" "$LHCI_BASE_URL$path"
+            curl -fs -o /dev/null -H "Cookie: cart_token=$LH_CART_TOKEN" "$LH_BASE_URL$path"
           done
       - name: Lighthouse CI
         run: pnpm exec lhci autorun --config=lighthouserc.cjs
@@ -93,4 +93,5 @@ jobs:
           path: |
             .lighthouseci
             server.log
+          include-hidden-files: true
           retention-days: 14
