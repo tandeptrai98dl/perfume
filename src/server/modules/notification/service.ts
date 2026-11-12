@@ -48,6 +48,11 @@ export type NotificationDeps = {
   orderLinkSecret?: string | null;
   /** Internal alert recipient (STAFF_ALERT_EMAIL); the channel is skipped when unset. */
   staffAlertEmail?: string | null;
+  /**
+   * Alert channels resolved per alert from admin settings (D19), env as fallback. When given it
+   * replaces `staffAlertEmail` and `chat` for staff alerts.
+   */
+  alertChannels?: () => Promise<{ emails: readonly string[]; chat: ChatNotifier | null }>;
   /** Telegram bot (TELEGRAM_*); skipped when null. */
   chat?: ChatNotifier | null;
 };
@@ -389,8 +394,9 @@ export async function sendStaffAlert(
         : null,
     refId: input.orderId ?? (input.details?.kind === 'low_stock' ? input.details.variantId : null),
   };
-  const staffEmail = deps.staffAlertEmail;
-  if (staffEmail) {
+  const resolved = deps.alertChannels ? await deps.alertChannels() : null;
+  const staffEmails = resolved?.emails ?? (deps.staffAlertEmail ? [deps.staffAlertEmail] : []);
+  for (const staffEmail of staffEmails) {
     channels.push([
       'email',
       () =>
@@ -409,7 +415,7 @@ export async function sendStaffAlert(
         ),
     ]);
   }
-  const chat = deps.chat;
+  const chat = resolved ? resolved.chat : deps.chat;
   if (chat) {
     channels.push([
       'telegram',

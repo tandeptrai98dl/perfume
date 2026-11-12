@@ -11,6 +11,7 @@ import {
 } from '@/server/modules/notification';
 
 import { logger } from '@/server/lib/logger';
+import { getAlertChannelSettings, resolveAlertChannels } from '@/server/modules/settings';
 
 import type { HandlerDeps } from '.';
 import type { JobPayload } from '../definitions';
@@ -36,6 +37,26 @@ export function createOrderNotificationHandlers(deps: HandlerDeps) {
             chatId: deps.telegramChatId,
             fetch: deps.fetch,
           }),
+    // Staff alert channels from admin settings (D19), env as fallback; the bot token is env-only
+    // (D07). An injected `chat` (tests) is kept as is.
+    alertChannels: async () => {
+      const channels = resolveAlertChannels(await getAlertChannelSettings(deps.db), {
+        staffAlertEmail: deps.staffAlertEmail,
+        telegramBotToken: deps.telegramBotToken,
+        telegramChatId: deps.telegramChatId,
+      });
+      return {
+        emails: channels.emailRecipients,
+        chat:
+          deps.chat !== undefined
+            ? deps.chat
+            : createTelegramNotifier({
+                botToken: channels.telegram?.botToken,
+                chatId: channels.telegram?.chatId,
+                fetch: deps.fetch,
+              }),
+      };
+    },
   };
   return {
     'order.placed': async ({ orderId }: JobPayload<'order.placed'>) => {
