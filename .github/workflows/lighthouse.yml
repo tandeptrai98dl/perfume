@@ -1,0 +1,72 @@
+name: Lighthouse CI
+
+# Performance budgets (ARCHITECTURE.md §14.1) on home, listing, PDP, cart and checkout in vi
+# and en, against the production build with the demo seed. Manual for now: GitHub-hosted
+# runner timings vary, so switch to `pull_request` once a few runs have set the baseline
+# (see docs/ops/runbook.md "Quality gates").
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+  HUSKY: 0
+
+jobs:
+  lighthouse:
+    name: Lighthouse (vi + en)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: perfume
+          POSTGRES_PASSWORD: perfume
+          POSTGRES_DB: perfume
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U perfume" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://perfume:perfume@localhost:5432/perfume
+      BETTER_AUTH_SECRET: ci-only-better-auth-secret-not-used-anywhere-else
+      INTERNAL_API_SECRET: ci-only-internal-api-secret-not-used-anywhere-else
+      LHCI_BASE_URL: http://localhost:3200
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+      - run: pnpm build
+      - name: Start the production server
+        run: |
+          node scripts/start-standalone.mjs > server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fs "$LHCI_BASE_URL/api/health" && exit 0; sleep 2; done
+          cat server.log; exit 1
+        env:
+          PORT: 3200
+          NODE_ENV: production
+          APP_URL: http://localhost:3200
+          PAYMENT_SIMULATOR: 'true'
+      - name: Seed a guest cart for cart/checkout
+        run: echo "LHCI_CART_TOKEN=$(node load/lighthouse/seed-cart.mjs)" >> "$GITHUB_ENV"
+      - name: Warm the caches (first request renders and caches each page)
+        run: |
+          for path in / /en /nuoc-hoa /en/perfumes /san-pham/maison-lumiere-cedre-nocturne-edt /en/products/maison-lumiere-cedre-nocturne-edt; do
+            curl -fs -o /dev/null "$LHCI_BASE_URL$path"
+          done
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.16.1 autorun --config=lighthouserc.cjs
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          retention-days: 14

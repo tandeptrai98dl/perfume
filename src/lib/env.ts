@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+// Browser only: Zod v4 probes `new Function` to compile object parsers, which the CSP
+// forbids (no 'unsafe-eval', ADR-0024). Set before the first parse below (clientEnv), which
+// is the first object parse on every page.
+if (typeof window !== 'undefined') z.config({ jitless: true });
+
 /**
  * Server-side environment schema. Validated once at boot (see `src/instrumentation.ts`).
  * Payment and other secrets live only here, never in the database (ADR-0007).
@@ -7,6 +12,8 @@ import { z } from 'zod';
  */
 const DEV_AUTH_SECRET = 'dev-only-insecure-better-auth-secret-change-me';
 const DEV_INTERNAL_SECRET = 'dev-only-insecure-internal-api-secret-change-me';
+/** One allowlist entry: an IPv4/IPv6 address or CIDR range. */
+const ipOrRange = z.union([z.ipv4(), z.ipv6(), z.cidrv4(), z.cidrv6()]);
 
 export const serverEnvSchema = z
   .object({
@@ -85,6 +92,54 @@ export const serverEnvSchema = z
     /** Telegram bot for internal alerts (ADR-0019). Both or neither; skipped when unset. */
     TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
     TELEGRAM_CHAT_ID: z.string().min(1).optional(),
+    // ---------- M3 e-invoicing (D13, ADR-0013; credentials only here, ADR-0007) ----------
+    /**
+     * E-invoice provider. Defaults to `sandbox` (no network, fake invoice numbers) outside
+     * production; production builds need `misa` or `viettel` with credentials (`sandbox` only
+     * on localhost, for E2E). Unset in production = invoices are not issued (job fails + alert).
+     */
+    EINVOICE_PROVIDER: z.enum(['sandbox', 'misa', 'viettel']).optional(),
+    /** Invoice template ("mẫu số", e.g. `1/001`) and series ("ký hiệu", e.g. `C26TAA`). */
+    EINVOICE_TEMPLATE_CODE: z.string().min(1).max(20).optional(),
+    EINVOICE_SERIES: z.string().min(1).max(20).optional(),
+    /** MISA meInvoice integration API (test host by default) and account. */
+    EINVOICE_MISA_BASE_URL: z.url().default('https://testapi.meinvoice.vn/api/integration'),
+    EINVOICE_MISA_APP_ID: z.string().min(1).optional(),
+    EINVOICE_MISA_TAX_CODE: z.string().min(1).optional(),
+    EINVOICE_MISA_USERNAME: z.string().min(1).optional(),
+    EINVOICE_MISA_PASSWORD: z.string().min(1).optional(),
+    /** Viettel S-Invoice API; the username is the seller's tax code. */
+    EINVOICE_VIETTEL_BASE_URL: z.url().default('https://api-vinvoice.viettel.vn'),
+    EINVOICE_VIETTEL_USERNAME: z.string().min(1).optional(),
+    EINVOICE_VIETTEL_PASSWORD: z.string().min(1).optional(),
+
+    // ---------- M3 hardening (ARCHITECTURE.md §12) ----------
+    /**
+     * The one request header that carries the real client IP, set (overwritten) by the
+     * reverse proxy: `cf-connecting-ip` behind Cloudflare, or the header Caddy sets from
+     * `{client_ip}`. Used for rate limits, Turnstile, the gateway allowlist and audit logs.
+     * Unset = no header is trusted (all clients share one bucket); required in production.
+     */
+    TRUSTED_IP_HEADER: z
+      .string()
+      .regex(/^[A-Za-z0-9-]+$/, 'must be a header name')
+      .transform((value) => value.toLowerCase())
+      .optional(),
+    /** Cloudflare Turnstile secret; Turnstile is off when unset (dev, E2E). */
+    TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+    /** `true` sends Content-Security-Policy-Report-Only instead of enforcing the policy. */
+    CSP_REPORT_ONLY: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    /** Where browsers POST CSP violation reports; defaults to Sentry's security endpoint. */
+    CSP_REPORT_URI: z.url().optional(),
+    /**
+     * Payment webhook IP allowlists (comma-separated IPs/CIDRs from the gateways' docs). Off
+     * when unset; signatures are always verified either way.
+     */
+    VNPAY_IPN_ALLOWED_IPS: z.string().min(1).optional(),
+    PAYOS_WEBHOOK_ALLOWED_IPS: z.string().min(1).optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -158,6 +213,28 @@ export const serverEnvSchema = z
         message: 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set together',
       });
     }
+    for (const key of ['VNPAY_IPN_ALLOWED_IPS', 'PAYOS_WEBHOOK_ALLOWED_IPS'] as const) {
+      const invalid = (env[key] ?? '')
+        .split(/[\s,]+/)
+        .filter((entry) => entry && !ipOrRange.safeParse(entry).success);
+      if (invalid.length > 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message: `invalid IP or CIDR range: ${invalid.join(', ')}`,
+        });
+      }
+    }
+    if (env.NODE_ENV === 'production' && !env.TRUSTED_IP_HEADER) {
+      const host = new URL(env.APP_URL).hostname;
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['TRUSTED_IP_HEADER'],
+          message: 'must name the client IP header set by the reverse proxy in production',
+        });
+      }
+    }
     if (Boolean(env.TELEGRAM_BOT_TOKEN) !== Boolean(env.TELEGRAM_CHAT_ID)) {
       ctx.addIssue({
         code: 'custom',
@@ -165,7 +242,60 @@ export const serverEnvSchema = z
         message: 'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set together',
       });
     }
+    // M3 e-invoicing: a real provider needs its full account and the invoice series.
+    for (const issue of einvoiceEnvIssues(env)) ctx.addIssue({ code: 'custom', ...issue });
   });
+
+function einvoiceEnvIssues(env: {
+  NODE_ENV: string;
+  APP_URL: string;
+  EINVOICE_PROVIDER?: string;
+  EINVOICE_TEMPLATE_CODE?: string;
+  EINVOICE_SERIES?: string;
+  EINVOICE_MISA_APP_ID?: string;
+  EINVOICE_MISA_TAX_CODE?: string;
+  EINVOICE_MISA_USERNAME?: string;
+  EINVOICE_MISA_PASSWORD?: string;
+  EINVOICE_VIETTEL_USERNAME?: string;
+  EINVOICE_VIETTEL_PASSWORD?: string;
+}): { path: string[]; message: string }[] {
+  const issues: { path: string[]; message: string }[] = [];
+  const required = (keys: (keyof typeof env)[]) => {
+    for (const key of keys) {
+      if (!env[key]) {
+        issues.push({
+          path: [key],
+          message: `${key} is required when EINVOICE_PROVIDER=${env.EINVOICE_PROVIDER}`,
+        });
+      }
+    }
+  };
+  if (env.EINVOICE_PROVIDER === 'misa') {
+    required([
+      'EINVOICE_MISA_APP_ID',
+      'EINVOICE_MISA_TAX_CODE',
+      'EINVOICE_MISA_USERNAME',
+      'EINVOICE_MISA_PASSWORD',
+      'EINVOICE_SERIES',
+    ]);
+  } else if (env.EINVOICE_PROVIDER === 'viettel') {
+    required([
+      'EINVOICE_VIETTEL_USERNAME',
+      'EINVOICE_VIETTEL_PASSWORD',
+      'EINVOICE_TEMPLATE_CODE',
+      'EINVOICE_SERIES',
+    ]);
+  } else if (env.EINVOICE_PROVIDER === 'sandbox' && env.NODE_ENV === 'production') {
+    const host = new URL(env.APP_URL).hostname;
+    if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
+      issues.push({
+        path: ['EINVOICE_PROVIDER'],
+        message: 'the e-invoice sandbox is only allowed on localhost in production builds',
+      });
+    }
+  }
+  return issues;
+}
 
 /** Client-exposed variables must be prefixed with NEXT_PUBLIC_. */
 export const clientEnvSchema = z.object({
@@ -173,6 +303,13 @@ export const clientEnvSchema = z.object({
   NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
   /** Public base URL of the media bucket/CDN, e.g. https://cdn.example.vn/media. */
   NEXT_PUBLIC_MEDIA_BASE_URL: z.url().optional(),
+  /** Cloudflare Turnstile site key (public); the widget is hidden when unset. */
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+  /** M3 privacy: Google Tag Manager container (GA4 + Meta Pixel), loaded only after consent. */
+  NEXT_PUBLIC_GTM_ID: z
+    .string()
+    .regex(/^GTM-[A-Z0-9]{4,12}$/, 'must look like GTM-XXXXXXX')
+    .optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -221,4 +358,6 @@ export const clientEnv: ClientEnv = parseClientEnv({
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   NEXT_PUBLIC_MEDIA_BASE_URL: process.env.NEXT_PUBLIC_MEDIA_BASE_URL,
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
 });

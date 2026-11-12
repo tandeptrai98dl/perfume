@@ -25,7 +25,11 @@ export const ADMIN_NAV: AdminNavSection[] = [
   // Admin orders stream (M2): orders, coupons, shipping.
   {
     labelKey: 'orders',
-    items: [{ href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' }],
+    items: [
+      { href: '/admin/orders', labelKey: 'orderList', permission: 'orders.view' },
+      // M3 e-invoicing (D13): invoices that failed after every retry.
+      { href: '/admin/orders/einvoices', labelKey: 'einvoices', permission: 'orders.view' },
+    ],
   },
   {
     labelKey: 'promotions',
@@ -88,6 +92,11 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/payments/events', labelKey: 'paymentEvents', permission: 'payments.refund' },
     ],
   },
+  // M3 reviews & wishlist stream: review moderation.
+  {
+    labelKey: 'reviewsSection',
+    items: [{ href: '/admin/reviews', labelKey: 'reviews', permission: 'reviews.moderate' }],
+  },
   {
     labelKey: 'content',
     items: [
@@ -97,6 +106,25 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/content/topics', labelKey: 'topics', permission: 'content.manage' },
       { href: '/admin/content/navigation', labelKey: 'navigation', permission: 'content.manage' },
       { href: '/admin/content/redirects', labelKey: 'redirects', permission: 'content.manage' },
+    ],
+  },
+  // M3 admin stream: staff management and audit log.
+  {
+    labelKey: 'system',
+    items: [
+      { href: '/admin/staff', labelKey: 'staff', permission: 'staff.manage' },
+      { href: '/admin/audit-log', labelKey: 'auditLog', permission: 'auditLog.view' },
+    ],
+  },
+  // M3 privacy stream: data-subject requests (Owner only).
+  {
+    labelKey: 'privacy',
+    items: [
+      {
+        href: '/admin/privacy-requests',
+        labelKey: 'privacyRequests',
+        permission: 'privacyRequests.handle',
+      },
     ],
   },
 ];

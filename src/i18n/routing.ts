@@ -37,6 +37,8 @@ export const routing = defineRouting({
     '/account/wishlist': { vi: '/tai-khoan/yeu-thich', en: '/account/wishlist' },
     '/account/profile': { vi: '/tai-khoan/ho-so', en: '/account/profile' },
     '/account/privacy': { vi: '/tai-khoan/quyen-rieng-tu', en: '/account/privacy' },
+    // M3 reviews stream: purchases to review + own reviews (ADR-0008).
+    '/account/reviews': { vi: '/tai-khoan/danh-gia', en: '/account/reviews' },
     '/journal': { vi: '/tap-chi', en: '/journal' },
     '/journal/[slug]': { vi: '/tap-chi/[slug]', en: '/journal/[slug]' },
     '/journal/topics/[slug]': { vi: '/tap-chi/chu-de/[slug]', en: '/journal/topics/[slug]' },
@@ -45,6 +47,12 @@ export const routing = defineRouting({
     '/contact': { vi: '/lien-he', en: '/contact' },
     '/faq': { vi: '/cau-hoi-thuong-gap', en: '/faq' },
     '/policies/[slug]': { vi: '/chinh-sach/[slug]', en: '/policies/[slug]' },
+    // M3 privacy: data-subject requests without an account (verified by e-mail).
+    '/privacy-request': { vi: '/quyen-rieng-tu/yeu-cau', en: '/privacy-request' },
+    '/privacy-request/confirm': {
+      vi: '/quyen-rieng-tu/yeu-cau/xac-nhan',
+      en: '/privacy-request/confirm',
+    },
   },
 });
 

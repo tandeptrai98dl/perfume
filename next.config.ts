@@ -2,6 +2,8 @@ import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+import { API_CONTENT_SECURITY_POLICY, STATIC_SECURITY_HEADERS } from './src/lib/security/csp';
+
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 /** Product media host (object storage / CDN), see src/lib/media-url.ts. */
@@ -16,12 +18,28 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   typedRoutes: true,
   poweredByHeader: false,
+  // Security headers on every response (§12). Pages get their nonce-based CSP from the proxy
+  // (src/proxy.ts); API and file responses never render HTML and get a deny-all policy.
+  async headers() {
+    return [
+      { source: '/:path*', headers: STATIC_SECURITY_HEADERS },
+      {
+        source: '/api/:path*',
+        headers: [{ key: 'Content-Security-Policy', value: API_CONTENT_SECURITY_POLICY }],
+      },
+    ];
+  },
   images: {
     remotePatterns: mediaBaseUrl ? [new URL(`${mediaBaseUrl}/**`)] : [],
   },
   // Sentry loads parts of its runtime hooks dynamically, which file tracing cannot see.
   outputFileTracingIncludes: {
-    '/*': ['./node_modules/.pnpm/@sentry+*/node_modules/@sentry/**/*'],
+    '/*': [
+      './node_modules/.pnpm/@sentry+*/node_modules/@sentry/**/*',
+      // Open Graph cards read the Fontsource WOFF files at runtime (src/server/seo/og-assets.ts).
+      './node_modules/@fontsource/be-vietnam-pro/files/*-{400,600}-normal.woff',
+      './node_modules/@fontsource/cormorant-garamond/files/*-500-normal.woff',
+    ],
   },
   turbopack: {
     rules: {

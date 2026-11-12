@@ -132,3 +132,6 @@ export {
 } from './slug-changes';
 export { PRICE_FIELDS, priceFieldViolations } from './variant-rules';
 export { uploadMedia, type UploadedMedia } from './media';
+
+// ---------- M3 reviews stream: denormalized rating, written from review moderation ----------
+export { setProductRating } from './ratings';

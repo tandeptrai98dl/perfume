@@ -155,3 +155,17 @@ export {
   type OrderEditInput,
 } from './admin-edit-schemas';
 // ---------- End order edits ----------
+// ---------- E-invoice (M3 e-invoicing stream, D13) ----------
+export { recordEinvoiceIssued } from './einvoice-record';
+// ---------- Privacy requests (M3 privacy stream): data export + anonymisation ----------
+export {
+  ANONYMIZED_TEXT,
+  anonymizeOrdersForSubject,
+  CLOSED_ORDER_STATUSES,
+  countOpenOrdersForSubject,
+  listOrdersForDataExport,
+  scrubEventDiff,
+  type OrderDataExport,
+  type OrderSubject,
+} from './privacy';
+// ---------- End privacy ----------

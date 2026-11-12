@@ -2,12 +2,17 @@ import type { PgBoss } from 'pg-boss';
 
 import type { Database } from '@/server/db/client';
 import type { ChatNotifier } from '@/server/integrations/chat/telegram';
+import type { EinvoiceProvider } from '@/server/integrations/einvoice';
 import type { EmailSender } from '@/server/integrations/email/send';
 
 import type { JobName, JobPayload } from '../definitions';
+import { createEinvoiceHandlers } from './einvoice';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
+import { createPruneRateLimitsHandler } from './prune-rate-limits';
+import { createPrivacyHandlers } from './privacy';
 import { createRevalidateHandler } from './revalidate';
+import { createReviewInvitationHandlers } from './review-invitations';
 import { createTestEmailHandler } from './test-email';
 
 export type JobHandlers = { [N in JobName]: (payload: JobPayload<N>) => Promise<void> };
@@ -33,10 +38,15 @@ export type HandlerDeps = {
   telegramChatId?: string;
   /** Injected chat channel (tests); `null` disables Telegram. */
   chat?: ChatNotifier | null;
+  // ---------- M3 e-invoicing ----------
+  /** E-invoice provider from env (`createEinvoiceProvider`); null = not configured. */
+  einvoice?: EinvoiceProvider | null;
 };
 
 /** One handler per job; the map type guarantees every job in JOBS is handled. */
 export function createHandlers(deps: HandlerDeps): JobHandlers {
+  const orderNotifications = createOrderNotificationHandlers(deps);
+  const reviewInvitations = createReviewInvitationHandlers(deps);
   return {
     'system.test-email': createTestEmailHandler(deps.email),
     'cache.revalidate': createRevalidateHandler({
@@ -44,7 +54,17 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
       secret: deps.internalSecret,
       fetch: deps.fetch,
     }),
-    ...createOrderNotificationHandlers(deps),
+    ...orderNotifications,
     ...createOrderTimeoutHandlers(deps),
+    ...createEinvoiceHandlers(deps),
+    // M3 reviews: the status e-mail first, then the review invitation on first delivery.
+    'order.status-changed': async (payload) => {
+      await orderNotifications['order.status-changed'](payload);
+      await reviewInvitations.onStatusChanged(payload);
+    },
+    'review.invite': reviewInvitations['review.invite'],
+    'system.prune-rate-limits': createPruneRateLimitsHandler(deps.db),
+    // M3 privacy stream: data-subject request e-mails and exports.
+    ...createPrivacyHandlers(deps),
   };
 }

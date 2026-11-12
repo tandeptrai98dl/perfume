@@ -57,3 +57,5 @@ export type {
 
 // ---------- Checkout stream (M2): conversion inside the placeOrder transaction ----------
 export { lockCart, markCartConverted } from './conversion';
+// Privacy requests (M3 privacy stream): account deletion removes the member's carts.
+export { deleteCartsForUser } from './privacy';

@@ -56,6 +56,7 @@ All decisions below are final. Items marked *external review* are implemented as
 | D20 | One domain for both languages (English under `/en`) | Consolidated SEO authority, one certificate, one Search Console property | [0020](./adr/0020-single-domain.md) |
 | D21 | English content is written or reviewed by an English editor; go-live requires ≥ 80% of active products with a published English translation | Machine translation hurts a luxury brand and SEO | [0021](./adr/0021-english-content-quality.md) |
 | D22 | Online-only, single warehouse in MVP; physical store / POS in Phase 3 via `locations` | Avoid multi-channel stock sync until needed | [0022](./adr/0022-online-only-single-warehouse.md) |
+| D24 | CSP without nonces: `'self'` + inline + documented host allowlist for scripts, everything else strict | Prerendered/cached shells (Cache Components) cannot carry a per-request nonce; measured | [0024](./adr/0024-csp-without-nonces.md) |
 
 ---
 
@@ -210,8 +211,9 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 | `customer` + `auth` | Accounts, addresses, wishlist, consents, privacy requests | users, sessions, accounts, addresses, wishlists, consents, privacy_requests |
 | `review` | Reviews, review invitations, moderation | reviews, review_invitations |
 | `content` | Banners, journal posts, static pages, menus, redirects | posts, pages, banners, navigation_menus, redirects, *_translations |
-| `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs (not created in M2: sends are recorded in `order_events`, see §10.5) |
-| `admin` | Permissions, audit, settings | audit_logs, settings |
+| `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs (M3: one row per e-mail / Telegram send, masked recipient; `order_events` keeps the at-most-once keys, see §10.5) |
+| `admin` | Permissions, audit, settings (M3 code: `staff` = staff accounts, roles, invitations, locks, 2FA resets on the auth tables; `audit` = audit log read side + CSV export) | audit_logs, settings |
+| `reporting` | Read-only KPI aggregates for the dashboard (owns no table, never writes) | — |
 
 **Module communication rules:** module A calls only module B's public `index.ts`, never B's `repo.ts`. Side effects (emails, alerts, e-invoices, stats) go through the job queue using a **transactional outbox**: the job is enqueued in the same database transaction as the business change.
 
@@ -228,6 +230,7 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 8. **Order edits:** allowed before `shipped` (address, items, quantities, shipping fee); totals are recomputed, reservations adjusted, a diff written to `order_events`. If the new total exceeds the amount paid → send a payment link for the difference; if lower → create a refund.
    *As implemented (M2, `order/admin-edit.ts`, `/admin/orders/[id]/edit`):* editable in `pending`, `awaiting_confirmation`, `confirmed`, `processing` (`orders.editBeforeShipping`), with `expectedVersion` + row lock. Kept lines keep their snapshot price, new lines take the catalogue price; totals go through `priceCart` (gift-wrap fee as charged). The order's coupon is re-applied by its terms (dates/limits are not re-checked: it was granted at checkout) and dropped with its redemption given back when they no longer hold. Shipping is re-quoted for the new province/weight (same rate if still offered, else the first) only when lines, province or override change; a Manager (`orders.cancelPaid`) may override the fee with a reason (kept on later edits until removed; stored in the `edited` event metadata). Stock: reserving statuses adjust active reservations (same expiry); deducted statuses deduct (`sale`) or restock (`release`) with movements and keep committed reservation rows in step, so cancel/return restock exactly. COD deposit: recomputed before confirmation (a pending COD order whose deposit would become 0 is refused: cancel and re-create), never raised after it. Payment module (`settleOrderAfterEdit`): recomputes `payment_status`, cancels pending sessions when the total changed, queues a refund of money held above the new total, confirms a pending order whose requirement is now covered; a confirmed/processing order with money due online gets an `adjustment` session from the checkout result page (`balanceDue` state). The worker sends `order.updated` (one e-mail per edit, with the pay-the-difference link).
 9. **E-invoice (D13):** when an order becomes `delivered`, an outbox job issues the e-invoice through the adapter (retry with backoff; result stored in `einvoice_ref`).
+   *As implemented (M3, `modules/einvoice`, `integrations/einvoice`):* `transitionOrder` enqueues `einvoice.issue` in the transaction of the real delivery (`shipped → delivered`; not a rejected return). The job builds the invoice from the order snapshot: every line (and the shipping / gift-wrap fee as service lines) is VAT-inclusive and split into taxable amount + VAT at the `einvoice.vatRatePercent` setting (default 10 %, **pending accountant confirmation**), so the invoice total equals `orders.total`; buyer = company with tax code when `orders.vat_invoice` is set, else the individual customer; total in Vietnamese words from `messages/vi.json`. Never issued twice: one issuer per order (transaction advisory lock — the order row is not locked during the provider call), write-once `einvoice_ref` (`<series>-<number>`), and the provider is first asked for an invoice with our refId (= order id, MISA `RefID` / Viettel `transactionUuid`). Each failed try is an `einvoice_attempt_failed` timeline event; retryable errors (network, timeout, 5xx) are retried by pg-boss (2 → 32 min backoff), and after 6 tries — or at once for a permanent error (validation, credentials, no provider configured) — `einvoice_failed` + a `staff.alert` (`einvoice_failed`). Staff retry from the order page or `/admin/orders/einvoices` (`orders.process`, audited); "View" shows number, series, provider and its lookup link. Provider by `EINVOICE_PROVIDER` (`sandbox` outside production; `misa` / `viettel` with env-only credentials).
 10. After each important step, the worker sends the customer email (in the order's locale) and internal alerts (new order, high-value COD, suspicious IPN, low stock).
 
 ### 3.5 State machines (D05)
@@ -313,7 +316,7 @@ stateDiagram-v2
 | Cache / rate limit | Next.js data cache; Postgres-backed rate limit + Cloudflare WAF in MVP; Redis (Valkey) when running multiple instances | Fewer moving parts in MVP | Upstash |
 | File storage | S3-compatible object storage in Vietnam + Cloudflare CDN | `next/image` for product images; S3 adapter keeps the provider swappable | Cloudinary |
 | Payments | VNPay (`vnpay` npm package), payOS (VietQR), COD | VNPay covers cards and bank QR; payOS confirms bank transfers automatically via webhook | MoMo, ZaloPay (Phase 2) |
-| E-invoicing | MISA meInvoice or Viettel S-Invoice API behind an adapter | Automatic invoice per delivered order (D13); retries; `einvoice_ref` stored; provider swappable | Manual issuing from accounting software |
+| E-invoicing | MISA meInvoice or Viettel S-Invoice API behind an adapter (M3: both adapters + a `sandbox` for dev/E2E, chosen by `EINVOICE_PROVIDER`) | Automatic invoice per delivered order (D13); retries; `einvoice_ref` stored; provider swappable | Manual issuing from accounting software |
 | Email | React Email + SES or Resend | Templates in React, localized | — |
 | Internal alerts | Telegram Bot API | Free, official, quick to integrate (D19) | Zalo group webhooks (unofficial) |
 | Monitoring | Sentry (errors + performance, PII scrubbing), Uptime Kuma, JSON logs (pino) | Catch checkout errors early | Datadog |
@@ -368,6 +371,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 | `(shop)/account` | `/tai-khoan` | `/en/account` | Account overview | Dynamic | MVP |
 | `account/orders`, `account/orders/[code]` | `/tai-khoan/don-hang/…` | `/en/account/orders/…` | Order history + detail | Dynamic | MVP |
 | `account/addresses`, `account/wishlist`, `account/profile`, `account/privacy` | `/tai-khoan/dia-chi`, `/yeu-thich`, `/ho-so`, `/quyen-rieng-tu` | `/en/account/addresses`, … | Addresses, wishlist, profile, privacy centre | Dynamic | MVP |
+| `account/reviews` | `/tai-khoan/danh-gia` | `/en/account/reviews` | Purchases to review + own reviews (D08) | Dynamic | MVP |
 | `account/rewards` | `/tai-khoan/diem-thuong` | `/en/account/rewards` | Loyalty | Dynamic | Phase 2 |
 | `(shop)/journal`, `journal/[slug]`, `journal/topics/[slug]` | `/tap-chi/…` | `/en/journal/…` | Journal | ISR | MVP |
 | `(shop)/about`, `authenticity`, `contact`, `faq` | `/gioi-thieu`, `/cam-ket-chinh-hang`, `/lien-he`, `/cau-hoi-thuong-gap` | `/en/about`, `/en/authenticity`, `/en/contact`, `/en/faq` | Information pages | ISR | MVP |
@@ -380,6 +384,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 | Route | Purpose | Phase |
 | --- | --- | --- |
 | `/admin/login` | Staff sign-in (email + password + TOTP; no OAuth) | MVP |
+| `/admin/set-password` | Invited staff set their password from the e-mailed link (no session; single-use token, 72 h) | MVP |
 | `/admin` | Dashboard: revenue, orders awaiting action, low stock, missing translations | MVP |
 | `/admin/orders`, `/admin/orders/new`, `/admin/orders/[id]` | List, manual order, detail, edit, transitions, printing | MVP |
 | `/admin/products`, `/new`, `/[id]` | Products + variants + media + vi/en translations + SEO + cosmetics compliance | MVP |
@@ -393,7 +398,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 | `/admin/payments`, `/admin/payments/cod-remittances` | Transactions, refunds, COD reconciliation | MVP |
 | `/admin/privacy-requests` | Data export/deletion requests with due dates (minimal) | MVP |
 | `/admin/settings` | Company info, COD threshold/deposit, gift-wrap fee, alert channels, SEO defaults (no payment secrets — D07) | MVP |
-| `/admin/staff`, `/admin/audit-log` | Staff, roles, audit trail | MVP |
+| `/admin/staff`, `/admin/staff/[id]`, `/admin/audit-log` | Staff, roles, audit trail (CSV export: `/api/admin/audit-log/export`) | MVP |
 | `/admin/reports` | Advanced reports | Phase 2 |
 | `/admin/loyalty`, `/admin/flash-sales` | Advanced marketing | Phase 2 |
 
@@ -401,7 +406,7 @@ Render column: **ISR** = static + tag-based revalidation; **PPR** = static shell
 
 - `/sitemap.xml` (index, split by content type, each URL with vi/en alternates), `/robots.txt`, per-locale dynamic `opengraph-image`.
 - `/api/auth/[...all]` (Better Auth), `/api/webhooks/vnpay`, `/api/webhooks/payos`, `/api/webhooks/shipping/[carrier]` (Phase 2).
-- `/api/internal/revalidate` (called by the worker, HMAC-signed), `/api/health`, `/feeds/google-merchant.xml` (Phase 2).
+- `/api/internal/revalidate` (called by the worker, HMAC-signed), `/api/health` (readiness: database; alias `/api/health/ready`), `/api/health/live` (liveness), `/feeds/google-merchant.xml` (Phase 2).
 
 ---
 
@@ -443,6 +448,8 @@ wishlists        PK(user_id, product_id)
 consents         user_id?, email?, phone?, purpose enum(terms, privacy, marketing_email,
                  marketing_sms, analytics, ads), granted bool, policy_version, locale,
                  source, ip, user_agent                    // append-only, never UPDATE
+                 // only exception: anonymisation clears email/phone/ip/user_agent (M3);
+                 // cookie choices store a truncated IP (/24, /48) and no contact data
 newsletter_subscribers  email UK, locale, status, consent_id FK, source
 privacy_requests user_id?, email, type enum(export, delete, correct, withdraw_consent),
                  status enum(received, in_progress, completed, rejected), due_at,
@@ -896,17 +903,21 @@ perfume-store/
 ### 10.5 After purchase (MVP)
 
 - Emails (in the order's locale): order confirmation, payment received, shipped (tracking code + carrier link), delivered, cancelled/refunded.
-- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP). The phone may be the contact or the delivery phone; any mismatch gets one generic message. A successful lookup sets the signed per-order access cookie; email links open the same read-only page with `?t=<orderAccessToken>`. M2: the limiter is in-memory per web process (`server/lib/rate-limit.ts`); the `rate_limits` table replaces it when the app runs on more than one instance.
+- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP, Turnstile). The phone may be the contact or the delivery phone; any mismatch gets one generic message. A successful lookup sets the signed per-order access cookie; email links open the same read-only page with `?t=<orderAccessToken>`. The limiter is the shared `rate_limits` table (M3, §12).
 - Emails are sent by the worker only (outbox jobs). Each customer email is recorded in the order timeline (`order_events.type = 'email_sent'`, `metadata.key` such as `order_confirmation`, `status:shipped`, `payment:<id>`) and skipped when a retried job finds it; staff alerts likewise (`staff_alert_sent`). Staff alerts go to `STAFF_ALERT_EMAIL` and the Telegram bot (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`); each channel is skipped when unset, and the text carries only order code, amount, payment method and province.
+- *M3:* every send also writes a `notification_logs` row (channel, masked recipient, template, locale, `ref_type = 'order'`): `queued` → `sent` / `failed` (PII-free error summary), or `skipped` (no customer e-mail on a manual order, no alert channel). The admin order detail shows the log. Manual orders paid online e-mail the signed payment page to the customer automatically when an e-mail exists (`order.payment-link`, order locale). An order edit that queues a refund alerts staff (`edit_refund`). Concurrent first-session creation is safe across instances: `createPaymentSession` waits for a just-created session without URL/QR (≤ 30 s) instead of cancelling it.
 - Customers can cancel before `processing`; return requests within 7 days of delivery per D17 (form + reason + photos).
 - Reviews after `delivered`, marked "Verified purchase", moderated. Guests receive a review invitation email with a one-time token link (30 days; one review per purchased item) (D08).
+  *As implemented (M3, `server/modules/review`):* the `order.status-changed` handler schedules `review.invite` 3 days after the first `shipped → delivered` (a rejected return moving back to `delivered` does not). The job re-checks the order (still `delivered`/`completed`, has an e-mail), then in one transaction under an advisory lock: guest orders get one `review_invitations` row per line without a review (SHA-256 of a 32-byte token, `expires_at` = send + 30 days) and one e-mail with a link per line; member orders get an e-mail pointing to `/tai-khoan/danh-gia`. The send is recorded once per order (`order_events` `email_sent`, key `review_invitation`); a failed send rolls the rows back, so a retry issues fresh tokens. Members review their own delivered/completed lines from the account; guests through the link (used once; the item's other links are closed too). Each review stores the language it was written in; the product page lists approved reviews newest first with the visitor's language first, plus averages of rating, longevity and sillage. Submissions are rate limited (members 10/h, guest links 10/10 min per IP). Members' display name defaults to their given name; it is shown publicly.
 
 ### 10.6 Account (MVP)
 
 - Sign up / sign in with email + password (email verification) or Google; password reset by email (30-minute single-use token). Email/password accounts must confirm their address before the first sign-in (the link signs them in); sign-up therefore answers the same for new and existing emails (no account enumeration). Account emails use `users.locale`: the sign-up page's language, changeable in the profile.
 - After a guest order: one-step account creation; past orders with the same verified email are attached.
 - Preferred language (used for emails), order history, one-tap reorder, address book (max 10), wishlist, profile.
+  *Wishlist as implemented (M3):* members only, max 60 products (`customer` module). The heart on ProductCard and the product page is seeded by a dynamic hole of the shop layout (session + wishlisted ids), so cached listing pages stay identical for everyone; guests pressing it go to sign-in with `?next=` back to the product.
 - **Privacy centre:** view/withdraw consents, download personal data (JSON), request account deletion (personal data anonymized; orders retained for accounting).
+  *As implemented (M3):* `/tai-khoan/quyen-rieng-tu` (`/en/account/privacy`) has consent switches (marketing e-mail = `users.marketing_opt_in`, marketing SMS, and this browser's analytics/ads cookie choice), the account's consent history, and export / correction / deletion requests (one open request per type). Guests use `/quyen-rieng-tu/yeu-cau` (`/en/privacy-request`): a signed, 24-hour confirmation link is e-mailed (same answer for every address, nothing stored before confirmation); the confirm page files the request only after an explicit "Confirm" (mail scanners follow links). `due_at` per Decree 356/2025 art. 5: export and correction 10 days, withdrawal of consent 15 days (carried out at once), deletion 20 days. Exports are completed by the `privacy.export` job, which e-mails a signed link (`/api/privacy/export/<id>?e=&t=`, 7 days; also downloadable in the account for 7 days); the JSON is generated at download time and never stored. Every request gets a confirmation e-mail (`privacy.notify`) in the account's or the request's language.
 
 ### 10.7 Bilingual behaviour (MVP)
 
@@ -950,6 +961,7 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 ### 11.2 Screens (MVP)
 
 - **Dashboard:** revenue today/7/30 days, orders by status (awaiting confirmation, to pack, in transit), average order value, top 10 products, low stock, reviews awaiting moderation, content missing English translations, e-invoices failed.
+  As built (M3): date range presets today / 7 days / 30 days / this month in Vietnam time (`?range=`); net revenue = `total − amount_refunded` of orders placed in the range that count as sales (not `pending`, `awaiting_confirmation`, `cancelled`, `returned`); cash collected = payments received minus refunds completed in the range; AOV = gross sales ÷ sales orders; conversion proxy = storefront orders ÷ carts created; live counters for COD awaiting remittance, open refunds, privacy requests (open/overdue), pending reviews and active products without published English. Every widget follows the permission of the screen it summarizes (money: `dashboard.viewRevenue`). Charts are plain CSS bars with a data table. E-invoice failures are added by the e-invoicing stream.
 - **Orders:** filter by status/payment method/date/province; search by code/phone/email; detail with timeline, payments, internal notes, e-invoice status; only valid transition buttons; carrier + tracking entry; packing slip (prices hidden for gifts) and delivery slip; cancel/refund with reason; bulk confirm/print.
   Work queues: "awaiting confirmation" = `awaiting_confirmation`, "to pack" = `confirmed` + `processing`, "in transit" = `shipped`. Confirming a COD order is refused until `amount_paid >= deposit_required`; entering `shipped` creates the `shipments` row (carrier + tracking code, COD amount = balance due); `delivery_failed` sets `users.cod_risk_flag` and the phone's failed deliveries warn on later COD orders (derived from `order_events`, no extra table); an order holding money is cancelled only with `orders.cancelPaid` and the amount owed appears in the payments refund queue. Notes are `order_events` of type `note`; every action writes `audit_logs`.
 - **Manual orders** (`/admin/orders/new`): find customer by phone/email or create; pick variants; apply coupon; choose email language; payment = COD, manually confirmed bank transfer, or a payment link sent by email/Zalo.
@@ -960,14 +972,18 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 - **Customers:** profile, order history, lifetime spend, notes, failed-delivery risk flag (warns on the next COD order); phone/email partially masked without permission.
 - **Coupons:** percent / fixed / free shipping; conditions (minimum subtotal, brands, categories, usage limits, dates); usage statistics.
 - **Reviews:** approve/reject/reply; approval updates `rating_avg`.
+  *As implemented (M3, `/admin/reviews`, `reviews.moderate`):* status tabs (pending queue oldest first, approved, rejected, all), search by product/reviewer/order code; approve, reject (or unpublish an approved review) and a public reply (shown under approved reviews). Every decision is audited, recomputes `products.rating_avg/rating_count` from approved reviews under a per-product advisory lock (catalogue `setProductRating`) and revalidates `product:<id>` + `reviews:product:<id>` (immediately and through the outbox). The Product JSON-LD `AggregateRating` comes from the approved-review aggregate.
 - **Content:** banners per placement with schedule, journal posts (Tiptap, linked products), static pages, header/footer menus, redirects — bilingual.
 - **Shipping:** zones (province groups) + weight-based rates, free-shipping threshold, delivery estimates. Rates change checkout prices, so managing them needs `settings.manage` (Owner); a province in several zones uses the zone with the lowest priority number.
 - **Payments:** transactions by gateway, unmatched payments, refund queue (including IPNs received after cancellation), webhook log.
 - **COD reconciliation:** create a remittance per carrier, tick the orders paid, compare with the bank receipt; failed deliveries → restock + phone risk flag.
 - **Internal alerts:** new order, high-value COD, invalid IPN signature/amount, low stock, e-invoice failure → email + Telegram bot (D19); channels configured in settings.
 - **Privacy requests:** list from the privacy centre with due dates; actions: export JSON, anonymize account; audited.
+  *As implemented (M3):* `/admin/privacy-requests` (permission `privacyRequests.handle`, Owner only per §11.1): queue sorted by due date with overdue flags, filters by status/type, search by e-mail; detail with the subject's open orders, history from `audit_logs`; actions: start, complete (with note), reject (reason required, e-mailed), re-send the export link, anonymise (type the e-mail to confirm). Anonymisation is refused while the subject has orders that are not `completed`/`cancelled`/`returned`, and for staff accounts. It removes addresses, wishlist, carts, sessions, OAuth/password accounts, 2FA, verification tokens and the newsletter row; overwrites the users row (name, e-mail → `deleted+<id>@anonymized.invalid`, phone, birthday; `banned`, `deleted_at`); on orders it clears name, e-mail, phone, notes, gift message, IP/user agent and the e-mail inside the VAT details, scrubs `order_addresses` and the address fields of `edited` event diffs, and keeps codes, items, totals, payments and VAT company details (accounting retention). Trade-off: the phone-based failed-delivery signal (D16) is lost for anonymised orders. Reviews and notification logs are anonymised through `ErasureStep` hooks owned by their modules.
 - **Settings:** company details (name, tax code, address, legal representative — shown in the footer), COD threshold and deposit %, gift-wrap fee, alert channels, SEO defaults, sender email. Payment secrets are not here (D07).
+  *M3 privacy stream:* the footer also shows the e-commerce notification badge when `company.moitNotificationUrl` (record on online.gov.vn) is set, with the official image from `company.moitBadgeImageUrl` or a text badge; legal pages (returns, shipping, payment, privacy, terms, cookies) are seeded as vi + en drafts marked "pending lawyer review" (`src/server/db/seed/legal-drafts.ts`); the English cookie policy stays unpublished until reviewed (the cookie banner then links the privacy policy).
 - **Staff & audit:** invite by email, assign role, enforce 2FA, lock accounts; audit log filterable by actor/entity/date with before/after diff.
+  As built (M3): an invitation creates the account (role set, e-mail treated as verified, no password) and e-mails a set-password link (Better Auth reset token, 72 h, `auth.email` outbox job `staff_invite`); TOTP enrolment is forced at first sign-in. Role changes, deactivation and 2FA resets revoke the account's sessions; nobody changes their own account and the last active Owner cannot be demoted or locked (Owner rows locked `FOR UPDATE`). Existing e-mails (customers included) cannot be invited. The audit log (`auditLog.view`) filters by actor, entity type/id, action prefix and dates, pages by keyset on the UUIDv7 id, redacts contact data and truncates IPs; CSV export needs `customers.export` and is itself audited. Per-action permission review: `docs/security/permission-review.md`.
 
 ### 11.3 Phase 2–3
 
@@ -988,13 +1004,15 @@ Advanced reports (revenue by brand/channel, repeat-customer cohorts, margins fro
 | Data access | Customers read only their own orders (`user_id` in every query — IDOR protection); non-guessable order codes; guest lookup requires code + phone; review and payment-link tokens stored hashed, expiring, single-use |
 | Input/output | Zod on every input; parameterized Drizzle queries (no string-built SQL); rich text sanitized with an allowlist on render; uploads accept images only (magic-byte check, 10 MB limit, re-encoded with sharp, EXIF stripped) |
 | CSRF | Server Actions check Origin; mutating Route Handlers check Origin; webhooks rely on signatures |
-| HTTP headers | Strict CSP (script nonces, allowlist for GTM/VNPay), HSTS, `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `frame-ancestors 'none'` |
-| Rate limiting | Sign-in 10/min/IP, place order 5/min/IP, order lookup 5/10 min, coupon attempts 10/min/session; Cloudflare WAF + bot fight mode; `/api/webhooks/*` excluded from Turnstile/bot challenges and protected by signatures + gateway IP allowlist instead |
+| HTTP headers | CSP with a host allowlist (GTM/GA4/Pixel, Turnstile; `form-action` VNPay/payOS) and no nonces — prerendered/cached shells cannot carry a per-request nonce (D24); report-only switch `CSP_REPORT_ONLY`; HSTS, `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `frame-ancestors 'none'` |
+| Rate limiting | Sign-in 10/min/IP, place order 5/min/IP, order lookup 5/10 min, coupon attempts 10/min/cart, search suggestions 120/min/IP — one shared fixed-window limiter on `rate_limits` (`server/lib/rate-limit.ts`, `guardRequest` for public forms) keyed by the trusted client IP (`TRUSTED_IP_HEADER` only, never a client-set `x-forwarded-for`); Cloudflare WAF + bot fight mode; `/api/webhooks/*` excluded from Turnstile/bot challenges and protected by signatures + an optional gateway IP allowlist (`VNPAY_IPN_ALLOWED_IPS`, `PAYOS_WEBHOOK_ALLOWED_IPS`) instead |
 | Abuse | COD threshold + deposit; failed-delivery phone flag; quantity cap per line; coupon once per phone |
 | Secrets | Env validated with Zod at boot; payment secrets only in env/secret store, never in DB or admin (D07); `.env` never committed; Gitleaks in CI |
 | Dependencies | Pinned versions, Dependabot/Renovate, `pnpm audit` in CI; follow Next.js security releases (Next.js publishes scheduled security patches since 2026-07) |
 | Personal data | TLS everywhere; managed-DB encryption at rest; phone/email masked in logs and Sentry; access logs kept 90 days; data-subject request and breach-notification procedures per Decree 356/2025 |
 | Operations | Daily DB backups + PITR, restore drill every quarter; append-only audit log; SSH keys only, root login disabled |
+
+**Analytics hosts (M3, for the CSP):** GTM is injected by the consent-gated tag loader (`src/components/privacy/tag-manager.tsx`) as a script created by our own bundle (allowed by `'strict-dynamic'`), only after consent and only when `NEXT_PUBLIC_GTM_ID` is set. Hosts the container needs: `script-src` https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://googleads.g.doubleclick.net; `connect-src` https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.facebook.com https://connect.facebook.net https://*.doubleclick.net; `img-src` https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.facebook.com https://*.doubleclick.net https://www.google.com.vn https://www.google.com; `frame-src` https://www.googletagmanager.com (preview mode) https://td.doubleclick.net. Consent Mode v2 defaults are `denied`; inside the container GA4 must fire only with `analytics_storage` granted and the Meta Pixel only with `ad_storage` granted (Meta ignores Consent Mode); the `cookie_consent_update` dataLayer event carries the choice. The footer badge image (`company.moitBadgeImageUrl`, online.gov.vn) needs `img-src` for its host if it is not uploaded to our media.
 
 **Before go-live:** OWASP ZAP baseline scan; manual payment tests (forged signature, wrong amount, replayed IPN, IPN after cancellation); review the permission check of every admin Server Action.
 
@@ -1043,7 +1061,7 @@ Google Search Console (one property, both locales, sitemaps submitted), Bing Web
 - **JavaScript:** Server Components by default; React Compiler on; `next/dynamic` for gallery zoom, Tiptap, charts; PDP JS budget < 150 KB gzip (bundle analyzer in CI).
 - **Third-party scripts:** GTM after consent with `strategy="lazyOnload"`; no heavy chat widgets (Zalo/Messenger as plain links).
 - **Database:** indexes per 6.3; no N+1 (joins/`with`); connection pooling (pgBouncer or the provider's pool); `EXPLAIN ANALYZE` for filter/search queries.
-- **Measurement:** Lighthouse CI on every PR (Performance ≥ 90 for home, listing, PDP in both locales); RUM via `useReportWebVitals` → GA4; Sentry performance for the server.
+- **Measurement:** Lighthouse CI (`lighthouserc.cjs`, `.github/workflows/lighthouse.yml`: Performance ≥ 90 for home, listing, PDP in both locales; LCP/CLS/TBT budgets also on cart and checkout) — manual until the runner baseline is stable, then on every PR; k6 load test in `load/k6/`; RUM via `useReportWebVitals` → GA4; Sentry performance for the server.
 
 ### 14.2 Scale on signals (only when a threshold is hit)
 

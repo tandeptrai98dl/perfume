@@ -129,6 +129,15 @@
         "pay": "Thanh toán phần chênh lệch",
         "refund": "Bạn đã thanh toán nhiều hơn tổng tiền mới. Chúng tôi sẽ hoàn lại {amount} cho bạn.",
         "help": "Nếu thay đổi này chưa đúng, vui lòng trả lời email này hoặc liên hệ với chúng tôi."
+      },
+      "paymentLink": {
+        "subject": "Thanh toán đơn hàng {code}",
+        "preview": "Đường dẫn thanh toán đơn hàng của bạn.",
+        "heading": "Thanh toán đơn hàng",
+        "body": "Cảm ơn bạn đã đặt hàng qua điện thoại. Đơn hàng {code} đang chờ thanh toán.",
+        "amount": "Số tiền cần thanh toán: {amount}.",
+        "pay": "Thanh toán ngay",
+        "help": "Đường dẫn có hiệu lực trong thời gian chúng tôi giữ hàng cho bạn. Nếu cần hỗ trợ, vui lòng trả lời email này."
       }
     },
     "auth": {
@@ -149,6 +158,79 @@
         "cta": "Đặt mật khẩu mới",
         "expiry": "Đường dẫn có hiệu lực trong 30 phút và chỉ dùng được một lần.",
         "ignore": "Nếu bạn không yêu cầu, hãy bỏ qua email này: mật khẩu của bạn vẫn giữ nguyên."
+      },
+      "staffInvite": {
+        "subject": "Lời mời tham gia quản trị Perfume Store",
+        "preview": "Đặt mật khẩu để bắt đầu sử dụng trang quản trị.",
+        "heading": "Bạn được mời vào trang quản trị",
+        "body": "Chủ cửa hàng đã tạo tài khoản quản trị Perfume Store cho bạn. Hãy đặt mật khẩu, sau đó đăng nhập và bật xác thực hai bước.",
+        "cta": "Đặt mật khẩu",
+        "expiry": "Đường dẫn có hiệu lực trong 72 giờ và chỉ dùng được một lần.",
+        "ignore": "Nếu bạn không mong đợi lời mời này, hãy bỏ qua email."
+      }
+    },
+    "review": {
+      "subject": "Bạn thấy mùi hương của đơn {code} thế nào?",
+      "preview": "Chia sẻ cảm nhận của bạn về mùi hương vừa nhận.",
+      "heading": "Chia sẻ cảm nhận của bạn",
+      "greeting": "Chào {name},",
+      "body": "Hy vọng bạn đã có vài ngày trải nghiệm mùi hương từ đơn hàng {code}. Đánh giá của bạn giúp những người yêu nước hoa khác lựa chọn dễ dàng hơn.",
+      "items": "Sản phẩm trong đơn",
+      "writeFor": "Đánh giá {product}",
+      "cta": "Viết đánh giá",
+      "guestNote": "Mỗi liên kết chỉ dùng một lần và có hiệu lực trong {days} ngày.",
+      "memberNote": "Bạn có thể đánh giá bất cứ lúc nào trong mục Đánh giá của tài khoản.",
+      "moderation": "Đánh giá được kiểm duyệt trước khi hiển thị và được gắn nhãn \"Đã mua hàng\"."
+    },
+    "privacy": {
+      "types": {
+        "export": "nhận bản sao dữ liệu",
+        "delete": "xoá dữ liệu",
+        "correct": "chỉnh sửa dữ liệu",
+        "withdrawConsent": "rút lại sự đồng ý tiếp thị"
+      },
+      "dueAt": "Hạn xử lý theo quy định: {date}.",
+      "note": "Ghi chú: {note}",
+      "expiresAt": "Liên kết có hiệu lực đến hết ngày {date}.",
+      "verify": {
+        "subject": "Xác nhận yêu cầu về dữ liệu cá nhân",
+        "preview": "Xác nhận yêu cầu {type}",
+        "heading": "Xác nhận yêu cầu của bạn",
+        "body": "Chúng tôi nhận được yêu cầu {type} cho email này. Bấm nút bên dưới để xác nhận.",
+        "cta": "Xác nhận yêu cầu",
+        "ignore": "Nếu bạn không gửi yêu cầu này, hãy bỏ qua email; sẽ không có gì thay đổi."
+      },
+      "received": {
+        "subject": "Chúng tôi đã nhận yêu cầu của bạn",
+        "preview": "Đã nhận yêu cầu {type}",
+        "heading": "Đã nhận yêu cầu",
+        "body": "Chúng tôi đã tiếp nhận yêu cầu {type} của bạn và sẽ phản hồi trong thời hạn luật định.",
+        "cta": "Xem yêu cầu",
+        "ignore": "Bạn có thể theo dõi yêu cầu trong trang quyền riêng tư nếu có tài khoản."
+      },
+      "exportReady": {
+        "subject": "Dữ liệu cá nhân của bạn đã sẵn sàng",
+        "preview": "Tải bản sao dữ liệu",
+        "heading": "Bản sao dữ liệu đã sẵn sàng",
+        "body": "Bấm nút bên dưới để tải tệp JSON chứa dữ liệu cá nhân chúng tôi lưu về bạn.",
+        "cta": "Tải dữ liệu",
+        "ignore": "Không chuyển tiếp email này: bất kỳ ai có liên kết đều tải được dữ liệu."
+      },
+      "completed": {
+        "subject": "Yêu cầu của bạn đã được xử lý",
+        "preview": "Đã hoàn tất yêu cầu {type}",
+        "heading": "Đã hoàn tất yêu cầu",
+        "body": "Yêu cầu {type} của bạn đã được thực hiện.",
+        "cta": "Xem trang quyền riêng tư",
+        "ignore": "Nếu có câu hỏi, bạn có thể liên hệ với chúng tôi qua trang Liên hệ."
+      },
+      "rejected": {
+        "subject": "Về yêu cầu dữ liệu cá nhân của bạn",
+        "preview": "Kết quả yêu cầu {type}",
+        "heading": "Chưa thể thực hiện yêu cầu",
+        "body": "Chúng tôi chưa thể thực hiện yêu cầu {type} của bạn vì lý do dưới đây.",
+        "cta": "Xem trang quyền riêng tư",
+        "ignore": "Bạn có thể gửi lại yêu cầu hoặc liên hệ với chúng tôi."
       }
     }
   },
@@ -200,8 +282,10 @@
       "address": "Địa chỉ: {value}",
       "representative": "Người đại diện: {value}",
       "phone": "Điện thoại: {value}",
-      "email": "Email: {value}"
-    }
+      "email": "Email: {value}",
+      "moitBadge": "Đã thông báo Bộ Công Thương"
+    },
+    "privacyRequest": "Yêu cầu về dữ liệu cá nhân"
   },
   "journal": {
     "title": "Tạp chí",
@@ -642,7 +726,8 @@
       "priceChanged": "Giá hoặc phí đã thay đổi kể từ khi trang được tải. Vui lòng kiểm tra tổng tiền mới và đặt hàng lại.",
       "rateLimited": "Có quá nhiều đơn hàng từ kết nối này. Vui lòng đợi một phút rồi thử lại.",
       "unexpected": "Chúng tôi chưa thể đặt đơn hàng của bạn. Vui lòng thử lại hoặc liên hệ với chúng tôi.",
-      "quoteFailed": "Chưa cập nhật được tổng tiền. Vui lòng thử lại."
+      "quoteFailed": "Chưa cập nhật được tổng tiền. Vui lòng thử lại.",
+      "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi đặt hàng lại."
     },
     "errors": {
       "invalid": "Vui lòng kiểm tra lại trường này.",
@@ -901,7 +986,10 @@
       "orders": "Đơn hàng",
       "addresses": "Địa chỉ",
       "profile": "Hồ sơ",
-      "signOut": "Đăng xuất"
+      "signOut": "Đăng xuất",
+      "wishlist": "Yêu thích",
+      "reviews": "Đánh giá",
+      "privacy": "Quyền riêng tư"
     },
     "overview": {
       "intro": "Theo dõi đơn hàng, quản lý địa chỉ và chọn cách chúng tôi liên hệ với bạn.",
@@ -1012,6 +1100,9 @@
       "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
       "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
       "validation": "Vui lòng sửa các mục được đánh dấu."
+    },
+    "privacy": {
+      "metaTitle": "Quyền riêng tư"
     }
   },
   "customerOrder": {
@@ -1110,6 +1201,348 @@
     "signIn": "Đăng nhập để xem tất cả đơn hàng",
     "resultTitle": "Đơn hàng {code}"
   },
+  "wishlist": {
+    "toggle": "Lưu {name} vào danh sách yêu thích",
+    "signInToSave": "Đăng nhập để lưu {name} vào danh sách yêu thích",
+    "added": "Đã thêm {name} vào danh sách yêu thích.",
+    "removed": "Đã bỏ {name} khỏi danh sách yêu thích.",
+    "errors": {
+      "full": "Danh sách yêu thích đã đầy. Hãy bỏ bớt vài sản phẩm rồi thử lại.",
+      "generic": "Chưa cập nhật được danh sách yêu thích. Vui lòng thử lại."
+    },
+    "page": {
+      "metaTitle": "Danh sách yêu thích",
+      "title": "Danh sách yêu thích",
+      "intro": "Những mùi hương bạn đã lưu lại để quay lại sau.",
+      "count": "{count, plural, other {# sản phẩm}}",
+      "emptyTitle": "Chưa có sản phẩm yêu thích",
+      "emptyDescription": "Nhấn biểu tượng trái tim trên sản phẩm để lưu mùi hương bạn muốn thử.",
+      "browse": "Khám phá nước hoa"
+    }
+  },
+  "reviews": {
+    "title": "Đánh giá của khách hàng",
+    "intro": "Chỉ khách đã mua và nhận hàng mới có thể đánh giá. Mọi đánh giá đều được kiểm duyệt trước khi hiển thị.",
+    "verified": "Đã mua hàng",
+    "byline": "{name} · {date}",
+    "purchased": "Đã mua: {variant}",
+    "longevityValue": "Độ lưu hương: {value}/5",
+    "sillageValue": "Độ toả hương: {value}/5",
+    "reply": "Phản hồi từ cửa hàng",
+    "listLabel": "Danh sách đánh giá",
+    "showing": "Đang hiển thị {shown} trên {total} đánh giá",
+    "loadFailed": "Chưa tải được thêm đánh giá. Vui lòng thử lại.",
+    "showMore": "Xem thêm đánh giá",
+    "empty": {
+      "title": "Chưa có đánh giá",
+      "description": "Sau khi nhận hàng, bạn sẽ được mời chia sẻ cảm nhận về mùi hương này."
+    },
+    "summary": {
+      "average": "{value, number, ::.0}",
+      "scale": "{value, number, ::.0}/5",
+      "stars": "{count} sao",
+      "starsCount": "{stars} sao: {count, plural, other {# đánh giá}}",
+      "longevity": "Độ lưu hương",
+      "sillage": "Độ toả hương"
+    },
+    "form": {
+      "rating": "Đánh giá chung",
+      "longevity": "Độ lưu hương (không bắt buộc)",
+      "sillage": "Độ toả hương (không bắt buộc)",
+      "skip": "Bỏ qua",
+      "longevityScale": {
+        "1": "Rất ngắn",
+        "2": "Ngắn",
+        "3": "Vừa",
+        "4": "Lâu",
+        "5": "Rất lâu"
+      },
+      "sillageScale": {
+        "1": "Rất nhẹ",
+        "2": "Nhẹ",
+        "3": "Vừa",
+        "4": "Rõ",
+        "5": "Rất mạnh"
+      },
+      "title": "Tiêu đề (không bắt buộc)",
+      "body": "Cảm nhận của bạn",
+      "bodyHint": "Tối thiểu {min} ký tự · {count}/{max}",
+      "name": "Tên hiển thị",
+      "nameHint": "Tên này sẽ hiển thị công khai cùng đánh giá.",
+      "moderation": "Đánh giá sẽ được kiểm duyệt trước khi hiển thị trên trang sản phẩm.",
+      "submit": "Gửi đánh giá",
+      "thanksTitle": "Cảm ơn bạn đã đánh giá",
+      "thanksBody": "Đánh giá của bạn đang chờ kiểm duyệt và sẽ sớm xuất hiện trên trang sản phẩm."
+    },
+    "errors": {
+      "required": "Vui lòng nhập thông tin này.",
+      "tooLong": "Nội dung quá dài.",
+      "bodyTooShort": "Hãy viết thêm một chút (tối thiểu 20 ký tự).",
+      "ratingRequired": "Vui lòng chọn số sao.",
+      "invalid": "Giá trị chưa hợp lệ.",
+      "validation": "Vui lòng kiểm tra lại các trường được đánh dấu.",
+      "unauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "notFound": "Không tìm thấy sản phẩm cần đánh giá.",
+      "alreadyReviewed": "Sản phẩm này đã được đánh giá cho đơn hàng này.",
+      "linkExpired": "Liên kết đánh giá đã hết hạn.",
+      "notReviewable": "Sản phẩm trong đơn hàng này hiện không thể đánh giá.",
+      "rateLimited": "Bạn gửi quá nhiều lần. Vui lòng thử lại sau ít phút.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "link": {
+      "metaTitle": "Đánh giá sản phẩm",
+      "eyebrow": "Đơn hàng {code}",
+      "title": "Đánh giá {product}",
+      "intro": "Bạn đã mua {variant}. Hãy chia sẻ cảm nhận để giúp những người yêu nước hoa khác lựa chọn.",
+      "viewProduct": "Xem sản phẩm",
+      "account": "Đánh giá trong tài khoản",
+      "contact": "Liên hệ cửa hàng",
+      "states": {
+        "used": {
+          "title": "Bạn đã đánh giá sản phẩm này",
+          "body": "Liên kết chỉ dùng được một lần. Cảm ơn bạn đã chia sẻ cảm nhận."
+        },
+        "expired": {
+          "title": "Liên kết đã hết hạn",
+          "body": "Liên kết đánh giá có hiệu lực 30 ngày. Nếu bạn vẫn muốn đánh giá, hãy liên hệ cửa hàng."
+        },
+        "unavailable": {
+          "title": "Không thể đánh giá đơn hàng này",
+          "body": "Đơn hàng đã được trả lại hoặc đang xử lý đổi trả nên không thể đánh giá."
+        },
+        "notFound": {
+          "title": "Liên kết không hợp lệ",
+          "body": "Vui lòng mở lại liên kết trong email mời đánh giá, hoặc đăng nhập để đánh giá từ tài khoản."
+        }
+      }
+    },
+    "account": {
+      "metaTitle": "Đánh giá của tôi",
+      "title": "Đánh giá",
+      "intro": "Chia sẻ cảm nhận về những mùi hương bạn đã nhận.",
+      "toWrite": "Sản phẩm chờ đánh giá",
+      "nothingToWrite": "Chưa có sản phẩm nào cần đánh giá. Bạn có thể đánh giá sau khi đơn hàng được giao.",
+      "viewOrders": "Xem đơn hàng",
+      "itemMeta": "{variant} · Đơn {code}",
+      "write": "Viết đánh giá",
+      "dialogTitle": "Đánh giá {product}",
+      "submitted": "Đã gửi đánh giá. Đánh giá sẽ hiển thị sau khi được kiểm duyệt.",
+      "written": "Đánh giá đã viết",
+      "noneWritten": "Bạn chưa viết đánh giá nào.",
+      "status": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã đăng",
+        "rejected": "Không được đăng"
+      }
+    },
+    "anonymousReviewer": "Khách hàng ẩn danh"
+  },
+  "ogImage": {
+    "tagline": "Nước hoa chính hãng · Giao hàng toàn quốc"
+  },
+  "security": {
+    "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi thử lại."
+  },
+  "cookieConsent": {
+    "title": "Chúng tôi dùng cookie",
+    "text": "Cookie cần thiết giúp giỏ hàng, đăng nhập và ngôn ngữ hoạt động. Với sự đồng ý của bạn, chúng tôi dùng thêm cookie phân tích (Google Analytics) và quảng cáo (Meta Pixel) để hiểu cách website được sử dụng và đo hiệu quả quảng cáo. Bạn có thể thay đổi lựa chọn bất cứ lúc nào ở cuối trang.",
+    "policyLink": "Xem chính sách cookie",
+    "rejectAll": "Từ chối tất cả",
+    "acceptAll": "Chấp nhận tất cả",
+    "customize": "Tuỳ chỉnh",
+    "saved": "Đã lưu lựa chọn cookie của bạn.",
+    "saveFailed": "Chưa lưu được lựa chọn. Vui lòng thử lại.",
+    "settings": "Cài đặt cookie",
+    "alwaysOn": "Luôn bật",
+    "preferences": {
+      "title": "Tuỳ chỉnh cookie",
+      "description": "Chọn loại cookie bạn đồng ý. Cookie không cần thiết chỉ được dùng khi bạn bật.",
+      "save": "Lưu lựa chọn"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Cần thiết",
+        "description": "Giỏ hàng, phiên đăng nhập, ngôn ngữ và lựa chọn cookie của bạn. Website không hoạt động nếu thiếu các cookie này."
+      },
+      "analytics": {
+        "title": "Phân tích",
+        "description": "Google Analytics 4 đo lượt xem trang và cách website được sử dụng để chúng tôi cải thiện trải nghiệm."
+      },
+      "ads": {
+        "title": "Quảng cáo",
+        "description": "Meta Pixel và Google Ads đo hiệu quả quảng cáo và có thể hiển thị quảng cáo phù hợp với bạn trên nền tảng khác."
+      }
+    }
+  },
+  "privacyCenter": {
+    "title": "Quyền riêng tư",
+    "intro": "Quản lý sự đồng ý của bạn và thực hiện các quyền đối với dữ liệu cá nhân theo Luật Bảo vệ dữ liệu cá nhân.",
+    "consents": {
+      "title": "Sự đồng ý của bạn",
+      "intro": "Bạn có thể bật hoặc tắt từng mục đích. Mỗi thay đổi được ghi lại kèm thời điểm.",
+      "save": "Lưu thay đổi",
+      "saved": "Đã cập nhật sự đồng ý.",
+      "withdrawNote": "Rút lại sự đồng ý không ảnh hưởng đến việc xử lý dữ liệu đã thực hiện trước đó. Cookie phân tích và quảng cáo áp dụng cho trình duyệt này.",
+      "marketingEmail": {
+        "title": "Email khuyến mãi",
+        "description": "Nhận tin về sản phẩm mới và ưu đãi qua email."
+      },
+      "marketingSms": {
+        "title": "Tin nhắn khuyến mãi",
+        "description": "Nhận ưu đãi qua SMS hoặc Zalo."
+      },
+      "analytics": {
+        "title": "Cookie phân tích",
+        "description": "Cho phép Google Analytics đo cách bạn sử dụng website."
+      },
+      "ads": {
+        "title": "Cookie quảng cáo",
+        "description": "Cho phép Meta Pixel và Google Ads đo hiệu quả quảng cáo."
+      }
+    },
+    "requests": {
+      "title": "Dữ liệu của bạn",
+      "intro": "Gửi yêu cầu về dữ liệu cá nhân. Chúng tôi phản hồi trong thời hạn luật định và gửi email cho bạn ở mỗi bước.",
+      "empty": "Bạn chưa gửi yêu cầu nào.",
+      "listCaption": "Các yêu cầu về dữ liệu cá nhân",
+      "download": "Tải dữ liệu (JSON)",
+      "pendingNote": "Bạn đang có một yêu cầu loại này đang xử lý.",
+      "alreadyOpen": "Bạn đã có một yêu cầu loại này đang được xử lý.",
+      "sent": {
+        "export": "Đã nhận yêu cầu. Liên kết tải dữ liệu sẽ được gửi qua email trong ít phút.",
+        "correct": "Đã nhận yêu cầu chỉnh sửa. Hạn xử lý: {date}.",
+        "delete": "Đã nhận yêu cầu xoá dữ liệu. Hạn xử lý: {date}."
+      },
+      "columns": {
+        "type": "Loại yêu cầu",
+        "createdAt": "Ngày gửi",
+        "status": "Trạng thái",
+        "dueAt": "Hạn / ngày hoàn tất",
+        "actions": "Thao tác"
+      },
+      "types": {
+        "export": "Nhận bản sao dữ liệu",
+        "delete": "Xoá dữ liệu",
+        "correct": "Chỉnh sửa dữ liệu",
+        "withdrawConsent": "Rút lại sự đồng ý tiếp thị"
+      },
+      "status": {
+        "received": "Đã tiếp nhận",
+        "inProgress": "Đang xử lý",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối"
+      },
+      "export": {
+        "title": "Nhận bản sao dữ liệu",
+        "description": "Tải về toàn bộ dữ liệu cá nhân chúng tôi lưu về bạn (tài khoản, địa chỉ, đơn hàng, sự đồng ý) dưới dạng tệp JSON. Liên kết có hiệu lực 7 ngày.",
+        "action": "Yêu cầu bản sao"
+      },
+      "correct": {
+        "title": "Chỉnh sửa dữ liệu",
+        "description": "Hồ sơ và sổ địa chỉ có thể tự sửa. Với dữ liệu khác (ví dụ thông tin trên đơn hàng), hãy cho chúng tôi biết điều cần sửa.",
+        "label": "Thông tin cần chỉnh sửa",
+        "action": "Gửi yêu cầu"
+      },
+      "delete": {
+        "title": "Xoá dữ liệu cá nhân",
+        "description": "Xoá tài khoản và ẩn danh hoá dữ liệu cá nhân của bạn. Thông tin kế toán của đơn hàng được giữ lại theo quy định.",
+        "action": "Yêu cầu xoá dữ liệu",
+        "confirmTitle": "Xoá dữ liệu cá nhân?",
+        "confirmDescription": "Sau khi xử lý, bạn không thể đăng nhập hay khôi phục tài khoản.",
+        "consequences": {
+          "account": "Tài khoản, sổ địa chỉ, danh sách yêu thích và đăng ký nhận tin bị xoá.",
+          "orders": "Đơn hàng được giữ cho mục đích kế toán và thuế nhưng không còn tên, số điện thoại, email hay địa chỉ của bạn.",
+          "openOrders": "Nếu còn đơn hàng đang xử lý, việc xoá được thực hiện sau khi đơn hoàn tất."
+        },
+        "reason": "Lý do (không bắt buộc)",
+        "understood": "Tôi hiểu việc xoá không thể hoàn tác.",
+        "cancel": "Huỷ",
+        "submit": "Gửi yêu cầu xoá"
+      }
+    },
+    "history": {
+      "title": "Lịch sử đồng ý",
+      "empty": "Chưa có ghi nhận nào.",
+      "caption": "Lịch sử đồng ý và rút lại sự đồng ý",
+      "columns": {
+        "date": "Thời điểm",
+        "purpose": "Mục đích",
+        "decision": "Lựa chọn",
+        "source": "Nơi ghi nhận"
+      },
+      "granted": "Đồng ý",
+      "withdrawn": "Không đồng ý / rút lại",
+      "purposes": {
+        "terms": "Điều khoản sử dụng",
+        "privacy": "Chính sách bảo mật",
+        "marketingEmail": "Email khuyến mãi",
+        "marketingSms": "Tin nhắn khuyến mãi",
+        "analytics": "Cookie phân tích",
+        "ads": "Cookie quảng cáo"
+      },
+      "sources": {
+        "checkout": "Khi đặt hàng",
+        "account_profile": "Hồ sơ tài khoản",
+        "privacy_center": "Trang quyền riêng tư",
+        "cookie_banner": "Thông báo cookie",
+        "cookie_preferences": "Tuỳ chỉnh cookie",
+        "guest_form": "Biểu mẫu yêu cầu",
+        "newsletter": "Đăng ký nhận tin",
+        "privacy_erasure": "Xoá dữ liệu"
+      }
+    },
+    "errors": {
+      "validation": "Vui lòng kiểm tra lại thông tin.",
+      "unauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+      "notFound": "Không tìm thấy.",
+      "invalid": "Giá trị không hợp lệ.",
+      "conflict": "Yêu cầu không thể thực hiện lúc này.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "required": "Vui lòng nhập nội dung (ít nhất 5 ký tự).",
+      "tooLong": "Nội dung quá dài (tối đa 1.000 ký tự).",
+      "email": "Email chưa hợp lệ.",
+      "tokenInvalid": "Liên kết xác nhận không hợp lệ hoặc đã hết hạn."
+    }
+  },
+  "privacyRequest": {
+    "metaTitle": "Yêu cầu về dữ liệu cá nhân",
+    "title": "Yêu cầu về dữ liệu cá nhân",
+    "intro": "Bạn có quyền nhận bản sao, chỉnh sửa, xoá dữ liệu cá nhân hoặc rút lại sự đồng ý nhận tin khuyến mãi. Chúng tôi gửi liên kết xác nhận tới email của bạn để bảo đảm chỉ chủ email mới gửi được yêu cầu.",
+    "memberHint": "Đã có tài khoản?",
+    "memberLink": "Quản lý trong trang quyền riêng tư",
+    "form": {
+      "email": "Email",
+      "emailHint": "Email bạn đã dùng khi đặt hàng hoặc đăng ký.",
+      "type": "Bạn muốn",
+      "typeHints": {
+        "export": "Nhận tệp JSON chứa dữ liệu chúng tôi lưu về email này.",
+        "correct": "Cho chúng tôi biết thông tin nào chưa đúng.",
+        "delete": "Ẩn danh hoá dữ liệu cá nhân; thông tin kế toán được giữ lại.",
+        "withdrawConsent": "Ngừng nhận email và tin nhắn khuyến mãi."
+      },
+      "details": "Ghi chú (không bắt buộc)",
+      "detailsRequired": "Thông tin cần chỉnh sửa",
+      "submit": "Gửi yêu cầu",
+      "sent": "Nếu email hợp lệ, bạn sẽ nhận được liên kết xác nhận trong ít phút. Liên kết có hiệu lực 24 giờ.",
+      "another": "Gửi yêu cầu khác"
+    },
+    "confirm": {
+      "metaTitle": "Xác nhận yêu cầu",
+      "title": "Xác nhận yêu cầu",
+      "intro": "Kiểm tra thông tin bên dưới và bấm xác nhận để gửi yêu cầu.",
+      "email": "Email",
+      "type": "Yêu cầu",
+      "details": "Ghi chú",
+      "submit": "Xác nhận yêu cầu",
+      "done": "Đã tiếp nhận yêu cầu. Hạn xử lý: {date}. Chúng tôi sẽ gửi email khi có kết quả.",
+      "doneExport": "Đã tiếp nhận yêu cầu. Liên kết tải dữ liệu sẽ được gửi qua email trong ít phút.",
+      "doneImmediate": "Đã thực hiện: bạn sẽ không nhận tin khuyến mãi nữa.",
+      "invalidTitle": "Liên kết không còn hiệu lực",
+      "invalidText": "Liên kết xác nhận không hợp lệ hoặc đã quá 24 giờ. Vui lòng gửi lại yêu cầu.",
+      "again": "Gửi lại yêu cầu"
+    }
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
@@ -1148,22 +1581,72 @@
       "paymentEvents": "Nhật ký webhook",
       "refunds": "Hoàn tiền",
       "bankTransfers": "Xác nhận chuyển khoản",
-      "codRemittances": "Đối soát COD"
+      "codRemittances": "Đối soát COD",
+      "einvoices": "Hoá đơn điện tử lỗi",
+      "system": "Hệ thống",
+      "staff": "Nhân sự",
+      "auditLog": "Nhật ký thao tác",
+      "reviewsSection": "Đánh giá",
+      "reviews": "Kiểm duyệt đánh giá",
+      "privacy": "Dữ liệu cá nhân",
+      "privacyRequests": "Yêu cầu dữ liệu"
     },
     "dashboard": {
       "title": "Tổng quan",
       "welcome": "Xin chào {name}",
       "role": "Vai trò: {role}",
       "queues": "Đơn cần xử lý",
-      "queueLink": "Xem {label}",
-      "byStatus": "Đơn theo trạng thái",
-      "lowStock": "Sắp hết hàng",
-      "revenue": "Doanh thu (đã trừ hoàn tiền)",
-      "today": "Hôm nay",
-      "last7Days": "7 ngày",
-      "last30Days": "30 ngày",
-      "orderCount": "{count, plural, other {# đơn}}",
-      "aov": "Giá trị đơn TB {amount}"
+      "rangeLabel": "Khoảng thời gian",
+      "ranges": {
+        "today": "Hôm nay",
+        "7d": "7 ngày",
+        "30d": "30 ngày",
+        "month": "Tháng này"
+      },
+      "rangeCaption": "Từ {from} đến {to}, giờ Việt Nam",
+      "kpis": "Chỉ số chính",
+      "netRevenue": "Doanh thu thuần",
+      "netRevenueHint": "Đơn đã xác nhận, trừ tiền đã hoàn ({refunded})",
+      "cashNet": "Tiền thu ròng",
+      "cashHint": "Đã nhận {received} · đã hoàn {refunded}",
+      "ordersPlaced": "Đơn đã đặt",
+      "ordersPlacedHint": "{count, plural, other {# đơn tính doanh thu}}",
+      "averageOrderValue": "Giá trị đơn trung bình",
+      "averageOrderValueHint": "Tổng giá trị đơn tính doanh thu chia số đơn",
+      "conversion": "Tỉ lệ chuyển đổi (ước tính)",
+      "conversionHint": "{orders} đơn web / {carts} giỏ hàng mới",
+      "conversionNone": "Chưa có giỏ hàng mới",
+      "dailyTitle": "Doanh thu thuần theo ngày",
+      "dailyBar": "{day}: {amount}, {orders, plural, other {# đơn}}",
+      "showTable": "Xem bảng số liệu",
+      "columns": {
+        "day": "Ngày",
+        "netRevenue": "Doanh thu thuần",
+        "orders": "Số đơn",
+        "status": "Trạng thái",
+        "product": "Sản phẩm",
+        "units": "Đã bán",
+        "revenue": "Doanh thu"
+      },
+      "byStatusTitle": "Đơn theo trạng thái",
+      "byStatusHint": "Đơn đặt trong khoảng thời gian, theo trạng thái hiện tại",
+      "statusBar": "{status}: {count, plural, other {# đơn}}",
+      "empty": "Chưa có đơn trong khoảng thời gian này.",
+      "topProducts": "Sản phẩm bán chạy",
+      "topProductsEmpty": "Chưa có sản phẩm nào được bán trong khoảng thời gian này.",
+      "units": "{count, plural, other {# sản phẩm}}",
+      "attention": "Việc cần xử lý",
+      "codPending": "COD chờ đối soát",
+      "codPendingValue": "{count, plural, other {# đơn}} · {amount}",
+      "pendingReviews": "Đánh giá chờ duyệt",
+      "openRefunds": "Hoàn tiền đang chờ",
+      "openRefundsValue": "{count, plural, other {# yêu cầu}} · {amount}",
+      "privacyRequests": "Yêu cầu về dữ liệu cá nhân",
+      "privacyValue": "{open} đang mở · {overdue} quá hạn",
+      "missingEnglish": "Sản phẩm thiếu bản tiếng Anh",
+      "missingEnglishValue": "{missing}/{total} sản phẩm đang bán · {coverage}% đã có tiếng Anh",
+      "open": "Mở",
+      "failedEinvoices": "Hoá đơn điện tử lỗi"
     },
     "roles": {
       "owner": "Chủ cửa hàng",
@@ -1187,7 +1670,8 @@
       "invalidCode": "Mã không đúng hoặc đã hết hạn.",
       "notStaff": "Tài khoản này không có quyền truy cập trang quản trị.",
       "locked": "Tài khoản đã bị khoá. Vui lòng liên hệ chủ cửa hàng.",
-      "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại."
+      "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi thử lại."
     },
     "twoFactor": {
       "title": "Bật xác thực hai bước",
@@ -1605,7 +2089,23 @@
       "depositNoLongerRequired": "Đơn COD đang chờ đặt cọc sẽ không còn cần cọc sau khi sửa. Hãy huỷ và tạo đơn thủ công mới.",
       "editNoChange": "Chưa có thay đổi nào để lưu.",
       "reservationExpired": "Thời gian giữ hàng của đơn đã hết nên không thêm sản phẩm được.",
-      "stockNotHeld": "Tồn kho của đơn không khớp. Tải lại trang."
+      "stockNotHeld": "Tồn kho của đơn không khớp. Tải lại trang.",
+      "notRetryable": "Hoá đơn của đơn này không thể xuất lại (đã xuất hoặc đơn chưa giao).",
+      "emailTaken": "Email này đã có tài khoản.",
+      "selfChange": "Bạn không thể tự đổi vai trò, khoá hoặc đặt lại xác thực hai bước cho chính mình.",
+      "lastOwner": "Cửa hàng cần ít nhất một Chủ cửa hàng đang hoạt động.",
+      "roleUnchanged": "Nhân sự đã có vai trò này.",
+      "alreadyDeactivated": "Tài khoản đã bị khoá.",
+      "alreadyActive": "Tài khoản đang hoạt động.",
+      "alreadyActivated": "Nhân sự đã đặt mật khẩu; không cần gửi lại lời mời.",
+      "openOrders": "Khách còn đơn hàng đang xử lý. Chờ đơn kết thúc rồi mới ẩn danh hoá.",
+      "staffAccount": "Không ẩn danh hoá tài khoản nhân viên. Hãy khoá tài khoản trong quản lý nhân viên.",
+      "confirmMismatch": "Email xác nhận không khớp.",
+      "rejectReasonRequired": "Nhập lý do từ chối (được gửi cho khách).",
+      "useAnonymize": "Yêu cầu xoá được hoàn tất bằng thao tác ẩn danh hoá.",
+      "notExport": "Đây không phải yêu cầu xuất dữ liệu.",
+      "notDelete": "Đây không phải yêu cầu xoá dữ liệu.",
+      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -2235,6 +2735,43 @@
           "account": "Tài khoản của khách đã bị đánh dấu sau một lần giao thất bại.",
           "phone": "Số điện thoại này có {count, plural, other {# đơn}} giao thất bại trước đây.",
           "advice": "Gọi xác nhận kỹ hoặc đề nghị khách chuyển khoản trước."
+        },
+        "notifications": {
+          "title": "Nhật ký thông báo",
+          "empty": "Chưa có email hay tin nhắn nào cho đơn này.",
+          "columns": {
+            "time": "Thời gian",
+            "channel": "Kênh",
+            "template": "Nội dung",
+            "recipient": "Người nhận",
+            "status": "Trạng thái"
+          },
+          "channels": {
+            "email": "Email",
+            "telegram": "Telegram",
+            "zalo": "Zalo"
+          },
+          "statuses": {
+            "queued": "Đang gửi",
+            "sent": "Đã gửi",
+            "failed": "Lỗi",
+            "skipped": "Bỏ qua"
+          },
+          "templates": {
+            "order_confirmation": "Xác nhận đơn hàng",
+            "paymentReceived": "Đã nhận thanh toán",
+            "shipped": "Đã giao cho hãng vận chuyển",
+            "delivered": "Đã giao hàng",
+            "cancelled": "Đơn đã huỷ",
+            "refunded": "Hoàn tiền",
+            "updated": "Đơn được cập nhật",
+            "paymentLink": "Link thanh toán",
+            "staff_alert": "Thông báo nội bộ"
+          },
+          "reasons": {
+            "no_recipient": "Khách không có email",
+            "no_channel": "Chưa cấu hình kênh nhận"
+          }
         }
       },
       "timeline": {
@@ -2252,7 +2789,11 @@
         "editedTotal": "Tổng tiền {from} → {to}",
         "editedItems": "{count} dòng sản phẩm thay đổi",
         "editedAddress": "Đổi địa chỉ giao hàng",
-        "editedOverride": "Ghi đè phí giao hàng: {reason}"
+        "editedOverride": "Ghi đè phí giao hàng: {reason}",
+        "einvoice_issued": "Đã xuất hoá đơn điện tử {number}",
+        "einvoice_attempt_failed": "Xuất hoá đơn điện tử lỗi (lần {attempt}), sẽ thử lại",
+        "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
+        "einvoice_retry_requested": "Yêu cầu xuất lại hoá đơn điện tử"
       },
       "print": {
         "packing-slip": "Phiếu đóng gói",
@@ -2427,7 +2968,8 @@
           "linkHint": "Gửi link này cho khách. Phiên thanh toán hiện tại hết hạn lúc {time}; khách có thể thử lại trên trang này khi hàng còn được giữ.",
           "linkSessionFailed": "Chưa mở được phiên thanh toán; khách mở link sẽ được tạo phiên mới.",
           "view": "Xem đơn hàng",
-          "another": "Tạo đơn khác"
+          "another": "Tạo đơn khác",
+          "linkEmailed": "Link thanh toán cũng được gửi tới email của khách."
         }
       },
       "edit": {
@@ -2930,11 +3472,402 @@
         "suspicious_ipn": "IPN đáng ngờ",
         "late_payment_refund": "Thanh toán sau khi huỷ cần hoàn tiền",
         "low_stock": "Sắp hết hàng",
-        "job_failed": "Tác vụ nền thất bại"
+        "job_failed": "Tác vụ nền thất bại",
+        "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
+        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền"
       },
       "order": "Đơn {code}: {amount} · {method} · {province}",
       "orderNoProvince": "Đơn {code}: {amount} · {method}",
       "noDetails": "Không có thêm thông tin."
+    },
+    "einvoices": {
+      "title": "Hoá đơn điện tử lỗi",
+      "description": "Đơn đã giao nhưng chưa xuất được hoá đơn điện tử sau nhiều lần thử. Kiểm tra lỗi, sửa cấu hình hoặc thông tin rồi bấm Xuất lại; nếu cần, xuất thủ công trên cổng của nhà cung cấp.",
+      "empty": "Không có hoá đơn lỗi.",
+      "caption": "Đơn có hoá đơn điện tử lỗi",
+      "columns": {
+        "order": "Đơn hàng",
+        "status": "Trạng thái đơn",
+        "total": "Tổng tiền",
+        "deliveredAt": "Giao lúc",
+        "reason": "Lỗi",
+        "attempts": "Số lần thử",
+        "failedAt": "Lỗi lúc",
+        "actions": "Thao tác"
+      },
+      "retry": "Xuất lại",
+      "retryNamed": "Xuất lại hoá đơn đơn {code}",
+      "retryDone": "Đã xếp lịch xuất lại hoá đơn điện tử.",
+      "view": "Xem hoá đơn",
+      "panel": {
+        "title": "Hoá đơn điện tử",
+        "state": {
+          "not_applicable": "Chưa đến lúc xuất (hoá đơn được xuất khi đơn chuyển sang Đã giao).",
+          "pending": "Đang chờ xuất hoá đơn.",
+          "retrying": "Đang thử lại: lần {attempts} bị lỗi ({reason}).",
+          "issued": "Đã xuất hoá đơn.",
+          "failed": "Xuất hoá đơn thất bại sau {attempts} lần thử: {reason}."
+        },
+        "badge": {
+          "not_applicable": "Chưa xuất",
+          "pending": "Đang chờ",
+          "retrying": "Đang thử lại",
+          "issued": "Đã xuất",
+          "failed": "Lỗi"
+        },
+        "buyerCompany": "Hoá đơn công ty (theo mã số thuế khách cung cấp).",
+        "buyerIndividual": "Hoá đơn cá nhân (khách không yêu cầu hoá đơn công ty).",
+        "retryHint": "Xuất lại an toàn: hệ thống kiểm tra với nhà cung cấp trước, không bao giờ xuất trùng hoá đơn."
+      },
+      "details": {
+        "title": "Hoá đơn {number}",
+        "description": "Thông tin hoá đơn điện tử của đơn {code}.",
+        "invoiceNo": "Số hoá đơn",
+        "series": "Ký hiệu",
+        "template": "Mẫu số",
+        "issuedAt": "Ngày xuất",
+        "provider": "Nhà cung cấp",
+        "transactionId": "Mã giao dịch",
+        "lookupCode": "Mã tra cứu",
+        "lookup": "Tra cứu trên cổng nhà cung cấp",
+        "sandbox": "Hoá đơn thử nghiệm (sandbox), không có giá trị pháp lý.",
+        "close": "Đóng"
+      },
+      "providers": {
+        "sandbox": "Sandbox (thử nghiệm)",
+        "misa": "MISA meInvoice",
+        "viettel": "Viettel S-Invoice"
+      },
+      "reasons": {
+        "not_configured": "chưa cấu hình nhà cung cấp hoá đơn",
+        "totals_mismatch": "tổng các dòng không khớp tổng đơn",
+        "timeout": "nhà cung cấp không phản hồi",
+        "network_error": "lỗi kết nối",
+        "unexpected": "lỗi không xác định"
+      },
+      "document": {
+        "unitGoods": "Chai",
+        "unitService": "Lần",
+        "shipping": "Phí vận chuyển",
+        "giftWrap": "Phí gói quà",
+        "paymentMethod": "TM/CK",
+        "note": "Đơn hàng {code}"
+      },
+      "words": {
+        "digits": "không|một|hai|ba|bốn|năm|sáu|bảy|tám|chín",
+        "hundred": "trăm",
+        "ten": "mười",
+        "tens": "mươi",
+        "odd": "linh",
+        "oneAfterTens": "mốt",
+        "fourAfterTens": "tư",
+        "five": "lăm",
+        "thousand": "nghìn",
+        "million": "triệu",
+        "billion": "tỷ",
+        "currency": "đồng"
+      }
+    },
+    "staff": {
+      "title": "Nhân sự",
+      "description": "Mời nhân sự, phân quyền, khoá tài khoản và đặt lại xác thực hai bước. Mọi thay đổi đều được ghi nhật ký.",
+      "invite": "Mời nhân sự",
+      "inviteTitle": "Mời nhân sự mới",
+      "inviteDescription": "Người được mời nhận email có liên kết đặt mật khẩu (hiệu lực {hours} giờ), sau đó bật xác thực hai bước ở lần đăng nhập đầu tiên.",
+      "invited": "Đã gửi lời mời",
+      "fields": {
+        "name": "Họ tên",
+        "email": "Email",
+        "role": "Vai trò"
+      },
+      "search": "Tìm theo tên hoặc email",
+      "statusFilter": "Trạng thái",
+      "allStatuses": "Tất cả",
+      "filter": "Lọc",
+      "statuses": {
+        "invited": "Đã mời",
+        "active": "Đang hoạt động",
+        "deactivated": "Đã khoá"
+      },
+      "columns": {
+        "name": "Nhân sự",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "twoFactor": "Xác thực hai bước",
+        "lastLogin": "Đăng nhập gần nhất",
+        "actions": "Thao tác"
+      },
+      "twoFactorOn": "Đã bật",
+      "twoFactorOff": "Chưa bật",
+      "never": "Chưa đăng nhập",
+      "you": "Bạn",
+      "empty": "Không có nhân sự phù hợp.",
+      "count": "{count, plural, other {# nhân sự}}",
+      "actionsFor": "Thao tác cho {name}",
+      "changeRole": "Đổi vai trò",
+      "changeRoleTitle": "Đổi vai trò của {name}",
+      "changeRoleDescription": "Quyền mới có hiệu lực ngay; nhân sự sẽ bị đăng xuất khỏi mọi thiết bị.",
+      "roleChanged": "Đã đổi vai trò",
+      "deactivate": "Khoá tài khoản",
+      "deactivateTitle": "Khoá tài khoản của {name}?",
+      "deactivateDescription": "Nhân sự bị đăng xuất khỏi mọi thiết bị và không thể đăng nhập cho đến khi được mở khoá.",
+      "deactivated": "Đã khoá tài khoản",
+      "reactivate": "Mở khoá",
+      "reactivateTitle": "Mở khoá tài khoản của {name}?",
+      "reactivateDescription": "Nhân sự có thể đăng nhập lại với mật khẩu và xác thực hai bước hiện có.",
+      "reactivated": "Đã mở khoá tài khoản",
+      "resetTwoFactor": "Đặt lại xác thực hai bước",
+      "resetTwoFactorTitle": "Đặt lại xác thực hai bước của {name}?",
+      "resetTwoFactorDescription": "Mã TOTP và mã dự phòng hiện tại bị xoá, nhân sự bị đăng xuất và phải thiết lập lại ở lần đăng nhập tới.",
+      "twoFactorReset": "Đã đặt lại xác thực hai bước",
+      "resendInvite": "Gửi lại lời mời",
+      "inviteResent": "Đã gửi lại lời mời",
+      "detailTitle": "Hồ sơ nhân sự",
+      "back": "Danh sách nhân sự",
+      "joined": "Tạo tài khoản",
+      "recentActivity": "Thao tác gần đây",
+      "changesToAccount": "Thay đổi trên tài khoản này",
+      "viewAll": "Xem tất cả trong nhật ký",
+      "resetFilters": "Xoá bộ lọc"
+    },
+    "audit": {
+      "title": "Nhật ký thao tác",
+      "description": "Mọi thao tác của nhân sự, chỉ thêm, không sửa hoặc xoá. Thông tin liên hệ được che.",
+      "filters": {
+        "actor": "Người thực hiện",
+        "entityType": "Loại đối tượng",
+        "entityId": "Mã đối tượng",
+        "action": "Hành động (bắt đầu bằng)",
+        "actionPlaceholder": "vd. order. hoặc staff.",
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "all": "Tất cả",
+        "apply": "Lọc",
+        "reset": "Xoá bộ lọc",
+        "label": "Bộ lọc nhật ký"
+      },
+      "columns": {
+        "time": "Thời gian",
+        "actor": "Người thực hiện",
+        "action": "Hành động",
+        "entity": "Đối tượng",
+        "changes": "Thay đổi",
+        "ip": "IP"
+      },
+      "system": "Hệ thống",
+      "deletedActor": "Tài khoản đã xoá",
+      "open": "Mở {entity}",
+      "noDiff": "Không có chi tiết",
+      "showDiff": "Xem {count, plural, other {# thay đổi}}",
+      "diffCaption": "Thay đổi của {action}",
+      "diffColumns": {
+        "field": "Trường",
+        "from": "Trước",
+        "to": "Sau",
+        "value": "Giá trị"
+      },
+      "emptyValue": "(trống)",
+      "empty": "Không có mục nào phù hợp.",
+      "newer": "Mới hơn",
+      "older": "Cũ hơn",
+      "newest": "Mới nhất",
+      "pagination": "Phân trang nhật ký",
+      "export": "Xuất CSV",
+      "exportHint": "Tối đa {limit} dòng theo bộ lọc hiện tại; việc xuất cũng được ghi nhật ký.",
+      "entityTypes": {
+        "order": "Đơn hàng",
+        "product": "Sản phẩm",
+        "product_variant": "Biến thể",
+        "brand": "Thương hiệu",
+        "category": "Danh mục",
+        "collection": "Bộ sưu tập",
+        "fragrance_family": "Nhóm hương",
+        "fragrance_note": "Nốt hương",
+        "product_line": "Dòng sản phẩm",
+        "media": "Ảnh",
+        "coupon": "Mã giảm giá",
+        "banner": "Banner",
+        "page": "Trang tĩnh",
+        "post": "Bài viết",
+        "topic": "Chủ đề",
+        "navigation_menu": "Menu",
+        "redirect": "Chuyển hướng",
+        "shipping_zone": "Khu vực giao hàng",
+        "shipping_rate": "Phí giao hàng",
+        "shipment": "Vận đơn",
+        "cod_remittance": "Đối soát COD",
+        "user": "Khách hàng",
+        "staff": "Nhân sự",
+        "audit_log": "Nhật ký",
+        "review": "Đánh giá",
+        "privacy_request": "Yêu cầu quyền riêng tư"
+      }
+    },
+    "setPassword": {
+      "title": "Đặt mật khẩu",
+      "intro": "Chọn mật khẩu cho tài khoản quản trị của bạn. Sau đó bạn sẽ đăng nhập và bật xác thực hai bước.",
+      "password": "Mật khẩu mới",
+      "confirm": "Nhập lại mật khẩu",
+      "hint": "Tối thiểu 8 ký tự.",
+      "submit": "Đặt mật khẩu",
+      "tooShort": "Mật khẩu cần ít nhất 8 ký tự.",
+      "mismatch": "Hai mật khẩu chưa khớp.",
+      "invalidToken": "Liên kết không hợp lệ hoặc đã hết hạn. Hãy nhờ Chủ cửa hàng gửi lại lời mời.",
+      "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "done": "Đã đặt mật khẩu. Bạn có thể đăng nhập.",
+      "toLogin": "Đến trang đăng nhập"
+    },
+    "reviews": {
+      "title": "Kiểm duyệt đánh giá",
+      "description": "Duyệt đánh giá của khách đã mua hàng trước khi hiển thị. Khi duyệt hoặc ẩn, điểm trung bình của sản phẩm được cập nhật.",
+      "search": "Tìm theo sản phẩm, người đánh giá, mã đơn",
+      "empty": "Không có đánh giá nào.",
+      "tabs": {
+        "label": "Lọc theo trạng thái",
+        "pending": "Chờ duyệt",
+        "approved": "Đã đăng",
+        "rejected": "Đã từ chối",
+        "all": "Tất cả"
+      },
+      "status": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã đăng",
+        "rejected": "Đã từ chối"
+      },
+      "columns": {
+        "review": "Đánh giá",
+        "product": "Sản phẩm",
+        "reviewer": "Người đánh giá",
+        "createdAt": "Ngày gửi",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "locales": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "language": "Ngôn ngữ: {locale}",
+      "scores": "Lưu hương {longevity}/5 · Toả hương {sillage}/5",
+      "member": "Thành viên",
+      "guest": "Khách (liên kết email)",
+      "currentReply": "Phản hồi của cửa hàng",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "unpublish": "Ẩn",
+      "approveFor": "Duyệt đánh giá của {name}",
+      "rejectFor": "Từ chối đánh giá của {name}",
+      "approvedToast": "Đã duyệt và đăng đánh giá.",
+      "rejectedToast": "Đã từ chối đánh giá.",
+      "reply": "Phản hồi",
+      "editReply": "Sửa phản hồi",
+      "replyFor": "Phản hồi đánh giá của {name}",
+      "replyTitle": "Phản hồi đánh giá",
+      "replyHint": "Phản hồi hiển thị công khai dưới đánh giá khi đánh giá được đăng. Để trống để xoá.",
+      "replyLabel": "Nội dung phản hồi",
+      "replyCount": "{count}/{max} ký tự",
+      "saveReply": "Lưu phản hồi",
+      "cancel": "Huỷ",
+      "replySaved": "Đã lưu phản hồi.",
+      "replyRemoved": "Đã xoá phản hồi."
+    },
+    "privacyRequests": {
+      "title": "Yêu cầu về dữ liệu cá nhân",
+      "description": "{open} yêu cầu đang mở, {overdue} quá hạn. Hạn theo Nghị định 356/2025: cung cấp và chỉnh sửa 10 ngày, rút lại đồng ý 15 ngày, xoá 20 ngày.",
+      "search": "Tìm theo email",
+      "empty": "Không có yêu cầu nào.",
+      "open": "Mở",
+      "openFor": "Mở yêu cầu của {email}",
+      "overdue": "Quá hạn",
+      "completedOn": "Xong {date}",
+      "start": "Bắt đầu xử lý",
+      "rerunExport": "Gửi lại liên kết dữ liệu",
+      "columns": {
+        "createdAt": "Ngày nhận",
+        "type": "Loại",
+        "email": "Email",
+        "status": "Trạng thái",
+        "dueAt": "Hạn xử lý",
+        "actions": "Thao tác"
+      },
+      "types": {
+        "export": "Xuất dữ liệu",
+        "delete": "Xoá dữ liệu",
+        "correct": "Chỉnh sửa",
+        "withdrawConsent": "Rút lại đồng ý"
+      },
+      "status": {
+        "received": "Mới",
+        "inProgress": "Đang xử lý",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối"
+      },
+      "account": {
+        "member": "Có tài khoản",
+        "guest": "Khách vãng lai"
+      },
+      "filter": {
+        "label": "Trạng thái",
+        "open": "Đang mở",
+        "overdue": "Quá hạn",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối",
+        "all": "Tất cả",
+        "type": "Loại",
+        "allTypes": "Mọi loại"
+      },
+      "detail": {
+        "title": "Yêu cầu dữ liệu cá nhân",
+        "summary": "Thông tin yêu cầu",
+        "account": "Tài khoản",
+        "accountDeleted": "Đã ẩn danh hoá",
+        "roles": {
+          "customer": "khách hàng",
+          "staff": "nhân viên"
+        },
+        "completedAt": "Hoàn tất lúc",
+        "openOrders": "Đơn đang xử lý",
+        "openOrdersBlock": "Còn {count} đơn đang xử lý: chỉ ẩn danh hoá khi các đơn đã kết thúc.",
+        "note": "Nội dung / ghi chú",
+        "history": "Lịch sử xử lý",
+        "requester": "Người yêu cầu",
+        "actions": "Thao tác",
+        "closed": "Yêu cầu đã đóng."
+      },
+      "actions": {
+        "created": "Tiếp nhận yêu cầu",
+        "in_progress": "Bắt đầu xử lý",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối",
+        "export_sent": "Gửi lại liên kết dữ liệu",
+        "anonymized": "Ẩn danh hoá dữ liệu"
+      },
+      "anonymize": {
+        "open": "Ẩn danh hoá dữ liệu",
+        "title": "Ẩn danh hoá dữ liệu của khách?",
+        "description": "Xoá tên, email, số điện thoại, địa chỉ, sổ địa chỉ, giỏ hàng, phiên đăng nhập và đăng ký nhận tin; ẩn thông tin liên hệ trên đơn hàng (giữ số liệu kế toán). Không thể hoàn tác.",
+        "confirm": "Ẩn danh hoá"
+      },
+      "complete": {
+        "open": "Đánh dấu hoàn tất",
+        "title": "Hoàn tất yêu cầu",
+        "description": "Ghi lại việc đã làm. Khách nhận email thông báo hoàn tất.",
+        "note": "Ghi chú (không bắt buộc)",
+        "submit": "Hoàn tất"
+      },
+      "reject": {
+        "open": "Từ chối",
+        "title": "Từ chối yêu cầu",
+        "description": "Lý do được gửi cho khách qua email.",
+        "note": "Lý do từ chối",
+        "submit": "Từ chối yêu cầu"
+      },
+      "done": {
+        "inProgress": "Đã chuyển sang đang xử lý.",
+        "exportSent": "Đã gửi lại liên kết dữ liệu.",
+        "anonymized": "Đã ẩn danh hoá dữ liệu.",
+        "completed": "Đã hoàn tất yêu cầu.",
+        "rejected": "Đã từ chối yêu cầu."
+      }
     }
   }
 }

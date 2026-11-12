@@ -42,6 +42,17 @@ export function OrderTimeline({ events }: { events: AdminOrderEvent[] }) {
         return t('timeline.created_by_staff');
       case 'edited':
         return t('timeline.edited');
+      // M3 e-invoicing (D13)
+      case 'einvoice_issued':
+        return t('timeline.einvoice_issued', { number: String(event.metadata?.ref ?? '') });
+      case 'einvoice_attempt_failed':
+        return t('timeline.einvoice_attempt_failed', {
+          attempt: Number(event.metadata?.attempt ?? 0),
+        });
+      case 'einvoice_failed':
+        return t('timeline.einvoice_failed');
+      case 'einvoice_retry_requested':
+        return t('timeline.einvoice_retry_requested');
       default:
         return t('timeline.other', { type: event.type });
     }

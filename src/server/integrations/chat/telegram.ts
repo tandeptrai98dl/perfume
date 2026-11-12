@@ -6,6 +6,8 @@
 
 export type ChatNotifier = {
   send(text: string): Promise<void>;
+  /** Destination for the notification log (stored masked). */
+  recipient?: string;
 };
 
 export type TelegramConfig = {
@@ -26,6 +28,7 @@ export function createTelegramNotifier(config: TelegramConfig): ChatNotifier | n
   const base = (config.apiBaseUrl ?? 'https://api.telegram.org').replace(/\/+$/, '');
 
   return {
+    recipient: chatId,
     async send(text) {
       const response = await doFetch(`${base}/bot${botToken}/sendMessage`, {
         method: 'POST',

@@ -489,6 +489,8 @@ const SELLER_KEYS = {
   phone: 'company.phone',
   email: 'company.email',
   businessRegistration: 'company.businessRegistration',
+  moitNotificationUrl: 'company.moitNotificationUrl',
+  moitBadgeImageUrl: 'company.moitBadgeImageUrl',
 } as const satisfies Record<keyof SellerInfo, string>;
 
 /** Legal seller information shown in the footer and contact page (from `settings`). */
@@ -502,9 +504,15 @@ export async function getSellerInfo(db: DbExecutor): Promise<SellerInfo> {
     const value = byKey.get(key);
     return typeof value === 'string' && value.trim() ? value : null;
   };
-  return Object.fromEntries(
+  const info = Object.fromEntries(
     Object.entries(SELLER_KEYS).map(([field, key]) => [field, read(key)]),
   ) as SellerInfo;
+  // Links rendered as href/src: only absolute http(s) URLs or site-relative paths.
+  const safeUrl = (value: string | null) =>
+    value && (/^https?:\/\//i.test(value) || /^\/(?!\/)/.test(value)) ? value : null;
+  info.moitNotificationUrl = safeUrl(info.moitNotificationUrl);
+  info.moitBadgeImageUrl = safeUrl(info.moitBadgeImageUrl);
+  return info;
 }
 
 // ---------- Redirects ----------

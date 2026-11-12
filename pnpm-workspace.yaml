@@ -3,3 +3,4 @@ onlyBuiltDependencies:
   - esbuild
 ignoredBuiltDependencies:
   - unrs-resolver
+  - msw

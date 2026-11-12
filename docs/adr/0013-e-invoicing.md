@@ -17,5 +17,6 @@ Issue an e-invoice automatically for every order when it transitions to `deliver
 - Invoice issuing never blocks order transitions.
 - Provider can be swapped without changing domain code.
 - The accountant confirms issue timing, template and series before go-live.
+- *Implementation note (M3):* the VAT rate is the `einvoice.vatRatePercent` setting (default 10 %; shop prices are VAT-inclusive and each line is split into taxable amount + VAT, rounded per line). The rate, the per-line rounding and the treatment of shipping and gift-wrap fees as service lines at the same rate are **pending accountant confirmation**, like the template and series (`EINVOICE_TEMPLATE_CODE`, `EINVOICE_SERIES`).
 
 See also: [ARCHITECTURE.md](../ARCHITECTURE.md), section 0.

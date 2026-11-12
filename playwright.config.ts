@@ -1,5 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import {
+  COOKIE_CONSENT_NAME,
+  COOKIE_CONSENT_VERSION,
+  serializeCookieConsent,
+} from './src/lib/privacy/cookie-consent';
+
 /**
  * E2E against the production build (`pnpm build` first). Locally and in CI the web server is
  * the standalone output; set E2E_BASE_URL to test an already running server instead.
@@ -8,6 +14,34 @@ import { defineConfig, devices } from '@playwright/test';
 const port = Number(process.env.E2E_PORT ?? 3200);
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${port}`;
 const channel = process.env.PLAYWRIGHT_CHANNEL;
+
+/**
+ * Every spec starts with the cookie notice answered ("reject all"), so the fixed banner never
+ * covers controls; `privacy.spec.ts` opts out with an empty storage state to test the banner.
+ */
+const answeredCookieNotice = {
+  cookies: [
+    {
+      name: COOKIE_CONSENT_NAME,
+      value: encodeURIComponent(
+        serializeCookieConsent({
+          version: COOKIE_CONSENT_VERSION,
+          analytics: false,
+          ads: false,
+          decidedAt: 1_762_905_600,
+          receiptId: null,
+        }),
+      ),
+      domain: new URL(baseURL).hostname,
+      path: '/',
+      expires: -1,
+      httpOnly: false,
+      secure: false,
+      sameSite: 'Lax' as const,
+    },
+  ],
+  origins: [],
+};
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -21,6 +55,7 @@ export default defineConfig({
     // Animations off (globals.css honours prefers-reduced-motion): no mid-transition
     // screenshots or axe colour-contrast readings on fading toasts and sheets.
     contextOptions: { reducedMotion: 'reduce' },
+    storageState: answeredCookieNotice,
     ...(channel ? { channel } : {}),
   },
   projects: [
@@ -58,6 +93,9 @@ export default defineConfig({
           PAYMENT_SIMULATOR: process.env.PAYMENT_SIMULATOR ?? 'true',
           // Every test account signs in from one IP; the limits themselves are unit-tested.
           AUTH_RATE_LIMIT: 'off',
+          // Specs give each shopper its own IP via x-forwarded-for (place-order limit 5/min/IP).
+          // Only acceptable because nothing but the test runner can reach this server.
+          TRUSTED_IP_HEADER: 'x-forwarded-for',
         },
       },
 });

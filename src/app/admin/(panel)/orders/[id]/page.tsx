@@ -3,12 +3,16 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { OrderStatusBadge, PaymentStatusBadge } from '@/components/admin/orders/order-badges';
+import { EinvoiceStatus } from '@/components/admin/orders/einvoice-status';
+import { NotificationLog } from '@/components/admin/orders/notification-log';
 import { OrderDetailView } from '@/components/admin/orders/order-detail';
 import { PageHeader } from '@/components/admin/page-header';
 import { PageSkeleton } from '@/components/admin/page-skeleton';
 import { requireAdminPage } from '@/server/auth/guards';
 import { hasPermission } from '@/server/auth/permissions';
 import { getDb } from '@/server/db/client';
+import { getOrderEinvoice } from '@/server/modules/einvoice';
+import { listNotificationLogs } from '@/server/modules/notification';
 import { canEditOrder, getAdminOrderDetail } from '@/server/modules/order';
 
 import { isUuid } from '../../_lib/params';
@@ -26,7 +30,12 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
   const { id } = await params;
   if (!isUuid(id)) notFound();
   const role = user.role ?? 'customer';
-  const order = await getAdminOrderDetail(getDb(), id, role);
+  const db = getDb();
+  const [order, einvoice, notifications] = await Promise.all([
+    getAdminOrderDetail(db, id, role),
+    getOrderEinvoice(db, id),
+    listNotificationLogs(db, { refType: 'order', refId: id }),
+  ]);
   if (!order) notFound();
   const t = await getTranslations({ locale: 'vi', namespace: 'admin.orders' });
   const placed = new Intl.DateTimeFormat('vi-VN', {
@@ -53,6 +62,16 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
         order={order}
         canCancelPaid={hasPermission(role, 'orders.cancelPaid')}
         canEdit={hasPermission(role, 'orders.editBeforeShipping') && canEditOrder(order.status)}
+        einvoice={
+          einvoice && (
+            <EinvoiceStatus
+              einvoice={einvoice}
+              orderCode={order.code}
+              canProcess={hasPermission(role, 'orders.process')}
+            />
+          )
+        }
+        notifications={<NotificationLog rows={notifications} />}
       />
     </>
   );

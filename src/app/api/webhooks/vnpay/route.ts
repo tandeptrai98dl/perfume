@@ -1,9 +1,16 @@
 import { connection, NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
+import { serverEnv } from '@/lib/env';
 import { getDb } from '@/server/db/client';
-import { getPaymentGateways, VNPAY_IPN_RESPONSES } from '@/server/integrations/payments';
+import {
+  getPaymentGateways,
+  getWebhookAllowlists,
+  isWebhookSourceAllowed,
+  VNPAY_IPN_RESPONSES,
+} from '@/server/integrations/payments';
 import { getProducer } from '@/server/jobs/producer';
+import { resolveClientIp } from '@/server/lib/client-ip';
 import { errorFields, logger } from '@/server/lib/logger';
 import { processGatewayNotification, type NotificationOutcome } from '@/server/modules/payment';
 
@@ -11,7 +18,8 @@ import { processGatewayNotification, type NotificationOutcome } from '@/server/m
  * VNPay IPN (server-to-server GET, ARCHITECTURE.md §5.3, §12 Payments). No session: the
  * HMAC-SHA512 signature replaces `requirePermission`. Every call is stored in
  * `payment_events`; replays are acknowledged without side effects. Always HTTP 200 with the
- * `{ RspCode, Message }` body VNPay expects.
+ * `{ RspCode, Message }` body VNPay expects — except calls from outside the optional gateway
+ * IP allowlist (`VNPAY_IPN_ALLOWED_IPS`), which get 403 before anything is parsed or stored.
  */
 
 const querySchema = z
@@ -33,6 +41,12 @@ const RESPONSES: Record<
 
 export async function GET(request: NextRequest) {
   await connection();
+  const sourceIp = resolveClientIp(request.headers, serverEnv().TRUSTED_IP_HEADER);
+  if (!isWebhookSourceAllowed(getWebhookAllowlists(), 'vnpay', sourceIp)) {
+    // Gateway servers, not customers: the source IP is not personal data.
+    logger.warn('payment.ipn.ip_rejected', { provider: 'vnpay', sourceIp });
+    return NextResponse.json({ RspCode: '99', Message: 'Forbidden' }, { status: 403 });
+  }
   const parsed = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams.entries()));
   if (!parsed.success) return NextResponse.json(VNPAY_IPN_RESPONSES.invalidSignature);
   const gateway = getPaymentGateways().vnpay;

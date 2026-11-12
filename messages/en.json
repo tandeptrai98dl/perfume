@@ -129,6 +129,15 @@
         "pay": "Pay the difference",
         "refund": "You have paid more than the new total. We will refund {amount} to you.",
         "help": "If this change is not right, reply to this email or contact us."
+      },
+      "paymentLink": {
+        "subject": "Pay for order {code}",
+        "preview": "The payment link for your order.",
+        "heading": "Pay for your order",
+        "body": "Thank you for ordering by phone. Order {code} is waiting for payment.",
+        "amount": "Amount to pay: {amount}.",
+        "pay": "Pay now",
+        "help": "The link works while we hold the items for you. If you need help, reply to this email."
       }
     },
     "auth": {
@@ -149,6 +158,79 @@
         "cta": "Choose a new password",
         "expiry": "This link is valid for 30 minutes and can be used once.",
         "ignore": "If you did not ask for this, you can ignore this email: your password stays the same."
+      },
+      "staffInvite": {
+        "subject": "Your invitation to the Perfume Store admin",
+        "preview": "Set your password to start using the admin.",
+        "heading": "You have been invited to the admin",
+        "body": "The shop owner created a Perfume Store admin account for you. Set your password, then sign in and turn on two-step verification.",
+        "cta": "Set password",
+        "expiry": "This link is valid for 72 hours and can be used once.",
+        "ignore": "If you were not expecting this invitation, you can ignore this email."
+      }
+    },
+    "review": {
+      "subject": "How is the scent from order {code}?",
+      "preview": "Share your impressions of the scent you received.",
+      "heading": "Share your impressions",
+      "greeting": "Hello {name},",
+      "body": "We hope you have enjoyed a few days with the scent from order {code}. Your review helps other perfume lovers choose with confidence.",
+      "items": "In your order",
+      "writeFor": "Review {product}",
+      "cta": "Write a review",
+      "guestNote": "Each link can be used once and is valid for {days} days.",
+      "memberNote": "You can review your purchases at any time under Reviews in your account.",
+      "moderation": "Reviews are moderated before publication and labelled \"Verified purchase\"."
+    },
+    "privacy": {
+      "types": {
+        "export": "copy of your data",
+        "delete": "deletion of your data",
+        "correct": "correction of your data",
+        "withdrawConsent": "withdrawal of marketing consent"
+      },
+      "dueAt": "Legal due date: {date}.",
+      "note": "Note: {note}",
+      "expiresAt": "The link is valid until the end of {date}.",
+      "verify": {
+        "subject": "Confirm your personal data request",
+        "preview": "Confirm your request: {type}",
+        "heading": "Confirm your request",
+        "body": "We received a request for a {type} for this e-mail address. Press the button below to confirm it.",
+        "cta": "Confirm request",
+        "ignore": "If you did not send this request, ignore this e-mail; nothing will change."
+      },
+      "received": {
+        "subject": "We received your request",
+        "preview": "Request received: {type}",
+        "heading": "Request received",
+        "body": "We have received your request for a {type} and will answer within the legal deadline.",
+        "cta": "View request",
+        "ignore": "If you have an account, you can follow the request on your privacy page."
+      },
+      "exportReady": {
+        "subject": "Your personal data is ready",
+        "preview": "Download a copy of your data",
+        "heading": "Your data is ready",
+        "body": "Press the button below to download a JSON file with the personal data we hold about you.",
+        "cta": "Download data",
+        "ignore": "Do not forward this e-mail: anyone with the link can download the data."
+      },
+      "completed": {
+        "subject": "Your request has been completed",
+        "preview": "Request completed: {type}",
+        "heading": "Request completed",
+        "body": "Your request for a {type} has been carried out.",
+        "cta": "Open your privacy page",
+        "ignore": "If you have any questions, contact us through the Contact page."
+      },
+      "rejected": {
+        "subject": "About your personal data request",
+        "preview": "Outcome of your request: {type}",
+        "heading": "We could not carry out your request",
+        "body": "We could not carry out your request for a {type} for the reason below.",
+        "cta": "Open your privacy page",
+        "ignore": "You can send the request again or contact us."
       }
     }
   },
@@ -200,8 +282,10 @@
       "address": "Address: {value}",
       "representative": "Legal representative: {value}",
       "phone": "Phone: {value}",
-      "email": "Email: {value}"
-    }
+      "email": "Email: {value}",
+      "moitBadge": "Notified to the Ministry of Industry and Trade"
+    },
+    "privacyRequest": "Personal data requests"
   },
   "journal": {
     "title": "Journal",
@@ -642,7 +726,8 @@
       "priceChanged": "A price or fee has changed since the page loaded. Please check the new total and place the order again.",
       "rateLimited": "Too many orders from this connection. Please wait a minute and try again.",
       "unexpected": "We could not place your order. Please try again or contact us.",
-      "quoteFailed": "We could not update the total. Please try again."
+      "quoteFailed": "We could not update the total. Please try again.",
+      "captchaFailed": "We couldn't complete the security check. Please wait a moment and place your order again."
     },
     "errors": {
       "invalid": "Please check this field.",
@@ -901,7 +986,10 @@
       "orders": "Orders",
       "addresses": "Addresses",
       "profile": "Profile",
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "wishlist": "Wishlist",
+      "reviews": "Reviews",
+      "privacy": "Privacy"
     },
     "overview": {
       "intro": "Follow your orders, manage your addresses and choose how we contact you.",
@@ -1012,6 +1100,9 @@
       "conflict": "The order changed in the meantime. Please reload the page.",
       "unexpected": "Something went wrong. Please try again.",
       "validation": "Please correct the highlighted fields."
+    },
+    "privacy": {
+      "metaTitle": "Privacy"
     }
   },
   "customerOrder": {
@@ -1109,5 +1200,347 @@
     "signInHint": "Have an account?",
     "signIn": "Sign in to see all your orders",
     "resultTitle": "Order {code}"
+  },
+  "wishlist": {
+    "toggle": "Save {name} to your wishlist",
+    "signInToSave": "Sign in to save {name} to your wishlist",
+    "added": "{name} saved to your wishlist.",
+    "removed": "{name} removed from your wishlist.",
+    "errors": {
+      "full": "Your wishlist is full. Remove a few products and try again.",
+      "generic": "We could not update your wishlist. Please try again."
+    },
+    "page": {
+      "metaTitle": "Wishlist",
+      "title": "Wishlist",
+      "intro": "The scents you saved to come back to.",
+      "count": "{count, plural, one {# product} other {# products}}",
+      "emptyTitle": "Your wishlist is empty",
+      "emptyDescription": "Tap the heart on a product to save the scents you want to try.",
+      "browse": "Explore perfumes"
+    }
+  },
+  "reviews": {
+    "title": "Customer reviews",
+    "intro": "Only customers who bought and received this product can review it. Every review is moderated before it is published.",
+    "verified": "Verified purchase",
+    "byline": "{name} · {date}",
+    "purchased": "Bought: {variant}",
+    "longevityValue": "Longevity: {value}/5",
+    "sillageValue": "Sillage: {value}/5",
+    "reply": "Reply from the shop",
+    "listLabel": "Reviews",
+    "showing": "Showing {shown} of {total} reviews",
+    "loadFailed": "We could not load more reviews. Please try again.",
+    "showMore": "Show more reviews",
+    "empty": {
+      "title": "No reviews yet",
+      "description": "After delivery, buyers are invited to share how this scent wears."
+    },
+    "summary": {
+      "average": "{value, number, ::.0}",
+      "scale": "{value, number, ::.0}/5",
+      "stars": "{count, plural, one {# star} other {# stars}}",
+      "starsCount": "{stars, plural, one {# star} other {# stars}}: {count, plural, one {# review} other {# reviews}}",
+      "longevity": "Longevity",
+      "sillage": "Sillage"
+    },
+    "form": {
+      "rating": "Overall rating",
+      "longevity": "Longevity (optional)",
+      "sillage": "Sillage (optional)",
+      "skip": "Skip",
+      "longevityScale": {
+        "1": "Very short",
+        "2": "Short",
+        "3": "Moderate",
+        "4": "Long",
+        "5": "Very long"
+      },
+      "sillageScale": {
+        "1": "Very soft",
+        "2": "Soft",
+        "3": "Moderate",
+        "4": "Strong",
+        "5": "Very strong"
+      },
+      "title": "Title (optional)",
+      "body": "Your review",
+      "bodyHint": "At least {min} characters · {count}/{max}",
+      "name": "Display name",
+      "nameHint": "This name is shown publicly with your review.",
+      "moderation": "Reviews are moderated before they appear on the product page.",
+      "submit": "Submit review",
+      "thanksTitle": "Thank you for your review",
+      "thanksBody": "Your review is awaiting moderation and will appear on the product page soon."
+    },
+    "errors": {
+      "required": "Please fill in this field.",
+      "tooLong": "This is too long.",
+      "bodyTooShort": "Please write a little more (at least 20 characters).",
+      "ratingRequired": "Please choose a star rating.",
+      "invalid": "This value is not valid.",
+      "validation": "Please check the highlighted fields.",
+      "unauthorized": "Your session has expired. Please sign in again.",
+      "notFound": "We could not find the product to review.",
+      "alreadyReviewed": "This product has already been reviewed for this order.",
+      "linkExpired": "This review link has expired.",
+      "notReviewable": "Products in this order cannot be reviewed at the moment.",
+      "rateLimited": "Too many attempts. Please try again in a few minutes.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "link": {
+      "metaTitle": "Review your purchase",
+      "eyebrow": "Order {code}",
+      "title": "Review {product}",
+      "intro": "You bought {variant}. Share how it wears to help other perfume lovers choose.",
+      "viewProduct": "View the product",
+      "account": "Reviews in your account",
+      "contact": "Contact us",
+      "states": {
+        "used": {
+          "title": "You have already reviewed this product",
+          "body": "Each link can be used once. Thank you for sharing your impressions."
+        },
+        "expired": {
+          "title": "This link has expired",
+          "body": "Review links are valid for 30 days. If you would still like to leave a review, please contact us."
+        },
+        "unavailable": {
+          "title": "This order cannot be reviewed",
+          "body": "The order was returned or a return is in progress, so it cannot be reviewed."
+        },
+        "notFound": {
+          "title": "This link is not valid",
+          "body": "Please open the link from your review invitation e-mail again, or sign in to review from your account."
+        }
+      }
+    },
+    "account": {
+      "metaTitle": "My reviews",
+      "title": "Reviews",
+      "intro": "Share your impressions of the scents you received.",
+      "toWrite": "Waiting for your review",
+      "nothingToWrite": "Nothing to review yet. You can review products once your order has been delivered.",
+      "viewOrders": "View orders",
+      "itemMeta": "{variant} · Order {code}",
+      "write": "Write a review",
+      "dialogTitle": "Review {product}",
+      "submitted": "Review sent. It will appear once it has been moderated.",
+      "written": "Reviews you wrote",
+      "noneWritten": "You have not written any reviews yet.",
+      "status": {
+        "pending": "Awaiting moderation",
+        "approved": "Published",
+        "rejected": "Not published"
+      }
+    },
+    "anonymousReviewer": "Anonymous customer"
+  },
+  "ogImage": {
+    "tagline": "Authentic fragrances · Delivered across Vietnam"
+  },
+  "security": {
+    "captchaFailed": "We couldn't complete the security check. Please wait a moment and try again."
+  },
+  "cookieConsent": {
+    "title": "We use cookies",
+    "text": "Necessary cookies keep the cart, sign-in and language working. With your consent we also use analytics cookies (Google Analytics) and advertising cookies (Meta Pixel) to understand how the site is used and to measure our ads. You can change your choice at any time from the bottom of the page.",
+    "policyLink": "Read the cookie policy",
+    "rejectAll": "Reject all",
+    "acceptAll": "Accept all",
+    "customize": "Customise",
+    "saved": "Your cookie choice has been saved.",
+    "saveFailed": "We could not save your choice. Please try again.",
+    "settings": "Cookie settings",
+    "alwaysOn": "Always on",
+    "preferences": {
+      "title": "Cookie preferences",
+      "description": "Choose which cookies you allow. Optional cookies are only used when you switch them on.",
+      "save": "Save my choice"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Necessary",
+        "description": "Cart, sign-in session, language and your cookie choice. The site does not work without them."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Google Analytics 4 measures page views and how the site is used so we can improve it."
+      },
+      "ads": {
+        "title": "Advertising",
+        "description": "Meta Pixel and Google Ads measure our ads and may show you relevant ads on other platforms."
+      }
+    }
+  },
+  "privacyCenter": {
+    "title": "Privacy",
+    "intro": "Manage your consents and exercise your rights over your personal data under Vietnam's Personal Data Protection Law.",
+    "consents": {
+      "title": "Your consents",
+      "intro": "Switch each purpose on or off. Every change is recorded with its time.",
+      "save": "Save changes",
+      "saved": "Your consents have been updated.",
+      "withdrawNote": "Withdrawing consent does not affect processing carried out before. Analytics and advertising cookies apply to this browser.",
+      "marketingEmail": {
+        "title": "Promotional e-mails",
+        "description": "News about new arrivals and offers by e-mail."
+      },
+      "marketingSms": {
+        "title": "Promotional messages",
+        "description": "Offers by SMS or Zalo."
+      },
+      "analytics": {
+        "title": "Analytics cookies",
+        "description": "Let Google Analytics measure how you use the site."
+      },
+      "ads": {
+        "title": "Advertising cookies",
+        "description": "Let Meta Pixel and Google Ads measure our advertising."
+      }
+    },
+    "requests": {
+      "title": "Your data",
+      "intro": "Send a request about your personal data. We answer within the legal deadline and e-mail you at every step.",
+      "empty": "You have not sent any requests.",
+      "listCaption": "Personal data requests",
+      "download": "Download data (JSON)",
+      "pendingNote": "You already have a request of this type in progress.",
+      "alreadyOpen": "You already have a request of this type in progress.",
+      "sent": {
+        "export": "Request received. The download link will be e-mailed to you in a few minutes.",
+        "correct": "Correction request received. Due by {date}.",
+        "delete": "Deletion request received. Due by {date}."
+      },
+      "columns": {
+        "type": "Request",
+        "createdAt": "Sent",
+        "status": "Status",
+        "dueAt": "Due / completed",
+        "actions": "Actions"
+      },
+      "types": {
+        "export": "Copy of my data",
+        "delete": "Delete my data",
+        "correct": "Correct my data",
+        "withdrawConsent": "Withdraw marketing consent"
+      },
+      "status": {
+        "received": "Received",
+        "inProgress": "In progress",
+        "completed": "Completed",
+        "rejected": "Rejected"
+      },
+      "export": {
+        "title": "Get a copy of your data",
+        "description": "Download all personal data we hold about you (account, addresses, orders, consents) as a JSON file. The link is valid for 7 days.",
+        "action": "Request a copy"
+      },
+      "correct": {
+        "title": "Correct your data",
+        "description": "You can edit your profile and address book yourself. For anything else (for example details on an order), tell us what needs correcting.",
+        "label": "What needs correcting",
+        "action": "Send request"
+      },
+      "delete": {
+        "title": "Delete your personal data",
+        "description": "Delete your account and anonymise your personal data. Accounting details of orders are kept as the law requires.",
+        "action": "Request deletion",
+        "confirmTitle": "Delete your personal data?",
+        "confirmDescription": "Once processed, you cannot sign in or restore the account.",
+        "consequences": {
+          "account": "Your account, address book, wishlist and newsletter subscription are deleted.",
+          "orders": "Orders are kept for accounting and tax purposes but no longer carry your name, phone, e-mail or address.",
+          "openOrders": "If an order is still in progress, deletion happens after it is completed."
+        },
+        "reason": "Reason (optional)",
+        "understood": "I understand that deletion cannot be undone.",
+        "cancel": "Cancel",
+        "submit": "Request deletion"
+      }
+    },
+    "history": {
+      "title": "Consent history",
+      "empty": "Nothing recorded yet.",
+      "caption": "History of consents given and withdrawn",
+      "columns": {
+        "date": "Time",
+        "purpose": "Purpose",
+        "decision": "Choice",
+        "source": "Recorded at"
+      },
+      "granted": "Granted",
+      "withdrawn": "Declined / withdrawn",
+      "purposes": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "marketingEmail": "Promotional e-mails",
+        "marketingSms": "Promotional messages",
+        "analytics": "Analytics cookies",
+        "ads": "Advertising cookies"
+      },
+      "sources": {
+        "checkout": "Checkout",
+        "account_profile": "Account profile",
+        "privacy_center": "Privacy page",
+        "cookie_banner": "Cookie notice",
+        "cookie_preferences": "Cookie preferences",
+        "guest_form": "Request form",
+        "newsletter": "Newsletter sign-up",
+        "privacy_erasure": "Data deletion"
+      }
+    },
+    "errors": {
+      "validation": "Please check the details.",
+      "unauthorized": "Your session has expired. Please sign in again.",
+      "rateLimited": "Too many requests. Please try again later.",
+      "notFound": "Not found.",
+      "invalid": "This value is not valid.",
+      "conflict": "This request cannot be carried out right now.",
+      "unexpected": "Something went wrong. Please try again.",
+      "required": "Please describe it (at least 5 characters).",
+      "tooLong": "Too long (1,000 characters at most).",
+      "email": "Please enter a valid e-mail address.",
+      "tokenInvalid": "The confirmation link is invalid or has expired."
+    }
+  },
+  "privacyRequest": {
+    "metaTitle": "Personal data requests",
+    "title": "Personal data requests",
+    "intro": "You have the right to get a copy of your personal data, have it corrected or deleted, or withdraw consent to marketing. We e-mail you a confirmation link so that only the owner of the address can file a request.",
+    "memberHint": "Have an account?",
+    "memberLink": "Manage it on your privacy page",
+    "form": {
+      "email": "E-mail",
+      "emailHint": "The address you used to order or sign up.",
+      "type": "You would like to",
+      "typeHints": {
+        "export": "Receive a JSON file with the data we hold for this e-mail.",
+        "correct": "Tell us which details are wrong.",
+        "delete": "Anonymise your personal data; accounting details are kept.",
+        "withdrawConsent": "Stop promotional e-mails and messages."
+      },
+      "details": "Notes (optional)",
+      "detailsRequired": "What needs correcting",
+      "submit": "Send request",
+      "sent": "If the address is valid, a confirmation link is on its way. It is valid for 24 hours.",
+      "another": "Send another request"
+    },
+    "confirm": {
+      "metaTitle": "Confirm your request",
+      "title": "Confirm your request",
+      "intro": "Check the details below and confirm to file the request.",
+      "email": "E-mail",
+      "type": "Request",
+      "details": "Notes",
+      "submit": "Confirm request",
+      "done": "Request received. Due by {date}. We will e-mail you with the outcome.",
+      "doneExport": "Request received. The download link will be e-mailed to you in a few minutes.",
+      "doneImmediate": "Done: you will no longer receive promotional messages.",
+      "invalidTitle": "This link is no longer valid",
+      "invalidText": "The confirmation link is invalid or older than 24 hours. Please send the request again.",
+      "again": "Send the request again"
+    }
   }
 }

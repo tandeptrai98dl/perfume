@@ -18,7 +18,6 @@ import { getProducer } from '@/server/jobs/producer';
 import { DomainError, type DomainErrorCode, type FieldIssue } from '@/server/lib/command-context';
 import { errorFields, logger } from '@/server/lib/logger';
 import {
-  countRecentOrdersByIp,
   findOrderByCheckoutKey,
   placeOrder,
   quoteCheckout,
@@ -29,6 +28,8 @@ import { listWards, type AdminUnit } from '@/server/modules/customer';
 import { createPaymentSession } from '@/server/modules/payment';
 import { grantOrderAccess } from '@/server/order-access';
 import { checkoutResultUrl, paymentDeps } from '@/server/payment-access';
+import { guardRequest } from '@/server/request-guard';
+import { TURNSTILE_ACTIONS } from '@/lib/turnstile';
 
 /*
  * Checkout Server Actions (§10.4). The storefront is public, so there is no permission check:
@@ -38,15 +39,17 @@ import { checkoutResultUrl, paymentDeps } from '@/server/payment-access';
  */
 
 export type CheckoutActionError =
-  DomainErrorCode | 'validation' | 'cartUnavailable' | 'rateLimited' | 'unexpected';
+  | DomainErrorCode
+  | 'validation'
+  | 'cartUnavailable'
+  | 'rateLimited'
+  | 'captchaFailed'
+  | 'unexpected';
 
 export type CheckoutFailure = { ok: false; error: CheckoutActionError; fieldErrors: FieldIssue[] };
 
 /** VNPay orders go straight to the gateway (§10.4); the client navigates there. */
 export type PlaceOrderRedirect = { ok: true; gatewayUrl: string };
-
-/** Place order 5/min/IP (§12). */
-const PLACE_ORDER_LIMIT_PER_MINUTE = 5;
 
 const CODE_PATTERN = /^[a-zA-Z]+$/;
 
@@ -92,6 +95,7 @@ async function vnpayGatewayUrl(
  */
 export async function placeOrderAction(
   raw: unknown,
+  turnstileToken?: unknown,
 ): Promise<CheckoutFailure | PlaceOrderRedirect> {
   const parsed = checkoutFormSchema.safeParse(raw);
   if (!parsed.success) {
@@ -110,9 +114,13 @@ export async function placeOrderAction(
     redirect(resultPath(existing, existing.locale));
   }
 
-  if (context.ip && (await countRecentOrdersByIp(db, context.ip)) >= PLACE_ORDER_LIMIT_PER_MINUTE) {
-    return { ok: false, error: 'rateLimited', fieldErrors: [] };
-  }
+  // Place order 5/min/IP (§12, shared limiter) + Turnstile when configured. A repeated submit
+  // above returns the first order without a new token.
+  const guard = await guardRequest({
+    scope: 'placeOrder',
+    turnstile: { token: turnstileToken, action: TURNSTILE_ACTIONS.placeOrder },
+  });
+  if (!guard.ok) return { ok: false, error: guard.error, fieldErrors: [] };
 
   const { cart, shopper } = await getCheckoutCart();
   if (!cart) {

@@ -3,11 +3,11 @@
 import 'server-only';
 
 import { updateTag } from 'next/cache';
-import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { AuthorizationError, requirePermission } from '@/server/auth/guards';
 import { getDb } from '@/server/db/client';
+import { getClientIp } from '@/server/request-ip';
 import { getProducer } from '@/server/jobs/producer';
 import { errorFields, logger } from '@/server/lib/logger';
 import { contentTags } from '@/server/modules/catalog/cache-tags';
@@ -44,13 +44,10 @@ import {
 export type ActionResult =
   { ok: true; id: string } | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
-const ipSchema = z.union([z.ipv4(), z.ipv6()]);
 const idInput = z.uuid();
 
 async function actorFrom(userId: string): Promise<Actor> {
-  const forwarded = (await headers()).get('x-forwarded-for')?.split(',')[0]?.trim();
-  const ip = ipSchema.safeParse(forwarded);
-  return { id: userId, ip: ip.success ? ip.data : null };
+  return { id: userId, ip: await getClientIp() };
 }
 
 function fieldErrors(error: z.ZodError): Record<string, string> {

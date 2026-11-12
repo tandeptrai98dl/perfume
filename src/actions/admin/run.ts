@@ -1,14 +1,12 @@
 import 'server-only';
 
-import { isIP } from 'node:net';
-
 import { refresh, revalidateTag } from 'next/cache';
-import { headers } from 'next/headers';
 import type { z } from 'zod';
 
 import { AuthorizationError, requirePermission } from '@/server/auth/guards';
 import type { Permission } from '@/server/auth/permissions';
 import { getDb } from '@/server/db/client';
+import { getClientIp } from '@/server/request-ip';
 import { getProducerBoss } from '@/server/jobs/producer';
 import {
   DomainError,
@@ -54,12 +52,6 @@ export function zodFieldErrors(error: z.ZodError): FieldIssue[] {
   }));
 }
 
-async function clientIp(): Promise<string | null> {
-  const list = await headers();
-  const forwarded = list.get('x-forwarded-for')?.split(',')[0]?.trim() ?? list.get('x-real-ip');
-  return forwarded && isIP(forwarded) ? forwarded : null;
-}
-
 export async function runAdminAction<S extends z.ZodType, T>(
   schema: S,
   rawInput: unknown,
@@ -87,7 +79,7 @@ export async function runAdminAction<S extends z.ZodType, T>(
       db: getDb(),
       boss: await getProducerBoss(),
       actor: { id: session.user.id, role: session.user.role ?? 'customer' },
-      ip: await clientIp(),
+      ip: await getClientIp(),
       onSlugChanges,
     };
     const result = await command(ctx, parsed.data);

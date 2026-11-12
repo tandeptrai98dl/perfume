@@ -5,7 +5,7 @@ import { orders, payments } from '@/server/db/schema';
 import type { Tx } from '@/server/lib/command-context';
 import { lockOrder, transitionOrder } from '@/server/modules/order';
 
-import { openRefundTotal, queueRefund, SYSTEM_ACTOR } from './ledger';
+import { alertStaff, openRefundTotal, queueRefund, SYSTEM_ACTOR } from './ledger';
 import {
   computePaymentStatus,
   isRequirementCovered,
@@ -124,6 +124,11 @@ export async function settleOrderAfterEdit(
       reason: input.reason ?? 'order_edited',
       method: source.method,
       actorId: input.actorId,
+    });
+    // Someone has to send the money back: tell staff now (ADR-0019; amount only, no PII).
+    await alertStaff(boss, tx, 'edit_refund', {
+      orderId: order.id,
+      message: `Order edit left ${effect.refund} VND above the new total; refund queued.`,
     });
   }
 

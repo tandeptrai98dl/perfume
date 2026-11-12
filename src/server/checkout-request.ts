@@ -1,12 +1,12 @@
 import 'server-only';
 
-import { isIP } from 'node:net';
-
 import { cookies, headers } from 'next/headers';
 
 import { getSession } from '@/server/auth/guards';
 import { getDb } from '@/server/db/client';
 import { CART_COOKIE, findActiveCart, type CartRow } from '@/server/modules/cart';
+
+import { getClientIp } from './request-ip';
 
 /*
  * Request-scoped context for the checkout page and its Server Actions (Next-only: cookies,
@@ -52,10 +52,6 @@ export async function getCheckoutCart(): Promise<{
 }
 
 export async function requestContext(): Promise<{ ip: string | null; userAgent: string | null }> {
-  const list = await headers();
-  const forwarded = list.get('x-forwarded-for')?.split(',')[0]?.trim() ?? list.get('x-real-ip');
-  return {
-    ip: forwarded && isIP(forwarded) ? forwarded : null,
-    userAgent: list.get('user-agent'),
-  };
+  const [list, ip] = await Promise.all([headers(), getClientIp()]);
+  return { ip, userAgent: list.get('user-agent') };
 }

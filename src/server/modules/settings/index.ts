@@ -48,3 +48,28 @@ export async function getCommerceSettings(db: Pick<Database, 'select'>): Promise
     returnsWindowDays: v['returns.windowDays'],
   };
 }
+
+// ---------- M3 e-invoicing (D13) ----------
+/**
+ * VAT rate applied to every invoice line (goods and fees), in percent. Default 10 % (standard
+ * rate for perfume/cosmetics) — PENDING ACCOUNTANT CONFIRMATION (ADR-0013): a temporary
+ * reduced rate (8 %) may apply in some periods. Prices are VAT-inclusive; the invoice splits
+ * each line into taxable amount + VAT. Stored as the `einvoice.vatRatePercent` setting.
+ */
+export const EINVOICE_VAT_RATES = [0, 5, 8, 10] as const;
+const einvoiceSchema = z.object({
+  'einvoice.vatRatePercent': z
+    .number()
+    .int()
+    .refine((rate) => (EINVOICE_VAT_RATES as readonly number[]).includes(rate))
+    .default(10),
+});
+
+export type EinvoiceSettings = { vatRatePercent: number };
+
+export async function getEinvoiceSettings(db: Pick<Database, 'select'>): Promise<EinvoiceSettings> {
+  const keys = Object.keys(einvoiceSchema.shape);
+  const rows = await db.select().from(settings).where(inArray(settings.key, keys));
+  const parsed = einvoiceSchema.safeParse(Object.fromEntries(rows.map((r) => [r.key, r.value])));
+  return { vatRatePercent: parsed.success ? parsed.data['einvoice.vatRatePercent'] : 10 };
+}

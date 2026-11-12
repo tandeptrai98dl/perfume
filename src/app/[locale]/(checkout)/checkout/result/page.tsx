@@ -1,8 +1,5 @@
-import { isIP } from 'node:net';
-
 import { AlertCircle, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
@@ -17,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
 import { getDb } from '@/server/db/client';
+import { getClientIp } from '@/server/request-ip';
 import { getPaymentGateways } from '@/server/integrations/payments';
 import { errorFields, logger } from '@/server/lib/logger';
 import {
@@ -72,16 +70,12 @@ function ResultSkeleton() {
 
 const ONLINE_ORDER: OnlineProvider[] = ['payos', 'vnpay'];
 
-async function clientIp(): Promise<string | null> {
-  const list = await headers();
-  const forwarded = list.get('x-forwarded-for')?.split(',')[0]?.trim() ?? list.get('x-real-ip');
-  return forwarded && isIP(forwarded) ? forwarded : null;
-}
-
 /**
  * Session creations in flight in this process, per order. Next.js can render this page twice
  * for one request (e.g. the place-order redirect); both renders must share one session instead
- * of the second cancelling the first while its gateway call is still running.
+ * of the second cancelling the first while its gateway call is still running. Across instances
+ * `createPaymentSession` itself waits for an in-flight session (M3); this map only saves the
+ * second render from polling the database.
  */
 const firstSessions = new Map<string, Promise<boolean>>();
 
@@ -113,7 +107,7 @@ async function openFirstSession(
     await createPaymentSession(await paymentDeps(), {
       orderId: result.orderId,
       provider: preferred,
-      ipAddress: await clientIp(),
+      ipAddress: await getClientIp(),
       returnUrl: checkoutResultUrl(locale, result.code),
     });
     return true;

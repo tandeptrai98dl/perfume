@@ -17,7 +17,9 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { TurnstileWidget, useTurnstile } from '@/components/ui/turnstile-widget';
 import { useRouter } from '@/i18n/navigation';
+import { TURNSTILE_ACTIONS } from '@/lib/turnstile';
 import { orderLookupSchema } from '@/lib/validation/account';
 
 import { AccountFormMessage, FormNotice } from './form-message';
@@ -26,8 +28,12 @@ import { AccountFormMessage, FormNotice } from './form-message';
 export function OrderLookupForm({ defaultCode = '' }: { defaultCode?: string }) {
   const t = useTranslations('orderLookup');
   const tErrors = useTranslations('account.errors');
+  const tSecurity = useTranslations('security');
   const router = useRouter();
-  const [notice, setNotice] = useState<'notFound' | 'rateLimited' | 'unexpected' | null>(null);
+  const turnstile = useTurnstile(TURNSTILE_ACTIONS.orderLookup);
+  const [notice, setNotice] = useState<
+    'notFound' | 'rateLimited' | 'captchaFailed' | 'unexpected' | null
+  >(null);
   const form = useForm<
     z.input<typeof orderLookupSchema>,
     unknown,
@@ -39,7 +45,8 @@ export function OrderLookupForm({ defaultCode = '' }: { defaultCode?: string }) 
 
   async function onSubmit(values: z.output<typeof orderLookupSchema>) {
     setNotice(null);
-    const result = await lookupOrderAction(values);
+    const result = await lookupOrderAction(values, turnstile.token);
+    turnstile.reset();
     if (result.ok) {
       router.push({ pathname: '/order-lookup', query: { code: result.code } });
       router.refresh();
@@ -58,7 +65,11 @@ export function OrderLookupForm({ defaultCode = '' }: { defaultCode?: string }) 
       >
         {notice && (
           <FormNotice tone="error">
-            {notice === 'unexpected' ? tErrors('unexpected') : t(notice)}
+            {notice === 'unexpected'
+              ? tErrors('unexpected')
+              : notice === 'captchaFailed'
+                ? tSecurity('captchaFailed')
+                : t(notice)}
           </FormNotice>
         )}
         <FormField
@@ -93,6 +104,7 @@ export function OrderLookupForm({ defaultCode = '' }: { defaultCode?: string }) 
             </FormItem>
           )}
         />
+        <TurnstileWidget {...turnstile.widgetProps} />
         <Button type="submit" loading={form.formState.isSubmitting}>
           {t('submit')}
         </Button>

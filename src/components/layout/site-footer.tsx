@@ -4,8 +4,10 @@ import type { Route } from 'next';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 
+import { CookieSettingsButton } from '@/components/privacy/cookie-settings-button';
 import { getMenu, getSellerInfo } from '@/data/content';
 import type { Locale } from '@/i18n/routing';
+import { localizedPath } from '@/lib/seo/paths';
 import type { MenuItem } from '@/server/modules/content';
 
 /**
@@ -13,7 +15,7 @@ import type { MenuItem } from '@/server/modules/content';
  * information required on Vietnamese e-commerce sites (§1.5), read from settings.
  */
 export async function SiteFooter() {
-  const t = await getTranslations();
+  const [t, locale] = await Promise.all([getTranslations(), getLocale()]);
   return (
     <footer className="border-line-200 bg-sand-100 mt-(--spacing-section) border-t lg:mt-(--spacing-section-lg)">
       <div className="container-content flex flex-col gap-10 py-12">
@@ -29,9 +31,21 @@ export async function SiteFooter() {
         <Suspense fallback={null}>
           <SellerInformation />
         </Suspense>
-        <p className="text-small text-taupe-600">
-          {t('footer.copyright', { siteName: t('metadata.siteName') })}
-        </p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <p className="text-small text-taupe-600">
+            {t('footer.copyright', { siteName: t('metadata.siteName') })}
+          </p>
+          {/* M3 privacy: re-open cookie preferences; privacy request form for guests. */}
+          <div className="flex flex-wrap items-center gap-x-6">
+            <CookieSettingsButton className="text-small hover:text-gold-700 inline-flex min-h-11 items-center text-taupe-600 underline-offset-4 hover:underline md:min-h-9" />
+            <Link
+              href={localizedPath(locale as Locale, '/privacy-request') as Route}
+              className="text-small hover:text-gold-700 inline-flex min-h-11 items-center text-taupe-600 underline-offset-4 hover:underline md:min-h-9"
+            >
+              {t('footer.privacyRequest')}
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );
@@ -98,14 +112,44 @@ async function SellerInformation() {
     seller.phone && t('phone', { value: seller.phone }),
     seller.email && t('email', { value: seller.email }),
   ].filter(Boolean);
-  if (lines.length === 0) return null;
+  if (lines.length === 0 && !seller.moitNotificationUrl) return null;
   return (
-    <section aria-label={t('title')} className="border-line-200 border-t pt-6">
+    <section
+      aria-label={t('title')}
+      className="border-line-200 flex flex-col gap-6 border-t pt-6 md:flex-row md:items-start md:justify-between"
+    >
       <address className="text-small flex flex-col gap-1 text-taupe-600 not-italic">
         {lines.map((line) => (
           <span key={line as string}>{line}</span>
         ))}
       </address>
+      {/* E-commerce Law 122/2025: notified-website badge, hidden until the record URL is set. */}
+      {seller.moitNotificationUrl && (
+        <a
+          href={seller.moitNotificationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="moit-badge"
+          className="inline-flex shrink-0 items-center self-start"
+        >
+          {seller.moitBadgeImageUrl ? (
+            // External official badge image (online.gov.vn), fixed size: no layout shift.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={seller.moitBadgeImageUrl}
+              alt={t('moitBadge')}
+              width={150}
+              height={57}
+              loading="lazy"
+              className="h-14 w-auto"
+            />
+          ) : (
+            <span className="border-line-200 text-small inline-flex min-h-11 items-center border px-3 text-taupe-600">
+              {t('moitBadge')}
+            </span>
+          )}
+        </a>
+      )}
     </section>
   );
 }

@@ -62,18 +62,24 @@ export const JOBS = {
         'late_payment_refund',
         'low_stock',
         'job_failed',
+        // M3: e-invoice failed for good; staff edit queued a refund.
+        'einvoice_failed',
+        'edit_refund',
       ]),
       orderId: z.uuid().optional(),
       message: z.string().max(500).optional(),
     }),
     queue: retryPolicy,
   },
-  /** Account emails (verification, password reset) in the user's locale. */
+  /**
+   * Account emails (verification, password reset) in the user's locale. `staff_invite` (M3
+   * admin stream): set-password link for an invited staff member (admin is Vietnamese only).
+   */
   'auth.email': {
     schema: z.object({
       to: z.email(),
       locale: z.enum(['vi', 'en']),
-      kind: z.enum(['verify_email', 'reset_password']),
+      kind: z.enum(['verify_email', 'reset_password', 'staff_invite']),
       url: z.url(),
     }),
     queue: retryPolicy,
@@ -93,6 +99,64 @@ export const JOBS = {
     schema: z.object({}).default({}),
     queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 300 },
   },
+
+  // ---------- M3: e-invoicing (D13) and manual-order payment links ----------
+  /**
+   * Issue the e-invoice of a delivered order (enqueued by `transitionOrder`, or by a staff
+   * retry). The handler counts its own attempts (timeline events) and stops after
+   * EINVOICE_MAX_ATTEMPTS = retryLimit + 1 with a `staff.alert`; backoff 2, 4, 8, 16, 32 min.
+   */
+  'einvoice.issue': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: { retryLimit: 5, retryDelay: 120, retryBackoff: true, expireInSeconds: 180 },
+  },
+  /** Manual order paid online: e-mail the payment page link to the customer (order locale). */
+  'order.payment-link': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: retryPolicy,
+  },
+
+  // ---------- M3: reviews (ADR-0008) ----------
+  /**
+   * Review invitation a few days after delivery: guest one-time links per line (hashed
+   * tokens, 30 days) or, for members, a link to the account's "Reviews to write".
+   */
+  'review.invite': {
+    schema: z.object({ orderId: z.uuid() }),
+    queue: retryPolicy,
+  },
+
+  // ---------- M3 hardening ----------
+  /** Cron: delete expired `rate_limits` counters (shared limiter, §12). */
+  'system.prune-rate-limits': {
+    schema: z.object({}).default({}),
+    queue: { ...retryPolicy, retryLimit: 1, expireInSeconds: 120 },
+  },
+
+  // ---------- M3 privacy: data-subject requests (PDPL 91/2025, Decree 356/2025) ----------
+  /** Guest request: e-mail with the signed confirmation link (request created on confirm). */
+  'privacy.verify-request': {
+    schema: z.object({
+      to: z.email(),
+      locale: z.enum(['vi', 'en']),
+      type: z.enum(['export', 'delete', 'correct', 'withdraw_consent']),
+      url: z.url(),
+    }),
+    queue: retryPolicy,
+  },
+  /** Customer e-mail about a request: received (with due date), completed or rejected. */
+  'privacy.notify': {
+    schema: z.object({
+      requestId: z.uuid(),
+      kind: z.enum(['received', 'completed', 'rejected']),
+    }),
+    queue: retryPolicy,
+  },
+  /** Completes an export request and e-mails the download link (valid 7 days). */
+  'privacy.export': {
+    schema: z.object({ requestId: z.uuid() }),
+    queue: retryPolicy,
+  },
 } as const;
 
 /** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */
@@ -100,6 +164,7 @@ export const CRON_JOBS: Partial<Record<keyof typeof JOBS, string>> = {
   'orders.expire-unpaid': '* * * * *',
   'orders.cancel-unconfirmed-cod': '*/5 * * * *',
   'orders.complete-delivered': '17 * * * *',
+  'system.prune-rate-limits': '41 * * * *',
 };
 
 export type JobName = keyof typeof JOBS;

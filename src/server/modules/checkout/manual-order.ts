@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 
 import type { Database } from '@/server/db/client';
 import { orders } from '@/server/db/schema';
+import { enqueue } from '@/server/jobs/queue';
 import { recordAudit } from '@/server/lib/audit';
 import {
   assertCan,
@@ -56,6 +57,8 @@ export type ManualOrderResult = {
   locale: 'vi' | 'en';
   /** Provider of the payment session the caller must open (null = none needed). */
   paymentLink: PaymentLinkProvider | null;
+  /** The payment link is e-mailed to the customer (`order.payment-link` job, M3). */
+  linkEmailed: boolean;
   duplicate: boolean;
 };
 
@@ -89,6 +92,7 @@ async function duplicateResult(
           ? (placed.paymentMethod as PaymentLinkProvider)
           : input.linkProvider
         : null,
+    linkEmailed: false,
     duplicate: true,
   };
 }
@@ -183,6 +187,13 @@ export async function placeManualOrder(
         });
       }
 
+      // Payment link: e-mailed to the customer automatically when we have an address
+      // (outbox; the worker checks the order still needs money online when it sends).
+      const linkEmailed = followUp.paymentLink !== null && contact.email !== '';
+      if (linkEmailed) {
+        await enqueue(ctx.boss, tx, 'order.payment-link', { orderId: placed.orderId });
+      }
+
       // No PII in the audit diff: contact fields are summarized as flags.
       await recordAudit(tx, {
         actorId: ctx.actor.id,
@@ -216,6 +227,7 @@ export async function placeManualOrder(
           depositRequired: placed.depositRequired,
           locale: placed.locale,
           paymentLink: followUp.paymentLink,
+          linkEmailed,
           duplicate: false,
         },
         tags,

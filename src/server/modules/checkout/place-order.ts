@@ -1,4 +1,4 @@
-import { and, count, eq, gt, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { PgBoss } from 'pg-boss';
 
 import type { Locale } from '@/i18n/routing';
@@ -131,25 +131,6 @@ export async function findOrderByCheckoutKey(
     paymentMethod: row.paymentMethod as PlacedOrder['paymentMethod'],
     duplicate: true,
   };
-}
-
-/** Web orders placed from one IP in the last `windowMs` (rate limit 5/min/IP, §12). */
-export async function countRecentOrdersByIp(
-  db: Executor,
-  ip: string,
-  windowMs = 60_000,
-  now: Date = new Date(),
-): Promise<number> {
-  const [row] = await db
-    .select({ n: count() })
-    .from(orders)
-    .where(
-      and(
-        sql`${orders.ipAddress} = ${ip}::inet`,
-        gt(orders.placedAt, new Date(now.getTime() - windowMs)),
-      ),
-    );
-  return row?.n ?? 0;
 }
 
 function invalid(issues: FieldIssue[]): never {

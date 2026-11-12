@@ -642,6 +642,7 @@ function ManualOrderResultPanel({
                   time: link.expiresAt ? format.dateTime(link.expiresAt) : '—',
                 })}
           </p>
+          {result.linkEmailed && <p className="text-small">{t('linkEmailed')}</p>}
         </div>
       )}
       <div className="flex flex-wrap gap-3">
