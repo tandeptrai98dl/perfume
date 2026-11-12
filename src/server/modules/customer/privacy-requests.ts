@@ -25,6 +25,7 @@ import { deleteCartsForUser } from '@/server/modules/cart';
 import { anonymizeOrdersForSubject, countOpenOrdersForSubject } from '@/server/modules/order';
 
 import { CONSENT_POLICY_VERSION, type ConsentPurpose } from './consents';
+import { syncAccountNewsletter } from './newsletter';
 import { eraseCustomerData, type PrivacySubject } from './privacy-erasure';
 import {
   canTransitionPrivacyRequest,
@@ -363,9 +364,12 @@ export async function updateAccountConsents(
       ([purpose, next, before]) =>
         next !== before || (cookieFirstAnswer && (purpose === 'analytics' || purpose === 'ads')),
     );
+    // M3 wave 2: the marketing e-mail row's id becomes the newsletter row's consent.
+    const marketingConsentId = newId();
     if (rows.length > 0) {
       await tx.insert(consents).values(
         rows.map(([purpose, granted]) => ({
+          id: purpose === 'marketing_email' ? marketingConsentId : newId(),
           userId: input.userId,
           email: purpose.startsWith('marketing') ? user.email : null,
           purpose,
@@ -383,6 +387,13 @@ export async function updateAccountConsents(
         .update(users)
         .set({ marketingOptIn: values.marketingEmail })
         .where(eq(users.id, input.userId));
+      await syncAccountNewsletter(tx, {
+        email: user.email,
+        locale: values.locale,
+        granted: values.marketingEmail,
+        consentId: marketingConsentId,
+        source: 'privacy_center',
+      });
     }
     return { changed: changed.map(([purpose]) => purpose) };
   });

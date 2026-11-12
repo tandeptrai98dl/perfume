@@ -170,6 +170,18 @@ export const JOBS = {
     schema: z.object({ requestId: z.uuid() }),
     queue: retryPolicy,
   },
+
+  // ---------- M3 wave 2: newsletter double opt-in (§2 Marketing) ----------
+  /** Sign-up: e-mail with the signed confirmation link (nothing stored before the click). */
+  'newsletter.confirm-request': {
+    schema: z.object({ to: z.email(), locale: z.enum(['vi', 'en']), url: z.url() }),
+    queue: retryPolicy,
+  },
+  /** Confirmed: welcome e-mail with the signed unsubscribe link (+ RFC 8058 headers). */
+  'newsletter.welcome': {
+    schema: z.object({ subscriberId: z.uuid() }),
+    queue: retryPolicy,
+  },
 } as const;
 
 /** Recurring jobs scheduled by the worker (pg-boss cron, UTC). */

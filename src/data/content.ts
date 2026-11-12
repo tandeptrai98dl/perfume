@@ -108,3 +108,18 @@ export async function getLiveBanners(placement: BannerPlacement, locale: Locale)
     content.isBannerLive(banner, now),
   );
 }
+
+// ---------- M3 wave 2 storefront: home and newsletter ----------
+
+/** Published policy pages of `locale` (`key`, title, localized path): trust strip, consent links. */
+export async function getPolicies(locale: Locale) {
+  'use cache';
+  cacheLife('max');
+  cacheTag(contentTags.pageList);
+  return content.listPublishedPolicies(getDb(), locale);
+}
+
+/** Path of the published policy with `key` in `locale`, or null. */
+export async function getPolicyPath(key: string, locale: Locale): Promise<string | null> {
+  return (await getPolicies(locale)).find((policy) => policy.key === key)?.path ?? null;
+}

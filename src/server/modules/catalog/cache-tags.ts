@@ -11,6 +11,8 @@ export const catalogTags = {
   collectionList: 'catalog:collections',
   familyList: 'catalog:families',
   noteList: 'catalog:notes',
+  /** Best-seller ranking (home rail, "best selling" sort); time-based, expire to refresh now. */
+  bestSellers: 'catalog:best-sellers',
   product: (id: string) => `product:${id}`,
   brand: (id: string) => `brand:${id}`,
   category: (id: string) => `category:${id}`,
