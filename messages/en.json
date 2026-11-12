@@ -33,7 +33,37 @@
     "brandsEyebrow": "Houses",
     "brandsTitle": "Brands",
     "viewAllBrands": "View all brands",
-    "featuredEmpty": "The collection is being updated."
+    "featuredEmpty": "The collection is being updated.",
+    "newEyebrow": "Just in",
+    "newTitle": "New arrivals",
+    "viewAllNew": "View all new arrivals",
+    "bestEyebrow": "Most loved",
+    "bestTitle": "Best sellers",
+    "viewAllBest": "View all best sellers",
+    "journalEyebrow": "Journal",
+    "journalTitle": "From the journal",
+    "viewJournal": "Read the journal",
+    "newsletterEyebrow": "Newsletter",
+    "newsletterTitle": "New scents, first",
+    "newsletterText": "New arrivals, fragrance guides and members-only offers, about twice a month. Unsubscribe anytime.",
+    "trust": {
+      "title": "Why shop with us",
+      "authentic": {
+        "title": "100% authentic",
+        "text": "Every bottle comes from authorised distributors, with full import papers.",
+        "link": "Our authenticity promise"
+      },
+      "returns": {
+        "title": "7-day returns",
+        "text": "Return sealed products within 7 days of delivery; defective items are replaced free.",
+        "link": "Returns policy"
+      },
+      "delivery": {
+        "title": "Fast delivery",
+        "text": "Carefully packed and shipped nationwide, with cash on delivery available.",
+        "link": "Shipping policy"
+      }
+    }
   },
   "notFound": {
     "title": "Page not found",
@@ -232,6 +262,26 @@
         "cta": "Open your privacy page",
         "ignore": "You can send the request again or contact us."
       }
+    },
+    "newsletter": {
+      "confirm": {
+        "subject": "Confirm your newsletter subscription",
+        "preview": "One click to confirm your subscription",
+        "heading": "Confirm your subscription",
+        "body": "Someone, hopefully you, asked to receive the Perfume Store newsletter at this address. Press the button to confirm.",
+        "cta": "Confirm subscription",
+        "expires": "This link is valid for 72 hours.",
+        "ignore": "If you did not sign up, ignore this e-mail: you will not be subscribed."
+      },
+      "welcome": {
+        "subject": "Welcome to the Perfume Store newsletter",
+        "preview": "You are subscribed",
+        "heading": "Welcome",
+        "body": "Thank you for subscribing. You will hear from us about new arrivals, fragrance guides and offers, about twice a month.",
+        "cta": "Explore perfumes"
+      },
+      "unsubscribeText": "Do not want these e-mails?",
+      "unsubscribeLink": "Unsubscribe"
     }
   },
   "ui": {
@@ -285,7 +335,11 @@
       "email": "Email: {value}",
       "moitBadge": "Notified to the Ministry of Industry and Trade"
     },
-    "privacyRequest": "Personal data requests"
+    "privacyRequest": "Personal data requests",
+    "newsletter": {
+      "title": "Join our newsletter",
+      "intro": "New arrivals, guides and offers by e-mail. We will ask you to confirm your address."
+    }
   },
   "journal": {
     "title": "Journal",
@@ -1541,6 +1595,47 @@
       "invalidTitle": "This link is no longer valid",
       "invalidText": "The confirmation link is invalid or older than 24 hours. Please send the request again.",
       "again": "Send the request again"
+    }
+  },
+  "newsletter": {
+    "email": "Newsletter e-mail address",
+    "submit": "Subscribe",
+    "consent": "I agree to receive news, new arrivals and offers from Perfume Store by e-mail. I can unsubscribe at any time with the link in every e-mail.",
+    "privacyLink": "How we handle your personal data",
+    "sent": "Almost done: check your inbox and press the link in our e-mail to confirm your subscription.",
+    "errors": {
+      "validation": "Please check the form.",
+      "invalid": "Please check this value.",
+      "emailInvalid": "Enter a valid e-mail address.",
+      "consentRequired": "Tick the box to agree to receive our e-mails.",
+      "rateLimited": "Too many attempts. Please try again in a few minutes.",
+      "captchaFailed": "We could not verify that you are human. Please try again.",
+      "invalidLink": "This link is invalid or has expired.",
+      "unexpected": "Something went wrong. Please try again."
+    },
+    "confirm": {
+      "metaTitle": "Confirm your subscription",
+      "title": "Confirm your subscription",
+      "intro": "Press the button to start receiving our newsletter at this address.",
+      "email": "Email",
+      "submit": "Confirm subscription",
+      "done": "Thank you, you are subscribed. A welcome e-mail is on its way.",
+      "already": "This address is already subscribed.",
+      "shop": "Explore perfumes",
+      "invalidTitle": "This link is invalid or has expired",
+      "invalidText": "Confirmation links are valid for 72 hours. Sign up again from the bottom of any page.",
+      "home": "Back to the home page"
+    },
+    "unsubscribe": {
+      "metaTitle": "Unsubscribe",
+      "title": "Unsubscribe from the newsletter",
+      "intro": "You will no longer receive marketing e-mails from us. Order e-mails are not affected.",
+      "email": "Email",
+      "submit": "Unsubscribe",
+      "done": "You are unsubscribed. You will not receive our newsletter any more.",
+      "invalidTitle": "This link is invalid",
+      "invalidText": "Use the unsubscribe link from one of our e-mails, or change your choice in your account's privacy centre.",
+      "home": "Back to the home page"
     }
   }
 }

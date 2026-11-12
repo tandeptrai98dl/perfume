@@ -53,6 +53,14 @@ const REVIEW_NOTES: Record<string, string> = {
     'Any staff session at the edge; `uploadMedia` then requires `products.editContent` or `content.manage`.',
   'src/app/api/admin/audit-log/export/route.ts':
     'Cross-site requests refused (Fetch Metadata); the export itself is audited.',
+  'src/actions/newsletter.ts#subscribeNewsletterAction':
+    'Anonymous allowed. Rate-limited + Turnstile; same answer for every e-mail (no enumeration); nothing stored before the e-mailed link is confirmed.',
+  'src/actions/newsletter.ts#confirmNewsletterAction':
+    'Signed, expiring double opt-in token is the authorisation; rate-limited.',
+  'src/actions/newsletter.ts#unsubscribeNewsletterAction':
+    'Signed unsubscribe link (HMAC of the subscriber id) is the authorisation; rate-limited.',
+  'src/app/api/newsletter/unsubscribe/route.ts':
+    'RFC 8058 one-click unsubscribe from mail clients; signed link, rate-limited, only ever unsubscribes.',
   'src/app/sitemap.xml/route.ts': 'Public sitemap index (published URLs only).',
   'src/app/sitemaps/[file]/route.ts': 'Public sitemaps (published URLs only).',
   'src/app/admin/login/page.tsx': 'Sign-in page.',

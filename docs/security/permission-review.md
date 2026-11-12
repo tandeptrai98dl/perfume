@@ -19,8 +19,8 @@ Every admin check also requires a staff session that passed TOTP within the last
 | --- | --- |
 | Admin Server Actions | 67 |
 | Admin Server Actions without a permission | 0 |
-| Storefront Server Actions | 25 |
-| Route Handlers | 18 |
+| Storefront Server Actions | 28 |
+| Route Handlers | 19 |
 | Admin pages | 59 |
 
 ## Admin Server Actions
@@ -109,6 +109,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/health` | GET | — | — | Liveness probe; no data. |
 | `/api/internal/revalidate` | POST | — | HMAC signature | Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session. |
 | `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only). |
+| `/api/newsletter/unsubscribe` | POST | — | — | RFC 8058 one-click unsubscribe from mail clients; signed link, rate-limited, only ever unsubscribes. |
 | `/api/payments/simulator/vnpay` | GET | — | simulator signature (non-production only); gateway signature + amount/txn_ref match + idempotency | Payment simulator: 404 unless the gateway runs in simulator mode (never in production). |
 | `/api/privacy/export/[id]` | GET | — | customer session (own data only) |  |
 | `/api/reviews` | GET | — | — |  |
@@ -139,6 +140,9 @@ No staff permission by design; the guard is ownership, a signed token or a rate 
 | `checkout.ts` | `listWardsAction` | — | yes | Public reference data (administrative units). |
 | `checkout.ts` | `placeOrderAction` | issues a signed order-access token | yes | Anonymous allowed. Rate-limited; prices recomputed on the server; returns a signed order-access token. |
 | `checkout.ts` | `quoteCheckoutAction` | — | yes | Anonymous allowed. Read-only price quote of the caller’s own cart; no PII returned. |
+| `newsletter.ts` | `confirmNewsletterAction` | — | yes | Signed, expiring double opt-in token is the authorisation; rate-limited. |
+| `newsletter.ts` | `subscribeNewsletterAction` | — | yes | Anonymous allowed. Rate-limited + Turnstile; same answer for every e-mail (no enumeration); nothing stored before the e-mailed link is confirmed. |
+| `newsletter.ts` | `unsubscribeNewsletterAction` | — | yes | Signed unsubscribe link (HMAC of the subscriber id) is the authorisation; rate-limited. |
 | `order-lookup.ts` | `lookupOrderAction` | issues a signed order-access token | yes | Guest order lookup: order code + phone, rate-limited, generic failure (no enumeration). |
 | `payment.ts` | `startPaymentAction` | order access (owner session or signed order token) | yes | Owner session or signed order token; unknown and foreign orders answer the same. |
 | `privacy.ts` | `confirmGuestPrivacyAction` | — | yes |  |

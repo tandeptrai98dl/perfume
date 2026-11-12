@@ -33,7 +33,37 @@
     "brandsEyebrow": "Nhà hương",
     "brandsTitle": "Thương hiệu",
     "viewAllBrands": "Xem tất cả thương hiệu",
-    "featuredEmpty": "Bộ sưu tập đang được cập nhật."
+    "featuredEmpty": "Bộ sưu tập đang được cập nhật.",
+    "newEyebrow": "Mới về",
+    "newTitle": "Hàng mới về",
+    "viewAllNew": "Xem tất cả hàng mới",
+    "bestEyebrow": "Được yêu thích",
+    "bestTitle": "Bán chạy nhất",
+    "viewAllBest": "Xem tất cả sản phẩm bán chạy",
+    "journalEyebrow": "Tạp chí",
+    "journalTitle": "Từ tạp chí",
+    "viewJournal": "Đọc tạp chí",
+    "newsletterEyebrow": "Bản tin",
+    "newsletterTitle": "Biết mùi hương mới trước tiên",
+    "newsletterText": "Hàng mới về, cẩm nang mùi hương và ưu đãi dành riêng cho bạn, khoảng hai lần mỗi tháng. Hủy đăng ký bất cứ lúc nào.",
+    "trust": {
+      "title": "Vì sao chọn chúng tôi",
+      "authentic": {
+        "title": "Chính hãng 100%",
+        "text": "Mọi chai nước hoa đều từ nhà phân phối chính thức, đầy đủ giấy tờ nhập khẩu.",
+        "link": "Cam kết chính hãng"
+      },
+      "returns": {
+        "title": "Đổi trả trong 7 ngày",
+        "text": "Đổi trả sản phẩm còn nguyên seal trong 7 ngày kể từ khi nhận hàng; hàng lỗi được đổi miễn phí.",
+        "link": "Chính sách đổi trả"
+      },
+      "delivery": {
+        "title": "Giao hàng nhanh",
+        "text": "Đóng gói cẩn thận, giao hàng toàn quốc, hỗ trợ thanh toán khi nhận hàng.",
+        "link": "Chính sách giao hàng"
+      }
+    }
   },
   "notFound": {
     "title": "Không tìm thấy trang",
@@ -232,6 +262,26 @@
         "cta": "Xem trang quyền riêng tư",
         "ignore": "Bạn có thể gửi lại yêu cầu hoặc liên hệ với chúng tôi."
       }
+    },
+    "newsletter": {
+      "confirm": {
+        "subject": "Xác nhận đăng ký bản tin",
+        "preview": "Một cú nhấp để xác nhận đăng ký",
+        "heading": "Xác nhận đăng ký",
+        "body": "Có người (hy vọng là bạn) đã đăng ký nhận bản tin Perfume Store bằng địa chỉ này. Nhấn nút bên dưới để xác nhận.",
+        "cta": "Xác nhận đăng ký",
+        "expires": "Liên kết có hiệu lực trong 72 giờ.",
+        "ignore": "Nếu bạn không đăng ký, hãy bỏ qua e-mail này: bạn sẽ không được thêm vào danh sách."
+      },
+      "welcome": {
+        "subject": "Chào mừng bạn đến với bản tin Perfume Store",
+        "preview": "Bạn đã đăng ký thành công",
+        "heading": "Chào mừng bạn",
+        "body": "Cảm ơn bạn đã đăng ký. Chúng tôi sẽ gửi bạn tin về hàng mới, cẩm nang mùi hương và ưu đãi, khoảng hai lần mỗi tháng.",
+        "cta": "Khám phá nước hoa"
+      },
+      "unsubscribeText": "Không muốn nhận những e-mail này?",
+      "unsubscribeLink": "Hủy đăng ký"
     }
   },
   "ui": {
@@ -285,7 +335,11 @@
       "email": "Email: {value}",
       "moitBadge": "Đã thông báo Bộ Công Thương"
     },
-    "privacyRequest": "Yêu cầu về dữ liệu cá nhân"
+    "privacyRequest": "Yêu cầu về dữ liệu cá nhân",
+    "newsletter": {
+      "title": "Đăng ký nhận bản tin",
+      "intro": "Hàng mới, cẩm nang và ưu đãi qua e-mail. Chúng tôi sẽ gửi e-mail để bạn xác nhận địa chỉ."
+    }
   },
   "journal": {
     "title": "Tạp chí",
@@ -3868,6 +3922,47 @@
         "completed": "Đã hoàn tất yêu cầu.",
         "rejected": "Đã từ chối yêu cầu."
       }
+    }
+  },
+  "newsletter": {
+    "email": "Địa chỉ e-mail nhận bản tin",
+    "submit": "Đăng ký",
+    "consent": "Tôi đồng ý nhận tin tức, sản phẩm mới và ưu đãi từ Perfume Store qua e-mail. Tôi có thể hủy đăng ký bất cứ lúc nào bằng liên kết trong mỗi e-mail.",
+    "privacyLink": "Cách chúng tôi xử lý dữ liệu cá nhân của bạn",
+    "sent": "Sắp xong: hãy kiểm tra hộp thư và nhấn vào liên kết trong e-mail của chúng tôi để xác nhận đăng ký.",
+    "errors": {
+      "validation": "Vui lòng kiểm tra lại biểu mẫu.",
+      "invalid": "Vui lòng kiểm tra lại giá trị này.",
+      "emailInvalid": "Nhập địa chỉ e-mail hợp lệ.",
+      "consentRequired": "Vui lòng đánh dấu ô đồng ý nhận e-mail từ chúng tôi.",
+      "rateLimited": "Bạn thử quá nhiều lần. Vui lòng thử lại sau vài phút.",
+      "captchaFailed": "Chúng tôi chưa xác minh được bạn. Vui lòng thử lại.",
+      "invalidLink": "Liên kết không hợp lệ hoặc đã hết hạn.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "confirm": {
+      "metaTitle": "Xác nhận đăng ký",
+      "title": "Xác nhận đăng ký bản tin",
+      "intro": "Nhấn nút bên dưới để bắt đầu nhận bản tin tại địa chỉ này.",
+      "email": "Email",
+      "submit": "Xác nhận đăng ký",
+      "done": "Cảm ơn bạn, bạn đã đăng ký thành công. E-mail chào mừng đang được gửi tới bạn.",
+      "already": "Địa chỉ này đã đăng ký nhận bản tin.",
+      "shop": "Khám phá nước hoa",
+      "invalidTitle": "Liên kết không hợp lệ hoặc đã hết hạn",
+      "invalidText": "Liên kết xác nhận có hiệu lực trong 72 giờ. Hãy đăng ký lại ở cuối bất kỳ trang nào.",
+      "home": "Về trang chủ"
+    },
+    "unsubscribe": {
+      "metaTitle": "Hủy đăng ký",
+      "title": "Hủy đăng ký bản tin",
+      "intro": "Bạn sẽ không nhận e-mail tiếp thị từ chúng tôi nữa. E-mail về đơn hàng không bị ảnh hưởng.",
+      "email": "Email",
+      "submit": "Hủy đăng ký",
+      "done": "Bạn đã hủy đăng ký. Bạn sẽ không nhận bản tin của chúng tôi nữa.",
+      "invalidTitle": "Liên kết không hợp lệ",
+      "invalidText": "Hãy dùng liên kết hủy đăng ký trong e-mail của chúng tôi, hoặc thay đổi lựa chọn trong mục quyền riêng tư của tài khoản.",
+      "home": "Về trang chủ"
     }
   }
 }

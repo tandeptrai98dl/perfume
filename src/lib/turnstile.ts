@@ -17,6 +17,8 @@ export const TURNSTILE_ACTIONS = {
   forgotPassword: 'forgot-password',
   orderLookup: 'order-lookup',
   placeOrder: 'place-order',
+  // M3 wave 2: newsletter sign-up (footer, home).
+  newsletter: 'newsletter',
 } as const;
 
 export type TurnstileAction = (typeof TURNSTILE_ACTIONS)[keyof typeof TURNSTILE_ACTIONS];
