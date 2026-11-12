@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 import {
   CONSENT_MODE_DEFAULTS,
   consentModeState,
   trackingCookieNames,
+  urlCarriesSecret,
   type CookieConsent,
 } from '@/lib/privacy/cookie-consent';
 
@@ -17,6 +19,8 @@ import {
  *   `ad_storage` granted (Meta does not read Consent Mode itself); the `cookie_consent_update`
  *   dataLayer event carries the choice for custom triggers.
  * - Withdrawal: Consent Mode is updated to denied and GA / Meta cookies are deleted.
+ * - Never started on a page whose URL carries a signed-link token (`urlCarriesSecret`): it
+ *   starts on the next clean page instead, so tags never record the token.
  *
  * CSP (owned by the hardening stream): the script is inserted by this bundle (works with
  * `'strict-dynamic'`); hosts are listed in docs/ARCHITECTURE.md §12 "Analytics hosts".
@@ -63,13 +67,18 @@ export function TagManager({
 }) {
   const analytics = consent?.analytics ?? false;
   const ads = consent?.ads ?? false;
+  // Re-checked on every navigation: a token page (e-mail link) defers loading to the next page.
+  const pathname = usePathname();
+  const applied = useRef<string | null>(null);
 
   useEffect(() => {
     if (!gtmId || !GTM_ID.test(gtmId)) return;
     const w = window as DataLayerWindow;
     const choice = { analytics, ads };
+    const key = `${analytics}:${ads}`;
     if (!w.__perfumeGtmLoaded) {
       if (!analytics && !ads) return;
+      if (urlCarriesSecret(window.location)) return;
       w.dataLayer = w.dataLayer ?? [];
       gtag('consent', 'default', CONSENT_MODE_DEFAULTS);
       gtag('consent', 'update', consentModeState(choice));
@@ -81,12 +90,16 @@ export function TagManager({
       script.dataset.consentGated = 'gtm';
       document.head.appendChild(script);
       w.__perfumeGtmLoaded = true;
+      applied.current = key;
       return;
     }
+    // A navigation alone (pathname) changes nothing once the container runs.
+    if (applied.current === key) return;
+    applied.current = key;
     gtag('consent', 'update', consentModeState(choice));
     w.dataLayer?.push({ event: 'cookie_consent_update', cookieConsent: choice });
     deleteTrackingCookies(choice);
-  }, [gtmId, analytics, ads]);
+  }, [gtmId, analytics, ads, pathname]);
 
   return null;
 }
