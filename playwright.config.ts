@@ -58,6 +58,9 @@ export default defineConfig({
           PAYMENT_SIMULATOR: process.env.PAYMENT_SIMULATOR ?? 'true',
           // Every test account signs in from one IP; the limits themselves are unit-tested.
           AUTH_RATE_LIMIT: 'off',
+          // Specs give each shopper its own IP via x-forwarded-for (place-order limit 5/min/IP).
+          // Only acceptable because nothing but the test runner can reach this server.
+          TRUSTED_IP_HEADER: 'x-forwarded-for',
         },
       },
 });

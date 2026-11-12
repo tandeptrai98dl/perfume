@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+// Browser only: Zod v4 probes `new Function` to compile object parsers, which the CSP
+// forbids (no 'unsafe-eval', ADR-0024). Set before the first parse below (clientEnv), which
+// is the first object parse on every page.
+if (typeof window !== 'undefined') z.config({ jitless: true });
+
 /**
  * Server-side environment schema. Validated once at boot (see `src/instrumentation.ts`).
  * Payment and other secrets live only here, never in the database (ADR-0007).

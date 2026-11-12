@@ -56,6 +56,7 @@ All decisions below are final. Items marked *external review* are implemented as
 | D20 | One domain for both languages (English under `/en`) | Consolidated SEO authority, one certificate, one Search Console property | [0020](./adr/0020-single-domain.md) |
 | D21 | English content is written or reviewed by an English editor; go-live requires ≥ 80% of active products with a published English translation | Machine translation hurts a luxury brand and SEO | [0021](./adr/0021-english-content-quality.md) |
 | D22 | Online-only, single warehouse in MVP; physical store / POS in Phase 3 via `locations` | Avoid multi-channel stock sync until needed | [0022](./adr/0022-online-only-single-warehouse.md) |
+| D24 | CSP without nonces: `'self'` + inline + documented host allowlist for scripts, everything else strict | Prerendered/cached shells (Cache Components) cannot carry a per-request nonce; measured | [0024](./adr/0024-csp-without-nonces.md) |
 
 ---
 
@@ -896,7 +897,7 @@ perfume-store/
 ### 10.5 After purchase (MVP)
 
 - Emails (in the order's locale): order confirmation, payment received, shipped (tracking code + carrier link), delivered, cancelled/refunded.
-- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP). The phone may be the contact or the delivery phone; any mismatch gets one generic message. A successful lookup sets the signed per-order access cookie; email links open the same read-only page with `?t=<orderAccessToken>`. M2: the limiter is in-memory per web process (`server/lib/rate-limit.ts`); the `rate_limits` table replaces it when the app runs on more than one instance.
+- Guest order lookup by order code + phone (rate limit 5 per 10 min per IP, Turnstile). The phone may be the contact or the delivery phone; any mismatch gets one generic message. A successful lookup sets the signed per-order access cookie; email links open the same read-only page with `?t=<orderAccessToken>`. The limiter is the shared `rate_limits` table (M3, §12).
 - Emails are sent by the worker only (outbox jobs). Each customer email is recorded in the order timeline (`order_events.type = 'email_sent'`, `metadata.key` such as `order_confirmation`, `status:shipped`, `payment:<id>`) and skipped when a retried job finds it; staff alerts likewise (`staff_alert_sent`). Staff alerts go to `STAFF_ALERT_EMAIL` and the Telegram bot (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`); each channel is skipped when unset, and the text carries only order code, amount, payment method and province.
 - Customers can cancel before `processing`; return requests within 7 days of delivery per D17 (form + reason + photos).
 - Reviews after `delivered`, marked "Verified purchase", moderated. Guests receive a review invitation email with a one-time token link (30 days; one review per purchased item) (D08).
@@ -988,8 +989,8 @@ Advanced reports (revenue by brand/channel, repeat-customer cohorts, margins fro
 | Data access | Customers read only their own orders (`user_id` in every query — IDOR protection); non-guessable order codes; guest lookup requires code + phone; review and payment-link tokens stored hashed, expiring, single-use |
 | Input/output | Zod on every input; parameterized Drizzle queries (no string-built SQL); rich text sanitized with an allowlist on render; uploads accept images only (magic-byte check, 10 MB limit, re-encoded with sharp, EXIF stripped) |
 | CSRF | Server Actions check Origin; mutating Route Handlers check Origin; webhooks rely on signatures |
-| HTTP headers | Strict CSP (script nonces, allowlist for GTM/VNPay), HSTS, `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `frame-ancestors 'none'` |
-| Rate limiting | Sign-in 10/min/IP, place order 5/min/IP, order lookup 5/10 min, coupon attempts 10/min/session; Cloudflare WAF + bot fight mode; `/api/webhooks/*` excluded from Turnstile/bot challenges and protected by signatures + gateway IP allowlist instead |
+| HTTP headers | CSP with a host allowlist (GTM/GA4/Pixel, Turnstile; `form-action` VNPay/payOS) and no nonces — prerendered/cached shells cannot carry a per-request nonce (D24); report-only switch `CSP_REPORT_ONLY`; HSTS, `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `frame-ancestors 'none'` |
+| Rate limiting | Sign-in 10/min/IP, place order 5/min/IP, order lookup 5/10 min, coupon attempts 10/min/cart, search suggestions 120/min/IP — one shared fixed-window limiter on `rate_limits` (`server/lib/rate-limit.ts`, `guardRequest` for public forms) keyed by the trusted client IP (`TRUSTED_IP_HEADER` only, never a client-set `x-forwarded-for`); Cloudflare WAF + bot fight mode; `/api/webhooks/*` excluded from Turnstile/bot challenges and protected by signatures + an optional gateway IP allowlist (`VNPAY_IPN_ALLOWED_IPS`, `PAYOS_WEBHOOK_ALLOWED_IPS`) instead |
 | Abuse | COD threshold + deposit; failed-delivery phone flag; quantity cap per line; coupon once per phone |
 | Secrets | Env validated with Zod at boot; payment secrets only in env/secret store, never in DB or admin (D07); `.env` never committed; Gitleaks in CI |
 | Dependencies | Pinned versions, Dependabot/Renovate, `pnpm audit` in CI; follow Next.js security releases (Next.js publishes scheduled security patches since 2026-07) |

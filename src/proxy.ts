@@ -2,6 +2,13 @@ import { getSessionCookie } from 'better-auth/cookies';
 import createMiddleware from 'next-intl/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { clientEnv, serverEnv } from './lib/env';
+import {
+  buildContentSecurityPolicy,
+  cspHeaderName,
+  reportingEndpoints,
+  type CspOptions,
+} from './lib/security/csp';
 import { matchLocalizedPath } from './lib/seo/paths';
 import { errorFields, logger } from './server/lib/logger';
 import { CATALOG_ROUTES } from './server/modules/catalog';
@@ -19,6 +26,8 @@ const PUBLIC_ADMIN_PATHS = new Set(['/admin/login']);
 
 /**
  * Next.js 16 proxy (formerly middleware).
+ * - Every page: the Content Security Policy (§12, ADR-0024), built from runtime env so
+ *   report-only mode and report endpoints switch without a rebuild (src/lib/security/csp.ts).
  * - Storefront: `redirects` table and content/catalogue existence (cached route table, no DB
  *   query per request), then locale routing (next-intl).
  * - /admin: optimistic cookie check only, so anonymous visitors get a fast redirect. The real
@@ -27,6 +36,7 @@ const PUBLIC_ADMIN_PATHS = new Set(['/admin/login']);
  */
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const csp = contentSecurityPolicy();
 
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     if (!PUBLIC_ADMIN_PATHS.has(pathname) && !getSessionCookie(request)) {
@@ -34,11 +44,43 @@ export default async function proxy(request: NextRequest) {
     }
     const response = NextResponse.next();
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');
-    return response;
+    return withCsp(response, csp);
   }
 
   const routed = await routeFromTable(request);
-  return routed ?? handleI18nRouting(request);
+  return withCsp(routed ?? handleI18nRouting(request), csp);
+}
+
+type Csp = { value: string; options: CspOptions; reportOnly: boolean };
+
+let cachedCsp: Csp | undefined;
+
+/** Same for every request (no nonce), so it is built once per process. */
+function contentSecurityPolicy(): Csp {
+  if (cachedCsp) return cachedCsp;
+  const env = serverEnv();
+  const options: CspOptions = {
+    isDev: env.NODE_ENV === 'development',
+    appUrl: env.APP_URL,
+    mediaBaseUrl: clientEnv.NEXT_PUBLIC_MEDIA_BASE_URL,
+    sentryDsn: clientEnv.NEXT_PUBLIC_SENTRY_DSN,
+    vnpayPaymentUrl: env.VNPAY_PAYMENT_URL,
+    reportUri: env.CSP_REPORT_URI,
+    environment: env.SENTRY_ENVIRONMENT ?? env.NODE_ENV,
+  };
+  cachedCsp = {
+    value: buildContentSecurityPolicy(options),
+    options,
+    reportOnly: env.CSP_REPORT_ONLY,
+  };
+  return cachedCsp;
+}
+
+function withCsp(response: NextResponse, csp: Csp): NextResponse {
+  response.headers.set(cspHeaderName(csp.reportOnly), csp.value);
+  const endpoints = reportingEndpoints(csp.options);
+  if (endpoints) response.headers.set('Reporting-Endpoints', endpoints);
+  return response;
 }
 
 /**

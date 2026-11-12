@@ -30,3 +30,4 @@ Template for new ADRs: copy `0000-template.md`, take the next number.
 | [0021](./0021-english-content-quality.md) | English content quality and go-live threshold | Accepted |
 | [0022](./0022-online-only-single-warehouse.md) | Online-only sales from a single warehouse | Accepted |
 | [0023](./0023-worker-build-and-outbox.md) | Worker build, transactional outbox and internal revalidation | Accepted |
+| [0024](./0024-csp-without-nonces.md) | Content Security Policy without nonces under Cache Components | Accepted |
