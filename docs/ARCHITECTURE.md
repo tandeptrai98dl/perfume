@@ -443,6 +443,8 @@ wishlists        PK(user_id, product_id)
 consents         user_id?, email?, phone?, purpose enum(terms, privacy, marketing_email,
                  marketing_sms, analytics, ads), granted bool, policy_version, locale,
                  source, ip, user_agent                    // append-only, never UPDATE
+                 // only exception: anonymisation clears email/phone/ip/user_agent (M3);
+                 // cookie choices store a truncated IP (/24, /48) and no contact data
 newsletter_subscribers  email UK, locale, status, consent_id FK, source
 privacy_requests user_id?, email, type enum(export, delete, correct, withdraw_consent),
                  status enum(received, in_progress, completed, rejected), due_at,
@@ -907,6 +909,7 @@ perfume-store/
 - After a guest order: one-step account creation; past orders with the same verified email are attached.
 - Preferred language (used for emails), order history, one-tap reorder, address book (max 10), wishlist, profile.
 - **Privacy centre:** view/withdraw consents, download personal data (JSON), request account deletion (personal data anonymized; orders retained for accounting).
+  *As implemented (M3):* `/tai-khoan/quyen-rieng-tu` (`/en/account/privacy`) has consent switches (marketing e-mail = `users.marketing_opt_in`, marketing SMS, and this browser's analytics/ads cookie choice), the account's consent history, and export / correction / deletion requests (one open request per type). Guests use `/quyen-rieng-tu/yeu-cau` (`/en/privacy-request`): a signed, 24-hour confirmation link is e-mailed (same answer for every address, nothing stored before confirmation); the confirm page files the request only after an explicit "Confirm" (mail scanners follow links). `due_at` per Decree 356/2025 art. 5: export and correction 10 days, withdrawal of consent 15 days (carried out at once), deletion 20 days. Exports are completed by the `privacy.export` job, which e-mails a signed link (`/api/privacy/export/<id>?e=&t=`, 7 days; also downloadable in the account for 7 days); the JSON is generated at download time and never stored. Every request gets a confirmation e-mail (`privacy.notify`) in the account's or the request's language.
 
 ### 10.7 Bilingual behaviour (MVP)
 
@@ -966,7 +969,9 @@ Fragrance Finder (quiz → 3–6 suggestions by family/occasion/budget), compari
 - **COD reconciliation:** create a remittance per carrier, tick the orders paid, compare with the bank receipt; failed deliveries → restock + phone risk flag.
 - **Internal alerts:** new order, high-value COD, invalid IPN signature/amount, low stock, e-invoice failure → email + Telegram bot (D19); channels configured in settings.
 - **Privacy requests:** list from the privacy centre with due dates; actions: export JSON, anonymize account; audited.
+  *As implemented (M3):* `/admin/privacy-requests` (permission `privacyRequests.handle`, Owner only per §11.1): queue sorted by due date with overdue flags, filters by status/type, search by e-mail; detail with the subject's open orders, history from `audit_logs`; actions: start, complete (with note), reject (reason required, e-mailed), re-send the export link, anonymise (type the e-mail to confirm). Anonymisation is refused while the subject has orders that are not `completed`/`cancelled`/`returned`, and for staff accounts. It removes addresses, wishlist, carts, sessions, OAuth/password accounts, 2FA, verification tokens and the newsletter row; overwrites the users row (name, e-mail → `deleted+<id>@anonymized.invalid`, phone, birthday; `banned`, `deleted_at`); on orders it clears name, e-mail, phone, notes, gift message, IP/user agent and the e-mail inside the VAT details, scrubs `order_addresses` and the address fields of `edited` event diffs, and keeps codes, items, totals, payments and VAT company details (accounting retention). Trade-off: the phone-based failed-delivery signal (D16) is lost for anonymised orders. Reviews and notification logs are anonymised through `ErasureStep` hooks owned by their modules.
 - **Settings:** company details (name, tax code, address, legal representative — shown in the footer), COD threshold and deposit %, gift-wrap fee, alert channels, SEO defaults, sender email. Payment secrets are not here (D07).
+  *M3 privacy stream:* the footer also shows the e-commerce notification badge when `company.moitNotificationUrl` (record on online.gov.vn) is set, with the official image from `company.moitBadgeImageUrl` or a text badge; legal pages (returns, shipping, payment, privacy, terms, cookies) are seeded as vi + en drafts marked "pending lawyer review" (`src/server/db/seed/legal-drafts.ts`); the English cookie policy stays unpublished until reviewed (the cookie banner then links the privacy policy).
 - **Staff & audit:** invite by email, assign role, enforce 2FA, lock accounts; audit log filterable by actor/entity/date with before/after diff.
 
 ### 11.3 Phase 2–3
@@ -995,6 +1000,8 @@ Advanced reports (revenue by brand/channel, repeat-customer cohorts, margins fro
 | Dependencies | Pinned versions, Dependabot/Renovate, `pnpm audit` in CI; follow Next.js security releases (Next.js publishes scheduled security patches since 2026-07) |
 | Personal data | TLS everywhere; managed-DB encryption at rest; phone/email masked in logs and Sentry; access logs kept 90 days; data-subject request and breach-notification procedures per Decree 356/2025 |
 | Operations | Daily DB backups + PITR, restore drill every quarter; append-only audit log; SSH keys only, root login disabled |
+
+**Analytics hosts (M3, for the CSP):** GTM is injected by the consent-gated tag loader (`src/components/privacy/tag-manager.tsx`) as a script created by our own bundle (allowed by `'strict-dynamic'`), only after consent and only when `NEXT_PUBLIC_GTM_ID` is set. Hosts the container needs: `script-src` https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://googleads.g.doubleclick.net; `connect-src` https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.facebook.com https://connect.facebook.net https://*.doubleclick.net; `img-src` https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.facebook.com https://*.doubleclick.net https://www.google.com.vn https://www.google.com; `frame-src` https://www.googletagmanager.com (preview mode) https://td.doubleclick.net. Consent Mode v2 defaults are `denied`; inside the container GA4 must fire only with `analytics_storage` granted and the Meta Pixel only with `ad_storage` granted (Meta ignores Consent Mode); the `cookie_consent_update` dataLayer event carries the choice. The footer badge image (`company.moitBadgeImageUrl`, online.gov.vn) needs `img-src` for its host if it is not uploaded to our media.
 
 **Before go-live:** OWASP ZAP baseline scan; manual payment tests (forged signature, wrong amount, replayed IPN, IPN after cancellation); review the permission check of every admin Server Action.
 
