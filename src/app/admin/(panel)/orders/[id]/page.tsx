@@ -72,6 +72,15 @@ async function Content({ params }: PageProps<'/admin/orders/[id]'>) {
           )
         }
         notifications={<NotificationLog rows={notifications} />}
+        customerHref={
+          hasPermission(role, 'customers.view')
+            ? order.userId
+              ? `/admin/customers/${order.userId}`
+              : order.contact.phone
+                ? `/admin/customers/g-${order.id}`
+                : null
+            : null
+        }
       />
     </>
   );

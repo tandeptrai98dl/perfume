@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, gte, like, lt, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, gte, inArray, like, lt, sql, type SQL } from 'drizzle-orm';
 
 import type { Database } from '@/server/db/client';
 import { auditLogs, users } from '@/server/db/schema';
@@ -160,4 +160,53 @@ export async function listAuditEntityTypes(db: Reader): Promise<string[]> {
     )
     select entity_type from types where entity_type is not null`);
   return result.rows.map((row) => row.entity_type);
+}
+
+// ---------- M3 wave 2 (customers stream): entity history read by the owning screen ----------
+
+export type EntityAuditEntry = {
+  id: string;
+  action: string;
+  actorName: string | null;
+  /** The stored diff, unredacted: only for screens whose permission covers its content. */
+  diff: Record<string, unknown> | null;
+  createdAt: Date;
+};
+
+/**
+ * Newest audit rows of one entity with the given actions (e.g. customer notes and COD risk
+ * changes on `/admin/customers/[id]`). Unlike the audit log viewer the diff is not redacted:
+ * callers show it only behind the permission that already grants the underlying data.
+ */
+export async function listEntityAuditEntries(
+  db: Pick<Database, 'select'>,
+  input: { entityType: string; entityId: string; actions: readonly string[]; limit?: number },
+): Promise<EntityAuditEntry[]> {
+  if (input.actions.length === 0) return [];
+  const rows = await db
+    .select({
+      id: auditLogs.id,
+      action: auditLogs.action,
+      actorName: users.name,
+      diff: auditLogs.diff,
+      createdAt: auditLogs.createdAt,
+    })
+    .from(auditLogs)
+    .leftJoin(users, eq(users.id, auditLogs.actorId))
+    .where(
+      and(
+        eq(auditLogs.entityType, input.entityType),
+        eq(auditLogs.entityId, input.entityId),
+        inArray(auditLogs.action, [...input.actions]),
+      ),
+    )
+    .orderBy(desc(auditLogs.id))
+    .limit(Math.min(input.limit ?? 50, 200));
+  return rows.map((row) => ({
+    ...row,
+    diff:
+      row.diff && typeof row.diff === 'object' && !Array.isArray(row.diff)
+        ? (row.diff as Record<string, unknown>)
+        : null,
+  }));
 }

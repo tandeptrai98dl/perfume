@@ -17,11 +17,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 67 |
+| Admin Server Actions | 69 |
 | Admin Server Actions without a permission | 0 |
 | Storefront Server Actions | 25 |
-| Route Handlers | 18 |
-| Admin pages | 59 |
+| Route Handlers | 19 |
+| Admin pages | 61 |
 
 ## Admin Server Actions
 
@@ -49,6 +49,8 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `content.ts` | `savePageAction` | `content.manage` | owner, manager, editor | yes |
 | `content.ts` | `savePostAction` | `content.manage` | owner, manager, editor | yes |
 | `content.ts` | `saveTopicAction` | `content.manage` | owner, manager, editor | yes |
+| `customers.ts` | `addCustomerNoteAction` | `customers.view` | owner, manager | yes |
+| `customers.ts` | `setCustomerCodRiskAction` | `customers.view` | owner, manager | yes |
 | `einvoices.ts` | `retryEinvoiceAction` | `orders.process` | owner, manager, staff | yes |
 | `inventory.ts` | `adjustStockAction` | `inventory.adjust` | owner, manager, staff | yes |
 | `inventory.ts` | `setLowStockThresholdAction` | `inventory.adjust` | owner, manager, staff | yes |
@@ -100,6 +102,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | Route | Method | Permission | Other guards | Review note |
 | --- | --- | --- | --- | --- |
 | `/api/admin/audit-log/export` | GET | `customers.export`, `auditLog.view` | — | Cross-site requests refused (Fetch Metadata); the export itself is audited. |
+| `/api/admin/customers/export` | GET | `customers.export` | — | Owner only; cross-site requests refused (Fetch Metadata); capped at 5,000 rows, formula-safe CSV, audited. |
 | `/api/admin/media` | POST | `admin.access` | Origin check | Any staff session at the edge; `uploadMedia` then requires `products.editContent` or `content.manage`. |
 | `/api/auth/[...all]` | GET | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
 | `/api/auth/[...all]` | POST | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
@@ -185,15 +188,17 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/content/topics/[id]` | `content.manage` | owner, manager, editor | — |  |
 | `/admin/content/topics/new` | `content.manage` | owner, manager, editor | — |  |
 | `/admin/content/topics` | `content.manage` | owner, manager, editor | — |  |
+| `/admin/customers/[id]` | `customers.view` | owner, manager | `privacyRequests.handle`, `auditLog.view` |  |
+| `/admin/customers` | `customers.view` | owner, manager | `customers.export` |  |
 | `/admin/forbidden` | — | — | — | Covered by the panel layout (any staff member). |
 | `/admin/inventory/movements` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/inventory` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/orders/[id]/edit` | `orders.editBeforeShipping` | owner, manager, staff | `orders.cancelPaid` |  |
-| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping`, `orders.process` |  |
+| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping`, `orders.process`, `customers.view` |  |
 | `/admin/orders/einvoices` | `orders.view` | owner, manager, staff | `orders.process` |  |
 | `/admin/orders/new` | `orders.createManual` | owner, manager, staff | `orders.process`, `payments.confirmBankTransfer` |  |
 | `/admin/orders` | `orders.view` | owner, manager, staff | `orders.createManual` |  |
-| `/admin` | `admin.access` | owner, manager, staff, editor | `orders.view`, `inventory.adjust` |  |
+| `/admin` | `admin.access` | owner, manager, staff, editor | `orders.view`, `inventory.adjust`, `customers.view` |  |
 | `/admin/payments/bank-transfers` | `payments.confirmBankTransfer` | owner, manager | — |  |
 | `/admin/payments/cod-remittances` | `payments.reconcileCod` | owner, manager | — |  |
 | `/admin/payments/events` | `payments.refund` | owner, manager | — |  |

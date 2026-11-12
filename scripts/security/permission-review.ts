@@ -53,6 +53,8 @@ const REVIEW_NOTES: Record<string, string> = {
     'Any staff session at the edge; `uploadMedia` then requires `products.editContent` or `content.manage`.',
   'src/app/api/admin/audit-log/export/route.ts':
     'Cross-site requests refused (Fetch Metadata); the export itself is audited.',
+  'src/app/api/admin/customers/export/route.ts':
+    'Owner only; cross-site requests refused (Fetch Metadata); capped at 5,000 rows, formula-safe CSV, audited.',
   'src/app/sitemap.xml/route.ts': 'Public sitemap index (published URLs only).',
   'src/app/sitemaps/[file]/route.ts': 'Public sitemaps (published URLs only).',
   'src/app/admin/login/page.tsx': 'Sign-in page.',
