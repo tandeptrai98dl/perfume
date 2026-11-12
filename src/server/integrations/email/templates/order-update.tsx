@@ -13,6 +13,7 @@ export const ORDER_UPDATE_KINDS = [
   'cancelled',
   'refunded',
   'updated',
+  'paymentLink',
 ] as const;
 export type OrderUpdateKind = (typeof ORDER_UPDATE_KINDS)[number];
 
@@ -30,7 +31,7 @@ export type OrderUpdateProps = {
   /** Amount of the payment that triggered `paymentReceived`. */
   paymentAmount?: number;
   shipment?: ShipmentEmailData | null;
-  /** `updated`: amount still to pay online after the edit, and where to pay it. */
+  /** `updated` / `paymentLink`: amount still to pay online, and where to pay it. */
   amountDueOnline?: number;
   payUrl?: string | null;
 };
@@ -155,6 +156,20 @@ export function OrderUpdateEmail({
         </>
       );
       break;
+    case 'paymentLink':
+      body = (
+        <>
+          <Text style={textStyle}>{t('email.order.paymentLink.body', { code })}</Text>
+          {amountDueOnline > 0 && (
+            <Text style={textStyle}>
+              {t('email.order.paymentLink.amount', { amount: f.money(amountDueOnline) })}
+            </Text>
+          )}
+          {payUrl && <EmailButton href={payUrl}>{t('email.order.paymentLink.pay')}</EmailButton>}
+          <Text style={mutedTextStyle}>{t('email.order.paymentLink.help')}</Text>
+        </>
+      );
+      break;
   }
 
   return (
@@ -171,13 +186,18 @@ export function OrderUpdateEmail({
       <Text style={textStyle}>{t('email.layout.greeting', { name: order.customerName })}</Text>
       {body}
       <EmailButton href={orderUrl}>{t('email.order.viewOrder')}</EmailButton>
-      {(kind === 'shipped' || kind === 'cancelled' || kind === 'updated') && (
+      {(kind === 'shipped' ||
+        kind === 'cancelled' ||
+        kind === 'updated' ||
+        kind === 'paymentLink') && (
         <>
           <OrderItems order={order} t={t} f={f} />
           <OrderTotals order={order} t={t} f={f} />
         </>
       )}
-      {(kind === 'shipped' || kind === 'updated') && <DeliveryAddress order={order} t={t} />}
+      {(kind === 'shipped' || kind === 'updated' || kind === 'paymentLink') && (
+        <DeliveryAddress order={order} t={t} />
+      )}
     </EmailLayout>
   );
 }

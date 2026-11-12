@@ -9,6 +9,7 @@ export {
   sendOrderConfirmation,
   sendOrderEdited,
   sendOrderUpdate,
+  sendPaymentLink,
   sendPaymentReceived,
   sendStaffAlert,
   sendStatusChangeEmail,
@@ -22,3 +23,14 @@ export {
 } from './staff-alerts';
 export { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';
 export { EMAIL_SENT_EVENT, STAFF_ALERT_EVENT } from './once';
+// ---------- M3 notification log (notification_logs) ----------
+export {
+  deliverLogged,
+  errorSummary,
+  listNotificationLogs,
+  logSkipped,
+  maskRecipient,
+  type NotificationChannel,
+  type NotificationLogRow,
+  type NotificationStatus,
+} from './log';
