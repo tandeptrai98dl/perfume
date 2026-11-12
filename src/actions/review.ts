@@ -118,7 +118,7 @@ export async function submitGuestReviewAction(raw: unknown): Promise<ReviewActio
   try {
     const { token, ...values } = parsed.data.review;
     await submitGuestReview(getDb(), { token, locale: parsed.data.locale, values });
-    refresh();
+    // No refresh(): the link page would re-render as "already used" over the thank-you note.
     return { ok: true };
   } catch (error) {
     return domainFailure(error, 'review.guest_submit');

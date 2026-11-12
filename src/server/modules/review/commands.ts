@@ -192,7 +192,12 @@ async function lockReview(tx: Tx, id: string) {
   return row;
 }
 
-export type ModerationResult = { id: string; status: ReviewStatus; adminReply: string | null };
+export type ModerationResult = {
+  id: string;
+  productId: string;
+  status: ReviewStatus;
+  adminReply: string | null;
+};
 
 /** Approve (publish) or reject (hide) a review; re-approving or re-rejecting is a no-op. */
 export async function moderateReview(
@@ -210,7 +215,12 @@ export async function moderateReview(
     const review = await lockReview(tx, input.id);
     if (review.status === input.decision) {
       return {
-        data: { id: review.id, status: review.status, adminReply: review.adminReply },
+        data: {
+          id: review.id,
+          productId: review.productId,
+          status: review.status,
+          adminReply: review.adminReply,
+        },
         tags: [],
       };
     }
@@ -228,7 +238,15 @@ export async function moderateReview(
       ip: ctx.ip,
     });
     const tags = await enqueueRevalidation(ctx.boss, tx, productTags(review.productId));
-    return { data: { id: review.id, status: input.decision, adminReply: review.adminReply }, tags };
+    return {
+      data: {
+        id: review.id,
+        productId: review.productId,
+        status: input.decision,
+        adminReply: review.adminReply,
+      },
+      tags,
+    };
   });
 }
 
@@ -242,7 +260,12 @@ export async function replyToReview(
     const review = await lockReview(tx, input.id);
     if (review.adminReply === input.reply) {
       return {
-        data: { id: review.id, status: review.status, adminReply: review.adminReply },
+        data: {
+          id: review.id,
+          productId: review.productId,
+          status: review.status,
+          adminReply: review.adminReply,
+        },
         tags: [],
       };
     }
@@ -263,6 +286,14 @@ export async function replyToReview(
       review.status === 'approved'
         ? await enqueueRevalidation(ctx.boss, tx, productTags(review.productId))
         : [];
-    return { data: { id: review.id, status: review.status, adminReply: input.reply }, tags };
+    return {
+      data: {
+        id: review.id,
+        productId: review.productId,
+        status: review.status,
+        adminReply: input.reply,
+      },
+      tags,
+    };
   });
 }

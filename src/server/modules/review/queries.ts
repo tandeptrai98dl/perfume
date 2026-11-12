@@ -232,16 +232,13 @@ export async function listMemberReviews(
 }
 
 /** Suggested public name for a member's review form (given name of the account name). */
-export async function memberReviewerName(
-  db: Executor,
-  input: { userId: string; locale: Locale },
-): Promise<string> {
+export async function memberReviewerName(db: Executor, input: { userId: string }): Promise<string> {
   const [row] = await db
     .select({ name: users.name })
     .from(users)
     .where(eq(users.id, input.userId))
     .limit(1);
-  return suggestedReviewerName(row?.name ?? null, input.locale);
+  return suggestedReviewerName(row?.name ?? null);
 }
 
 // ---------- Guest link ----------
@@ -268,7 +265,6 @@ export async function getInvitationByToken(
       orderStatus: orders.status,
       orderCode: orders.code,
       customerName: orders.customerName,
-      orderLocale: orders.locale,
       productName: orderItems.productName,
       variantLabel: orderItems.variantLabel,
       imageUrl: orderItems.imageUrl,
@@ -303,7 +299,7 @@ export async function getInvitationByToken(
     imageUrl: row.imageUrl,
     productSlug: row.productSlug,
     orderCode: row.orderCode,
-    suggestedName: suggestedReviewerName(row.customerName, row.orderLocale),
+    suggestedName: suggestedReviewerName(row.customerName),
   };
 }
 

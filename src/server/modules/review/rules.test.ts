@@ -109,9 +109,11 @@ describe('moderation and names', () => {
   });
 
   it('proposes the given name as display name', () => {
-    expect(suggestedReviewerName('Nguyễn Thị Hương', 'vi')).toBe('Hương');
-    expect(suggestedReviewerName('Jane Doe', 'en')).toBe('Jane');
-    expect(suggestedReviewerName('   ', 'vi')).toBe('');
-    expect(suggestedReviewerName(null, 'en')).toBe('');
+    expect(suggestedReviewerName('Nguyễn Thị Hương')).toBe('Hương');
+    expect(suggestedReviewerName('Nguyen Van An')).toBe('An');
+    expect(suggestedReviewerName('E2E Review Hương')).toBe('Hương');
+    expect(suggestedReviewerName('Jane Doe')).toBe('Jane');
+    expect(suggestedReviewerName('   ')).toBe('');
+    expect(suggestedReviewerName(null)).toBe('');
   });
 });

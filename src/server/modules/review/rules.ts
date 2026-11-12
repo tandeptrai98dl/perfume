@@ -117,13 +117,55 @@ export function summarize(
   };
 }
 
+/** Common Vietnamese family names (with and without diacritics), first word of a full name. */
+const VIETNAMESE_SURNAMES = new Set([
+  'nguyen',
+  'tran',
+  'le',
+  'pham',
+  'hoang',
+  'huynh',
+  'phan',
+  'vu',
+  'vo',
+  'dang',
+  'bui',
+  'do',
+  'ho',
+  'ngo',
+  'duong',
+  'ly',
+  'trinh',
+  'dinh',
+  'truong',
+  'lam',
+  'mai',
+  'cao',
+  'ta',
+  'luong',
+]);
+
+function looksVietnamese(words: string[]): boolean {
+  const fold = (word: string) =>
+    word
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/đ/gi, 'd')
+      .toLowerCase();
+  // Vietnamese diacritics anywhere, or a common family name first.
+  return (
+    words.some((word) => fold(word) !== word.toLowerCase()) ||
+    VIETNAMESE_SURNAMES.has(fold(words[0]!))
+  );
+}
+
 /**
- * Display name proposed in the form: the given name of a Vietnamese full name is its last
- * word ("Nguyễn Thị Hương" → "Hương"); other names keep their first word. The reviewer can
- * change it; it is shown publicly.
+ * Display name proposed in the form (the reviewer can change it; it is shown publicly): the
+ * given name, i.e. the last word of a Vietnamese full name ("Nguyễn Thị Hương" → "Hương"), the
+ * first word otherwise ("Jane Doe" → "Jane").
  */
-export function suggestedReviewerName(fullName: string | null, locale: 'vi' | 'en'): string {
+export function suggestedReviewerName(fullName: string | null): string {
   const words = (fullName ?? '').trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return '';
-  return (locale === 'vi' ? words.at(-1) : words[0])!.slice(0, 60);
+  return (looksVietnamese(words) ? words.at(-1) : words[0])!.slice(0, 60);
 }

@@ -56,7 +56,7 @@ async function Reviews({ params }: { params: Props['params'] }) {
   const [items, written, defaultName] = await Promise.all([
     listReviewableItems(db, { userId, locale }),
     listMemberReviews(db, { userId, locale }),
-    memberReviewerName(db, { userId, locale }),
+    memberReviewerName(db, { userId }),
   ]);
 
   return (
