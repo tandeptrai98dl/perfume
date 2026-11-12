@@ -43,6 +43,8 @@ go-live gate). Owner signs off in the go-live notes.
       `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (test alert received).
 - [ ] Media: `S3_*`, `MEDIA_STORAGE=s3`, `NEXT_PUBLIC_MEDIA_BASE_URL` (CDN URL, build arg).
 - [ ] First owner account created (`pnpm auth:create-staff` in the worker image) with TOTP.
+- [ ] Database seeded without demo data (`node dist/worker/seed.mjs`, no `SEED_DEMO`;
+      `legal.conflicts` empty) and `/admin/settings` filled in ([seed.md](./seed.md)).
 
 ## Payments (ADR-0007: keys only in env)
 

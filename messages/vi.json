@@ -1589,7 +1589,8 @@
       "reviewsSection": "Đánh giá",
       "reviews": "Kiểm duyệt đánh giá",
       "privacy": "Dữ liệu cá nhân",
-      "privacyRequests": "Yêu cầu dữ liệu"
+      "privacyRequests": "Yêu cầu dữ liệu",
+      "settings": "Cài đặt"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -2105,7 +2106,16 @@
       "useAnonymize": "Yêu cầu xoá được hoàn tất bằng thao tác ẩn danh hoá.",
       "notExport": "Đây không phải yêu cầu xuất dữ liệu.",
       "notDelete": "Đây không phải yêu cầu xoá dữ liệu.",
-      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này."
+      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này.",
+      "taxCodeInvalid": "Mã số thuế gồm 10 chữ số (chi nhánh: 10 số-3 số) hoặc 12 chữ số.",
+      "hotlineInvalid": "Số điện thoại gồm 6–20 ký tự: chữ số, dấu cách, + . - ( ).",
+      "moitUrlInvalid": "Dán đường dẫn hồ sơ của website trên online.gov.vn.",
+      "moitUrlRequired": "Cần đường dẫn hồ sơ thông báo trước khi hiển thị logo.",
+      "badgeUrlInvalid": "Dùng ảnh từ https://online.gov.vn hoặc đường dẫn bắt đầu bằng / trên website.",
+      "vatRateInvalid": "Thuế suất chỉ nhận 0, 5, 8 hoặc 10 %.",
+      "telegramChatIdInvalid": "Chat ID là số (nhóm bắt đầu bằng dấu -) hoặc @tên_kênh.",
+      "reservationShorterThanSession": "Thời gian giữ hàng phải dài hơn hoặc bằng phiên thanh toán.",
+      "tooMany": "Quá nhiều mục."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -3867,6 +3877,126 @@
         "anonymized": "Đã ẩn danh hoá dữ liệu.",
         "completed": "Đã hoàn tất yêu cầu.",
         "rejected": "Đã từ chối yêu cầu."
+      }
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "description": "Thông tin người bán, thanh toán & COD, đổi trả, hoá đơn điện tử, thông báo nội bộ, SEO và email gửi đi. Khoá cổng thanh toán, mật khẩu SMTP và token bot không lưu ở đây mà cấu hình bằng biến môi trường.",
+      "tabsLabel": "Nhóm cài đặt",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu cài đặt",
+      "noChanges": "Không có thay đổi nào để lưu",
+      "unsaved": "Có thay đổi chưa lưu",
+      "sections": {
+        "company": {
+          "tab": "Người bán",
+          "title": "Thông tin người bán",
+          "description": "Hiển thị ở chân trang và trang Liên hệ theo quy định về website thương mại điện tử. Để trống trường nào thì trường đó không hiển thị."
+        },
+        "checkout": {
+          "tab": "Thanh toán & COD",
+          "title": "Thanh toán, COD và giữ hàng",
+          "description": "Ngưỡng đặt cọc COD, thời gian xác nhận, phiên thanh toán online, thời gian giữ hàng và phí gói quà."
+        },
+        "returns": {
+          "tab": "Đổi trả",
+          "title": "Đổi trả",
+          "description": "Thời hạn nhận yêu cầu đổi trả tính từ ngày giao hàng."
+        },
+        "einvoice": {
+          "tab": "Hoá đơn điện tử",
+          "title": "Hoá đơn điện tử",
+          "description": "Thuế suất GTGT áp dụng cho mọi dòng hoá đơn (hàng hoá, phí giao hàng, phí gói quà)."
+        },
+        "alerts": {
+          "tab": "Thông báo nội bộ",
+          "title": "Kênh thông báo nội bộ",
+          "description": "Nơi nhận cảnh báo: đơn mới, COD giá trị cao, IPN đáng ngờ, sắp hết hàng, lỗi hoá đơn điện tử."
+        },
+        "seo": {
+          "tab": "SEO",
+          "title": "SEO mặc định",
+          "description": "Tiêu đề và mô tả mặc định của website cho từng ngôn ngữ. Để trống để dùng nội dung mặc định."
+        },
+        "email": {
+          "tab": "Email gửi đi",
+          "title": "Người gửi email",
+          "description": "Tên và địa chỉ hiển thị trong email gửi khách hàng và nhân viên."
+        }
+      },
+      "company": {
+        "name": "Tên doanh nghiệp",
+        "taxCode": "Mã số thuế",
+        "taxCodeHint": "10 chữ số, chi nhánh dạng 0123456789-001.",
+        "address": "Địa chỉ trụ sở",
+        "legalRepresentative": "Người đại diện theo pháp luật",
+        "phone": "Hotline",
+        "email": "Email liên hệ",
+        "businessRegistration": "Giấy phép kinh doanh",
+        "businessRegistrationHint": "Ví dụ: Giấy chứng nhận ĐKDN số …, cấp ngày …, nơi cấp ….",
+        "moitTitle": "Thông báo website với Bộ Công Thương",
+        "moitNote": "Logo \"Đã thông báo Bộ Công Thương\" chỉ hiện ở chân trang khi có đường dẫn hồ sơ. Không có ảnh thì hiển thị nhãn chữ.",
+        "moitNotificationUrl": "Đường dẫn hồ sơ trên online.gov.vn",
+        "moitNotificationUrlHint": "Ví dụ: http://online.gov.vn/Home/WebDetails/12345",
+        "moitBadgeImageUrl": "Ảnh logo đã thông báo",
+        "moitBadgeImageUrlHint": "Đường dẫn ảnh do online.gov.vn cung cấp, hoặc ảnh trên website (bắt đầu bằng /)."
+      },
+      "checkout": {
+        "pricesWarning": "Thay đổi ở đây ảnh hưởng ngay đến giá và điều kiện thanh toán khi khách đặt hàng (tiền cọc, phí gói quà, thời gian giữ hàng). Đơn đã đặt giữ nguyên điều kiện cũ.",
+        "codTitle": "Thanh toán khi nhận hàng (COD)",
+        "codMaxOrderWithoutDeposit": "Giá trị đơn tối đa không cần cọc (VND)",
+        "codMaxOrderWithoutDepositHint": "Đơn COD lớn hơn mức này phải đặt cọc online trước khi xác nhận.",
+        "codDepositPercent": "Tiền cọc (%)",
+        "codDepositPercentHint": "Phần trăm tổng đơn khách trả trước; đơn vị vận chuyển thu phần còn lại.",
+        "codConfirmationWindowHours": "Thời hạn xác nhận đơn COD (giờ)",
+        "codConfirmationWindowHoursHint": "Quá thời hạn mà chưa xác nhận, đơn tự huỷ và trả hàng về kho.",
+        "onlineTitle": "Thanh toán online",
+        "paymentSessionMinutes": "Phiên thanh toán (phút)",
+        "paymentSessionMinutesHint": "Thời gian một lần thanh toán qua VNPay/VietQR có hiệu lực.",
+        "onlineReservationMinutes": "Giữ hàng cho đơn online (phút)",
+        "onlineReservationMinutesHint": "Hết thời gian mà chưa thanh toán, đơn tự huỷ. Phải dài hơn hoặc bằng phiên thanh toán.",
+        "cartTitle": "Giỏ hàng",
+        "giftWrapFee": "Phí gói quà (VND)",
+        "giftWrapFeeHint": "Nhập 0 để miễn phí.",
+        "maxQuantityPerLine": "Số lượng tối đa mỗi sản phẩm",
+        "maxQuantityPerLineHint": "Giới hạn số lượng của một sản phẩm trong một đơn."
+      },
+      "returns": {
+        "policyWarning": "Thời hạn này dùng để tự động hoàn tất đơn đã giao. Khi đổi, hãy cập nhật cả trang Chính sách đổi trả (Nội dung → Trang tĩnh) để khách thấy cùng một con số.",
+        "windowDays": "Thời hạn đổi trả (ngày)",
+        "windowDaysHint": "Từ 7 đến 30 ngày kể từ khi giao hàng."
+      },
+      "einvoice": {
+        "pendingAccountant": "Chờ kế toán xác nhận: thuế suất, cách làm tròn theo dòng và việc áp cùng thuế suất cho phí giao hàng, phí gói quà. Chỉ đổi khi kế toán đã xác nhận.",
+        "vatRatePercent": "Thuế suất GTGT",
+        "vatRatePercentHint": "Giá bán đã gồm VAT; hoá đơn tách tiền hàng và tiền thuế. Áp dụng cho hoá đơn xuất sau khi lưu.",
+        "rate": "{rate} %"
+      },
+      "alerts": {
+        "precedence": "Giá trị lưu ở đây được dùng thay cho cấu hình máy chủ (STAFF_ALERT_EMAIL, TELEGRAM_CHAT_ID). Token của bot Telegram chỉ cấu hình trên máy chủ.",
+        "botConfigured": "Bot Telegram: đã cấu hình trên máy chủ.",
+        "botMissing": "Bot Telegram: chưa cấu hình token trên máy chủ, cảnh báo chỉ gửi qua email.",
+        "emailRecipients": "Email nhận cảnh báo",
+        "emailRecipientsHint": "Mỗi dòng một địa chỉ, tối đa 5. Để trống thì không gửi cảnh báo qua email.",
+        "emailRecipientsHintFallback": "Mỗi dòng một địa chỉ, tối đa 5. Để trống thì dùng địa chỉ cấu hình trên máy chủ.",
+        "telegramChatId": "Telegram chat ID",
+        "telegramChatIdHint": "ID của nhóm hoặc kênh nhận cảnh báo, ví dụ -1001234567890."
+      },
+      "seo": {
+        "legend": {
+          "vi": "Tiếng Việt",
+          "en": "Tiếng Anh"
+        },
+        "title": "Tiêu đề mặc định",
+        "titleHint": "Tối đa 70 ký tự, hiển thị sau tên website trên trang chủ.",
+        "description": "Mô tả mặc định",
+        "descriptionHint": "Tối đa 170 ký tự, dùng cho trang không có mô tả riêng."
+      },
+      "email": {
+        "fallback": "Để trống thì dùng người gửi cấu hình trên máy chủ: {from}",
+        "domainWarning": "Địa chỉ gửi phải thuộc tên miền đã cấu hình SPF/DKIM cho máy chủ email, nếu không email dễ vào thư rác.",
+        "senderName": "Tên người gửi",
+        "senderAddress": "Địa chỉ email gửi"
       }
     }
   }

@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { sql } from 'drizzle-orm';
 
 import { newId } from '@/server/lib/ids';
+import { settingDefaults } from '@/server/modules/settings';
 
 import { createDb, type Database } from '../client';
 import {
@@ -31,6 +32,7 @@ import {
 import { demoCatalog } from './demo-catalog';
 import { seedDemoCoupons, seedShipping } from './commerce';
 import { seedDemoContent } from './demo-content';
+import { seedLegalPages } from './legal-pages';
 import adminUnitsData from './data/vn-admin-units.json';
 
 type AdminUnits = {
@@ -83,17 +85,13 @@ async function seedAdminUnits(db: Database) {
   return { provinces: data.provinces.length, wards: data.wards.length };
 }
 
-/** Defaults from ADR-0006 and ADR-0016. Editable later in admin settings. */
-export const defaultSettings: Record<string, unknown> = {
-  'cod.maxOrderWithoutDeposit': 5_000_000,
-  'cod.depositPercent': 20,
-  'cod.confirmationWindowHours': 24,
-  'checkout.paymentSessionMinutes': 15,
-  'checkout.onlineReservationMinutes': 30,
-  'cart.maxQuantityPerLine': 5,
-  'giftWrap.fee': 50_000,
-  'returns.windowDays': 7,
-};
+/**
+ * Defaults of every setting that has one (ADR-0006, ADR-0013, ADR-0016, ADR-0017), from the
+ * settings registry. Insert-only: values changed in admin → Settings are never overwritten.
+ * Seller information, alert channels, SEO texts and the sender stay unset until the owner
+ * fills them in (the footer hides empty lines; env values are the fallback).
+ */
+export const defaultSettings: Record<string, unknown> = settingDefaults();
 
 async function seedSettings(db: Database) {
   await db
@@ -254,6 +252,8 @@ export async function seed(connectionString: string, options: { demo: boolean })
     const units = await seedAdminUnits(db);
     await seedSettings(db);
     const locationId = await seedDefaultLocation(db);
+    // Policy pages + legal menu are required in production too (§1.5); demo content follows.
+    const legal = await seedLegalPages(db);
     const demo = options.demo
       ? await seedDemoCatalog(db, locationId)
       : { skipped: true, products: 0 };
@@ -262,7 +262,7 @@ export async function seed(connectionString: string, options: { demo: boolean })
       : { skipped: true, pages: 0, posts: 0 };
     const shipping = await seedShipping(db);
     const coupons = options.demo ? await seedDemoCoupons(db) : 0;
-    return { units, demo, content, shipping, coupons };
+    return { units, legal, demo, content, shipping, coupons };
   } finally {
     await pool.end();
   }
