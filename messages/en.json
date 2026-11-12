@@ -642,7 +642,8 @@
       "priceChanged": "A price or fee has changed since the page loaded. Please check the new total and place the order again.",
       "rateLimited": "Too many orders from this connection. Please wait a minute and try again.",
       "unexpected": "We could not place your order. Please try again or contact us.",
-      "quoteFailed": "We could not update the total. Please try again."
+      "quoteFailed": "We could not update the total. Please try again.",
+      "captchaFailed": "We couldn't complete the security check. Please wait a moment and place your order again."
     },
     "errors": {
       "invalid": "Please check this field.",
@@ -1109,5 +1110,11 @@
     "signInHint": "Have an account?",
     "signIn": "Sign in to see all your orders",
     "resultTitle": "Order {code}"
+  },
+  "ogImage": {
+    "tagline": "Authentic fragrances · Delivered across Vietnam"
+  },
+  "security": {
+    "captchaFailed": "We couldn't complete the security check. Please wait a moment and try again."
   }
 }

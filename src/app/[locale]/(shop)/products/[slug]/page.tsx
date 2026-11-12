@@ -72,8 +72,6 @@ export async function generateMetadata({
         brand: product.brand.name,
       }),
   );
-  const image = product.images[0];
-  const imageUrl = image ? mediaUrl(image.storageKey, image.url) : null;
   return {
     // Canonical never includes ?v= (§13.1).
     title: { absolute: title },
@@ -85,7 +83,7 @@ export async function generateMetadata({
       description,
       locale: locale === 'vi' ? 'vi_VN' : 'en_GB',
       url: absoluteUrl(locale, { pathname: '/products/[slug]', params: { slug: product.slug } }),
-      ...(imageUrl ? { images: [{ url: imageUrl, alt: image?.alt || product.name }] } : {}),
+      // The image is the generated card in ./opengraph-image.tsx (file convention wins).
     },
   };
 }

@@ -642,7 +642,8 @@
       "priceChanged": "Giá hoặc phí đã thay đổi kể từ khi trang được tải. Vui lòng kiểm tra tổng tiền mới và đặt hàng lại.",
       "rateLimited": "Có quá nhiều đơn hàng từ kết nối này. Vui lòng đợi một phút rồi thử lại.",
       "unexpected": "Chúng tôi chưa thể đặt đơn hàng của bạn. Vui lòng thử lại hoặc liên hệ với chúng tôi.",
-      "quoteFailed": "Chưa cập nhật được tổng tiền. Vui lòng thử lại."
+      "quoteFailed": "Chưa cập nhật được tổng tiền. Vui lòng thử lại.",
+      "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi đặt hàng lại."
     },
     "errors": {
       "invalid": "Vui lòng kiểm tra lại trường này.",
@@ -1110,6 +1111,12 @@
     "signIn": "Đăng nhập để xem tất cả đơn hàng",
     "resultTitle": "Đơn hàng {code}"
   },
+  "ogImage": {
+    "tagline": "Nước hoa chính hãng · Giao hàng toàn quốc"
+  },
+  "security": {
+    "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi thử lại."
+  },
   "admin": {
     "title": "Quản trị",
     "metaTitle": "Quản trị — Perfume Store",
@@ -1187,7 +1194,8 @@
       "invalidCode": "Mã không đúng hoặc đã hết hạn.",
       "notStaff": "Tài khoản này không có quyền truy cập trang quản trị.",
       "locked": "Tài khoản đã bị khoá. Vui lòng liên hệ chủ cửa hàng.",
-      "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại."
+      "genericError": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi thử lại."
     },
     "twoFactor": {
       "title": "Bật xác thực hai bước",
