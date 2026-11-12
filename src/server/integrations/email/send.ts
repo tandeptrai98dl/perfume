@@ -19,16 +19,20 @@ export type EmailSender = {
   close(): void;
 };
 
+/** `from` may be resolved per message (admin → Settings → sender, cached by the caller). */
+type From = string | (() => Promise<string>);
+
 export function createEmailSender(
-  options: { smtpUrl: string; from: string } | { transport: Transporter; from: string },
+  options: { smtpUrl: string; from: From } | { transport: Transporter; from: From },
 ): EmailSender {
   const transport =
     'transport' in options ? options.transport : nodemailer.createTransport(options.smtpUrl);
   return {
     async send({ to, subject, template }) {
       const html = await render(template);
+      const from = typeof options.from === 'function' ? await options.from() : options.from;
       const info = await transport.sendMail({
-        from: options.from,
+        from,
         to,
         subject,
         html,

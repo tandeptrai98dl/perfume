@@ -6,6 +6,7 @@ import { getDb } from '@/server/db/client';
 import { contentTags } from '@/server/modules/catalog/cache-tags';
 import * as content from '@/server/modules/content';
 import type { BannerPlacement, Locale } from '@/server/modules/content';
+import { settingsTags } from '@/server/modules/settings';
 
 /**
  * Cached storefront reads for content (Next-only layer: 'use cache' + cacheTag, §14.1).
@@ -80,11 +81,11 @@ export async function getMenu(key: string, locale: Locale) {
   return content.getMenu(getDb(), { key, locale });
 }
 
-/** Seller details live in `settings` (admin module); refreshed hourly until it has a tag. */
+/** Seller details live in `settings`; admin → Settings (company) expires the tag on save. */
 export async function getSellerInfo() {
   'use cache';
-  cacheLife('hours');
-  cacheTag('settings:company');
+  cacheLife('max');
+  cacheTag(settingsTags.company);
   return content.getSellerInfo(getDb());
 }
 
