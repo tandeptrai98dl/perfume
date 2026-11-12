@@ -114,6 +114,8 @@ export const ADMIN_NAV: AdminNavSection[] = [
     items: [
       { href: '/admin/staff', labelKey: 'staff', permission: 'staff.manage' },
       { href: '/admin/audit-log', labelKey: 'auditLog', permission: 'auditLog.view' },
+      // M3 wave 2 settings stream: company info, COD, returns, VAT, alerts, SEO, sender.
+      { href: '/admin/settings', labelKey: 'settings', permission: 'settings.manage' },
     ],
   },
   // M3 privacy stream: data-subject requests (Owner only).
