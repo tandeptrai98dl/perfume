@@ -5,7 +5,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 
 import pg from 'pg';
 
-const SKU = process.env.LHCI_SKU ?? 'ATEL-HOA--EDP-10';
+const SKU = process.env.LH_SKU ?? 'ATEL-HOA--EDP-10';
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
 await client.connect();
 try {

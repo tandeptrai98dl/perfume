@@ -3,9 +3,8 @@
 import { ZoomIn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import NextImage from 'next/image';
-import { useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { mediaUrl } from '@/lib/media-url';
 import { cn } from '@/lib/utils';
 import type { MediaImage } from '@/server/modules/catalog';
@@ -13,9 +12,14 @@ import type { MediaImage } from '@/server/modules/catalog';
 import { ImagePlaceholder } from './product-image';
 import { useSelectedSku } from './variant-store';
 
+const loadZoom = () => import('./product-gallery-zoom');
+const ProductGalleryZoom = lazy(loadZoom);
+/** Starts downloading the zoom dialog on intent so opening feels instant. */
+const preloadZoom = () => void loadZoom();
+
 /**
- * PDP gallery (§10.2): 4:5 main image, thumbnails, zoom dialog. Follows the selected variant
- * when it has its own photo.
+ * PDP gallery (§10.2): 4:5 main image, thumbnails, zoom dialog (loaded on first use). Follows
+ * the selected variant when it has its own photo.
  */
 export function ProductGallery({
   images,
@@ -52,6 +56,8 @@ function Gallery({
   const t = useTranslations('product.gallery');
   const [index, setIndex] = useState(start);
   const [zoomed, setZoomed] = useState(false);
+  const [zoomUsed, setZoomUsed] = useState(false);
+  const zoomButton = useRef<HTMLButtonElement>(null);
   const active = images[index] ?? images[0]!;
   const src = mediaUrl(active.storageKey, active.url);
   const alt = active.alt || productName;
@@ -75,8 +81,15 @@ function Gallery({
         )}
         {src && (
           <button
+            ref={zoomButton}
             type="button"
-            onClick={() => setZoomed(true)}
+            onClick={() => {
+              setZoomUsed(true);
+              setZoomed(true);
+            }}
+            onPointerEnter={preloadZoom}
+            onFocus={preloadZoom}
+            onTouchStart={preloadZoom}
             className="bg-ivory-50/90 hover:bg-ivory-50 absolute right-3 bottom-3 inline-flex size-11 items-center justify-center"
             aria-label={t('zoom')}
           >
@@ -111,17 +124,17 @@ function Gallery({
         </ul>
       )}
 
-      {src && (
-        <Dialog open={zoomed} onOpenChange={setZoomed}>
-          <DialogContent className="max-w-4xl p-2 md:p-4">
-            <DialogTitle className="sr-only">
-              {t('zoomTitle', { name: productName, index: index + 1 })}
-            </DialogTitle>
-            <div className="relative aspect-[4/5] max-h-[85dvh] w-full">
-              <NextImage src={src} alt={alt} fill sizes="90vw" className="object-contain" />
-            </div>
-          </DialogContent>
-        </Dialog>
+      {src && zoomUsed && (
+        <Suspense fallback={null}>
+          <ProductGalleryZoom
+            open={zoomed}
+            onOpenChange={setZoomed}
+            src={src}
+            alt={alt}
+            title={t('zoomTitle', { name: productName, index: index + 1 })}
+            triggerRef={zoomButton}
+          />
+        </Suspense>
       )}
     </div>
   );

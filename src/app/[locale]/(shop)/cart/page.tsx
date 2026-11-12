@@ -84,14 +84,19 @@ async function CartContent({ locale }: { locale: Locale }) {
   );
 }
 
+/**
+ * Roughly the size of a one-line cart, so the footer does not jump when the cart streams in
+ * (desktop CLS 0.16 with a short placeholder, §14.1): the summary + gift column is ~930 px
+ * tall at ≥1024 px, which keeps the footer below the fold until the content arrives.
+ */
 function CartSkeleton() {
   return (
-    <div className="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]" aria-hidden>
+    <div className="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-16" aria-hidden>
       <div className="flex flex-col gap-4">
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-32 w-full" />
       </div>
-      <Skeleton className="h-80 w-full" />
+      <Skeleton className="h-80 w-full lg:h-232" />
     </div>
   );
 }

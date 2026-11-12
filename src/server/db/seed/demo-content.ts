@@ -384,7 +384,8 @@ export async function seedDemoContent(db: Database) {
       bannerId: announcementId,
       locale: 'en',
       title: 'Authenticity guaranteed · 7-day returns',
-      ctaLabel: 'Learn more',
+      // Descriptive link text (Lighthouse "link-text", WCAG 2.4.4): never a bare "Learn more".
+      ctaLabel: 'Our authenticity promise',
       ctaUrl: localizedPath('en', '/authenticity'),
       isPublished: true,
     },

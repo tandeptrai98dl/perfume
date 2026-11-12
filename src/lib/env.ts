@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-// Browser only: Zod v4 probes `new Function` to compile object parsers, which the CSP
-// forbids (no 'unsafe-eval', ADR-0024). Set before the first parse below (clientEnv), which
-// is the first object parse on every page.
-if (typeof window !== 'undefined') z.config({ jitless: true });
+import { publicEnv } from './public-env';
+
+// Server-only in practice: browser code reads `./public-env`, and the browser's Zod
+// `jitless` setting (CSP, ADR-0024) lives in `src/instrumentation-client.ts`.
 
 /**
  * Server-side environment schema. Validated once at boot (see `src/instrumentation.ts`).
@@ -352,12 +352,7 @@ export function serverEnv(): ServerEnv {
 }
 
 /**
- * Client env must reference each variable explicitly so Next.js can inline it at build time.
+ * Validated client env (server code). Browser code reads `publicEnv` from `./public-env`
+ * instead, which lists each variable explicitly so Next.js inlines it, without shipping Zod.
  */
-export const clientEnv: ClientEnv = parseClientEnv({
-  NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  NEXT_PUBLIC_MEDIA_BASE_URL: process.env.NEXT_PUBLIC_MEDIA_BASE_URL,
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-  NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
-});
+export const clientEnv: ClientEnv = parseClientEnv(publicEnv);

@@ -3,7 +3,7 @@
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { clientEnv } from '@/lib/env';
+import { publicEnv } from '@/lib/public-env';
 import { TURNSTILE_SCRIPT_URL, type TurnstileAction } from '@/lib/turnstile';
 import { cn } from '@/lib/utils';
 
@@ -58,7 +58,7 @@ export type TurnstileWidgetProps = {
 };
 
 export function TurnstileWidget({ action, onToken, resetKey, className }: TurnstileWidgetProps) {
-  const siteKey = clientEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const siteKey = publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const locale = useLocale();
   const container = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
@@ -122,7 +122,7 @@ export function useTurnstile(action: TurnstileAction): TurnstileState {
     setResetKey((key) => key + 1);
   }, []);
   return {
-    enabled: Boolean(clientEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY),
+    enabled: Boolean(publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY),
     token,
     reset,
     widgetProps: { action, onToken: setToken, resetKey },
