@@ -19,10 +19,12 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { TurnstileWidget, useTurnstile } from '@/components/ui/turnstile-widget';
 import { Link } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
 import { authClient } from '@/lib/auth/client';
 import { localizedPath } from '@/lib/seo/paths';
+import { TURNSTILE_ACTIONS, TURNSTILE_TOKEN_HEADER } from '@/lib/turnstile';
 import {
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -44,6 +46,15 @@ function isRateLimited(error: AuthError) {
   return error?.status === 429;
 }
 
+function isCaptchaFailed(error: AuthError) {
+  return error?.code === 'CAPTCHA_FAILED';
+}
+
+/** Better Auth request options carrying the Turnstile token (verified in a server hook). */
+function captchaOptions(token: string | null) {
+  return token ? { headers: { [TURNSTILE_TOKEN_HEADER]: token } } : undefined;
+}
+
 export function SignInForm({
   next,
   initialNotice,
@@ -52,7 +63,9 @@ export function SignInForm({
   initialNotice?: 'verifyFailed' | 'oauth';
 }) {
   const t = useTranslations('auth');
+  const tSecurity = useTranslations('security');
   const router = useRouter();
+  const turnstile = useTurnstile(TURNSTILE_ACTIONS.signIn);
   const form = useForm<z.input<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: '', password: '' },
@@ -64,6 +77,7 @@ export function SignInForm({
     | 'staffAccount'
     | 'tooManyRequests'
     | 'verifyFailed'
+    | 'captchaFailed'
     | 'genericError'
     | null
   >(
@@ -81,9 +95,12 @@ export function SignInForm({
       password: values.password,
       // Where the verification link (re-sent to unverified accounts) returns to.
       callbackURL: next,
+      fetchOptions: captchaOptions(turnstile.token),
     });
+    turnstile.reset();
     if (error) {
       if (isRateLimited(error)) setNotice('tooManyRequests');
+      else if (isCaptchaFailed(error)) setNotice('captchaFailed');
       else if (error.code === 'EMAIL_NOT_VERIFIED') setNotice('notVerified');
       else if (error.code === 'ACCOUNT_LOCKED') setNotice('locked');
       else setNotice('invalidCredentials');
@@ -99,6 +116,7 @@ export function SignInForm({
 
   let noticeText: ReactNode = null;
   if (notice === 'tooManyRequests' || notice === 'genericError') noticeText = t(notice);
+  else if (notice === 'captchaFailed') noticeText = tSecurity('captchaFailed');
   else if (notice === 'staffAccount') {
     noticeText = t.rich('signIn.staffAccount', {
       link: (chunks) => (
@@ -146,6 +164,7 @@ export function SignInForm({
             </FormItem>
           )}
         />
+        <TurnstileWidget {...turnstile.widgetProps} />
         <Button type="submit" loading={form.formState.isSubmitting}>
           {t('signIn.submit')}
         </Button>
@@ -156,13 +175,17 @@ export function SignInForm({
 
 export function SignUpForm({ verifyCallback }: { verifyCallback: string }) {
   const t = useTranslations('auth');
+  const tSecurity = useTranslations('security');
   const locale = useLocale() as Locale;
+  const turnstile = useTurnstile(TURNSTILE_ACTIONS.signUp);
   const form = useForm<z.input<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: { name: '', email: '', password: '' },
   });
   const [sentTo, setSentTo] = useState<string | null>(null);
-  const [notice, setNotice] = useState<'tooManyRequests' | 'genericError' | null>(null);
+  const [notice, setNotice] = useState<'tooManyRequests' | 'captchaFailed' | 'genericError' | null>(
+    null,
+  );
 
   async function onSubmit(values: z.output<typeof signUpSchema>) {
     setNotice(null);
@@ -173,9 +196,17 @@ export function SignUpForm({ verifyCallback }: { verifyCallback: string }) {
       // Account e-mails use the language the customer signed up in (changeable in the profile).
       locale,
       callbackURL: verifyCallback,
+      fetchOptions: captchaOptions(turnstile.token),
     } as Parameters<typeof authClient.signUp.email>[0]);
+    turnstile.reset();
     if (error) {
-      setNotice(isRateLimited(error) ? 'tooManyRequests' : 'genericError');
+      setNotice(
+        isRateLimited(error)
+          ? 'tooManyRequests'
+          : isCaptchaFailed(error)
+            ? 'captchaFailed'
+            : 'genericError',
+      );
       return;
     }
     setSentTo(values.email);
@@ -196,7 +227,11 @@ export function SignUpForm({ verifyCallback }: { verifyCallback: string }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
-        {notice && <FormNotice tone="error">{t(notice)}</FormNotice>}
+        {notice && (
+          <FormNotice tone="error">
+            {notice === 'captchaFailed' ? tSecurity(notice) : t(notice)}
+          </FormNotice>
+        )}
         <FormField
           control={form.control}
           name="name"
@@ -238,6 +273,7 @@ export function SignUpForm({ verifyCallback }: { verifyCallback: string }) {
           )}
         />
         <p className="text-small text-taupe-600">{t('signUp.terms')}</p>
+        <TurnstileWidget {...turnstile.widgetProps} />
         <Button type="submit" loading={form.formState.isSubmitting}>
           {t('signUp.submit')}
         </Button>
@@ -248,23 +284,31 @@ export function SignUpForm({ verifyCallback }: { verifyCallback: string }) {
 
 export function ForgotPasswordForm() {
   const t = useTranslations('auth');
+  const tSecurity = useTranslations('security');
   const locale = useLocale() as Locale;
+  const turnstile = useTurnstile(TURNSTILE_ACTIONS.forgotPassword);
   const form = useForm<z.input<typeof forgotPasswordSchema>>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: '' },
   });
   const [sentTo, setSentTo] = useState<string | null>(null);
-  const [notice, setNotice] = useState<'tooManyRequests' | null>(null);
+  const [notice, setNotice] = useState<'tooManyRequests' | 'captchaFailed' | null>(null);
 
   async function onSubmit(values: z.output<typeof forgotPasswordSchema>) {
     setNotice(null);
     const { error } = await authClient.requestPasswordReset({
       email: values.email,
       redirectTo: localizedPath(locale, '/reset-password'),
+      fetchOptions: captchaOptions(turnstile.token),
     });
+    turnstile.reset();
     // Same answer whether or not the e-mail has an account; only throttling is shown.
     if (isRateLimited(error)) {
       setNotice('tooManyRequests');
+      return;
+    }
+    if (isCaptchaFailed(error)) {
+      setNotice('captchaFailed');
       return;
     }
     setSentTo(values.email);
@@ -285,7 +329,11 @@ export function ForgotPasswordForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
-        {notice && <FormNotice tone="error">{t(notice)}</FormNotice>}
+        {notice && (
+          <FormNotice tone="error">
+            {notice === 'captchaFailed' ? tSecurity(notice) : t(notice)}
+          </FormNotice>
+        )}
         <FormField
           control={form.control}
           name="email"
@@ -299,6 +347,7 @@ export function ForgotPasswordForm() {
             </FormItem>
           )}
         />
+        <TurnstileWidget {...turnstile.widgetProps} />
         <Button type="submit" loading={form.formState.isSubmitting}>
           {t('forgot.submit')}
         </Button>

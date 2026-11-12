@@ -2,6 +2,7 @@ import 'server-only';
 
 import { serverEnv } from '@/lib/env';
 import { getDb } from '@/server/db/client';
+import { getTurnstileVerifier } from '@/server/integrations/turnstile';
 import { getProducer } from '@/server/jobs/producer';
 import { enqueue } from '@/server/jobs/queue';
 
@@ -19,6 +20,7 @@ export function getAuth(): Auth {
     enqueueAuthEmail: async (job) => {
       await enqueue(await getProducer(), getDb(), 'auth.email', job);
     },
+    turnstile: getTurnstileVerifier(),
   });
   return auth;
 }

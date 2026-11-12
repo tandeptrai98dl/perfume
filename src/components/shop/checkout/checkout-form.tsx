@@ -16,12 +16,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { TurnstileWidget, useTurnstile } from '@/components/ui/turnstile-widget';
 import { Link } from '@/i18n/navigation';
 import {
   CHECKOUT_LIMITS,
   checkoutFormSchema,
   type CheckoutFormValues,
 } from '@/lib/checkout/form-schema';
+import { TURNSTILE_ACTIONS } from '@/lib/turnstile';
 
 import { AddressForm, useWardDirectory } from './address-form';
 import { CheckoutSection } from './checkout-section';
@@ -44,7 +46,15 @@ import { VatInvoiceFields } from './vat-invoice-fields';
  */
 
 type Alert =
-  | { kind: 'fixErrors' | 'priceChanged' | 'rateLimited' | 'unexpected' | 'quoteFailed' }
+  | {
+      kind:
+        | 'fixErrors'
+        | 'priceChanged'
+        | 'rateLimited'
+        | 'captchaFailed'
+        | 'unexpected'
+        | 'quoteFailed';
+    }
   | { kind: 'cartChanged'; items: { variantId: string; code: string }[] };
 
 const FORM_PATHS = new Set<string>([
@@ -109,6 +119,7 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
   const [placing, setPlacing] = useState(false);
   const submitLock = useRef(false);
   const quoteSeq = useRef(0);
+  const turnstile = useTurnstile(TURNSTILE_ACTIONS.placeOrder);
 
   const [provinceCode, shippingRateId, paymentMethod, couponCode] = useWatch({
     control: form.control,
@@ -218,7 +229,12 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
 
   function applyFailure(failure: CheckoutFailure) {
     const items: { variantId: string; code: string }[] = [];
-    let next: Alert = { kind: failure.error === 'rateLimited' ? 'rateLimited' : 'unexpected' };
+    let next: Alert = {
+      kind:
+        failure.error === 'rateLimited' || failure.error === 'captchaFailed'
+          ? failure.error
+          : 'unexpected',
+    };
     let firstField: string | null = null;
     let refresh = false;
 
@@ -260,10 +276,10 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
     try {
       // Raw values: the action parses them with the same schema. No prices are sent; the
       // displayed total is only compared so a price change is never charged silently.
-      const result = await placeOrderAction({
-        ...form.getValues(),
-        expectedTotal: quote.totals.total,
-      });
+      const result = await placeOrderAction(
+        { ...form.getValues(), expectedTotal: quote.totals.total },
+        turnstile.token,
+      );
       // VNPay: leave for the gateway (external page); the button stays locked meanwhile.
       if (result?.ok) {
         window.location.assign(result.gatewayUrl);
@@ -275,6 +291,8 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
     }
     // On success the action redirects to the result page and the button stays locked.
     if (failure) {
+      // The Turnstile token is single-use: get a fresh one for the next attempt.
+      turnstile.reset();
       submitLock.current = false;
       setPlacing(false);
       applyFailure(failure);
@@ -415,6 +433,7 @@ export function CheckoutForm({ data }: { data: CheckoutPageData }) {
               </div>
             )}
           </div>
+          <TurnstileWidget {...turnstile.widgetProps} />
           <PlaceOrderButton placing={placing} paysOnline={paysOnline} waiting={quoting} />
         </aside>
       </form>

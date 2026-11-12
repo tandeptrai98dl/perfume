@@ -6,10 +6,13 @@ import { useId, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { TurnstileWidget, useTurnstile } from '@/components/ui/turnstile-widget';
 import { authClient } from '@/lib/auth/client';
+import { TURNSTILE_ACTIONS, TURNSTILE_TOKEN_HEADER } from '@/lib/turnstile';
 
 type Step = 'credentials' | 'totp' | 'backup';
-type ErrorKey = 'invalidCredentials' | 'invalidCode' | 'notStaff' | 'locked' | 'genericError';
+type ErrorKey =
+  'invalidCredentials' | 'invalidCode' | 'notStaff' | 'locked' | 'captchaFailed' | 'genericError';
 
 const STAFF_ROLES = new Set(['owner', 'manager', 'staff', 'editor']);
 
@@ -24,6 +27,8 @@ export function LoginForm() {
   const [step, setStep] = useState<Step>('credentials');
   const [error, setError] = useState<ErrorKey | null>(null);
   const [pending, startTransition] = useTransition();
+  // Same /sign-in/email endpoint as customers, so the same Turnstile check (§12).
+  const turnstile = useTurnstile(TURNSTILE_ACTIONS.signIn);
 
   function goToAdmin() {
     router.replace('/admin');
@@ -33,12 +38,21 @@ export function LoginForm() {
   function submitCredentials(form: FormData) {
     setError(null);
     startTransition(async () => {
+      const token = turnstile.token;
       const { data, error: signInError } = await authClient.signIn.email({
         email: String(form.get('email') ?? ''),
         password: String(form.get('password') ?? ''),
+        fetchOptions: token ? { headers: { [TURNSTILE_TOKEN_HEADER]: token } } : undefined,
       });
+      turnstile.reset();
       if (signInError) {
-        setError(signInError.code === 'ACCOUNT_LOCKED' ? 'locked' : 'invalidCredentials');
+        setError(
+          signInError.code === 'ACCOUNT_LOCKED'
+            ? 'locked'
+            : signInError.code === 'CAPTCHA_FAILED'
+              ? 'captchaFailed'
+              : 'invalidCredentials',
+        );
         return;
       }
       if (data && 'twoFactorRedirect' in data && data.twoFactorRedirect) {
@@ -96,6 +110,7 @@ export function LoginForm() {
             minLength={8}
           />
         </label>
+        <TurnstileWidget {...turnstile.widgetProps} />
         {errorMessage}
         <Button type="submit" loading={pending}>
           {t('submit')}
