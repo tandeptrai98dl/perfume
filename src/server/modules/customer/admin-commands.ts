@@ -1,6 +1,7 @@
 import { and, eq, isNull } from 'drizzle-orm';
 
-import { users } from '@/server/db/schema';
+import { customerNotes, users } from '@/server/db/schema';
+import { newId } from '@/server/lib/ids';
 import { recordAudit } from '@/server/lib/audit';
 import {
   assertCan,
@@ -19,8 +20,8 @@ import type { CustomerFilter, CustomerNoteInput, SetCodRiskFlagInput } from './a
 /*
  * Admin customer commands (§11.2 "Customers"). `/admin/customers` is Owner + Manager
  * (`customers.view`, §11.1); the COD risk flag (D16) and internal notes are changed there by
- * the same roles. Notes and risk changes are append-only audit rows on the account
- * (`entity_type = 'user'`): no customer-notes table exists in MVP (§6.2).
+ * the same roles. The text (note or risk reason) lives in `customer_notes`, which privacy
+ * anonymisation deletes; the append-only audit row only references it (`noteId`, ADR-0025).
  */
 
 async function lockCustomer(tx: Tx, userId: string) {
@@ -45,6 +46,14 @@ export async function setCodRiskFlag(
       throw new DomainError('invalid', [{ path: 'flagged', code: 'riskUnchanged' }]);
     }
     await tx.update(users).set({ codRiskFlag: input.flagged }).where(eq(users.id, user.id));
+    const noteId = newId();
+    await tx.insert(customerNotes).values({
+      id: noteId,
+      userId: user.id,
+      kind: 'cod_risk',
+      body: input.reason,
+      authorId: ctx.actor.id,
+    });
     await recordAudit(tx, {
       actorId: ctx.actor.id,
       action: COD_RISK_ACTION,
@@ -52,7 +61,7 @@ export async function setCodRiskFlag(
       entityId: user.id,
       diff: {
         codRiskFlag: { from: user.codRiskFlag, to: input.flagged },
-        reason: { from: null, to: input.reason },
+        noteId: { from: null, to: noteId },
       },
       ip: ctx.ip,
     });
@@ -61,7 +70,7 @@ export async function setCodRiskFlag(
   });
 }
 
-/** Internal staff note on a customer account (append-only audit row). */
+/** Internal staff note on a customer account (`customer_notes` + audit reference). */
 export async function addCustomerNote(
   ctx: CommandContext,
   input: CustomerNoteInput,
@@ -69,12 +78,20 @@ export async function addCustomerNote(
   assertCan(ctx.actor, 'customers.view');
   return ctx.db.transaction(async (tx) => {
     const user = await lockCustomer(tx, input.userId);
+    const noteId = newId();
+    await tx.insert(customerNotes).values({
+      id: noteId,
+      userId: user.id,
+      kind: 'note',
+      body: input.note,
+      authorId: ctx.actor.id,
+    });
     await recordAudit(tx, {
       actorId: ctx.actor.id,
       action: CUSTOMER_NOTE_ACTION,
       entityType: 'user',
       entityId: user.id,
-      diff: { note: { from: null, to: input.note } },
+      diff: { noteId: { from: null, to: noteId } },
       ip: ctx.ip,
     });
     return { data: { userId: user.id }, tags: [] };

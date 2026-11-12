@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { auditLogs, orderEvents, orders, refunds, users } from '@/server/db/schema';
+import { auditLogs, customerNotes, orderEvents, orders, refunds, users } from '@/server/db/schema';
 import { DomainError } from '@/server/lib/command-context';
 import { newId } from '@/server/lib/ids';
 import {
@@ -13,6 +13,7 @@ import {
   listCustomersForExport,
   setCodRiskFlag,
   type CustomerListQuery,
+  eraseCustomerData,
 } from '@/server/modules/customer';
 import { generateOrderCode } from '@/server/modules/order';
 
@@ -308,21 +309,26 @@ describe('COD risk flag and notes', () => {
       .from(auditLogs)
       .where(and(eq(auditLogs.action, 'customer.codRiskFlag'), eq(auditLogs.entityId, huong)));
     expect(audit).toHaveLength(2);
-    expect(audit.map((entry) => entry.diff)).toEqual(
+    // ADR-0025: the audit row references the note; the text lives in customer_notes.
+    const notes = await h.db
+      .select({ id: customerNotes.id, kind: customerNotes.kind, body: customerNotes.body })
+      .from(customerNotes)
+      .where(eq(customerNotes.userId, huong));
+    const byId = new Map(notes.map((note) => [note.id, note]));
+    const changes = audit.map((entry) => {
+      const diff = entry.diff as { codRiskFlag: unknown; noteId: { to: string }; reason?: unknown };
+      expect(diff.reason).toBeUndefined();
+      return [diff.codRiskFlag, byId.get(diff.noteId.to)?.body];
+    });
+    expect(changes).toEqual(
       expect.arrayContaining([
-        {
-          codRiskFlag: { from: false, to: true },
-          reason: { from: null, to: 'Từ chối nhận hàng 2 lần' },
-        },
-        {
-          codRiskFlag: { from: true, to: false },
-          reason: { from: null, to: 'Đã gọi xác nhận lại' },
-        },
+        [{ from: false, to: true }, 'Từ chối nhận hàng 2 lần'],
+        [{ from: true, to: false }, 'Đã gọi xác nhận lại'],
       ]),
     );
   });
 
-  it('stores notes as audit rows and shows notes and risk changes newest first', async () => {
+  it('stores notes in customer_notes (audited) and shows notes and risk changes newest first', async () => {
     await addCustomerNote(h.ctx('manager'), {
       userId: huong,
       note: 'Khách thích giao giờ hành chính',
@@ -340,6 +346,27 @@ describe('COD risk flag and notes', () => {
       ['risk', 'Đã gọi xác nhận lại', false, 'owner'],
       ['risk', 'Từ chối nhận hàng 2 lần', true, 'manager'],
     ]);
+    const noteAudit = await h.db
+      .select({ diff: auditLogs.diff })
+      .from(auditLogs)
+      .where(and(eq(auditLogs.action, 'customer.note'), eq(auditLogs.entityId, huong)));
+    expect(JSON.stringify(noteAudit)).not.toContain('giờ hành chính');
+  });
+
+  it('privacy erasure deletes the note text but keeps the audit trail (ADR-0025)', async () => {
+    const lan = await customer('Trần Thị Lan', 'lan-erase@example.com', '0987654321');
+    await addCustomerNote(h.ctx('manager'), { userId: lan, note: 'Hay đổi địa chỉ giao' });
+    await h.db.transaction((tx) =>
+      eraseCustomerData(tx, { userId: lan, email: 'lan-erase@example.com' }, { locale: 'vi' }),
+    );
+    expect(
+      await h.db.select().from(customerNotes).where(eq(customerNotes.userId, lan)),
+    ).toHaveLength(0);
+    const audit = await h.db
+      .select({ id: auditLogs.id })
+      .from(auditLogs)
+      .where(and(eq(auditLogs.action, 'customer.note'), eq(auditLogs.entityId, lan)));
+    expect(audit).toHaveLength(1);
   });
 });
 

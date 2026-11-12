@@ -1,7 +1,7 @@
 import { and, count, desc, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 
 import type { Database } from '@/server/db/client';
-import { consents, orders, privacyRequests, users } from '@/server/db/schema';
+import { consents, customerNotes, orders, privacyRequests, users } from '@/server/db/schema';
 import { listEntityAuditEntries } from '@/server/modules/audit';
 import { codRiskForPhone } from '@/server/modules/order';
 import { pageOffset, type Paged } from '@/server/lib/sql-helpers';
@@ -337,6 +337,22 @@ async function customerHistory(db: Reader, userId: string): Promise<CustomerHist
     actions: [CUSTOMER_NOTE_ACTION, COD_RISK_ACTION],
     limit: 50,
   });
+  const noteIds = entries.flatMap((entry) => {
+    const change = entry.diff?.noteId;
+    const id =
+      change && typeof change === 'object' && 'to' in change
+        ? (change as { to: unknown }).to
+        : null;
+    return typeof id === 'string' ? [id] : [];
+  });
+  const notes = noteIds.length
+    ? await db
+        .select({ id: customerNotes.id, body: customerNotes.body })
+        .from(customerNotes)
+        .where(and(eq(customerNotes.userId, userId), inArray(customerNotes.id, noteIds)))
+    : [];
+  const bodies = new Map(notes.map((note) => [note.id, note.body]));
+
   return entries.map((entry) => {
     const diff = entry.diff ?? {};
     const to = (field: string) => {
@@ -345,25 +361,26 @@ async function customerHistory(db: Reader, userId: string): Promise<CustomerHist
         ? (change as { to: unknown }).to
         : undefined;
     };
+    // Text from `customer_notes` (ADR-0025); null once erased by a privacy request.
+    const noteId = to('noteId');
+    const text = typeof noteId === 'string' ? (bodies.get(noteId) ?? null) : null;
     if (entry.action === CUSTOMER_NOTE_ACTION) {
-      const note = to('note');
       return {
         id: entry.id,
         kind: 'note' as const,
         actorName: entry.actorName,
-        text: typeof note === 'string' ? note : null,
+        text,
         flagged: null,
         createdAt: entry.createdAt,
       };
     }
-    const reason = to('reason');
     const flag = to('codRiskFlag');
     return {
       id: entry.id,
       kind: 'risk' as const,
       actorName: entry.actorName,
       // Flags set by a failed delivery (order module) carry the order instead of a reason.
-      text: typeof reason === 'string' ? reason : null,
+      text,
       flagged: typeof flag === 'boolean' ? flag : null,
       createdAt: entry.createdAt,
     };

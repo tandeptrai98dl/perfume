@@ -57,6 +57,7 @@ All decisions below are final. Items marked *external review* are implemented as
 | D21 | English content is written or reviewed by an English editor; go-live requires ≥ 80% of active products with a published English translation | Machine translation hurts a luxury brand and SEO | [0021](./adr/0021-english-content-quality.md) |
 | D22 | Online-only, single warehouse in MVP; physical store / POS in Phase 3 via `locations` | Avoid multi-channel stock sync until needed | [0022](./adr/0022-online-only-single-warehouse.md) |
 | D24 | CSP without nonces: `'self'` + inline + documented host allowlist for scripts, everything else strict | Prerendered/cached shells (Cache Components) cannot carry a per-request nonce; measured | [0024](./adr/0024-csp-without-nonces.md) |
+| D25 | Staff notes and COD risk reasons live in `customer_notes`, deleted by privacy anonymisation; the audit log only references them | `audit_logs` is append-only and must not keep personal text after a deletion request (PDPL 91/2025) | [0025](./adr/0025-customer-notes-table.md) |
 
 ---
 
@@ -208,7 +209,7 @@ All traffic passes Cloudflare and Caddy. The web app and the worker share `serve
 | `payment` | Payment initiation, IPN/webhook verification, retries, COD remittances, refunds | payments, payment_events, refunds, cod_remittances, cod_remittance_orders |
 | `shipping` | Rates, shipments | shipping_zones, shipping_rates, shipping_rate_translations, shipments |
 | `promotion` | Coupons, rules, redemptions | coupons, coupon_redemptions |
-| `customer` + `auth` | Accounts, addresses, wishlist, consents, privacy requests | users, sessions, accounts, addresses, wishlists, consents, privacy_requests |
+| `customer` + `auth` | Accounts, addresses, wishlist, consents, privacy requests, staff notes | users, sessions, accounts, addresses, wishlists, consents, privacy_requests, customer_notes (ADR-0025) |
 | `review` | Reviews, review invitations, moderation | reviews, review_invitations |
 | `content` | Banners, journal posts, static pages, menus, redirects | posts, pages, banners, navigation_menus, redirects, *_translations |
 | `notification` | Customer emails (in the order's locale), internal staff alerts (email + Telegram) | notification_logs (M3: one row per e-mail / Telegram send, masked recipient; `order_events` keeps the at-most-once keys, see §10.5) |
@@ -452,6 +453,7 @@ consents         user_id?, email?, phone?, purpose enum(terms, privacy, marketin
                  // only exception: anonymisation clears email/phone/ip/user_agent (M3);
                  // cookie choices store a truncated IP (/24, /48) and no contact data
 newsletter_subscribers  email UK, locale, status, consent_id FK, source
+customer_notes   user_id FK, kind enum(note, cod_risk), body, author_id   // ADR-0025: erased on deletion
 privacy_requests user_id?, email, type enum(export, delete, correct, withdraw_consent),
                  status enum(received, in_progress, completed, rejected), due_at,
                  handled_by?, completed_at?, note

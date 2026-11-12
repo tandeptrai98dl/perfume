@@ -76,6 +76,27 @@ export const wishlists = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.productId] })],
 );
 
+export const customerNoteKindEnum = pgEnum('customer_note_kind', ['note', 'cod_risk']);
+
+/**
+ * Internal staff notes and COD risk reasons on a customer (ADR-0025). Personal data: deleted by
+ * privacy anonymisation; the audit log only references `id`.
+ */
+export const customerNotes = pgTable(
+  'customer_notes',
+  {
+    id: primaryId(),
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    kind: customerNoteKindEnum().notNull(),
+    body: text().notNull(),
+    authorId: uuid().references(() => users.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [index().on(t.userId, t.createdAt)],
+);
+
 export const consentPurposeEnum = pgEnum('consent_purpose', [
   'terms',
   'privacy',

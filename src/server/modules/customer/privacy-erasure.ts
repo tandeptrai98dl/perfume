@@ -4,6 +4,7 @@ import {
   accounts,
   addresses,
   consents,
+  customerNotes,
   newsletterSubscribers,
   sessions,
   twoFactors,
@@ -74,6 +75,9 @@ export async function eraseCustomerData(
     .returning({ id: consents.id });
 
   await tx.delete(newsletterSubscribers).where(eq(newsletterSubscribers.email, email));
+  // Staff notes and COD risk reasons are personal data (ADR-0025).
+  if (subject.userId)
+    await tx.delete(customerNotes).where(eq(customerNotes.userId, subject.userId));
   // Verification / reset tokens addressed to the e-mail (Better Auth keys them by identifier).
   await tx.delete(verifications).where(eq(verifications.identifier, email));
 
