@@ -155,3 +155,5 @@ export {
   type OrderEditInput,
 } from './admin-edit-schemas';
 // ---------- End order edits ----------
+// ---------- E-invoice (M3 e-invoicing stream, D13) ----------
+export { recordEinvoiceIssued } from './einvoice-record';

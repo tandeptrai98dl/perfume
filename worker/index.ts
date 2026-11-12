@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 
 import { serverEnv } from '@/lib/env';
 import { sentryOptions } from '@/lib/observability/sentry-options';
+import { createEinvoiceProvider } from '@/server/integrations/einvoice';
 import { createEmailSender } from '@/server/integrations/email/send';
 import { createHandlers } from '@/server/jobs/handlers';
 import { createBoss, ensureQueues, scheduleCronJobs } from '@/server/jobs/queue';
@@ -46,6 +47,7 @@ async function main() {
       staffAlertEmail: env.STAFF_ALERT_EMAIL,
       telegramBotToken: env.TELEGRAM_BOT_TOKEN,
       telegramChatId: env.TELEGRAM_CHAT_ID,
+      einvoice: createEinvoiceProvider(env),
     }),
     (error, context) => Sentry.captureException(error, { tags: context }),
   );

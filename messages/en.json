@@ -129,6 +129,15 @@
         "pay": "Pay the difference",
         "refund": "You have paid more than the new total. We will refund {amount} to you.",
         "help": "If this change is not right, reply to this email or contact us."
+      },
+      "paymentLink": {
+        "subject": "Pay for order {code}",
+        "preview": "The payment link for your order.",
+        "heading": "Pay for your order",
+        "body": "Thank you for ordering by phone. Order {code} is waiting for payment.",
+        "amount": "Amount to pay: {amount}.",
+        "pay": "Pay now",
+        "help": "The link works while we hold the items for you. If you need help, reply to this email."
       }
     },
     "auth": {

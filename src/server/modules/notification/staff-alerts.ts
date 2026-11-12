@@ -18,6 +18,8 @@ export const STAFF_ALERT_KINDS = [
   'late_payment_refund',
   'low_stock',
   'job_failed',
+  'einvoice_failed',
+  'edit_refund',
 ] as const;
 export type StaffAlertKind = (typeof STAFF_ALERT_KINDS)[number];
 
