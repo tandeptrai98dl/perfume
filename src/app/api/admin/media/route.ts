@@ -12,7 +12,8 @@ import { uploadMedia } from '@/server/modules/catalog';
 /**
  * Admin image upload (ARCHITECTURE.md §12). A Route Handler rather than a Server Action so
  * 10 MB files are not limited by the Server Action body size and can stream progress.
- * Mutating Route Handlers check Origin (CSRF); validation and permission come first.
+ * Mutating Route Handlers check Origin (CSRF); then the declared size and the staff session,
+ * both before the body is read; then Zod.
  */
 
 const MAX_REQUEST_BYTES = 10 * 1024 * 1024 + 64 * 1024;
@@ -35,9 +36,25 @@ function fail(status: number, error: string, fieldErrors: unknown[] = []) {
 
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return fail(403, 'forbidden');
-  const length = Number(request.headers.get('content-length') ?? 0);
+  // The body is buffered by formData(), so its size is known and bounded before it is read:
+  // a missing length (chunked upload) is refused like an oversized one (memory DoS).
+  const lengthHeader = request.headers.get('content-length');
+  const length = Number(lengthHeader);
+  if (!lengthHeader || !Number.isSafeInteger(length) || length < 0) {
+    return fail(411, 'invalid', [{ path: 'file', code: 'required' }]);
+  }
   if (length > MAX_REQUEST_BYTES) {
     return fail(413, 'invalid', [{ path: 'file', code: 'fileTooLarge' }]);
+  }
+
+  // Staff session (2FA-verified) before anything is read: anonymous callers never get their
+  // body parsed. Catalogue and content editors both upload; uploadMedia checks either one.
+  let session;
+  try {
+    session = await requirePermission('admin.access');
+  } catch (error) {
+    if (error instanceof AuthorizationError) return fail(401, 'unauthorized');
+    throw error;
   }
 
   let form: FormData;
@@ -51,15 +68,6 @@ export async function POST(request: Request) {
     altVi: form.get('altVi'),
   });
   if (!parsed.success) return fail(400, 'validation', [{ path: 'file', code: 'required' }]);
-
-  let session;
-  try {
-    // Catalogue and content editors both upload; uploadMedia checks either permission.
-    session = await requirePermission('admin.access');
-  } catch (error) {
-    if (error instanceof AuthorizationError) return fail(401, 'unauthorized');
-    throw error;
-  }
 
   try {
     const { file, altVi } = parsed.data;
