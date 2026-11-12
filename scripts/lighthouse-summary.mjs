@@ -37,15 +37,18 @@ const rows = [...runs.entries()]
       Math.round(audit(lhrs, 'largest-contentful-paint')),
       audit(lhrs, 'cumulative-layout-shift').toFixed(3),
       Math.round(audit(lhrs, 'total-blocking-time')),
-      lhrs.length,
+      // Every run's LCP, to spot a bimodal page behind a median.
+      lhrs
+        .map((l) => Math.round(l.audits['largest-contentful-paint']?.numericValue ?? NaN))
+        .join(' / '),
     ].join(' | '),
   );
 
 const table = [
   '### Lighthouse (median of runs)',
   '',
-  '| URL | Perf | A11y | BP | SEO | LCP ms | CLS | TBT ms | Runs |',
-  '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
+  '| URL | Perf | A11y | BP | SEO | LCP ms | CLS | TBT ms | LCP per run |',
+  '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
   ...rows.map((row) => `| ${row} |`),
   '',
 ].join('\n');
