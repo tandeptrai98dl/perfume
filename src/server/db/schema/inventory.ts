@@ -80,6 +80,7 @@ export const stockMovements = pgTable(
   },
   (t) => [
     index().on(t.variantId, t.createdAt),
+    index().on(t.createdAt),
     check('stock_movements_delta_check', sql`${t.delta} <> 0`),
   ],
 );
