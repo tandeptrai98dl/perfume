@@ -93,6 +93,29 @@ export function readCookieConsent(cookieHeader: string | null | undefined): Cook
   return null;
 }
 
+/** Set on <html> before first paint when the visitor already answered the current notice. */
+export const COOKIE_CONSENT_ANSWERED_ATTRIBUTE = 'data-cookie-consent';
+
+/**
+ * Inline script for <head>: the cookie banner is part of the static page shell, so it paints
+ * with the first frame for new visitors (it is often the LCP element, §14.1); this marks
+ * <html> before that first paint when the stored choice matches the current notice version,
+ * and `globals.css` then hides the banner, so returning visitors never see it flash. After
+ * hydration the banner component decides from `readCookieConsent` and removes the attribute.
+ * Plain ES5, no dependencies; a malformed cookie simply leaves the banner visible.
+ */
+export function cookieConsentPaintScript(): string {
+  const name = JSON.stringify(`${COOKIE_CONSENT_NAME}=`);
+  const version = JSON.stringify(COOKIE_CONSENT_VERSION);
+  const attribute = JSON.stringify(COOKIE_CONSENT_ANSWERED_ATTRIBUTE);
+  return (
+    `(function(){try{var c=document.cookie.split(';');for(var i=0;i<c.length;i++){` +
+    `var p=c[i].replace(/^\\s+/,'');if(p.indexOf(${name})!==0)continue;` +
+    `var v=new URLSearchParams(decodeURIComponent(p.slice(${name}.length))).get('v');` +
+    `if(v===${version})document.documentElement.setAttribute(${attribute},'answered');}}catch(e){}})();`
+  );
+}
+
 /**
  * Google Consent Mode v2 state for a choice. Defaults are all denied; GTM is only loaded
  * once something optional is granted, and the update below is pushed before its first event.

@@ -212,3 +212,11 @@
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Cookie banner (static shell, §14.1): hidden before first paint for visitors who already
+ * answered; the attribute is set by cookieConsentPaintScript() in the locale layout.
+ */
+html[data-cookie-consent='answered'] [data-cookie-banner] {
+  display: none;
+}

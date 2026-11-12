@@ -1,7 +1,12 @@
+import { runInNewContext } from 'node:vm';
+
 import { describe, expect, it } from 'vitest';
 
 import {
+  COOKIE_CONSENT_ANSWERED_ATTRIBUTE,
+  COOKIE_CONSENT_NAME,
   COOKIE_CONSENT_VERSION,
+  cookieConsentPaintScript,
   consentModeState,
   CONSENT_MODE_DEFAULTS,
   isCurrentConsent,
@@ -82,5 +87,41 @@ describe('helpers', () => {
     expect(truncateIp('999.1.1.1')).toBeNull();
     expect(truncateIp('not-an-ip')).toBeNull();
     expect(truncateIp(null)).toBeNull();
+  });
+});
+
+describe('pre-paint script', () => {
+  /** Runs the inline script against a fake document; returns the attribute it set, if any. */
+  function run(cookie: string): string | undefined {
+    const attributes: Record<string, string> = {};
+    const document = {
+      cookie,
+      documentElement: {
+        setAttribute: (name: string, value: string) => (attributes[name] = value),
+      },
+    };
+    runInNewContext(cookieConsentPaintScript(), { document, URLSearchParams });
+    return attributes[COOKIE_CONSENT_ANSWERED_ATTRIBUTE];
+  }
+  const value = (version: string) =>
+    encodeURIComponent(serializeCookieConsent({ ...consent, version }));
+
+  it('marks a current answer, among other cookies', () => {
+    expect(run(`cart_token=abc; ${COOKIE_CONSENT_NAME}=${value(COOKIE_CONSENT_VERSION)}`)).toBe(
+      'answered',
+    );
+  });
+
+  it('agrees with readCookieConsent on old, missing and malformed values', () => {
+    for (const cookie of [
+      '',
+      'cart_token=abc',
+      `${COOKIE_CONSENT_NAME}=${value('2020-01-01')}`,
+      `${COOKIE_CONSENT_NAME}=%E0%A4%A`,
+      `x${COOKIE_CONSENT_NAME}=${value(COOKIE_CONSENT_VERSION)}`,
+    ]) {
+      expect(run(cookie)).toBeUndefined();
+      expect(isCurrentConsent(readCookieConsent(cookie))).toBe(false);
+    }
   });
 });

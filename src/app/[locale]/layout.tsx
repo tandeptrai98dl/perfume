@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 
 import { CookieConsent } from '@/components/privacy/cookie-consent';
 import { Toaster } from '@/components/ui/toaster';
 import { routing } from '@/i18n/routing';
+import { cookieConsentPaintScript } from '@/lib/privacy/cookie-consent';
 import { OG_LOCALES } from '@/lib/seo/content-metadata';
 
 import '../fonts';
@@ -40,14 +40,17 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   if (!hasLocale(routing.locales, locale)) notFound();
 
   return (
-    <html lang={locale}>
+    // suppressHydrationWarning: the pre-paint script below may set an attribute on <html>.
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        {/* Before first paint: hides the static-shell cookie banner for returning visitors. */}
+        <script dangerouslySetInnerHTML={{ __html: cookieConsentPaintScript() }} />
+      </head>
       <body>
         <NextIntlClientProvider>
           {children}
           {/* M3 privacy: cookie banner + preferences and the consent-gated tag loader. */}
-          <Suspense fallback={null}>
-            <CookieConsent locale={locale} />
-          </Suspense>
+          <CookieConsent locale={locale} />
           <Toaster />
         </NextIntlClientProvider>
       </body>
