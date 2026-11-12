@@ -1,6 +1,8 @@
 import { and, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import type { PgBoss } from 'pg-boss';
 
 import type { Database } from '@/server/db/client';
+import { enqueueThrottled } from '@/server/jobs/queue';
 import { orderItems, orders, reviewInvitations, reviews } from '@/server/db/schema';
 import { diffRecords, recordAudit } from '@/server/lib/audit';
 import {
@@ -41,6 +43,25 @@ function productTags(productId: string): string[] {
   return [catalogTags.product(productId), reviewTags.product(productId)];
 }
 
+/**
+ * Staff alert for reviews awaiting moderation (M3 wave 2): at most one per clock hour. The
+ * first review of an hour alerts at once; later ones in the same hour share a single alert at
+ * the start of the next hour; the worker sends the pending count at that time (none: skipped).
+ */
+export const REVIEW_ALERT_THROTTLE_SECONDS = 3600;
+export const REVIEW_ALERT_KEY = 'review_pending';
+
+async function enqueuePendingReviewAlert(boss: PgBoss | null | undefined, tx: Tx) {
+  if (!boss) return;
+  await enqueueThrottled(
+    boss,
+    tx,
+    'staff.alert',
+    { kind: 'review_pending' },
+    { key: REVIEW_ALERT_KEY, seconds: REVIEW_ALERT_THROTTLE_SECONDS, nextSlot: true },
+  );
+}
+
 const alreadyReviewed = () =>
   new DomainError('conflict', [{ path: 'orderItemId', code: 'alreadyReviewed' }]);
 const notReviewable = () =>
@@ -54,6 +75,7 @@ async function insertReview(
     userId: string | null;
     locale: Locale;
     values: ReviewFormValues;
+    boss?: PgBoss | null;
   },
 ): Promise<string> {
   const [row] = await tx
@@ -81,6 +103,7 @@ async function insertReview(
     .where(
       and(eq(reviewInvitations.orderItemId, input.orderItemId), isNull(reviewInvitations.usedAt)),
     );
+  await enqueuePendingReviewAlert(input.boss, tx);
   return row.id;
 }
 
@@ -90,7 +113,14 @@ async function insertReview(
  */
 export async function submitMemberReview(
   db: Database,
-  input: { userId: string; orderItemId: string; locale: Locale; values: ReviewFormValues },
+  input: {
+    userId: string;
+    orderItemId: string;
+    locale: Locale;
+    values: ReviewFormValues;
+    /** Producer for the throttled `review_pending` staff alert (outbox). */
+    boss?: PgBoss | null;
+  },
 ): Promise<{ id: string }> {
   return db.transaction(async (tx) => {
     const [item] = await tx
@@ -113,6 +143,7 @@ export async function submitMemberReview(
       userId: input.userId,
       locale: input.locale,
       values: input.values,
+      boss: input.boss,
     });
     return { id };
   });
@@ -121,7 +152,13 @@ export async function submitMemberReview(
 /** A guest reviews through the one-time e-mailed link (token hashed, 30 days, single use). */
 export async function submitGuestReview(
   db: Database,
-  input: { token: string; locale: Locale; values: ReviewFormValues; now?: Date },
+  input: {
+    token: string;
+    locale: Locale;
+    values: ReviewFormValues;
+    now?: Date;
+    boss?: PgBoss | null;
+  },
 ): Promise<{ id: string }> {
   return db.transaction(async (tx) => {
     const [invitation] = await tx
@@ -158,6 +195,7 @@ export async function submitGuestReview(
       userId: invitation.orderUserId,
       locale: input.locale,
       values: input.values,
+      boss: input.boss,
     });
     return { id };
   });

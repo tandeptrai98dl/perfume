@@ -454,6 +454,7 @@ export async function editOrder(
         expiresAt,
         actorId: ctx.actor.id,
         note: `order ${order.code} edited`,
+        boss: ctx.boss,
       });
     } catch (error) {
       if (error instanceof DomainError && error.code === 'insufficientStock') {

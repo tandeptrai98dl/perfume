@@ -10,8 +10,11 @@ import {
   type NotificationDeps,
 } from '@/server/modules/notification';
 
+import { logger } from '@/server/lib/logger';
+
 import type { HandlerDeps } from '.';
 import type { JobPayload } from '../definitions';
+import { resolveStaffAlertDetails } from './staff-alert-details';
 
 /**
  * Customer emails in the order's locale + staff alerts (§10.5, ADR-0019). Idempotent: a
@@ -48,7 +51,18 @@ export function createOrderNotificationHandlers(deps: HandlerDeps) {
       await sendPaymentReceived(notify, payload);
     },
     'staff.alert': async (payload: JobPayload<'staff.alert'>) => {
-      await sendStaffAlert(notify, payload);
+      // M3 wave 2: low stock / pending reviews / failed jobs carry details read at send time.
+      const resolved = await resolveStaffAlertDetails(deps.db, payload);
+      if ('skip' in resolved) {
+        logger.info('staff_alert.skipped', { kind: payload.kind, reason: resolved.skip });
+        return;
+      }
+      await sendStaffAlert(notify, {
+        kind: payload.kind,
+        orderId: payload.orderId,
+        message: payload.message,
+        details: resolved.details,
+      });
     },
     'order.payment-link': async (payload: JobPayload<'order.payment-link'>) => {
       await sendPaymentLink(notify, payload);

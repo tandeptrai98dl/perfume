@@ -126,6 +126,9 @@ export function entityHref(entityType: string, entityId: string | null): string 
       return '/admin/payments/cod-remittances';
     case 'staff':
       return `/admin/staff/${id}`;
+    // M3 wave 2: customer accounts (risk flag, notes, exports of one customer).
+    case 'user':
+      return `/admin/customers/${id}`;
     case 'review':
       return '/admin/reviews?status=all';
     case 'privacy_request':

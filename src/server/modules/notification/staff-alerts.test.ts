@@ -55,4 +55,49 @@ describe('buildStaffAlert', () => {
     expect(alert.lines).toEqual(['chi tiết']);
     expect(alert.adminUrl).toBe('https://s/admin');
   });
+
+  it('formats a low-stock alert with SKU, availability and a link to the variant', () => {
+    const alert = buildStaffAlert({
+      kind: 'low_stock',
+      appUrl: 'https://shop.test/',
+      details: {
+        kind: 'low_stock',
+        variantId: 'v1',
+        sku: 'CHN-BLEU-100',
+        productName: 'Bleu de Chanel EDP',
+        available: 2,
+        threshold: 3,
+      },
+    });
+    expect(alert.title).toBe('Sắp hết hàng');
+    expect(alert.lines).toEqual(['CHN-BLEU-100 · Bleu de Chanel EDP: còn 2 có thể bán (ngưỡng 3)']);
+    expect(alert.adminUrl).toBe('https://shop.test/admin/inventory/movements?variant=v1');
+  });
+
+  it('summarises pending reviews and links the moderation queue', () => {
+    const alert = buildStaffAlert({
+      kind: 'review_pending',
+      appUrl: 'https://s',
+      details: { kind: 'review_pending', pending: 4 },
+    });
+    expect(alert.title).toBe('Đánh giá chờ duyệt');
+    expect(alert.lines).toEqual(['4 đánh giá đang chờ kiểm duyệt']);
+    expect(alert.adminUrl).toBe('https://s/admin/reviews');
+  });
+
+  it('names a dead-lettered job by queue and id only', () => {
+    const alert = buildStaffAlert({
+      kind: 'job_failed',
+      appUrl: 'https://s',
+      details: {
+        kind: 'job_failed',
+        job: 'order.placed',
+        id: '0190f6b6-0000-7000-8000-000000000009',
+        attempts: 6,
+      },
+    });
+    expect(alert.lines[0]).toContain('order.placed');
+    expect(alert.lines[0]).toContain('0190f6b6-0000-7000-8000-000000000009');
+    expect(alert.lines[0]).toContain('6 lần thử');
+  });
 });

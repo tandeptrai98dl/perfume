@@ -143,3 +143,50 @@ export {
   type PrivacyMailDeps,
 } from './privacy-emails';
 // ---------- End privacy ----------
+// ---------- M3 wave 2 (customers & alerts stream): admin customers ----------
+export {
+  canSeeCustomerContact,
+  COD_RISK_ACTION,
+  COD_RISK_REASON_MAX,
+  COD_RISK_REASON_MIN,
+  CUSTOMER_EXPORT_LIMIT,
+  CUSTOMER_NOTE_ACTION,
+  CUSTOMER_NOTE_MAX,
+  CUSTOMER_SORTS,
+  CUSTOMER_TYPES,
+  customerKeyString,
+  displayContact,
+  lifetimeSpend,
+  NON_SPEND_STATUSES,
+  parseCustomerKey,
+  parseCustomerSearch,
+  type CustomerKey,
+  type CustomerSearch,
+  type CustomerSort,
+  type CustomerType,
+} from './admin-rules';
+export {
+  customerFilterSchema,
+  customerListSchema,
+  customerNoteSchema,
+  setCodRiskFlagSchema,
+  type CustomerFilter,
+  type CustomerListQuery,
+  type CustomerNoteInput,
+  type SetCodRiskFlagInput,
+} from './admin-schemas';
+export {
+  countFlaggedCustomers,
+  CUSTOMER_ORDER_LIMIT,
+  customerPrivacyEmail,
+  getCustomerDetail,
+  listCustomers,
+  listCustomersForExport,
+  type CustomerConsent,
+  type CustomerDetail,
+  type CustomerHistoryEntry,
+  type CustomerOrderRow,
+  type CustomerRow,
+} from './admin-queries';
+export { addCustomerNote, exportCustomersCsv, setCodRiskFlag } from './admin-commands';
+// ---------- End admin customers ----------

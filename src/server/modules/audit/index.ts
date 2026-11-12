@@ -8,8 +8,10 @@ export {
   exportAuditLogs,
   listAuditEntityTypes,
   listAuditLogs,
+  listEntityAuditEntries,
   type AuditPage,
   type AuditRow,
+  type EntityAuditEntry,
 } from './queries';
 export {
   AUDIT_EXPORT_LIMIT,

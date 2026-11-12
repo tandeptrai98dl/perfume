@@ -61,6 +61,7 @@ describe('entityHref', () => {
     expect(entityHref('order', 'abc')).toBe('/admin/orders/abc');
     expect(entityHref('staff', 'u1')).toBe('/admin/staff/u1');
     expect(entityHref('product_variant', 'v1')).toBe('/admin/inventory/movements?variant=v1');
+    expect(entityHref('user', 'c1')).toBe('/admin/customers/c1');
     expect(entityHref('unknown', 'x')).toBeNull();
     expect(entityHref('order', null)).toBeNull();
   });

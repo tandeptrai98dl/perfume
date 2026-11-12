@@ -1,4 +1,5 @@
 import { PencilLine, Printer, TriangleAlert } from 'lucide-react';
+import type { Route } from 'next';
 import Link from 'next/link';
 
 import { useTranslations } from 'next-intl';
@@ -76,6 +77,7 @@ export function OrderDetailView({
   canEdit = false,
   einvoice,
   notifications,
+  customerHref,
 }: {
   order: AdminOrderDetail;
   canCancelPaid: boolean;
@@ -85,6 +87,8 @@ export function OrderDetailView({
   einvoice?: ReactNode;
   /** Notification log (M3, `notification_logs`), its own section above the timeline. */
   notifications?: ReactNode;
+  /** M3 wave 2: the customer's admin page, for roles with `customers.view`. */
+  customerHref?: string | null;
 }) {
   const t = useTranslations('admin.orders');
   const format = useOrderFormat();
@@ -381,6 +385,15 @@ export function OrderDetailView({
           </dl>
           {order.contact.masked && (
             <p className="text-small text-taupe-600">{t('detail.masked')}</p>
+          )}
+          {customerHref && (
+            <Link
+              href={customerHref as Route}
+              prefetch={false}
+              className="text-small text-gold-700 w-fit underline-offset-4 hover:underline"
+            >
+              {t('detail.customerProfile')}
+            </Link>
           )}
           {order.customerNote && (
             <div className="text-small flex flex-col gap-1">

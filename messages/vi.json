@@ -1590,7 +1590,9 @@
       "reviews": "Kiểm duyệt đánh giá",
       "privacy": "Dữ liệu cá nhân",
       "privacyRequests": "Yêu cầu dữ liệu",
-      "settings": "Cài đặt"
+      "settings": "Cài đặt",
+      "customersSection": "Khách hàng",
+      "customers": "Danh sách khách hàng"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -1647,7 +1649,8 @@
       "missingEnglish": "Sản phẩm thiếu bản tiếng Anh",
       "missingEnglishValue": "{missing}/{total} sản phẩm đang bán · {coverage}% đã có tiếng Anh",
       "open": "Mở",
-      "failedEinvoices": "Hoá đơn điện tử lỗi"
+      "failedEinvoices": "Hoá đơn điện tử lỗi",
+      "flaggedCustomers": "Khách bị gắn cờ rủi ro COD"
     },
     "roles": {
       "owner": "Chủ cửa hàng",
@@ -2115,7 +2118,8 @@
       "vatRateInvalid": "Thuế suất chỉ nhận 0, 5, 8 hoặc 10 %.",
       "telegramChatIdInvalid": "Chat ID là số (nhóm bắt đầu bằng dấu -) hoặc @tên_kênh.",
       "reservationShorterThanSession": "Thời gian giữ hàng phải dài hơn hoặc bằng phiên thanh toán.",
-      "tooMany": "Quá nhiều mục."
+      "tooMany": "Quá nhiều mục.",
+      "riskUnchanged": "Trạng thái cờ rủi ro đã như vậy. Tải lại trang."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -2782,7 +2786,8 @@
             "no_recipient": "Khách không có email",
             "no_channel": "Chưa cấu hình kênh nhận"
           }
-        }
+        },
+        "customerProfile": "Xem hồ sơ khách hàng"
       },
       "timeline": {
         "system": "Hệ thống",
@@ -3484,11 +3489,15 @@
         "low_stock": "Sắp hết hàng",
         "job_failed": "Tác vụ nền thất bại",
         "einvoice_failed": "Xuất hoá đơn điện tử thất bại",
-        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền"
+        "edit_refund": "Sửa đơn phát sinh khoản hoàn tiền",
+        "review_pending": "Đánh giá chờ duyệt"
       },
       "order": "Đơn {code}: {amount} · {method} · {province}",
       "orderNoProvince": "Đơn {code}: {amount} · {method}",
-      "noDetails": "Không có thêm thông tin."
+      "noDetails": "Không có thêm thông tin.",
+      "lowStock": "{sku} · {product}: còn {available} có thể bán (ngưỡng {threshold})",
+      "reviewPending": "{count, plural, other {# đánh giá}} đang chờ kiểm duyệt",
+      "jobFailed": "Tác vụ {job} ({id}) thất bại sau {attempts, plural, other {# lần thử}}. Đã chuyển vào hàng lỗi."
     },
     "einvoices": {
       "title": "Hoá đơn điện tử lỗi",
@@ -3997,6 +4006,123 @@
         "domainWarning": "Địa chỉ gửi phải thuộc tên miền đã cấu hình SPF/DKIM cho máy chủ email, nếu không email dễ vào thư rác.",
         "senderName": "Tên người gửi",
         "senderAddress": "Địa chỉ email gửi"
+      }
+    },
+    "customers": {
+      "title": "Khách hàng",
+      "description": "Tài khoản đã đăng ký và khách mua không đăng ký (gộp theo số điện thoại). Chi tiêu tính theo đơn đã xác nhận, trừ tiền hoàn.",
+      "search": "Tìm theo tên, số điện thoại hoặc email",
+      "export": "Xuất CSV",
+      "exportHint": "Tối đa {limit} dòng theo bộ lọc hiện tại; việc xuất được ghi nhật ký.",
+      "empty": "Không có khách hàng nào phù hợp.",
+      "noName": "(Chưa có tên)",
+      "back": "Khách hàng",
+      "yes": "Có",
+      "no": "Không",
+      "columns": {
+        "name": "Khách hàng",
+        "contact": "Liên hệ",
+        "orders": "Số đơn",
+        "spend": "Tổng chi tiêu",
+        "lastOrder": "Đơn gần nhất",
+        "risk": "Rủi ro COD"
+      },
+      "type": {
+        "registered": "Có tài khoản",
+        "guest": "Khách vãng lai"
+      },
+      "risk": {
+        "flagged": "Gắn cờ rủi ro",
+        "failed": "{count, plural, other {# lần giao thất bại}}"
+      },
+      "filter": {
+        "type": "Loại khách",
+        "allTypes": "Tất cả",
+        "risk": "Rủi ro",
+        "allRisk": "Tất cả",
+        "flagged": "Có rủi ro COD"
+      },
+      "locales": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "purposes": {
+        "terms": "Điều khoản sử dụng",
+        "privacy": "Chính sách bảo mật",
+        "marketing_email": "Nhận email tiếp thị",
+        "marketing_sms": "Nhận SMS tiếp thị",
+        "analytics": "Cookie phân tích",
+        "ads": "Cookie quảng cáo"
+      },
+      "orderColumns": {
+        "code": "Mã đơn",
+        "placedAt": "Ngày đặt",
+        "status": "Trạng thái",
+        "payment": "Thanh toán",
+        "total": "Tổng tiền",
+        "refunded": "Đã hoàn"
+      },
+      "detail": {
+        "profile": "Thông tin",
+        "phone": "Số điện thoại",
+        "email": "Email",
+        "locale": "Ngôn ngữ email",
+        "since": "Ngày tạo tài khoản",
+        "firstOrder": "Đơn đầu tiên",
+        "emailVerified": "Đã xác minh email",
+        "lastLogin": "Đăng nhập gần nhất",
+        "never": "Chưa đăng nhập",
+        "banned": "Tài khoản bị khoá",
+        "masked": "Thông tin liên hệ được che một phần theo quyền của bạn.",
+        "stats": "Tổng quan mua hàng",
+        "failedDeliveries": "Giao thất bại",
+        "spendHint": "Tổng chi tiêu = tổng tiền các đơn đã xác nhận trở đi trừ số tiền đã hoàn; không tính đơn chờ, đã huỷ, giao thất bại hoặc đã trả hàng.",
+        "orders": "Lịch sử đơn hàng",
+        "noOrders": "Khách chưa có đơn hàng.",
+        "moreOrders": "Chỉ hiển thị {shown} đơn gần nhất.",
+        "failedDelivery": "Giao thất bại",
+        "risk": "Rủi ro COD",
+        "riskFlagged": "Tài khoản đang bị gắn cờ rủi ro: đơn COD tiếp theo sẽ hiện cảnh báo.",
+        "riskNotFlagged": "Tài khoản không bị gắn cờ rủi ro.",
+        "phoneFailed": "Số điện thoại này có {count, plural, other {# đơn giao thất bại}} (tính cả đơn của người khác dùng số này).",
+        "guestRisk": "Khách vãng lai không có cờ rủi ro riêng: lịch sử giao thất bại của số điện thoại vẫn được cảnh báo trên đơn COD mới.",
+        "addresses": "Sổ địa chỉ",
+        "noAddresses": "Chưa lưu địa chỉ nào.",
+        "defaultAddress": "Mặc định",
+        "consents": "Đồng ý xử lý dữ liệu",
+        "noConsents": "Chưa có ghi nhận đồng ý nào.",
+        "consentGranted": "Đồng ý ngày {date} (phiên bản {version})",
+        "consentWithdrawn": "Từ chối hoặc rút lại ngày {date} (phiên bản {version})",
+        "marketingOn": "Đang nhận tin tiếp thị.",
+        "marketingOff": "Không nhận tin tiếp thị.",
+        "privacy": "Yêu cầu về dữ liệu",
+        "privacyCount": "{count, plural, =0 {Chưa có yêu cầu nào.} other {# yêu cầu về dữ liệu cá nhân.}}",
+        "privacyLink": "Xem yêu cầu dữ liệu của khách",
+        "auditLink": "Xem nhật ký thao tác trên tài khoản"
+      },
+      "riskControl": {
+        "set": "Gắn cờ rủi ro COD",
+        "clear": "Bỏ cờ rủi ro",
+        "setTitle": "Gắn cờ rủi ro COD cho {name}?",
+        "clearTitle": "Bỏ cờ rủi ro COD của {name}?",
+        "setDescription": "Đơn COD tiếp theo của khách sẽ hiện cảnh báo cho nhân viên xác nhận đơn.",
+        "clearDescription": "Lịch sử giao thất bại của số điện thoại vẫn được giữ và cảnh báo trên đơn COD mới.",
+        "reason": "Lý do",
+        "reasonHint": "Bắt buộc, ít nhất {min} ký tự. Lý do được ghi vào nhật ký.",
+        "flaggedDone": "Đã gắn cờ rủi ro COD.",
+        "cleared": "Đã bỏ cờ rủi ro COD."
+      },
+      "notes": {
+        "title": "Ghi chú nội bộ",
+        "label": "Thêm ghi chú",
+        "hint": "Chỉ nhân viên thấy. Ghi chú không sửa hoặc xoá được.",
+        "submit": "Lưu ghi chú",
+        "done": "Đã lưu ghi chú.",
+        "empty": "Chưa có ghi chú.",
+        "meta": "{actor} · {date}",
+        "system": "Hệ thống",
+        "riskSet": "Đã gắn cờ rủi ro COD",
+        "riskCleared": "Đã bỏ cờ rủi ro COD"
       }
     }
   }

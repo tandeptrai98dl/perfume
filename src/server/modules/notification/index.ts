@@ -19,6 +19,7 @@ export {
   buildStaffAlert,
   STAFF_ALERT_KINDS,
   type StaffAlert,
+  type StaffAlertDetails,
   type StaffAlertKind,
 } from './staff-alerts';
 export { carrierTrackingUrl, orderPageUrl, orderPaymentUrl } from './links';

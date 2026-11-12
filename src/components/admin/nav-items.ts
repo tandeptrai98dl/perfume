@@ -31,6 +31,11 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/orders/einvoices', labelKey: 'einvoices', permission: 'orders.view' },
     ],
   },
+  // M3 wave 2 (customers & alerts stream): customers, Owner + Manager (§11.1).
+  {
+    labelKey: 'customersSection',
+    items: [{ href: '/admin/customers', labelKey: 'customers', permission: 'customers.view' }],
+  },
   {
     labelKey: 'promotions',
     items: [

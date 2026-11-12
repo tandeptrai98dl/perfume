@@ -65,9 +65,22 @@ export const JOBS = {
         // M3: e-invoice failed for good; staff edit queued a refund.
         'einvoice_failed',
         'edit_refund',
+        // M3 wave 2 (customers & alerts stream): reviews awaiting moderation (throttled).
+        'review_pending',
       ]),
       orderId: z.uuid().optional(),
       message: z.string().max(500).optional(),
+      // ---------- M3 wave 2 (customers & alerts stream) ----------
+      /** `low_stock`: the variant that crossed its threshold (details read at send time). */
+      variantId: z.uuid().optional(),
+      /** `job_failed`: the dead-lettered job (queue name + id only, never its payload). */
+      job: z
+        .object({
+          name: z.string().min(1).max(100),
+          id: z.uuid(),
+          attempts: z.number().int().nonnegative(),
+        })
+        .optional(),
     }),
     queue: retryPolicy,
   },
