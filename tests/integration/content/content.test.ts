@@ -113,7 +113,8 @@ describe('migrations', () => {
 describe('demo seed', () => {
   it('seeds bilingual content once and keeps the English cookie draft hidden', async () => {
     const first = await seed(testDb.url, { demo: true });
-    expect(first.content).toEqual({ skipped: false, pages: 10, posts: 2 });
+    expect(first.content).toEqual({ skipped: false, pages: 4, posts: 2 });
+    expect(first.legal.created).toHaveLength(6);
     const again = await seed(testDb.url, { demo: true });
     expect(again.content.skipped).toBe(true);
 
