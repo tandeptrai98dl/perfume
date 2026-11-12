@@ -17,6 +17,7 @@ Issue an e-invoice automatically for every order when it transitions to `deliver
 - Invoice issuing never blocks order transitions.
 - Provider can be swapped without changing domain code.
 - The accountant confirms issue timing, template and series before go-live.
+- *Implementation note (M3 wave 2):* returns cancel the invoice (nothing invoiced left) or replace it with what the customer kept, through the adapter's `cancel` / `replace` from an outbox job with retries and a staff alert; Owner/Manager can do the same from the order page. Which document the accountant wants for returns (replacement or adjustment invoice) is **pending accountant confirmation**.
 - *Implementation note (M3):* the VAT rate is the `einvoice.vatRatePercent` setting (default 10 %; shop prices are VAT-inclusive and each line is split into taxable amount + VAT, rounded per line). The rate, the per-line rounding and the treatment of shipping and gift-wrap fees as service lines at the same rate are **pending accountant confirmation**, like the template and series (`EINVOICE_TEMPLATE_CODE`, `EINVOICE_SERIES`).
 
 See also: [ARCHITECTURE.md](../ARCHITECTURE.md), section 0.
