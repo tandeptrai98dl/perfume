@@ -177,6 +177,18 @@ test.describe.serial('admin manual orders', () => {
       return rows;
     });
     expect(payment).toEqual([{ provider: 'payos', status: 'pending', amount: '4600000' }]);
+    // M3: the link is also e-mailed to the customer (outbox job in the order transaction).
+    await expect(
+      result.getByText('Link thanh toán cũng được gửi tới email của khách.'),
+    ).toBeVisible();
+    const emailJobs = await withDb(async (db) => {
+      const { rows } = await db.query<{ n: number }>(
+        `select count(*)::int as n from pgboss.job where name = 'order.payment-link' and data->>'orderId' = $1`,
+        [orderId],
+      );
+      return rows[0]!.n;
+    });
+    expect(emailJobs).toBe(1);
 
     // The customer opens the link in another browser (no admin session, no order cookie).
     const url = await link.inputValue();
