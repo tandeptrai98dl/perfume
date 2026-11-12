@@ -31,8 +31,6 @@ const REVIEW_NOTES: Record<string, string> = {
   'src/actions/checkout.ts#listWardsAction': 'Public reference data (administrative units).',
   'src/actions/order-lookup.ts#lookupOrderAction':
     'Guest order lookup: order code + phone, rate-limited, generic failure (no enumeration).',
-  'src/actions/returns.ts#requestReturnAction':
-    'Order owner session or the order access (signed `?t=` link / lookup cookie); rate-limited per IP; unknown and foreign orders answer the same.',
   'src/actions/payment.ts#startPaymentAction':
     'Owner session or signed order token; unknown and foreign orders answer the same.',
   'src/app/api/auth/[...all]/route.ts': 'Better Auth handler (rate limits, CSRF/Origin, sessions).',
@@ -42,7 +40,10 @@ const REVIEW_NOTES: Record<string, string> = {
   'src/app/api/health/route.ts': 'Liveness probe; no data.',
   'src/app/api/internal/revalidate/route.ts':
     'Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session.',
-  'src/app/api/media/[...key]/route.ts': 'Public product/content images (uploads are images only).',
+  'src/app/api/media/[...key]/route.ts':
+    'Public product/content images (uploads are images only); refuses `private/…` keys.',
+  'src/app/api/returns/request/route.ts':
+    'Same-origin only; order owner session or the order access (signed `?t=` link / lookup cookie); rate-limited per IP; unknown and foreign orders answer the same; ≤ 3 photos, magic bytes + size checked, re-encoded (EXIF stripped), stored privately.',
   'src/app/api/payments/simulator/vnpay/route.ts':
     'Payment simulator: 404 unless the gateway runs in simulator mode (never in production).',
   'src/app/api/search/suggestions/route.ts':

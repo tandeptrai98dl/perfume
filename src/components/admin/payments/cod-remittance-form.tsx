@@ -29,7 +29,9 @@ type Values = {
 
 /**
  * COD reconciliation (§3.4 step 6, §11.2): pick the carrier, tick the orders on its
- * statement, compare (Σ COD − fee) with the money on the bank receipt, save.
+ * statement, compare (Σ COD − fee) with the money on the bank receipt, save. Orders the
+ * customer returned after delivery are listed too (the carrier collected them): saving queues
+ * the refund their return still owes.
  */
 export function CodRemittanceForm({
   candidates,
@@ -163,6 +165,16 @@ export function CodRemittanceForm({
                             <span className="text-taupe-600">
                               {t('form.delivered', {
                                 date: format.dateTime(c.deliveredAt, { dateStyle: 'short' }),
+                              })}
+                            </span>
+                          )}
+                          {c.status === 'returned' && (
+                            <span className="text-taupe-600">{t('form.returned')}</span>
+                          )}
+                          {c.deferredRefund > 0 && (
+                            <span className="text-warning" data-testid="cod-deferred-refund">
+                              {t('form.deferredRefund', {
+                                amount: format.number(c.deferredRefund, VND),
                               })}
                             </span>
                           )}

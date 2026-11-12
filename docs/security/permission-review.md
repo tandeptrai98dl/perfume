@@ -17,10 +17,10 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 75 |
+| Admin Server Actions | 76 |
 | Admin Server Actions without a permission | 0 |
-| Storefront Server Actions | 29 |
-| Route Handlers | 20 |
+| Storefront Server Actions | 28 |
+| Route Handlers | 22 |
 | Admin pages | 63 |
 
 ## Admin Server Actions
@@ -86,6 +86,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `promotions.ts` | `searchCouponProductsAction` | `coupons.manage` | owner, manager | yes |
 | `promotions.ts` | `setCouponActiveAction` | `coupons.manage` | owner, manager | yes |
 | `returns.ts` | `approveReturnAction` | `payments.refund` | owner, manager | yes |
+| `returns.ts` | `openReturnForCustomerAction` | `orders.process` | owner, manager, staff | yes |
 | `returns.ts` | `receiveReturnAction` | `orders.process` | owner, manager, staff | yes |
 | `returns.ts` | `rejectReturnAction` | `payments.refund` | owner, manager | yes |
 | `reviews.ts` | `moderateReviewAction` | `reviews.moderate` | owner, manager, editor | yes |
@@ -110,6 +111,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/admin/audit-log/export` | GET | `customers.export`, `auditLog.view` | — | Cross-site requests refused (Fetch Metadata); the export itself is audited. |
 | `/api/admin/customers/export` | GET | `customers.export` | — | Owner only; cross-site requests refused (Fetch Metadata); capped at 5,000 rows, formula-safe CSV, audited. |
 | `/api/admin/media` | POST | `admin.access` | Origin check | Any staff session at the edge; `uploadMedia` then requires `products.editContent` or `content.manage`. |
+| `/api/admin/orders/[id]/return-photos/[photoId]` | GET | `orders.view` | — |  |
 | `/api/auth/[...all]` | GET | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
 | `/api/auth/[...all]` | POST | — | Better Auth (own rate limits, CSRF and session rules) | Better Auth handler (rate limits, CSRF/Origin, sessions). |
 | `/api/checkout/payment-status` | GET | — | order access (owner session or signed order token) | Polled by the result page; owner session or signed order token; 404 otherwise. |
@@ -117,10 +119,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/health/live` | GET | — | — |  |
 | `/api/health` | GET | — | — | Liveness probe; no data. |
 | `/api/internal/revalidate` | POST | — | HMAC signature | Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session. |
-| `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only). |
+| `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only); refuses `private/…` keys. |
 | `/api/newsletter/unsubscribe` | POST | — | — | RFC 8058 one-click unsubscribe from mail clients; signed link, rate-limited, only ever unsubscribes. |
 | `/api/payments/simulator/vnpay` | GET | — | simulator signature (non-production only); gateway signature + amount/txn_ref match + idempotency | Payment simulator: 404 unless the gateway runs in simulator mode (never in production). |
 | `/api/privacy/export/[id]` | GET | — | customer session (own data only) |  |
+| `/api/returns/request` | POST | — | Origin check; customer session (own data only) | Same-origin only; order owner session or the order access (signed `?t=` link / lookup cookie); rate-limited per IP; unknown and foreign orders answer the same; ≤ 3 photos, magic bytes + size checked, re-encoded (EXIF stripped), stored privately. |
 | `/api/reviews` | GET | — | — |  |
 | `/api/search/suggestions` | GET | — | — | Public catalogue search suggestions (published data). |
 | `/api/webhooks/payos` | POST | — | gateway signature + amount/txn_ref match + idempotency | Gateway webhook: signature, amount + txn_ref match and idempotency key (no session by design). |
@@ -159,7 +162,6 @@ No staff permission by design; the guard is ownership, a signed token or a rate 
 | `privacy.ts` | `requestGuestPrivacyAction` | — | yes |  |
 | `privacy.ts` | `saveCookieConsentAction` | session lookup | yes |  |
 | `privacy.ts` | `updateAccountConsentsAction` | customer session (own data only) | yes |  |
-| `returns.ts` | `requestReturnAction` | customer session (own data only) | yes | Order owner session or the order access (signed `?t=` link / lookup cookie); rate-limited per IP; unknown and foreign orders answer the same. |
 | `review.ts` | `submitGuestReviewAction` | — | yes |  |
 | `review.ts` | `submitMemberReviewAction` | customer session (own data only) | yes |  |
 | `wishlist.ts` | `setWishlistedAction` | customer session (own data only) | yes |  |
@@ -205,7 +207,7 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/inventory/movements` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/inventory` | `inventory.adjust` | owner, manager, staff | — |  |
 | `/admin/orders/[id]/edit` | `orders.editBeforeShipping` | owner, manager, staff | `orders.cancelPaid` |  |
-| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.cancelPaid`, `orders.editBeforeShipping`, `orders.process`, `payments.refund`, `customers.view` |  |
+| `/admin/orders/[id]` | `orders.view` | owner, manager, staff | `orders.process`, `orders.cancelPaid`, `orders.editBeforeShipping`, `payments.refund`, `customers.view` |  |
 | `/admin/orders/einvoices` | `orders.view` | owner, manager, staff | `orders.process` |  |
 | `/admin/orders/new` | `orders.createManual` | owner, manager, staff | `orders.process`, `payments.confirmBankTransfer` |  |
 | `/admin/orders` | `orders.view` | owner, manager, staff | `orders.createManual` |  |

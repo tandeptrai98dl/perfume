@@ -14,7 +14,14 @@ import { FilterSelect } from '../data-table/filter-select';
 import { CompleteRefundDialog } from './complete-refund-dialog';
 import { DATE_TIME, orderHref, REFUND_TONES, VND } from './format';
 
-const KNOWN_REASONS = ['late_payment_after_cancellation', 'overpayment', 'order_cancelled'];
+const KNOWN_REASONS = [
+  'late_payment_after_cancellation',
+  'overpayment',
+  'order_cancelled',
+  'return_shipping_payout',
+];
+/** Customer returns queue `return:<reason>` (ADR-0017). */
+const RETURN_REASONS = ['unopened', 'defective', 'wrong_item', 'damaged'];
 
 /** Refund queue (§11.2), including money received after cancellation. */
 export function RefundTable(props: {
@@ -26,6 +33,7 @@ export function RefundTable(props: {
   refundProviders: string[];
 }) {
   const t = useTranslations('admin.payments');
+  const tReturns = useTranslations('admin.returns');
   const format = useFormatter();
   const { refundProviders } = props;
   const columns = useMemo<DataTableColumn<RefundRow>[]>(
@@ -67,10 +75,19 @@ export function RefundTable(props: {
       {
         id: 'reason',
         header: t('refunds.columns.reason'),
-        cell: ({ row }) =>
-          KNOWN_REASONS.includes(row.original.reason)
-            ? t(`refunds.reasons.${row.original.reason as 'overpayment'}`)
-            : row.original.reason,
+        cell: ({ row }) => {
+          const { reason } = row.original;
+          if (KNOWN_REASONS.includes(reason)) {
+            return t(`refunds.reasons.${reason as 'overpayment'}`);
+          }
+          const returnReason = reason.startsWith('return:') ? reason.slice(7) : null;
+          if (returnReason && RETURN_REASONS.includes(returnReason)) {
+            return t('refunds.reasons.return', {
+              reason: tReturns(`reasons.${returnReason as 'unopened'}`),
+            });
+          }
+          return reason;
+        },
       },
       {
         id: 'method',
@@ -143,7 +160,7 @@ export function RefundTable(props: {
           ),
       },
     ],
-    [t, format, refundProviders],
+    [t, tReturns, format, refundProviders],
   );
   return (
     <DataTable
