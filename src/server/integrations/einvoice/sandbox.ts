@@ -18,8 +18,8 @@ export type SandboxConfig = {
   series?: string;
   templateCode?: string;
   now?: () => Date;
-  /** Return an error to fail this call (tests); null to succeed. */
-  failWith?: (document: EinvoiceDocument) => EinvoiceError | null;
+  /** Return an error to fail this call (tests); null to succeed. `null` document = cancel. */
+  failWith?: (document: EinvoiceDocument | null) => EinvoiceError | null;
 };
 
 export function sandboxInvoiceNo(refId: string): string {
@@ -65,11 +65,16 @@ export function createSandboxEinvoiceProvider(config: SandboxConfig = {}): Einvo
       return { status: state, invoice, providerStatus: state };
     },
     async cancel(invoice) {
-      const found = issued.get(invoice.refId);
-      if (!found) throw new EinvoiceError('sandbox:not_found', false);
-      found.state = 'cancelled';
+      const failure = config.failWith?.(null);
+      if (failure) throw failure;
+      // Sandbox memory does not survive a worker restart: an invoice issued by an earlier
+      // process is accepted as known (numbers are derived from the refId anyway).
+      const found = issued.get(invoice.refId) ?? { ...invoice, state: 'issued' as const };
+      issued.set(invoice.refId, { ...found, state: 'cancelled' });
     },
     async replace(original, document) {
+      const failure = config.failWith?.(document);
+      if (failure) throw failure;
       const found = issued.get(original.refId);
       if (found) found.state = 'replaced';
       const invoice = make(document.refId);

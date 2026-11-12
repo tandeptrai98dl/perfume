@@ -5,6 +5,7 @@ import {
   sendAuthEmail,
   sendPaymentLink,
   sendPaymentReceived,
+  sendReturnUpdate,
   sendStaffAlert,
   sendStatusChangeEmail,
   type NotificationDeps,
@@ -55,6 +56,10 @@ export function createOrderNotificationHandlers(deps: HandlerDeps) {
     },
     'auth.email': async (payload: JobPayload<'auth.email'>) => {
       await sendAuthEmail(notify, payload);
+    },
+    // M3 wave 2 returns stream: customer e-mails about a return request.
+    'return.notify': async (payload: JobPayload<'return.notify'>) => {
+      await sendReturnUpdate(notify, payload);
     },
   } as const;
 }

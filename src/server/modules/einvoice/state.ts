@@ -84,3 +84,126 @@ export function einvoiceStatus(
     canRetry: eligible,
   };
 }
+
+// ---------- Cancellation and replacement (M3 wave 2 returns stream) ----------
+/*
+ * After an invoice is issued it can be cancelled (everything was returned) or replaced (part
+ * of it was returned, or staff correct it), always through the provider adapter from the
+ * `einvoice.adjust` outbox job. Each request, failed try and result is an `order_events` row;
+ * `orders.einvoice_ref` keeps the current invoice (a replacement swaps it, a cancellation keeps
+ * the cancelled number for the record). Kept apart from the issuing events above so issuing,
+ * retries and the failed list are unchanged.
+ */
+export const EINVOICE_ADJUSTMENT_EVENTS = {
+  requested: 'einvoice_adjust_requested',
+  attemptFailed: 'einvoice_adjust_attempt_failed',
+  failed: 'einvoice_adjust_failed',
+  cancelled: 'einvoice_cancelled',
+  replaced: 'einvoice_replaced',
+} as const;
+export const EINVOICE_ADJUSTMENT_EVENT_TYPES: readonly string[] = Object.values(
+  EINVOICE_ADJUSTMENT_EVENTS,
+);
+
+export const EINVOICE_ADJUSTMENT_ACTIONS = ['cancel', 'replace'] as const;
+export type EinvoiceAdjustmentAction = (typeof EINVOICE_ADJUSTMENT_ACTIONS)[number];
+
+export type EinvoiceAdjustmentState =
+  'none' | 'pending' | 'retrying' | 'failed' | 'cancelled' | 'replaced';
+
+export type EinvoiceAdjustmentEventRow = EinvoiceEventRow & { message: string | null };
+
+export type EinvoiceAdjustmentSummary = {
+  state: EinvoiceAdjustmentState;
+  action: EinvoiceAdjustmentAction | null;
+  adjustmentId: string | null;
+  /** Why staff (or the return) asked for it. */
+  requestReason: string | null;
+  /** Provider failure code of the latest failed try. */
+  reason: string | null;
+  attempts: number;
+  lastEventAt: Date | null;
+  /** An invoice exists, is not cancelled and no adjustment is running. */
+  canAdjust: boolean;
+};
+
+function metaString(metadata: Record<string, unknown> | null, key: string): string | null {
+  const value = metadata?.[key];
+  return typeof value === 'string' && value ? value : null;
+}
+
+/** State of the latest cancellation/replacement request (events in chronological order). */
+export function einvoiceAdjustmentStatus(
+  order: { einvoiceRef: string | null },
+  events: readonly EinvoiceAdjustmentEventRow[],
+): EinvoiceAdjustmentSummary {
+  let summary: EinvoiceAdjustmentSummary = {
+    state: 'none',
+    action: null,
+    adjustmentId: null,
+    requestReason: null,
+    reason: null,
+    attempts: 0,
+    lastEventAt: null,
+    canAdjust: false,
+  };
+  let cancelled = false;
+  for (const event of events) {
+    const adjustmentId = metaString(event.metadata, 'adjustmentId');
+    if (event.type === EINVOICE_ADJUSTMENT_EVENTS.cancelled) cancelled = true;
+    if (event.type === EINVOICE_ADJUSTMENT_EVENTS.requested) {
+      const action = metaString(event.metadata, 'action');
+      summary = {
+        ...summary,
+        state: 'pending',
+        action: action === 'cancel' || action === 'replace' ? action : null,
+        adjustmentId,
+        requestReason: event.message,
+        reason: null,
+        attempts: 0,
+        lastEventAt: event.createdAt,
+      };
+      continue;
+    }
+    if (!adjustmentId || adjustmentId !== summary.adjustmentId) {
+      // A result of an older request (e.g. a cancellation that overtook a replacement).
+      if (event.type === EINVOICE_ADJUSTMENT_EVENTS.cancelled) {
+        summary = { ...summary, state: 'cancelled', lastEventAt: event.createdAt };
+      }
+      continue;
+    }
+    switch (event.type) {
+      case EINVOICE_ADJUSTMENT_EVENTS.attemptFailed:
+        summary = {
+          ...summary,
+          state: 'retrying',
+          attempts: summary.attempts + 1,
+          reason: metaString(event.metadata, 'reason'),
+          lastEventAt: event.createdAt,
+        };
+        break;
+      case EINVOICE_ADJUSTMENT_EVENTS.failed:
+        summary = {
+          ...summary,
+          state: 'failed',
+          attempts: summary.attempts + 1,
+          reason: metaString(event.metadata, 'reason'),
+          lastEventAt: event.createdAt,
+        };
+        break;
+      case EINVOICE_ADJUSTMENT_EVENTS.cancelled:
+        summary = { ...summary, state: 'cancelled', lastEventAt: event.createdAt };
+        break;
+      case EINVOICE_ADJUSTMENT_EVENTS.replaced:
+        summary = { ...summary, state: 'replaced', lastEventAt: event.createdAt };
+        break;
+    }
+  }
+  // A cancelled invoice is final: later requests are refused (and skipped by the job).
+  if (cancelled) summary = { ...summary, state: 'cancelled' };
+  const running = summary.state === 'pending' || summary.state === 'retrying';
+  return {
+    ...summary,
+    canAdjust: !!order.einvoiceRef && !cancelled && !running,
+  };
+}
