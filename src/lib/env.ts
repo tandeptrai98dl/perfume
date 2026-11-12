@@ -305,6 +305,11 @@ export const clientEnvSchema = z.object({
   NEXT_PUBLIC_MEDIA_BASE_URL: z.url().optional(),
   /** Cloudflare Turnstile site key (public); the widget is hidden when unset. */
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+  /** M3 privacy: Google Tag Manager container (GA4 + Meta Pixel), loaded only after consent. */
+  NEXT_PUBLIC_GTM_ID: z
+    .string()
+    .regex(/^GTM-[A-Z0-9]{4,12}$/, 'must look like GTM-XXXXXXX')
+    .optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -354,4 +359,5 @@ export const clientEnv: ClientEnv = parseClientEnv({
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   NEXT_PUBLIC_MEDIA_BASE_URL: process.env.NEXT_PUBLIC_MEDIA_BASE_URL,
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
 });

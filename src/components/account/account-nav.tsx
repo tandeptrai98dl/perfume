@@ -16,6 +16,8 @@ const ITEMS = [
   { href: '/account/wishlist', key: 'wishlist' },
   { href: '/account/reviews', key: 'reviews' },
   { href: '/account/profile', key: 'profile' },
+  // M3 privacy stream: privacy centre.
+  { href: '/account/privacy', key: 'privacy' },
 ] as const;
 
 /**

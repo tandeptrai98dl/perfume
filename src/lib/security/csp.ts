@@ -19,6 +19,12 @@ export const CSP_HOSTS = {
   googleAnalytics: ['https://*.google-analytics.com', 'https://*.analytics.google.com'],
   /** Meta Pixel (after consent). */
   metaPixel: ['https://connect.facebook.net', 'https://www.facebook.com'],
+  /** Google Ads conversion/remarketing tags fired by GTM (after `ad_storage` consent). */
+  googleAds: ['https://googleads.g.doubleclick.net', 'https://*.doubleclick.net'],
+  /** Google Ads remarketing pixels. */
+  googleAdsImages: ['https://www.google.com', 'https://www.google.com.vn'],
+  /** Ministry of Industry and Trade notification badge image (footer). */
+  moitBadge: ['https://online.gov.vn'],
   /** Cloudflare Turnstile (script + challenge iframe). */
   turnstile: ['https://challenges.cloudflare.com'],
   /**
@@ -99,6 +105,7 @@ export function buildContentSecurityPolicy(options: CspOptions): string {
       ...CSP_HOSTS.googleTagManager,
       ...CSP_HOSTS.googleAnalytics,
       CSP_HOSTS.metaPixel[0],
+      CSP_HOSTS.googleAds[0],
       ...CSP_HOSTS.turnstile,
     ]),
     'style-src': ["'self'", "'unsafe-inline'"],
@@ -110,6 +117,9 @@ export function buildContentSecurityPolicy(options: CspOptions): string {
       ...CSP_HOSTS.googleTagManager,
       ...CSP_HOSTS.googleAnalytics,
       CSP_HOSTS.metaPixel[1],
+      CSP_HOSTS.googleAds[1],
+      ...CSP_HOSTS.googleAdsImages,
+      ...CSP_HOSTS.moitBadge,
     ]),
     'font-src': ["'self'", 'data:'],
     'connect-src': unique([
@@ -119,10 +129,15 @@ export function buildContentSecurityPolicy(options: CspOptions): string {
       ...CSP_HOSTS.googleTagManager,
       ...CSP_HOSTS.googleAnalytics,
       ...CSP_HOSTS.metaPixel,
+      CSP_HOSTS.googleAds[1],
       ...CSP_HOSTS.turnstile,
     ]),
     'media-src': unique(["'self'", media]),
-    'frame-src': unique([...CSP_HOSTS.turnstile, CSP_HOSTS.googleTagManager[0]]),
+    'frame-src': unique([
+      ...CSP_HOSTS.turnstile,
+      CSP_HOSTS.googleTagManager[0],
+      'https://td.doubleclick.net',
+    ]),
     'worker-src': ["'self'", 'blob:'],
     'manifest-src': ["'self'"],
     'form-action': unique(["'self'", ...CSP_HOSTS.paymentForms, origin(options.vnpayPaymentUrl)]),

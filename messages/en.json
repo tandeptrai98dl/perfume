@@ -181,6 +181,57 @@
       "guestNote": "Each link can be used once and is valid for {days} days.",
       "memberNote": "You can review your purchases at any time under Reviews in your account.",
       "moderation": "Reviews are moderated before publication and labelled \"Verified purchase\"."
+    },
+    "privacy": {
+      "types": {
+        "export": "copy of your data",
+        "delete": "deletion of your data",
+        "correct": "correction of your data",
+        "withdrawConsent": "withdrawal of marketing consent"
+      },
+      "dueAt": "Legal due date: {date}.",
+      "note": "Note: {note}",
+      "expiresAt": "The link is valid until the end of {date}.",
+      "verify": {
+        "subject": "Confirm your personal data request",
+        "preview": "Confirm your request: {type}",
+        "heading": "Confirm your request",
+        "body": "We received a request for a {type} for this e-mail address. Press the button below to confirm it.",
+        "cta": "Confirm request",
+        "ignore": "If you did not send this request, ignore this e-mail; nothing will change."
+      },
+      "received": {
+        "subject": "We received your request",
+        "preview": "Request received: {type}",
+        "heading": "Request received",
+        "body": "We have received your request for a {type} and will answer within the legal deadline.",
+        "cta": "View request",
+        "ignore": "If you have an account, you can follow the request on your privacy page."
+      },
+      "exportReady": {
+        "subject": "Your personal data is ready",
+        "preview": "Download a copy of your data",
+        "heading": "Your data is ready",
+        "body": "Press the button below to download a JSON file with the personal data we hold about you.",
+        "cta": "Download data",
+        "ignore": "Do not forward this e-mail: anyone with the link can download the data."
+      },
+      "completed": {
+        "subject": "Your request has been completed",
+        "preview": "Request completed: {type}",
+        "heading": "Request completed",
+        "body": "Your request for a {type} has been carried out.",
+        "cta": "Open your privacy page",
+        "ignore": "If you have any questions, contact us through the Contact page."
+      },
+      "rejected": {
+        "subject": "About your personal data request",
+        "preview": "Outcome of your request: {type}",
+        "heading": "We could not carry out your request",
+        "body": "We could not carry out your request for a {type} for the reason below.",
+        "cta": "Open your privacy page",
+        "ignore": "You can send the request again or contact us."
+      }
     }
   },
   "ui": {
@@ -231,8 +282,10 @@
       "address": "Address: {value}",
       "representative": "Legal representative: {value}",
       "phone": "Phone: {value}",
-      "email": "Email: {value}"
-    }
+      "email": "Email: {value}",
+      "moitBadge": "Notified to the Ministry of Industry and Trade"
+    },
+    "privacyRequest": "Personal data requests"
   },
   "journal": {
     "title": "Journal",
@@ -935,7 +988,8 @@
       "profile": "Profile",
       "signOut": "Sign out",
       "wishlist": "Wishlist",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "privacy": "Privacy"
     },
     "overview": {
       "intro": "Follow your orders, manage your addresses and choose how we contact you.",
@@ -1046,6 +1100,9 @@
       "conflict": "The order changed in the meantime. Please reload the page.",
       "unexpected": "Something went wrong. Please try again.",
       "validation": "Please correct the highlighted fields."
+    },
+    "privacy": {
+      "metaTitle": "Privacy"
     }
   },
   "customerOrder": {
@@ -1277,12 +1334,213 @@
         "approved": "Published",
         "rejected": "Not published"
       }
-    }
+    },
+    "anonymousReviewer": "Anonymous customer"
   },
   "ogImage": {
     "tagline": "Authentic fragrances · Delivered across Vietnam"
   },
   "security": {
     "captchaFailed": "We couldn't complete the security check. Please wait a moment and try again."
+  },
+  "cookieConsent": {
+    "title": "We use cookies",
+    "text": "Necessary cookies keep the cart, sign-in and language working. With your consent we also use analytics cookies (Google Analytics) and advertising cookies (Meta Pixel) to understand how the site is used and to measure our ads. You can change your choice at any time from the bottom of the page.",
+    "policyLink": "Read the cookie policy",
+    "rejectAll": "Reject all",
+    "acceptAll": "Accept all",
+    "customize": "Customise",
+    "saved": "Your cookie choice has been saved.",
+    "saveFailed": "We could not save your choice. Please try again.",
+    "settings": "Cookie settings",
+    "alwaysOn": "Always on",
+    "preferences": {
+      "title": "Cookie preferences",
+      "description": "Choose which cookies you allow. Optional cookies are only used when you switch them on.",
+      "save": "Save my choice"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Necessary",
+        "description": "Cart, sign-in session, language and your cookie choice. The site does not work without them."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Google Analytics 4 measures page views and how the site is used so we can improve it."
+      },
+      "ads": {
+        "title": "Advertising",
+        "description": "Meta Pixel and Google Ads measure our ads and may show you relevant ads on other platforms."
+      }
+    }
+  },
+  "privacyCenter": {
+    "title": "Privacy",
+    "intro": "Manage your consents and exercise your rights over your personal data under Vietnam's Personal Data Protection Law.",
+    "consents": {
+      "title": "Your consents",
+      "intro": "Switch each purpose on or off. Every change is recorded with its time.",
+      "save": "Save changes",
+      "saved": "Your consents have been updated.",
+      "withdrawNote": "Withdrawing consent does not affect processing carried out before. Analytics and advertising cookies apply to this browser.",
+      "marketingEmail": {
+        "title": "Promotional e-mails",
+        "description": "News about new arrivals and offers by e-mail."
+      },
+      "marketingSms": {
+        "title": "Promotional messages",
+        "description": "Offers by SMS or Zalo."
+      },
+      "analytics": {
+        "title": "Analytics cookies",
+        "description": "Let Google Analytics measure how you use the site."
+      },
+      "ads": {
+        "title": "Advertising cookies",
+        "description": "Let Meta Pixel and Google Ads measure our advertising."
+      }
+    },
+    "requests": {
+      "title": "Your data",
+      "intro": "Send a request about your personal data. We answer within the legal deadline and e-mail you at every step.",
+      "empty": "You have not sent any requests.",
+      "listCaption": "Personal data requests",
+      "download": "Download data (JSON)",
+      "pendingNote": "You already have a request of this type in progress.",
+      "alreadyOpen": "You already have a request of this type in progress.",
+      "sent": {
+        "export": "Request received. The download link will be e-mailed to you in a few minutes.",
+        "correct": "Correction request received. Due by {date}.",
+        "delete": "Deletion request received. Due by {date}."
+      },
+      "columns": {
+        "type": "Request",
+        "createdAt": "Sent",
+        "status": "Status",
+        "dueAt": "Due / completed",
+        "actions": "Actions"
+      },
+      "types": {
+        "export": "Copy of my data",
+        "delete": "Delete my data",
+        "correct": "Correct my data",
+        "withdrawConsent": "Withdraw marketing consent"
+      },
+      "status": {
+        "received": "Received",
+        "inProgress": "In progress",
+        "completed": "Completed",
+        "rejected": "Rejected"
+      },
+      "export": {
+        "title": "Get a copy of your data",
+        "description": "Download all personal data we hold about you (account, addresses, orders, consents) as a JSON file. The link is valid for 7 days.",
+        "action": "Request a copy"
+      },
+      "correct": {
+        "title": "Correct your data",
+        "description": "You can edit your profile and address book yourself. For anything else (for example details on an order), tell us what needs correcting.",
+        "label": "What needs correcting",
+        "action": "Send request"
+      },
+      "delete": {
+        "title": "Delete your personal data",
+        "description": "Delete your account and anonymise your personal data. Accounting details of orders are kept as the law requires.",
+        "action": "Request deletion",
+        "confirmTitle": "Delete your personal data?",
+        "confirmDescription": "Once processed, you cannot sign in or restore the account.",
+        "consequences": {
+          "account": "Your account, address book, wishlist and newsletter subscription are deleted.",
+          "orders": "Orders are kept for accounting and tax purposes but no longer carry your name, phone, e-mail or address.",
+          "openOrders": "If an order is still in progress, deletion happens after it is completed."
+        },
+        "reason": "Reason (optional)",
+        "understood": "I understand that deletion cannot be undone.",
+        "cancel": "Cancel",
+        "submit": "Request deletion"
+      }
+    },
+    "history": {
+      "title": "Consent history",
+      "empty": "Nothing recorded yet.",
+      "caption": "History of consents given and withdrawn",
+      "columns": {
+        "date": "Time",
+        "purpose": "Purpose",
+        "decision": "Choice",
+        "source": "Recorded at"
+      },
+      "granted": "Granted",
+      "withdrawn": "Declined / withdrawn",
+      "purposes": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "marketingEmail": "Promotional e-mails",
+        "marketingSms": "Promotional messages",
+        "analytics": "Analytics cookies",
+        "ads": "Advertising cookies"
+      },
+      "sources": {
+        "checkout": "Checkout",
+        "account_profile": "Account profile",
+        "privacy_center": "Privacy page",
+        "cookie_banner": "Cookie notice",
+        "cookie_preferences": "Cookie preferences",
+        "guest_form": "Request form",
+        "newsletter": "Newsletter sign-up",
+        "privacy_erasure": "Data deletion"
+      }
+    },
+    "errors": {
+      "validation": "Please check the details.",
+      "unauthorized": "Your session has expired. Please sign in again.",
+      "rateLimited": "Too many requests. Please try again later.",
+      "notFound": "Not found.",
+      "invalid": "This value is not valid.",
+      "conflict": "This request cannot be carried out right now.",
+      "unexpected": "Something went wrong. Please try again.",
+      "required": "Please describe it (at least 5 characters).",
+      "tooLong": "Too long (1,000 characters at most).",
+      "email": "Please enter a valid e-mail address.",
+      "tokenInvalid": "The confirmation link is invalid or has expired."
+    }
+  },
+  "privacyRequest": {
+    "metaTitle": "Personal data requests",
+    "title": "Personal data requests",
+    "intro": "You have the right to get a copy of your personal data, have it corrected or deleted, or withdraw consent to marketing. We e-mail you a confirmation link so that only the owner of the address can file a request.",
+    "memberHint": "Have an account?",
+    "memberLink": "Manage it on your privacy page",
+    "form": {
+      "email": "E-mail",
+      "emailHint": "The address you used to order or sign up.",
+      "type": "You would like to",
+      "typeHints": {
+        "export": "Receive a JSON file with the data we hold for this e-mail.",
+        "correct": "Tell us which details are wrong.",
+        "delete": "Anonymise your personal data; accounting details are kept.",
+        "withdrawConsent": "Stop promotional e-mails and messages."
+      },
+      "details": "Notes (optional)",
+      "detailsRequired": "What needs correcting",
+      "submit": "Send request",
+      "sent": "If the address is valid, a confirmation link is on its way. It is valid for 24 hours.",
+      "another": "Send another request"
+    },
+    "confirm": {
+      "metaTitle": "Confirm your request",
+      "title": "Confirm your request",
+      "intro": "Check the details below and confirm to file the request.",
+      "email": "E-mail",
+      "type": "Request",
+      "details": "Notes",
+      "submit": "Confirm request",
+      "done": "Request received. Due by {date}. We will e-mail you with the outcome.",
+      "doneExport": "Request received. The download link will be e-mailed to you in a few minutes.",
+      "doneImmediate": "Done: you will no longer receive promotional messages.",
+      "invalidTitle": "This link is no longer valid",
+      "invalidText": "The confirmation link is invalid or older than 24 hours. Please send the request again.",
+      "again": "Send the request again"
+    }
   }
 }

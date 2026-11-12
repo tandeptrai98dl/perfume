@@ -10,6 +10,7 @@ import { createEinvoiceHandlers } from './einvoice';
 import { createOrderNotificationHandlers } from './order-notifications';
 import { createOrderTimeoutHandlers } from './order-timeouts';
 import { createPruneRateLimitsHandler } from './prune-rate-limits';
+import { createPrivacyHandlers } from './privacy';
 import { createRevalidateHandler } from './revalidate';
 import { createReviewInvitationHandlers } from './review-invitations';
 import { createTestEmailHandler } from './test-email';
@@ -63,5 +64,7 @@ export function createHandlers(deps: HandlerDeps): JobHandlers {
     },
     'review.invite': reviewInvitations['review.invite'],
     'system.prune-rate-limits': createPruneRateLimitsHandler(deps.db),
+    // M3 privacy stream: data-subject request e-mails and exports.
+    ...createPrivacyHandlers(deps),
   };
 }

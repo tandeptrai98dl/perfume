@@ -29,7 +29,7 @@ function ReviewItem({ review }: { review: ReviewRow }) {
       </div>
       <p className="text-small text-taupe-600">
         {t('byline', {
-          name: review.reviewerName,
+          name: review.reviewerName || t('anonymousReviewer'),
           date: format.dateTime(new Date(review.createdAt), { dateStyle: 'medium' }),
         })}
         {' · '}

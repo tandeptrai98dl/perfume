@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
 import type { Database } from '@/server/db/client';
 import { orderItems, orders, reviewInvitations, reviews } from '@/server/db/schema';
@@ -296,4 +296,39 @@ export async function replyToReview(
       tags,
     };
   });
+}
+
+/**
+ * Privacy deletion step (PDPL 91/2025; `ErasureStep` of the customer module): the subject's
+ * reviews stay published as anonymous (empty reviewer name, rendered as "anonymous customer")
+ * and their guest invitations, which hold the e-mail, are deleted. Matches member reviews by
+ * user id and guest reviews through the invitation e-mail.
+ */
+export async function anonymizeReviewsForSubject(
+  tx: Tx,
+  subject: { userId: string | null; email: string },
+): Promise<{ reviews: number; invitations: number }> {
+  const invited = await tx
+    .select({ orderItemId: reviewInvitations.orderItemId })
+    .from(reviewInvitations)
+    .where(eq(reviewInvitations.email, subject.email));
+  const itemIds = invited.map((row) => row.orderItemId);
+
+  const conditions = [];
+  if (subject.userId) conditions.push(eq(reviews.userId, subject.userId));
+  if (itemIds.length > 0) conditions.push(inArray(reviews.orderItemId, itemIds));
+  let anonymized = 0;
+  if (conditions.length > 0) {
+    const updated = await tx
+      .update(reviews)
+      .set({ reviewerName: '', userId: null })
+      .where(conditions.length === 1 ? conditions[0] : or(...conditions))
+      .returning({ id: reviews.id });
+    anonymized = updated.length;
+  }
+  const deleted = await tx
+    .delete(reviewInvitations)
+    .where(eq(reviewInvitations.email, subject.email))
+    .returning({ id: reviewInvitations.id });
+  return { reviews: anonymized, invitations: deleted.length };
 }

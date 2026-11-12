@@ -47,6 +47,12 @@ export const routing = defineRouting({
     '/contact': { vi: '/lien-he', en: '/contact' },
     '/faq': { vi: '/cau-hoi-thuong-gap', en: '/faq' },
     '/policies/[slug]': { vi: '/chinh-sach/[slug]', en: '/policies/[slug]' },
+    // M3 privacy: data-subject requests without an account (verified by e-mail).
+    '/privacy-request': { vi: '/quyen-rieng-tu/yeu-cau', en: '/privacy-request' },
+    '/privacy-request/confirm': {
+      vi: '/quyen-rieng-tu/yeu-cau/xac-nhan',
+      en: '/privacy-request/confirm',
+    },
   },
 });
 

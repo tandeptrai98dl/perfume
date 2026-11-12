@@ -116,6 +116,17 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { href: '/admin/audit-log', labelKey: 'auditLog', permission: 'auditLog.view' },
     ],
   },
+  // M3 privacy stream: data-subject requests (Owner only).
+  {
+    labelKey: 'privacy',
+    items: [
+      {
+        href: '/admin/privacy-requests',
+        labelKey: 'privacyRequests',
+        permission: 'privacyRequests.handle',
+      },
+    ],
+  },
 ];
 
 /** Sections and items visible to a role; empty sections are dropped. */

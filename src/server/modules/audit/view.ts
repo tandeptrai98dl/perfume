@@ -128,6 +128,8 @@ export function entityHref(entityType: string, entityId: string | null): string 
       return `/admin/staff/${id}`;
     case 'review':
       return '/admin/reviews?status=all';
+    case 'privacy_request':
+      return `/admin/privacy-requests/${id}`;
     default:
       return null;
   }

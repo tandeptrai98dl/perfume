@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
+import { CookieConsent } from '@/components/privacy/cookie-consent';
 import { Toaster } from '@/components/ui/toaster';
 import { routing } from '@/i18n/routing';
 import { OG_LOCALES } from '@/lib/seo/content-metadata';
@@ -42,6 +44,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       <body>
         <NextIntlClientProvider>
           {children}
+          {/* M3 privacy: cookie banner + preferences and the consent-gated tag loader. */}
+          <Suspense fallback={null}>
+            <CookieConsent locale={locale} />
+          </Suspense>
           <Toaster />
         </NextIntlClientProvider>
       </body>

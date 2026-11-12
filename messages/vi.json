@@ -181,6 +181,57 @@
       "guestNote": "Mỗi liên kết chỉ dùng một lần và có hiệu lực trong {days} ngày.",
       "memberNote": "Bạn có thể đánh giá bất cứ lúc nào trong mục Đánh giá của tài khoản.",
       "moderation": "Đánh giá được kiểm duyệt trước khi hiển thị và được gắn nhãn \"Đã mua hàng\"."
+    },
+    "privacy": {
+      "types": {
+        "export": "nhận bản sao dữ liệu",
+        "delete": "xoá dữ liệu",
+        "correct": "chỉnh sửa dữ liệu",
+        "withdrawConsent": "rút lại sự đồng ý tiếp thị"
+      },
+      "dueAt": "Hạn xử lý theo quy định: {date}.",
+      "note": "Ghi chú: {note}",
+      "expiresAt": "Liên kết có hiệu lực đến hết ngày {date}.",
+      "verify": {
+        "subject": "Xác nhận yêu cầu về dữ liệu cá nhân",
+        "preview": "Xác nhận yêu cầu {type}",
+        "heading": "Xác nhận yêu cầu của bạn",
+        "body": "Chúng tôi nhận được yêu cầu {type} cho email này. Bấm nút bên dưới để xác nhận.",
+        "cta": "Xác nhận yêu cầu",
+        "ignore": "Nếu bạn không gửi yêu cầu này, hãy bỏ qua email; sẽ không có gì thay đổi."
+      },
+      "received": {
+        "subject": "Chúng tôi đã nhận yêu cầu của bạn",
+        "preview": "Đã nhận yêu cầu {type}",
+        "heading": "Đã nhận yêu cầu",
+        "body": "Chúng tôi đã tiếp nhận yêu cầu {type} của bạn và sẽ phản hồi trong thời hạn luật định.",
+        "cta": "Xem yêu cầu",
+        "ignore": "Bạn có thể theo dõi yêu cầu trong trang quyền riêng tư nếu có tài khoản."
+      },
+      "exportReady": {
+        "subject": "Dữ liệu cá nhân của bạn đã sẵn sàng",
+        "preview": "Tải bản sao dữ liệu",
+        "heading": "Bản sao dữ liệu đã sẵn sàng",
+        "body": "Bấm nút bên dưới để tải tệp JSON chứa dữ liệu cá nhân chúng tôi lưu về bạn.",
+        "cta": "Tải dữ liệu",
+        "ignore": "Không chuyển tiếp email này: bất kỳ ai có liên kết đều tải được dữ liệu."
+      },
+      "completed": {
+        "subject": "Yêu cầu của bạn đã được xử lý",
+        "preview": "Đã hoàn tất yêu cầu {type}",
+        "heading": "Đã hoàn tất yêu cầu",
+        "body": "Yêu cầu {type} của bạn đã được thực hiện.",
+        "cta": "Xem trang quyền riêng tư",
+        "ignore": "Nếu có câu hỏi, bạn có thể liên hệ với chúng tôi qua trang Liên hệ."
+      },
+      "rejected": {
+        "subject": "Về yêu cầu dữ liệu cá nhân của bạn",
+        "preview": "Kết quả yêu cầu {type}",
+        "heading": "Chưa thể thực hiện yêu cầu",
+        "body": "Chúng tôi chưa thể thực hiện yêu cầu {type} của bạn vì lý do dưới đây.",
+        "cta": "Xem trang quyền riêng tư",
+        "ignore": "Bạn có thể gửi lại yêu cầu hoặc liên hệ với chúng tôi."
+      }
     }
   },
   "ui": {
@@ -231,8 +282,10 @@
       "address": "Địa chỉ: {value}",
       "representative": "Người đại diện: {value}",
       "phone": "Điện thoại: {value}",
-      "email": "Email: {value}"
-    }
+      "email": "Email: {value}",
+      "moitBadge": "Đã thông báo Bộ Công Thương"
+    },
+    "privacyRequest": "Yêu cầu về dữ liệu cá nhân"
   },
   "journal": {
     "title": "Tạp chí",
@@ -935,7 +988,8 @@
       "profile": "Hồ sơ",
       "signOut": "Đăng xuất",
       "wishlist": "Yêu thích",
-      "reviews": "Đánh giá"
+      "reviews": "Đánh giá",
+      "privacy": "Quyền riêng tư"
     },
     "overview": {
       "intro": "Theo dõi đơn hàng, quản lý địa chỉ và chọn cách chúng tôi liên hệ với bạn.",
@@ -1046,6 +1100,9 @@
       "conflict": "Đơn hàng vừa được cập nhật. Vui lòng tải lại trang.",
       "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
       "validation": "Vui lòng sửa các mục được đánh dấu."
+    },
+    "privacy": {
+      "metaTitle": "Quyền riêng tư"
     }
   },
   "customerOrder": {
@@ -1277,13 +1334,214 @@
         "approved": "Đã đăng",
         "rejected": "Không được đăng"
       }
-    }
+    },
+    "anonymousReviewer": "Khách hàng ẩn danh"
   },
   "ogImage": {
     "tagline": "Nước hoa chính hãng · Giao hàng toàn quốc"
   },
   "security": {
     "captchaFailed": "Chưa hoàn tất bước kiểm tra bảo mật. Vui lòng đợi giây lát rồi thử lại."
+  },
+  "cookieConsent": {
+    "title": "Chúng tôi dùng cookie",
+    "text": "Cookie cần thiết giúp giỏ hàng, đăng nhập và ngôn ngữ hoạt động. Với sự đồng ý của bạn, chúng tôi dùng thêm cookie phân tích (Google Analytics) và quảng cáo (Meta Pixel) để hiểu cách website được sử dụng và đo hiệu quả quảng cáo. Bạn có thể thay đổi lựa chọn bất cứ lúc nào ở cuối trang.",
+    "policyLink": "Xem chính sách cookie",
+    "rejectAll": "Từ chối tất cả",
+    "acceptAll": "Chấp nhận tất cả",
+    "customize": "Tuỳ chỉnh",
+    "saved": "Đã lưu lựa chọn cookie của bạn.",
+    "saveFailed": "Chưa lưu được lựa chọn. Vui lòng thử lại.",
+    "settings": "Cài đặt cookie",
+    "alwaysOn": "Luôn bật",
+    "preferences": {
+      "title": "Tuỳ chỉnh cookie",
+      "description": "Chọn loại cookie bạn đồng ý. Cookie không cần thiết chỉ được dùng khi bạn bật.",
+      "save": "Lưu lựa chọn"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Cần thiết",
+        "description": "Giỏ hàng, phiên đăng nhập, ngôn ngữ và lựa chọn cookie của bạn. Website không hoạt động nếu thiếu các cookie này."
+      },
+      "analytics": {
+        "title": "Phân tích",
+        "description": "Google Analytics 4 đo lượt xem trang và cách website được sử dụng để chúng tôi cải thiện trải nghiệm."
+      },
+      "ads": {
+        "title": "Quảng cáo",
+        "description": "Meta Pixel và Google Ads đo hiệu quả quảng cáo và có thể hiển thị quảng cáo phù hợp với bạn trên nền tảng khác."
+      }
+    }
+  },
+  "privacyCenter": {
+    "title": "Quyền riêng tư",
+    "intro": "Quản lý sự đồng ý của bạn và thực hiện các quyền đối với dữ liệu cá nhân theo Luật Bảo vệ dữ liệu cá nhân.",
+    "consents": {
+      "title": "Sự đồng ý của bạn",
+      "intro": "Bạn có thể bật hoặc tắt từng mục đích. Mỗi thay đổi được ghi lại kèm thời điểm.",
+      "save": "Lưu thay đổi",
+      "saved": "Đã cập nhật sự đồng ý.",
+      "withdrawNote": "Rút lại sự đồng ý không ảnh hưởng đến việc xử lý dữ liệu đã thực hiện trước đó. Cookie phân tích và quảng cáo áp dụng cho trình duyệt này.",
+      "marketingEmail": {
+        "title": "Email khuyến mãi",
+        "description": "Nhận tin về sản phẩm mới và ưu đãi qua email."
+      },
+      "marketingSms": {
+        "title": "Tin nhắn khuyến mãi",
+        "description": "Nhận ưu đãi qua SMS hoặc Zalo."
+      },
+      "analytics": {
+        "title": "Cookie phân tích",
+        "description": "Cho phép Google Analytics đo cách bạn sử dụng website."
+      },
+      "ads": {
+        "title": "Cookie quảng cáo",
+        "description": "Cho phép Meta Pixel và Google Ads đo hiệu quả quảng cáo."
+      }
+    },
+    "requests": {
+      "title": "Dữ liệu của bạn",
+      "intro": "Gửi yêu cầu về dữ liệu cá nhân. Chúng tôi phản hồi trong thời hạn luật định và gửi email cho bạn ở mỗi bước.",
+      "empty": "Bạn chưa gửi yêu cầu nào.",
+      "listCaption": "Các yêu cầu về dữ liệu cá nhân",
+      "download": "Tải dữ liệu (JSON)",
+      "pendingNote": "Bạn đang có một yêu cầu loại này đang xử lý.",
+      "alreadyOpen": "Bạn đã có một yêu cầu loại này đang được xử lý.",
+      "sent": {
+        "export": "Đã nhận yêu cầu. Liên kết tải dữ liệu sẽ được gửi qua email trong ít phút.",
+        "correct": "Đã nhận yêu cầu chỉnh sửa. Hạn xử lý: {date}.",
+        "delete": "Đã nhận yêu cầu xoá dữ liệu. Hạn xử lý: {date}."
+      },
+      "columns": {
+        "type": "Loại yêu cầu",
+        "createdAt": "Ngày gửi",
+        "status": "Trạng thái",
+        "dueAt": "Hạn / ngày hoàn tất",
+        "actions": "Thao tác"
+      },
+      "types": {
+        "export": "Nhận bản sao dữ liệu",
+        "delete": "Xoá dữ liệu",
+        "correct": "Chỉnh sửa dữ liệu",
+        "withdrawConsent": "Rút lại sự đồng ý tiếp thị"
+      },
+      "status": {
+        "received": "Đã tiếp nhận",
+        "inProgress": "Đang xử lý",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối"
+      },
+      "export": {
+        "title": "Nhận bản sao dữ liệu",
+        "description": "Tải về toàn bộ dữ liệu cá nhân chúng tôi lưu về bạn (tài khoản, địa chỉ, đơn hàng, sự đồng ý) dưới dạng tệp JSON. Liên kết có hiệu lực 7 ngày.",
+        "action": "Yêu cầu bản sao"
+      },
+      "correct": {
+        "title": "Chỉnh sửa dữ liệu",
+        "description": "Hồ sơ và sổ địa chỉ có thể tự sửa. Với dữ liệu khác (ví dụ thông tin trên đơn hàng), hãy cho chúng tôi biết điều cần sửa.",
+        "label": "Thông tin cần chỉnh sửa",
+        "action": "Gửi yêu cầu"
+      },
+      "delete": {
+        "title": "Xoá dữ liệu cá nhân",
+        "description": "Xoá tài khoản và ẩn danh hoá dữ liệu cá nhân của bạn. Thông tin kế toán của đơn hàng được giữ lại theo quy định.",
+        "action": "Yêu cầu xoá dữ liệu",
+        "confirmTitle": "Xoá dữ liệu cá nhân?",
+        "confirmDescription": "Sau khi xử lý, bạn không thể đăng nhập hay khôi phục tài khoản.",
+        "consequences": {
+          "account": "Tài khoản, sổ địa chỉ, danh sách yêu thích và đăng ký nhận tin bị xoá.",
+          "orders": "Đơn hàng được giữ cho mục đích kế toán và thuế nhưng không còn tên, số điện thoại, email hay địa chỉ của bạn.",
+          "openOrders": "Nếu còn đơn hàng đang xử lý, việc xoá được thực hiện sau khi đơn hoàn tất."
+        },
+        "reason": "Lý do (không bắt buộc)",
+        "understood": "Tôi hiểu việc xoá không thể hoàn tác.",
+        "cancel": "Huỷ",
+        "submit": "Gửi yêu cầu xoá"
+      }
+    },
+    "history": {
+      "title": "Lịch sử đồng ý",
+      "empty": "Chưa có ghi nhận nào.",
+      "caption": "Lịch sử đồng ý và rút lại sự đồng ý",
+      "columns": {
+        "date": "Thời điểm",
+        "purpose": "Mục đích",
+        "decision": "Lựa chọn",
+        "source": "Nơi ghi nhận"
+      },
+      "granted": "Đồng ý",
+      "withdrawn": "Không đồng ý / rút lại",
+      "purposes": {
+        "terms": "Điều khoản sử dụng",
+        "privacy": "Chính sách bảo mật",
+        "marketingEmail": "Email khuyến mãi",
+        "marketingSms": "Tin nhắn khuyến mãi",
+        "analytics": "Cookie phân tích",
+        "ads": "Cookie quảng cáo"
+      },
+      "sources": {
+        "checkout": "Khi đặt hàng",
+        "account_profile": "Hồ sơ tài khoản",
+        "privacy_center": "Trang quyền riêng tư",
+        "cookie_banner": "Thông báo cookie",
+        "cookie_preferences": "Tuỳ chỉnh cookie",
+        "guest_form": "Biểu mẫu yêu cầu",
+        "newsletter": "Đăng ký nhận tin",
+        "privacy_erasure": "Xoá dữ liệu"
+      }
+    },
+    "errors": {
+      "validation": "Vui lòng kiểm tra lại thông tin.",
+      "unauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+      "notFound": "Không tìm thấy.",
+      "invalid": "Giá trị không hợp lệ.",
+      "conflict": "Yêu cầu không thể thực hiện lúc này.",
+      "unexpected": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      "required": "Vui lòng nhập nội dung (ít nhất 5 ký tự).",
+      "tooLong": "Nội dung quá dài (tối đa 1.000 ký tự).",
+      "email": "Email chưa hợp lệ.",
+      "tokenInvalid": "Liên kết xác nhận không hợp lệ hoặc đã hết hạn."
+    }
+  },
+  "privacyRequest": {
+    "metaTitle": "Yêu cầu về dữ liệu cá nhân",
+    "title": "Yêu cầu về dữ liệu cá nhân",
+    "intro": "Bạn có quyền nhận bản sao, chỉnh sửa, xoá dữ liệu cá nhân hoặc rút lại sự đồng ý nhận tin khuyến mãi. Chúng tôi gửi liên kết xác nhận tới email của bạn để bảo đảm chỉ chủ email mới gửi được yêu cầu.",
+    "memberHint": "Đã có tài khoản?",
+    "memberLink": "Quản lý trong trang quyền riêng tư",
+    "form": {
+      "email": "Email",
+      "emailHint": "Email bạn đã dùng khi đặt hàng hoặc đăng ký.",
+      "type": "Bạn muốn",
+      "typeHints": {
+        "export": "Nhận tệp JSON chứa dữ liệu chúng tôi lưu về email này.",
+        "correct": "Cho chúng tôi biết thông tin nào chưa đúng.",
+        "delete": "Ẩn danh hoá dữ liệu cá nhân; thông tin kế toán được giữ lại.",
+        "withdrawConsent": "Ngừng nhận email và tin nhắn khuyến mãi."
+      },
+      "details": "Ghi chú (không bắt buộc)",
+      "detailsRequired": "Thông tin cần chỉnh sửa",
+      "submit": "Gửi yêu cầu",
+      "sent": "Nếu email hợp lệ, bạn sẽ nhận được liên kết xác nhận trong ít phút. Liên kết có hiệu lực 24 giờ.",
+      "another": "Gửi yêu cầu khác"
+    },
+    "confirm": {
+      "metaTitle": "Xác nhận yêu cầu",
+      "title": "Xác nhận yêu cầu",
+      "intro": "Kiểm tra thông tin bên dưới và bấm xác nhận để gửi yêu cầu.",
+      "email": "Email",
+      "type": "Yêu cầu",
+      "details": "Ghi chú",
+      "submit": "Xác nhận yêu cầu",
+      "done": "Đã tiếp nhận yêu cầu. Hạn xử lý: {date}. Chúng tôi sẽ gửi email khi có kết quả.",
+      "doneExport": "Đã tiếp nhận yêu cầu. Liên kết tải dữ liệu sẽ được gửi qua email trong ít phút.",
+      "doneImmediate": "Đã thực hiện: bạn sẽ không nhận tin khuyến mãi nữa.",
+      "invalidTitle": "Liên kết không còn hiệu lực",
+      "invalidText": "Liên kết xác nhận không hợp lệ hoặc đã quá 24 giờ. Vui lòng gửi lại yêu cầu.",
+      "again": "Gửi lại yêu cầu"
+    }
   },
   "admin": {
     "title": "Quản trị",
@@ -1329,7 +1587,9 @@
       "staff": "Nhân sự",
       "auditLog": "Nhật ký thao tác",
       "reviewsSection": "Đánh giá",
-      "reviews": "Kiểm duyệt đánh giá"
+      "reviews": "Kiểm duyệt đánh giá",
+      "privacy": "Dữ liệu cá nhân",
+      "privacyRequests": "Yêu cầu dữ liệu"
     },
     "dashboard": {
       "title": "Tổng quan",
@@ -1837,7 +2097,15 @@
       "roleUnchanged": "Nhân sự đã có vai trò này.",
       "alreadyDeactivated": "Tài khoản đã bị khoá.",
       "alreadyActive": "Tài khoản đang hoạt động.",
-      "alreadyActivated": "Nhân sự đã đặt mật khẩu; không cần gửi lại lời mời."
+      "alreadyActivated": "Nhân sự đã đặt mật khẩu; không cần gửi lại lời mời.",
+      "openOrders": "Khách còn đơn hàng đang xử lý. Chờ đơn kết thúc rồi mới ẩn danh hoá.",
+      "staffAccount": "Không ẩn danh hoá tài khoản nhân viên. Hãy khoá tài khoản trong quản lý nhân viên.",
+      "confirmMismatch": "Email xác nhận không khớp.",
+      "rejectReasonRequired": "Nhập lý do từ chối (được gửi cho khách).",
+      "useAnonymize": "Yêu cầu xoá được hoàn tất bằng thao tác ẩn danh hoá.",
+      "notExport": "Đây không phải yêu cầu xuất dữ liệu.",
+      "notDelete": "Đây không phải yêu cầu xoá dữ liệu.",
+      "invalidTransition": "Trạng thái hiện tại không cho phép thao tác này."
     },
     "brands": {
       "title": "Thương hiệu",
@@ -3431,7 +3699,8 @@
         "user": "Khách hàng",
         "staff": "Nhân sự",
         "audit_log": "Nhật ký",
-        "review": "Đánh giá"
+        "review": "Đánh giá",
+        "privacy_request": "Yêu cầu quyền riêng tư"
       }
     },
     "setPassword": {
@@ -3500,6 +3769,105 @@
       "cancel": "Huỷ",
       "replySaved": "Đã lưu phản hồi.",
       "replyRemoved": "Đã xoá phản hồi."
+    },
+    "privacyRequests": {
+      "title": "Yêu cầu về dữ liệu cá nhân",
+      "description": "{open} yêu cầu đang mở, {overdue} quá hạn. Hạn theo Nghị định 356/2025: cung cấp và chỉnh sửa 10 ngày, rút lại đồng ý 15 ngày, xoá 20 ngày.",
+      "search": "Tìm theo email",
+      "empty": "Không có yêu cầu nào.",
+      "open": "Mở",
+      "openFor": "Mở yêu cầu của {email}",
+      "overdue": "Quá hạn",
+      "completedOn": "Xong {date}",
+      "start": "Bắt đầu xử lý",
+      "rerunExport": "Gửi lại liên kết dữ liệu",
+      "columns": {
+        "createdAt": "Ngày nhận",
+        "type": "Loại",
+        "email": "Email",
+        "status": "Trạng thái",
+        "dueAt": "Hạn xử lý",
+        "actions": "Thao tác"
+      },
+      "types": {
+        "export": "Xuất dữ liệu",
+        "delete": "Xoá dữ liệu",
+        "correct": "Chỉnh sửa",
+        "withdrawConsent": "Rút lại đồng ý"
+      },
+      "status": {
+        "received": "Mới",
+        "inProgress": "Đang xử lý",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối"
+      },
+      "account": {
+        "member": "Có tài khoản",
+        "guest": "Khách vãng lai"
+      },
+      "filter": {
+        "label": "Trạng thái",
+        "open": "Đang mở",
+        "overdue": "Quá hạn",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối",
+        "all": "Tất cả",
+        "type": "Loại",
+        "allTypes": "Mọi loại"
+      },
+      "detail": {
+        "title": "Yêu cầu dữ liệu cá nhân",
+        "summary": "Thông tin yêu cầu",
+        "account": "Tài khoản",
+        "accountDeleted": "Đã ẩn danh hoá",
+        "roles": {
+          "customer": "khách hàng",
+          "staff": "nhân viên"
+        },
+        "completedAt": "Hoàn tất lúc",
+        "openOrders": "Đơn đang xử lý",
+        "openOrdersBlock": "Còn {count} đơn đang xử lý: chỉ ẩn danh hoá khi các đơn đã kết thúc.",
+        "note": "Nội dung / ghi chú",
+        "history": "Lịch sử xử lý",
+        "requester": "Người yêu cầu",
+        "actions": "Thao tác",
+        "closed": "Yêu cầu đã đóng."
+      },
+      "actions": {
+        "created": "Tiếp nhận yêu cầu",
+        "in_progress": "Bắt đầu xử lý",
+        "completed": "Hoàn tất",
+        "rejected": "Từ chối",
+        "export_sent": "Gửi lại liên kết dữ liệu",
+        "anonymized": "Ẩn danh hoá dữ liệu"
+      },
+      "anonymize": {
+        "open": "Ẩn danh hoá dữ liệu",
+        "title": "Ẩn danh hoá dữ liệu của khách?",
+        "description": "Xoá tên, email, số điện thoại, địa chỉ, sổ địa chỉ, giỏ hàng, phiên đăng nhập và đăng ký nhận tin; ẩn thông tin liên hệ trên đơn hàng (giữ số liệu kế toán). Không thể hoàn tác.",
+        "confirm": "Ẩn danh hoá"
+      },
+      "complete": {
+        "open": "Đánh dấu hoàn tất",
+        "title": "Hoàn tất yêu cầu",
+        "description": "Ghi lại việc đã làm. Khách nhận email thông báo hoàn tất.",
+        "note": "Ghi chú (không bắt buộc)",
+        "submit": "Hoàn tất"
+      },
+      "reject": {
+        "open": "Từ chối",
+        "title": "Từ chối yêu cầu",
+        "description": "Lý do được gửi cho khách qua email.",
+        "note": "Lý do từ chối",
+        "submit": "Từ chối yêu cầu"
+      },
+      "done": {
+        "inProgress": "Đã chuyển sang đang xử lý.",
+        "exportSent": "Đã gửi lại liên kết dữ liệu.",
+        "anonymized": "Đã ẩn danh hoá dữ liệu.",
+        "completed": "Đã hoàn tất yêu cầu.",
+        "rejected": "Đã từ chối yêu cầu."
+      }
     }
   }
 }

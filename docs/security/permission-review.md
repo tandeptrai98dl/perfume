@@ -17,11 +17,11 @@ Every admin check also requires a staff session that passed TOTP within the last
 
 | Entry points | Count |
 | --- | --- |
-| Admin Server Actions | 64 |
+| Admin Server Actions | 67 |
 | Admin Server Actions without a permission | 0 |
-| Storefront Server Actions | 20 |
-| Route Handlers | 17 |
-| Admin pages | 57 |
+| Storefront Server Actions | 25 |
+| Route Handlers | 18 |
+| Admin pages | 59 |
 
 ## Admin Server Actions
 
@@ -69,6 +69,9 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `payments.ts` | `confirmBankTransferAction` | `payments.confirmBankTransfer` | owner, manager | yes |
 | `payments.ts` | `createCodRemittanceAction` | `payments.reconcileCod` | owner, manager | yes |
 | `payments.ts` | `requestRefundAction` | `payments.refund` | owner, manager | yes |
+| `privacy.ts` | `anonymizePrivacySubjectAction` | `privacyRequests.handle` | owner | yes |
+| `privacy.ts` | `rerunPrivacyExportAction` | `privacyRequests.handle` | owner | yes |
+| `privacy.ts` | `setPrivacyRequestStatusAction` | `privacyRequests.handle` | owner | yes |
 | `products.ts` | `createProductAction` | `products.editContent` | owner, manager, editor | yes |
 | `products.ts` | `deleteProductAction` | `products.editContent` | owner, manager, editor | yes |
 | `products.ts` | `duplicateProductAction` | `products.editContent` | owner, manager, editor | yes |
@@ -107,6 +110,7 @@ Every admin check also requires a staff session that passed TOTP within the last
 | `/api/internal/revalidate` | POST | — | HMAC signature | Worker → web; HMAC over timestamp + body with INTERNAL_API_SECRET replaces a session. |
 | `/api/media/[...key]` | GET | — | — | Public product/content images (uploads are images only). |
 | `/api/payments/simulator/vnpay` | GET | — | simulator signature (non-production only); gateway signature + amount/txn_ref match + idempotency | Payment simulator: 404 unless the gateway runs in simulator mode (never in production). |
+| `/api/privacy/export/[id]` | GET | — | customer session (own data only) |  |
 | `/api/reviews` | GET | — | — |  |
 | `/api/search/suggestions` | GET | — | — | Public catalogue search suggestions (published data). |
 | `/api/webhooks/payos` | POST | — | gateway signature + amount/txn_ref match + idempotency | Gateway webhook: signature, amount + txn_ref match and idempotency key (no session by design). |
@@ -137,6 +141,11 @@ No staff permission by design; the guard is ownership, a signed token or a rate 
 | `checkout.ts` | `quoteCheckoutAction` | — | yes | Anonymous allowed. Read-only price quote of the caller’s own cart; no PII returned. |
 | `order-lookup.ts` | `lookupOrderAction` | issues a signed order-access token | yes | Guest order lookup: order code + phone, rate-limited, generic failure (no enumeration). |
 | `payment.ts` | `startPaymentAction` | order access (owner session or signed order token) | yes | Owner session or signed order token; unknown and foreign orders answer the same. |
+| `privacy.ts` | `confirmGuestPrivacyAction` | — | yes |  |
+| `privacy.ts` | `requestAccountPrivacyAction` | customer session (own data only) | yes |  |
+| `privacy.ts` | `requestGuestPrivacyAction` | — | yes |  |
+| `privacy.ts` | `saveCookieConsentAction` | session lookup | yes |  |
+| `privacy.ts` | `updateAccountConsentsAction` | customer session (own data only) | yes |  |
 | `review.ts` | `submitGuestReviewAction` | — | yes |  |
 | `review.ts` | `submitMemberReviewAction` | customer session (own data only) | yes |  |
 | `wishlist.ts` | `setWishlistedAction` | customer session (own data only) | yes |  |
@@ -190,6 +199,8 @@ Pages under `(panel)` also pass the panel layout (`requireAdminPage()`, any staf
 | `/admin/payments/events` | `payments.refund` | owner, manager | — |  |
 | `/admin/payments` | `payments.refund` | owner, manager | — |  |
 | `/admin/payments/refunds` | `payments.refund` | owner, manager | — |  |
+| `/admin/privacy-requests/[id]` | `privacyRequests.handle` | owner | — |  |
+| `/admin/privacy-requests` | `privacyRequests.handle` | owner | — |  |
 | `/admin/products/[id]` | `products.editContent` | owner, manager, editor | — |  |
 | `/admin/products/new` | `products.editContent` | owner, manager, editor | — |  |
 | `/admin/products` | `products.editContent` | owner, manager, editor | — |  |

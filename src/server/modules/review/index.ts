@@ -45,6 +45,7 @@ export {
   type ReviewPage,
 } from './queries';
 export {
+  anonymizeReviewsForSubject,
   moderateReview,
   replyToReview,
   reviewTags,

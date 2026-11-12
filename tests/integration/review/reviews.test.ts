@@ -28,6 +28,7 @@ import {
   setWishlisted,
 } from '@/server/modules/customer';
 import {
+  anonymizeReviewsForSubject,
   countReviewsByStatus,
   getInvitationByToken,
   getReviewSummary,
@@ -397,6 +398,34 @@ describe('guest reviews through the link', () => {
     const again = await rejection(submitGuestReview(db, { token, locale: 'vi', values: values() }));
     expect(again.fieldErrors[0]?.code).toBe('alreadyReviewed');
     expect((await getInvitationByToken(db, { token, locale: 'vi' }))?.state).toBe('used');
+  });
+
+  it('anonymises the subject’s member and guest reviews on a privacy deletion', async () => {
+    const email = 'erase-review@example.com';
+    const { token } = await invitedGuestOrder(email);
+    const guest = await submitGuestReview(db, { token, locale: 'vi', values: values() });
+    const userId = await insertCustomer(db, email);
+    const order = await insertOrder(db, { userId, status: 'delivered' });
+    const line = await lineOf(order.id);
+    const member = await submitMemberReview(db, {
+      userId,
+      orderItemId: line.id,
+      locale: 'vi',
+      values: values(),
+    });
+
+    const result = await db.transaction((tx) => anonymizeReviewsForSubject(tx, { userId, email }));
+    expect(result.reviews).toBe(2);
+    expect(result.invitations).toBeGreaterThanOrEqual(1);
+    for (const id of [guest.id, member.id]) {
+      const [row] = await db.select().from(reviews).where(eq(reviews.id, id));
+      expect(row).toMatchObject({ reviewerName: '', userId: null });
+    }
+    const left = await db
+      .select({ id: reviewInvitations.id })
+      .from(reviewInvitations)
+      .where(eq(reviewInvitations.email, email));
+    expect(left).toHaveLength(0);
   });
 
   it('refuses expired, unknown and returned-order links', async () => {

@@ -30,6 +30,7 @@ describe('buildContentSecurityPolicy', () => {
       'https://*.google-analytics.com',
       'https://*.analytics.google.com',
       'https://connect.facebook.net',
+      'https://googleads.g.doubleclick.net',
       'https://challenges.cloudflare.com',
     ]);
     // No eval in production; no nonce (it would disable 'unsafe-inline' and cannot match
