@@ -38,3 +38,6 @@ Thumbs.db
 # local infra data
 docker/data/
 .data/
+
+# Local launcher scripts (personal, never committed)
+claude-start.cmd
