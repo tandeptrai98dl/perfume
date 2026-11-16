@@ -12,7 +12,10 @@ services:
       - '5432:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    configs:
+      # Inline (not a bind mount) so it also works with a remote or WSL Docker engine.
+      - source: postgres-init
+        target: /docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U perfume -d perfume']
       interval: 5s
@@ -27,8 +30,9 @@ services:
       - '8025:8025'
 
   minio:
-    # S3-compatible storage; console on http://localhost:9001 (minioadmin / minioadmin)
-    image: minio/minio:latest
+    # S3-compatible storage; console on http://localhost:9001 (minioadmin / minioadmin).
+    # MinIO no longer publishes images on Docker Hub; Chainguard's image ships minio + mc + sh.
+    image: cgr.dev/chainguard/minio:latest
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -45,7 +49,7 @@ services:
       retries: 10
 
   minio-setup:
-    image: minio/mc:latest
+    image: cgr.dev/chainguard/minio:latest
     depends_on:
       minio:
         condition: service_healthy
@@ -56,6 +60,12 @@ services:
       mc anonymous set none local/perfume-media &&
       mc anonymous set download local/perfume-media/media
       "
+
+configs:
+  postgres-init:
+    # Creates the integration-test database next to the dev database.
+    content: |
+      CREATE DATABASE perfume_test OWNER perfume;
 
 volumes:
   postgres-data:
