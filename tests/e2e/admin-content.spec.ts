@@ -73,9 +73,12 @@ test('editor manages content from the admin screens', async ({ page, request }) 
   await expect(viPanel.getByLabel('Đường dẫn (slug)')).toHaveValue(`trang-thu-${run}`);
   const editor = viPanel.getByRole('textbox', { name: 'Nội dung' });
   await editor.click();
-  await page.keyboard.type('Nội dung kiểm thử ');
+  // Type first, then select the last words and bold them: clicking "In đậm" moves focus to
+  // the toolbar, and keys typed before the editor has it back were dropped (CI flake).
+  await page.keyboard.type('Nội dung kiểm thử quan trọng');
+  await expect(editor).toContainText('Nội dung kiểm thử quan trọng');
+  for (let i = 0; i < 'quan trọng'.length; i += 1) await page.keyboard.press('Shift+ArrowLeft');
   await viPanel.getByRole('button', { name: 'In đậm' }).click();
-  await page.keyboard.type('quan trọng');
   await expect(editor.locator('strong')).toHaveText('quan trọng');
   await viPanel.getByLabel('Xuất bản bản tiếng Việt').check();
   await page.getByRole('button', { name: 'Lưu' }).click();
