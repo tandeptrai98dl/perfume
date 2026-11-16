@@ -80,7 +80,7 @@
     "@playwright/test": "^1.65.0",
     "@tailwindcss/turbopack": "4.3.5",
     "@testcontainers/postgresql": "^12.2.1",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.6",
     "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.6",
